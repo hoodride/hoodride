@@ -2,6 +2,12 @@
 // run the full Hood Ride protocol against the LIVE server over actual TCP.
 // Run with the server up:  node test_load/ws_test.mjs
 import process from "node:process";
+import { createRequire } from "node:module";
+
+// the map's updates come grouped ("batch", since 2026-10): unpacked with the
+// app's own helper, so this reads them exactly as the app does
+const require = createRequire(import.meta.url);
+const HoodMapFrame = require("../priv/static/mapframe.js");
 
 const BASE = "http://127.0.0.1:4000";
 const WS = "ws://127.0.0.1:4000/socket/websocket?vsn=2.0.0";
@@ -39,14 +45,24 @@ class Phx {
         else reject(new Error(`${topic} reply error: ${JSON.stringify(payload.response)}`));
         return;
       }
-      this.waiters = this.waiters.filter((w) => {
-        if (w.topic === topic && w.event === event && (!w.pred || w.pred(payload))) {
-          w.resolve(payload);
-          return false;
-        }
-        return true;
-      });
+      // a "batch" is many updates in one message: each is delivered as if
+      // it came alone (the waiters wait for the update, not the wrapping)
+      if (event === "batch") {
+        const each = new Proxy({}, { get: (_, ev) => (p) => this.deliver(topic, ev, p) });
+        return HoodMapFrame.unbatch(payload.items, each);
+      }
+      this.deliver(topic, event, payload);
     };
+  }
+
+  deliver(topic, event, payload) {
+    this.waiters = this.waiters.filter((w) => {
+      if (w.topic === topic && w.event === event && (!w.pred || w.pred(payload))) {
+        w.resolve(payload);
+        return false;
+      }
+      return true;
+    });
   }
 
   send(topic, event, payload) {
