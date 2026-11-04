@@ -1737,6 +1737,28 @@ batch each watcher's updates (~0.5 s, one frame) — fewer socket writes;
 then encode once per update; skipping the map-channel hop would move the
 privacy role check, so last.
 
+**No 28k connection ceiling — proven (2026-11-04).** Over 127.0.0.1 every
+connection takes a temporary port from Linux's pool (`ip_local_port_range`,
+default 32768–60999: 28,232), so a proxy on the same machine tops out there;
+the tunnel reaches the app over the Unix socket instead. `test_load/
+conn_ceiling.mjs` against the loadtest release in WSL (Ubuntu 24.04, open
+files 1,048,576 for both sides, the release's `+Q 1048576`), 40,000
+connections at ~2,000/s, each asking `GET /api/me` (answered 200 by the
+app) and asking again every 30 s so the app's 60 s idle close can't free
+ports:
+
+| | over 127.0.0.1 | over the Unix socket |
+|---|---|---|
+| held open at once | **28,231**, then a hard stop | **40,000**, all |
+| first failure | #28,232: `EADDRNOTAVAIL` (the pool is empty) | none |
+| Linux's count of the app's open files | 28,263 | 40,032 |
+| time | ~233 s (crawls as the pool runs dry) | ~31 s |
+
+The app's memory peaked ~1.5 GB with 40,000 idle connections. (A first run
+without the 30 s re-ask crawled to ~27,900 open, then rose only as the
+oldest connections timed out — the idle close blurred it.) Past this,
+memory/CPU and the configured 1,048,576 are the limits, not ports.
+
 **Arrivals:** a burst of thousands joining at once is what tips a busy
 server (join work + each newcomer widens the fan-out). The database used to
 fail first — every connect read the user (pool of 5): fixed by the sign-out
