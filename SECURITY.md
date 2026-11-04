@@ -12,7 +12,7 @@ privately instead:
   Security tab.
 
 Please include what you found, how to reproduce it, and what someone could
-do with it. We'll reply within **14 days**, and let you know when it's fixed.
+do with it. We aim to reply within **14 days**, and will let you know when it's fixed.
 
 ## What counts
 

@@ -49,7 +49,8 @@ defmodule Hoodride.OpenSourceTest do
     security = root("SECURITY.md")
     assert security =~ "contact@hoodride.app"
     assert security =~ "**don't** open a public issue"
-    assert security =~ "within **14 days**"
+    # a goal, not a guarantee (owner, 2026-11-04): one person answers
+    assert security =~ "We aim to reply within **14 days**"
     assert security =~ "never\nagainst hoodride.app or its users"
   end
 
