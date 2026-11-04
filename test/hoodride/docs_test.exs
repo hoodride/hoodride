@@ -192,6 +192,22 @@ defmodule Hoodride.DocsTest do
         do: assert(mode == "100755", "#{path} is stored #{mode}: not executable on a Linux clone")
   end
 
+  # a NUL character in a text file makes git treat it as binary (no diffs,
+  # no review); shell quoting once wrote one into a test file instead of
+  # the text "\u0000" (2026-11-04)
+  test "no text file holds a NUL character" do
+    {out, 0} = System.cmd("git", ~w(ls-files --cached --others --exclude-standard))
+    text = ~w(.ex .exs .eex .js .mjs .css .html .md .json .txt .sh .toml .yml .service .conf .svg)
+
+    files =
+      out
+      |> String.split("\n", trim: true)
+      |> Enum.filter(&(Path.extname(&1) in text and File.regular?(&1)))
+
+    assert length(files) > 300
+    for f <- files, do: refute(File.read!(f) =~ <<0>>, "#{f} holds a NUL character")
+  end
+
   test "the server guide says what hoodride.app actually runs on" do
     guide = doc("SELF_HOSTING.md")
     assert guide =~ "Ubuntu 24.04"
