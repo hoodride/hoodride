@@ -5,6 +5,10 @@ import { journey, step, check, BASE } from "./cdp.mjs";
 import { bannerIs, bannerLike, bannerHasCar, showsCar, typeText, send } from "./app.mjs";
 
 const visible = (id) => `(() => { const e = document.getElementById(${JSON.stringify(id)}); return !!e && !e.classList.contains("hidden") && e.offsetParent !== null; })()`;
+// the GitHub mark inside `where`, as the page shows it: the picture drawn
+// (loaded) at its size, linking to the code in a new tab, with a label
+const sourceLink = (where) => `(() => { const a = document.querySelector(${JSON.stringify(where)} + " a.source-link"); const i = a && a.querySelector("img"); if (!a || !i) return null; const r = i.getBoundingClientRect(); return { href: a.href, target: a.target, rel: a.rel, label: a.title, drawn: i.complete && i.naturalWidth > 0, size: Math.round(r.height) }; })()`;
+const SOURCE = (size) => ({ href: "https://github.com/hoodride/hoodride", target: "_blank", rel: "noopener", label: "Source code on GitHub", drawn: true, size });
 
 await journey("visitor: the signed-out screen, signing in, the demo", async (browser) => {
   step("Vic opens Hood Ride signed out: Continue with Google, Facebook only if offered, the Terms and the privacy policy");
@@ -26,6 +30,11 @@ await journey("visitor: the signed-out screen, signing in, the demo", async (bro
   const fine = await vic.eval(`document.querySelector(".fineprint").textContent`);
   check(fine === "By continuing, you agree to our Terms and Privacy Policy.", "the Terms and the privacy policy", fine);
   check(!(await vic.eval(`typeof state !== "undefined" && !!state.realUser`)), "nobody signed in");
+  // the code is public (owner, 2026-11-04): GitHub's mark below the line —
+  // drawn, small (smaller than the car), centered, below the text, not over it
+  check(JSON.stringify(await vic.eval(sourceLink(".source-login"))) === JSON.stringify(SOURCE(20)), "GitHub's mark: the code, in a new tab", await vic.eval(sourceLink(".source-login")));
+  const marks = await vic.eval(`(() => { const m = document.querySelector(".source-login img").getBoundingClientRect(), f = document.querySelector(".fineprint").getBoundingClientRect(), car = document.querySelector("img.brand-car").getBoundingClientRect(); return { below: m.top >= f.bottom, centered: Math.abs((m.left + m.width / 2) - innerWidth / 2) <= 1, onScreen: m.bottom <= innerHeight, smaller: m.height < car.height / 3 }; })()`);
+  check(marks.below && marks.centered && marks.onScreen && marks.smaller, "below the line, centered, on screen, much smaller than the car", marks);
 
   // (fully loaded before moving on: a link's page finishing later would
   // count as the next goto's load)
@@ -226,7 +235,9 @@ await journey("visitor: the signed-out screen, signing in, the demo", async (bro
   await dee.waitFor(`document.getElementById("settings-sheet").classList.contains("open")`, "Settings open");
   const row = await dee.eval(`({ label: document.querySelector("#btn-logout .settings-label").textContent, note: document.getElementById("logout-note").textContent, enabled: !document.getElementById("btn-logout").disabled, del: getComputedStyle(document.getElementById("delete-wrap")).display, legal: document.querySelector(".drawer-legal").innerText.trim() })`);
   check(row.label === "Leave demo" && row.note === "Back to the sign-in page" && row.enabled, "the row: Leave demo, back to the sign-in page", row);
-  check(row.del === "none" && row.legal === "Terms · Privacy Policy", "no Delete account (no account): just Terms · Privacy Policy", row);
+  check(row.del === "none" && row.legal === "Terms · Privacy Policy ·", "no Delete account (no account): just Terms · Privacy Policy · the GitHub mark", row);
+  // the GitHub mark in the menu too: drawn, small (the text's size), the repo in a new tab
+  check(JSON.stringify(await dee.eval(sourceLink(".drawer-legal"))) === JSON.stringify(SOURCE(16)), "the menu's GitHub mark: the code, in a new tab", await dee.eval(sourceLink(".drawer-legal")));
   // any sign-out request would be noted where it outlives the page change
   await dee.eval(`(() => { const f = window.fetch; window.fetch = (u, ...a) => { if (String(u).includes("/api/")) sessionStorage.setItem("demo_api_call", String(u)); return f(u, ...a); }; return true; })()`);
   await dee.click("btn-logout");

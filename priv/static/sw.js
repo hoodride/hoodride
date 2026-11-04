@@ -48,6 +48,7 @@ const ASSETS = [
   "chat.svg",
   "hand-avatar.svg",
   "person.svg",
+  "github-invertocat-white.svg",
   "favicon.ico",
   "icon-180.png",
   "icon-192.png",

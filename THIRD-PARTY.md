@@ -10,6 +10,10 @@ files written by others, each under its own license:
 | `phoenix.min.js` | [Phoenix](https://github.com/phoenixframework/phoenix) 1.8 | MIT | `phoenix.LICENSE.txt` |
 | `hand.svg`, `pin.svg`, `compass.svg`, `chat.svg`, `person.svg`, `hand-avatar.svg` (from `icons.js`) | [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) | MIT | `fluent-emoji.LICENSE.txt` |
 
+`github-invertocat-white.svg` is GitHub's own logo, unchanged, linking to
+this project's code as [GitHub's brand rules](https://brand.github.com/foundations/logo)
+allow. It isn't covered by the MIT license; GitHub owns it.
+
 The server's libraries (Phoenix, Ecto, Bandit and others, listed in
 `mix.lock`) are downloaded when you build. They're MIT or
 Apache-2.0 licensed, and their licenses come with them.

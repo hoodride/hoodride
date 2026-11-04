@@ -115,7 +115,8 @@ a.btn { text-decoration: none; }
   color: var(--muted);
   font-size: 12px;
   position: fixed;
-  bottom: calc(16px + env(safe-area-inset-bottom));
+  /* room below for the GitHub mark (.source-login) */
+  bottom: calc(52px + env(safe-area-inset-bottom));
   left: 0;
   right: 0;
   padding: 0 16px;
@@ -281,6 +282,21 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 .settings-danger .settings-label { color: var(--danger); font-weight: 700; }
 .drawer-row:disabled { cursor: default; background: transparent; }
 .drawer-legal { margin: 8px 10px 0; font-size: 13px; }
+
+/* the GitHub mark: small, linking to the public code. A finger-sized tap
+   area around a small picture (the padding), without moving the text */
+.source-link { display: inline-block; line-height: 0; }
+.source-link img { display: block; }
+.source-login {
+  position: fixed;
+  bottom: calc(6px + env(safe-area-inset-bottom));
+  left: 0;
+  right: 0;
+  text-align: center;
+  line-height: 0;
+}
+.source-login .source-link { padding: 12px; }
+.drawer-legal .source-link { vertical-align: middle; padding: 10px 4px; margin: -10px 0; }
 /* a button that looks like the link beside it (Delete account) */
 .link-button { background: none; border: 0; padding: 4px 0; font: inherit; color: var(--muted); text-decoration: underline; cursor: pointer; }
 .link-button:hover, .link-button:focus-visible { color: var(--text); }

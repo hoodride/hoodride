@@ -56,6 +56,15 @@ defmodule Hoodride.DocsTest do
     assert readme =~ "git clone https://github.com/hoodride/hoodride.git\n   cd hoodride\n"
   end
 
+  # the community (owner, 2026-11-04): the Discord invite (set to never
+  # expire), Discussions and Issues
+  test "the README says where to talk" do
+    readme = doc("README.md")
+    assert readme =~ "**[Discord](https://discord.gg/ehce7eGQFt)**"
+    assert readme =~ "[Discussions](../../discussions)"
+    assert readme =~ "[Issues](../../issues)"
+  end
+
   # a setting the app reads at start must be explained where a person
   # running their own copy looks: the settings file's example, the service,
   # or the guides

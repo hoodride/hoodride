@@ -57,6 +57,13 @@ everything to change.
 
 Would a Docker setup help you? [Open an issue](../../issues) and say so.
 
+## Community
+
+Questions, ideas, or running Hood Ride where you live? Come say hi on
+**[Discord](https://discord.gg/ehce7eGQFt)**, or start a thread in
+[Discussions](../../discussions). Bugs and requests go in
+[Issues](../../issues).
+
 ## How it works
 
 Built with [Elixir](https://elixir-lang.org) and
