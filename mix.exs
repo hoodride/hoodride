@@ -54,6 +54,10 @@ defmodule Hoodride.MixProject do
       # Phoenix team's package; it downloads the esbuild program, checking
       # npm's signature and its SHA-512 (config :esbuild, Mix.Tasks.Hoodride.Minify)
       {:esbuild, "0.10.0", runtime: false},
+      # gettext's own .po/.pot reader and writer (Apache-2.0, the elixir-gettext
+      # project): the translations' standard files, read at build time
+      # (Mix.Tasks.Hoodride.I18n) — not needed while the app runs
+      {:expo, "~> 1.1", runtime: false},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
