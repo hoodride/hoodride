@@ -19,6 +19,21 @@ defmodule Hoodride.DocsTest do
     end
   end
 
+  # a phone picture shown phone-sized (300 px, centered — the usual README
+  # way: an <img> with a width), drawn at twice that so it stays sharp
+  # (owner, 2026-11-03: it filled more than a screen)
+  test "the README's picture: shown 300 px wide, drawn 600 px wide" do
+    readme = doc("README.md")
+
+    assert readme =~
+             ~s(<p align="center"><img src="docs/screenshot.png" width="300" alt="Hood Ride's demo: cars on a map"></p>)
+
+    for [_, src] <- Regex.scan(~r/<img src="([^"]+)"/, readme), do: assert(File.exists?(src), src)
+
+    <<_::binary-size(16), width::32, _height::32, _::binary>> = File.read!("docs/screenshot.png")
+    assert width == 600
+  end
+
   test "every file path the guides name exists" do
     for d <- @docs,
         [_, path] <-

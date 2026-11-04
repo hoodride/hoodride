@@ -4,7 +4,7 @@
 by find each other on a map, message, and ride together. A web app that works
 on any phone, with nothing to install.
 
-![Hood Ride's demo: cars and people on a map](docs/screenshot.png)
+<p align="center"><img src="docs/screenshot.png" width="300" alt="Hood Ride's demo: cars on a map"></p>
 
 Try the demo at **[hoodride.app/?demo](https://hoodride.app/?demo)**. It's a
 pretend neighborhood, with no account needed.

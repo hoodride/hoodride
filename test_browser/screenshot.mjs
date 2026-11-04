@@ -16,7 +16,9 @@ const out = process.argv[2] || "docs/screenshot.png";
 const browser = await launch();
 try {
   const p = await browser.visitor("Screenshot", null);
-  await p.phone(390, 780);
+  // shown 300 px wide in the README; drawn 600 px wide (twice that) to
+  // stay sharp on sharp screens without a needlessly big file
+  await p.phone(390, 780, 600 / 390);
   await p.goto(`${base}/?demo=1`);
   await p.waitFor(`typeof DEMO !== "undefined" && DEMO && !!map && drivers.length > 0`, "the demo's pretend cars", 20000);
   // every map tile drawn, and a moment for the markers to settle
