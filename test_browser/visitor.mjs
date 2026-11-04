@@ -51,11 +51,16 @@ await journey("visitor: the signed-out screen, signing in, the demo", async (bro
   await vic.waitFor(visible("btn-google"), "the button");
   check((await vic.eval(`HoodSession.loginRoute("hoodride.app")`)) === "google", "hoodride.app → Google");
   await vic.eval(`localStorage.setItem("hoodride_dev_name", "BT-Vic"), true`);
+  // every screen this page shows, in order — a reload would wipe the list
+  // (owner, 2026-11-04: the map flashed before the Terms, then a reload)
+  await vic.eval(`(() => { window.__screens = []; const rec = () => { const a = [...document.querySelectorAll(".screen.active")].map((e) => e.id).join(","); if (window.__screens[window.__screens.length - 1] !== a) window.__screens.push(a); }; rec(); new MutationObserver(rec).observe(document.body, { subtree: true, attributes: true, attributeFilter: ["class"] }); return true; })()`);
   await vic.click("btn-google");
   // a new account: "Before you start" first (the terms journey covers it)
   await vic.waitFor(`document.getElementById("screen-terms").classList.contains("active")`, "the Terms screen", 15000);
   await vic.click("btn-agree");
   await vic.waitFor(`!!state.realUser && state.realUser.name === "BT-Vic" && liveNow()`, "signed in as BT-Vic, connected", 15000);
+  const screens = await vic.eval(`window.__screens || "the page reloaded"`);
+  check(JSON.stringify(screens) === JSON.stringify(["screen-login", "screen-terms", "screen-map"]), "sign-in → Terms → map: never the map before agreeing, no reload", screens);
   check(JSON.stringify(await zoom(vic)) === JSON.stringify(["pan-x pan-y", "pan-x pan-y"]), "the map screen: the page itself can't zoom", await zoom(vic));
 
   step("the link preview: the page's Open Graph tags, and its picture loads at 1200×630");

@@ -324,9 +324,7 @@ async function handleLogin(provider, button) {
   try {
     const result = await auth.signIn(provider);
     if (result.real) {
-      state.realUser = result.state.user;
-      await enterApp();
-      hydrate(result.state);
+      await startSignedIn(result.state);
     } else {
       label.textContent = "Couldn't sign in — try again";
       await new Promise((r) => setTimeout(r, 2000));
@@ -901,6 +899,18 @@ function agreeToTerms() {
 }
 
 // ===== App entry =====
+// signed in — the ONE way in, for a page load and for the test login's
+// button alike: the Terms of Use first, once per account (and again for a
+// new version), never the map before — the server gives no connection token
+// until then. (The button used to open the map straight away; the refused
+// token then reloaded the page into the Terms — owner, 2026-11-04)
+async function startSignedIn(data) {
+  state.realUser = data.user;
+  if (data.terms_agreed === false) await agreeToTerms();
+  await enterApp();
+  hydrate(data);
+}
+
 async function enterApp() {
   if (!state.realUser) DEMO = true;
   show("screen-map");
@@ -3843,12 +3853,7 @@ const booting = HoodBoot.create({
     return { status: res.status, body, retryAfter: res.headers.get("Retry-After") };
   },
   onSignedIn: async (data) => {
-    state.realUser = data.user;
-    // the Terms of Use, once per account (and again for a new version):
-    // no map before — the server gives no connection token until then
-    if (data.terms_agreed === false) await agreeToTerms();
-    await enterApp();
-    hydrate(data);
+    await startSignedIn(data);
     // a page load mid-shift or mid-ride: GPS starts at once (locator.js)
     if (!DEMO) loc.resumeAtLoad();
     // back from a refresh the server couldn't do (or refused): say so once
