@@ -58,8 +58,13 @@ defmodule HoodrideWeb.SourceLinkTest do
                ~s(<a class="source-link" href="#{@discord}" target="_blank" rel="noopener" title="Hood Ride on Discord" aria-label="Hood Ride on Discord">) <>
                ~s(<img src="discord-symbol-white.svg" alt="" width="21" height="16" /></a></p>)
 
-    # Discord: the menu only, not the sign-in page; the same invite as the README
-    refute login =~ "discord"
+    # Discord on the sign-in page too, right after GitHub (owner,
+    # 2026-11-04), sized to it; the same invite as the README
+    assert login =~
+             ~s(<img src="github-invertocat-white.svg" alt="" width="20" height="20" /></a>) <>
+               ~s(<a class="source-link" href="#{@discord}" target="_blank" rel="noopener" title="Hood Ride on Discord" aria-label="Hood Ride on Discord">) <>
+               ~s(<img src="discord-symbol-white.svg" alt="" width="26" height="20" /></a></p>)
+
     assert File.read!("README.md") =~ "(#{@discord})"
 
     {logout, _} = :binary.match(html, ~s(id="btn-logout"))

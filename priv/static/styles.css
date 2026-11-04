@@ -292,10 +292,13 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   bottom: calc(6px + env(safe-area-inset-bottom));
   left: 0;
   right: 0;
-  text-align: center;
+  /* GitHub and Discord, centred as a pair, 24 px apart */
+  display: flex;
+  justify-content: center;
+  gap: 24px;
   line-height: 0;
 }
-.source-login .source-link { padding: 12px; }
+.source-login .source-link { padding: 12px; margin: 0 -12px; }
 /* the menu: its own line between Sign out and the legal links, lined up
    with their text; the margins keep both at least 24 px away, and the gap
    keeps GitHub and Discord 24 px apart */

@@ -33,8 +33,12 @@ await journey("visitor: the signed-out screen, signing in, the demo", async (bro
   // the code is public (owner, 2026-11-04): GitHub's mark below the line —
   // drawn, small (smaller than the car), centered, below the text, not over it
   check(JSON.stringify(await vic.eval(sourceLink(".source-login"))) === JSON.stringify(SOURCE(20)), "GitHub's mark: the code, in a new tab", await vic.eval(sourceLink(".source-login")));
-  const marks = await vic.eval(`(() => { const m = document.querySelector(".source-login img").getBoundingClientRect(), f = document.querySelector(".fineprint").getBoundingClientRect(), car = document.querySelector("img.brand-car").getBoundingClientRect(); return { below: m.top >= f.bottom, centered: Math.abs((m.left + m.width / 2) - innerWidth / 2) <= 1, onScreen: m.bottom <= innerHeight, smaller: m.height < car.height / 3 }; })()`);
-  check(marks.below && marks.centered && marks.onScreen && marks.smaller, "below the line, centered, on screen, much smaller than the car", marks);
+  // and Discord's beside it (owner, 2026-11-04): the pair centred as one,
+  // 24 px apart, both below the text, much smaller than the car
+  const marks = await vic.eval(`(() => { const [g, d] = [...document.querySelectorAll(".source-login img")].map((i) => i.getBoundingClientRect()), f = document.querySelector(".fineprint").getBoundingClientRect(), car = document.querySelector("img.brand-car").getBoundingClientRect(); return { below: Math.min(g.top, d.top) >= f.bottom, centered: Math.abs((g.left + d.right) / 2 - innerWidth / 2) <= 1, apart: Math.round(d.left - g.right), onScreen: Math.max(g.bottom, d.bottom) <= innerHeight, smaller: Math.max(g.height, d.height) < car.height / 3 }; })()`);
+  check(marks.below && marks.centered && marks.apart >= 24 && marks.onScreen && marks.smaller, "GitHub and Discord: below the line, centered as a pair, 24 px apart, on screen, much smaller than the car", marks);
+  const signInDiscord = await vic.eval(`(async () => { const a = document.querySelectorAll(".source-login a.source-link")[1]; const i = a && a.querySelector("img"); if (!i) return null; await i.decode(); const c = document.createElement("canvas"); c.width = 78; c.height = 60; const x = c.getContext("2d"); x.drawImage(i, 0, 0, 78, 60); const d = x.getImageData(0, 0, 78, 60).data; let white = 0; for (let k = 0; k < d.length; k += 4) if (d[k+3] > 200) white = Math.max(white, Math.min(d[k], d[k+1], d[k+2])); return { href: a.href, target: a.target, label: a.title, size: Math.round(i.getBoundingClientRect().height), white }; })()`);
+  check(JSON.stringify(signInDiscord) === JSON.stringify({ href: "https://discord.gg/ehce7eGQFt", target: "_blank", label: "Hood Ride on Discord", size: 20, white: 255 }), "the sign-in page's Discord symbol: the invite, a new tab, drawn white", signInDiscord);
 
   // (fully loaded before moving on: a link's page finishing later would
   // count as the next goto's load)
@@ -135,7 +139,19 @@ await journey("visitor: the signed-out screen, signing in, the demo", async (bro
     const shown = f.map((x) => { const [lng, lat] = x.geometry.coordinates; const c = h3.latLngToCell(lat, lng, res); return { shown: Number(x.properties.label), cars: inCell(c) }; });
     return shown.every((s) => s.shown === s.cars && s.cars > 0) ? shown : null;
   })()`;
-  const counted = await dee.waitFor(hexCheck, "each hexagon counts the pretend cars inside it", 5000);
+  // on a miss, say WHY (it failed once under a fully loaded CPU, 2026-11-04,
+  // with only "null"): the level, how many numbers were drawn, and each
+  // number against the cars really inside its hexagon
+  const hexWhy = `(() => {
+    const f = hexLabels();
+    const res = demoPlan && demoPlan.res;
+    const inCell = (c) => drivers.filter((d) => h3.latLngToCell(d.pos.lat, d.pos.lng, res) === c).length;
+    return { res, zoom: map.getZoom(), moving: map.isMoving(), tilesLoaded: map.areTilesLoaded(), drawn: f.length, cars: drivers.length,
+      labels: f.map((x) => { const [lng, lat] = x.geometry.coordinates; return { shown: Number(x.properties.label), cars: res ? inCell(h3.latLngToCell(lat, lng, res)) : null }; }) };
+  })()`;
+  const counted = await dee.waitFor(hexCheck, "each hexagon counts the pretend cars inside it", 5000).catch(async (e) => {
+    throw new Error(`${e.message.split("\n")[0]}\n  hexagons: ${JSON.stringify(await dee.eval(hexWhy).catch((x) => String(x.message)))}`);
+  });
   check(counted.reduce((s, x) => s + x.shown, 0) > 0, "the hexagons count the pretend cars", counted);
   check(await dee.eval(`drivers.every((d) => !d.visible) && document.querySelectorAll(".maplibregl-marker .marker-car").length === 0`), "no car markers among the hexagons");
 
