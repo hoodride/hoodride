@@ -37,7 +37,7 @@ defmodule HoodrideWeb.DeleteAccountTest do
   defp signed_in(conn, u),
     do: init_test_session(conn, %{user_id: u.id, signed_in_at: System.system_time(:millisecond)})
 
-  defp delete_account(conn, body \\ %{"confirm" => true}),
+  defp delete_account(conn, body \\ %{"confirm" => "DELETE"}),
     do: post(conn, "/api/account/delete", body)
 
   describe "deleting" do
@@ -157,6 +157,35 @@ defmodule HoodrideWeb.DeleteAccountTest do
              }
 
       assert Accounts.get_user(u.id)
+    end
+
+    # typed, not just tapped (owner, 2026-11-04): the word the person typed,
+    # any case; a bare `true` (what an old copy of the app sent without the
+    # box) or anything else is refused, and the account stays
+    test "the typed word, any case, spaces ignored", %{conn: conn} do
+      for {word, n} <- Enum.with_index(["DELETE", "delete", " Delete "]) do
+        u = user("del-word-#{n}")
+
+        assert json_response(delete_account(signed_in(conn, u), %{"confirm" => word}), 200) == %{
+                 "ok" => true
+               }
+
+        refute Accounts.get_user(u.id)
+      end
+    end
+
+    test "not the word: refused, nothing deleted", %{conn: conn} do
+      for {bad, n} <-
+            Enum.with_index([true, "true", "delet", "DELETE IT", "", nil, 1, %{"a" => 1}]) do
+        u = user("del-bad-#{n}")
+
+        assert json_response(delete_account(signed_in(conn, u), %{"confirm" => bad}), 400) == %{
+                 "error" => "confirm"
+               },
+               inspect(bad)
+
+        assert Accounts.get_user(u.id)
+      end
     end
 
     test "signed out", %{conn: conn} do

@@ -165,7 +165,7 @@ defmodule HoodrideWeb.AvatarServingTest do
     u = user("av-del", "/avatars/#{name}")
 
     assert json_response(
-             post(signed_in(conn, u), "/api/account/delete", %{"confirm" => true}),
+             post(signed_in(conn, u), "/api/account/delete", %{"confirm" => "DELETE"}),
              200
            )
 
@@ -176,7 +176,7 @@ defmodule HoodrideWeb.AvatarServingTest do
     name = stored(dir, @png)
     u = user("av-del2", "/avatars/#{name}")
     Repo.query!("ALTER TABLE sign_outs RENAME TO sign_outs_away")
-    assert post(signed_in(conn, u), "/api/account/delete", %{"confirm" => true}).status == 503
+    assert post(signed_in(conn, u), "/api/account/delete", %{"confirm" => "DELETE"}).status == 503
     assert File.exists?(Path.join(dir, name))
   end
 

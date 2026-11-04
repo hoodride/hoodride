@@ -21,7 +21,7 @@ defmodule HoodrideWeb do
   # with the build — HoodrideWeb.Build)
   def static_paths,
     do:
-      ~w(assets fonts images favicon.ico robots.txt app.js styles.css manifest.json car.png car-avatar.png icon-180.png icon-192.png icon-512.png phoenix.min.js h3-js.umd.js viewport.js sync.js sendfilter.js locator.js browse.js rehydrate.js update.js session.js ridepos.js reveal_queue.js mapframe.js msgcopy.js boot.js avatarretry.js distance.js modestore.js viewstore.js readstore.js car.js icons.js avatar.js hand.svg pin.svg compass.svg chat.svg hand-avatar.svg person.svg fluent-emoji.LICENSE.txt chatlist.js chatscroll.js navlink.js googlerefresh.js maplibre-gl.js maplibre-gl.css maplibre-gl.LICENSE.txt github-invertocat-white.svg h3-js.LICENSE.txt phoenix.LICENSE.txt privacy.css og.png)
+      ~w(assets fonts images favicon.ico robots.txt app.js styles.css manifest.json car.png car-avatar.png icon-180.png icon-192.png icon-512.png phoenix.min.js h3-js.umd.js viewport.js sync.js sendfilter.js locator.js browse.js rehydrate.js update.js session.js ridepos.js reveal_queue.js mapframe.js msgcopy.js boot.js avatarretry.js distance.js modestore.js viewstore.js readstore.js car.js icons.js avatar.js hand.svg pin.svg compass.svg chat.svg hand-avatar.svg person.svg fluent-emoji.LICENSE.txt chatlist.js chatscroll.js navlink.js googlerefresh.js maplibre-gl.js maplibre-gl.css maplibre-gl.LICENSE.txt github-invertocat-white.svg discord-symbol-white.svg h3-js.LICENSE.txt phoenix.LICENSE.txt privacy.css og.png)
 
   def router do
     quote do

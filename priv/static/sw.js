@@ -49,6 +49,7 @@ const ASSETS = [
   "hand-avatar.svg",
   "person.svg",
   "github-invertocat-white.svg",
+  "discord-symbol-white.svg",
   "favicon.ico",
   "icon-180.png",
   "icon-192.png",

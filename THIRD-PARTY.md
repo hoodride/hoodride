@@ -13,6 +13,9 @@ files written by others, each under its own license:
 `github-invertocat-white.svg` is GitHub's own logo, unchanged, linking to
 this project's code as [GitHub's brand rules](https://brand.github.com/foundations/logo)
 allow. It isn't covered by the MIT license; GitHub owns it.
+`discord-symbol-white.svg` is Discord's own symbol, unchanged, linking to the
+Hood Ride Discord server as [Discord's brand rules](https://discord.com/branding)
+allow. It isn't covered by the MIT license either; Discord owns it.
 
 The server's libraries (Phoenix, Ecto, Bandit and others, listed in
 `mix.lock`) are downloaded when you build. They're MIT or

@@ -555,15 +555,17 @@ defmodule HoodrideWeb.AuthController do
     end
   end
 
-  # POST /api/account/delete — {confirm: true}: deletes the account and all
-  # it left behind (Hoodride.AccountDeletion), then ends this session. 409
+  # POST /api/account/delete — {confirm: "DELETE"}: the word the person
+  # typed (any case; owner, 2026-11-04), not just `true` — an old or broken
+  # copy of the app can't skip typing it. Deletes the account and all it
+  # left behind (Hoodride.AccountDeletion), then ends this session. 409
   # during a ride or while your own request waits (end/cancel it first).
   def delete_account(conn, params) do
     cond do
       conn.assigns.current_user == nil ->
         conn |> put_status(401) |> json(%{error: "unauthenticated"})
 
-      params["confirm"] not in [true, "true"] ->
+      not typed_delete?(params["confirm"]) ->
         conn |> put_status(400) |> json(%{error: "confirm"})
 
       true ->
@@ -580,6 +582,11 @@ defmodule HoodrideWeb.AuthController do
         end
     end
   end
+
+  defp typed_delete?(word) when is_binary(word),
+    do: word |> String.trim() |> String.downcase() == "delete"
+
+  defp typed_delete?(_), do: false
 
   defp client_id("google"), do: key(:google_client_id, "GOOGLE_CLIENT_ID")
   defp client_id("facebook"), do: key(:facebook_app_id, "FACEBOOK_APP_ID")

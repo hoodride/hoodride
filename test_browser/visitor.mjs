@@ -235,9 +235,15 @@ await journey("visitor: the signed-out screen, signing in, the demo", async (bro
   await dee.waitFor(`document.getElementById("settings-sheet").classList.contains("open")`, "Settings open");
   const row = await dee.eval(`({ label: document.querySelector("#btn-logout .settings-label").textContent, note: document.getElementById("logout-note").textContent, enabled: !document.getElementById("btn-logout").disabled, del: getComputedStyle(document.getElementById("delete-wrap")).display, legal: document.querySelector(".drawer-legal").innerText.trim() })`);
   check(row.label === "Leave demo" && row.note === "Back to the sign-in page" && row.enabled, "the row: Leave demo, back to the sign-in page", row);
-  check(row.del === "none" && row.legal === "Terms · Privacy Policy ·", "no Delete account (no account): just Terms · Privacy Policy · the GitHub mark", row);
-  // the GitHub mark in the menu too: drawn, small (the text's size), the repo in a new tab
-  check(JSON.stringify(await dee.eval(sourceLink(".drawer-legal"))) === JSON.stringify(SOURCE(16)), "the menu's GitHub mark: the code, in a new tab", await dee.eval(sourceLink(".drawer-legal")));
+  check(row.del === "none" && row.legal === "Terms · Privacy Policy", "no Delete account (no account): just Terms · Privacy Policy", row);
+  // the GitHub mark in the menu too, on its own line: drawn, small (the
+  // text's size), the repo in a new tab
+  check(JSON.stringify(await dee.eval(sourceLink(".drawer-source"))) === JSON.stringify(SOURCE(16)), "the menu's GitHub mark: the code, in a new tab", await dee.eval(sourceLink(".drawer-source")));
+  // and Discord's, beside it (the menu only): the invite, a new tab, drawn
+  // WHITE — its file colours itself with a <style> the page's rules must
+  // not block (it would draw black, unseen on the dark menu)
+  const discord = await dee.eval(`(async () => { const a = document.querySelectorAll(".drawer-source a.source-link")[1]; const i = a && a.querySelector("img"); if (!i) return null; await i.decode(); const c = document.createElement("canvas"); c.width = 63; c.height = 48; const x = c.getContext("2d"); x.drawImage(i, 0, 0, 63, 48); const d = x.getImageData(0, 0, 63, 48).data; let white = 0; for (let k = 0; k < d.length; k += 4) if (d[k+3] > 200) white = Math.max(white, Math.min(d[k], d[k+1], d[k+2])); return { href: a.href, target: a.target, rel: a.rel, label: a.title, size: Math.round(i.getBoundingClientRect().height), white }; })()`);
+  check(JSON.stringify(discord) === JSON.stringify({ href: "https://discord.gg/ehce7eGQFt", target: "_blank", rel: "noopener", label: "Hood Ride on Discord", size: 16, white: 255 }), "the menu's Discord symbol: the invite, a new tab, drawn white", discord);
   // any sign-out request would be noted where it outlives the page change
   await dee.eval(`(() => { const f = window.fetch; window.fetch = (u, ...a) => { if (String(u).includes("/api/")) sessionStorage.setItem("demo_api_call", String(u)); return f(u, ...a); }; return true; })()`);
   await dee.click("btn-logout");

@@ -174,16 +174,27 @@
           <span class="settings-label">Sign out</span>
           <span id="logout-note" class="muted settings-note">On all your devices</span>
         </button>
+        <!-- the code (GitHub) and the community (Discord, Discord's own white
+             symbol): their own line between Sign out and the legal links, with
+             room on all sides — so Delete account stays last and alone
+             (owner, 2026-11-04) -->
+        <p class="drawer-source"><a class="source-link" href="https://github.com/hoodride/hoodride" target="_blank" rel="noopener" title="Source code on GitHub" aria-label="Source code on GitHub"><img src="github-invertocat-white.svg" alt="" width="16" height="16" /></a><a class="source-link" href="https://discord.gg/ehce7eGQFt" target="_blank" rel="noopener" title="Hood Ride on Discord" aria-label="Hood Ride on Discord"><img src="discord-symbol-white.svg" alt="" width="21" height="16" /></a></p>
         <!-- delete account: a small link, not a big row — rare and permanent
              (its confirm step follows); blocked in a ride like sign out -->
-        <p class="drawer-legal muted"><a href="/terms">Terms</a> · <a href="/privacy">Privacy Policy</a> · <a class="source-link" href="https://github.com/hoodride/hoodride" target="_blank" rel="noopener" title="Source code on GitHub" aria-label="Source code on GitHub"><img src="github-invertocat-white.svg" alt="" width="16" height="16" /></a><span id="delete-wrap"> · <button id="btn-delete" class="link-button">Delete account</button></span></p>
+        <p class="drawer-legal muted"><a href="/terms">Terms</a> · <a href="/privacy">Privacy Policy</a><span id="delete-wrap"> · <button id="btn-delete" class="link-button">Delete account</button></span></p>
       </div>
       <!-- delete: a second, explicit step (it can't be undone) -->
       <div id="delete-confirm" class="drawer-confirm" role="alertdialog" aria-labelledby="delete-title" aria-describedby="delete-desc">
         <h2 id="delete-title">Delete your account?</h2>
         <p id="delete-desc">This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account.</p>
+        <!-- typed, not just tapped (owner, 2026-11-04): the red button wakes
+             only once the box says DELETE (any case); the server checks the
+             word too -->
+        <label class="car-field">Type DELETE to confirm
+          <input id="delete-typed" type="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="done" maxlength="20" />
+        </label>
         <p id="delete-error" class="delete-error hidden" role="alert"></p>
-        <button id="delete-yes" class="btn btn-danger">Delete my account</button>
+        <button id="delete-yes" class="btn btn-danger" disabled>Delete my account</button>
         <button id="delete-cancel" class="btn btn-small">Cancel</button>
       </div>
     </aside>

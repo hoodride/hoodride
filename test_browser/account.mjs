@@ -51,6 +51,25 @@ await journey("account: another device, a new version, deleting the account", as
   await phone.click("btn-delete");
   // (shown, not just there: it lives in the drawer, hidden until asked)
   await phone.waitFor(`document.getElementById("settings-sheet").classList.contains("confirming") && document.getElementById("delete-yes").offsetParent !== null`, "the confirm step, shown");
+  // typed, not just tapped (owner, 2026-11-04): locked until the box says
+  // DELETE, any case
+  const typeDelete = (text) => phone.eval(`(() => { const i = document.getElementById("delete-typed"); i.value = ${JSON.stringify(text)}; i.dispatchEvent(new Event("input")); return document.getElementById("delete-yes").disabled; })()`);
+  const box = () => phone.eval(`({ typed: document.getElementById("delete-typed").value, locked: document.getElementById("delete-yes").disabled, shown: document.getElementById("delete-typed").offsetParent !== null })`);
+  check(JSON.stringify(await box()) === JSON.stringify({ typed: "", locked: true, shown: true }), "an empty box; the red button locked", await box());
+  await phone.eval(`document.getElementById("delete-yes").click(), true`);
+  check(await phone.eval(`!!state.realUser && document.getElementById("settings-sheet").classList.contains("confirming")`), "tapping it locked: nothing happens");
+  check((await typeDelete("delet")) === true, "a wrong word: still locked");
+  // Enter with the wrong word: nothing either
+  await phone.eval(`document.getElementById("delete-typed").dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true })), true`);
+  check(await phone.eval(`!!state.realUser`), "Enter with a wrong word: nothing happens");
+  check((await typeDelete("DELETE")) === false, "DELETE: unlocked");
+  // Cancel forgets it: the next time starts empty and locked
+  await phone.click("delete-cancel");
+  await phone.click("btn-delete");
+  await phone.waitFor(`document.getElementById("settings-sheet").classList.contains("confirming")`, "the confirm step again");
+  check(JSON.stringify(await box()) === JSON.stringify({ typed: "", locked: true, shown: true }), "after Cancel: empty and locked again", await box());
+  // a phone's own capital, a stray space: still the word
+  check((await typeDelete(" Delete ")) === false, "' Delete ' (any case, spaces): unlocked");
   await phone.click("delete-yes");
   await phone.waitFor(`typeof state !== "undefined" && !state.realUser && !document.getElementById("auth-buttons").classList.contains("hidden")`, "signed out", 15000);
   const me = await phone.eval(`fetch("/api/me").then((r) => r.json())`);

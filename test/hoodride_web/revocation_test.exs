@@ -54,7 +54,7 @@ defmodule HoodrideWeb.RevocationTest do
     Process.sleep(2)
 
     assert json_response(
-             post(signed_in(conn, u), "/api/account/delete", %{"confirm" => true}),
+             post(signed_in(conn, u), "/api/account/delete", %{"confirm" => "DELETE"}),
              200
            )
 
@@ -70,7 +70,7 @@ defmodule HoodrideWeb.RevocationTest do
 
     # a real database failure: the revocation can't be saved
     Repo.query!("ALTER TABLE sign_outs RENAME TO sign_outs_away")
-    conn1 = post(signed_in(conn, u), "/api/account/delete", %{"confirm" => true})
+    conn1 = post(signed_in(conn, u), "/api/account/delete", %{"confirm" => "DELETE"})
     assert json_response(conn1, 503) == %{"error" => "failed"}
 
     # nothing happened: the account, its sign-in, its car on the map
@@ -81,7 +81,7 @@ defmodule HoodrideWeb.RevocationTest do
     Repo.query!("ALTER TABLE sign_outs_away RENAME TO sign_outs")
 
     assert json_response(
-             post(signed_in(build_conn(), u), "/api/account/delete", %{"confirm" => true}),
+             post(signed_in(build_conn(), u), "/api/account/delete", %{"confirm" => "DELETE"}),
              200
            )
 

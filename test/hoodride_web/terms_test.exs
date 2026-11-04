@@ -243,7 +243,10 @@ defmodule HoodrideWeb.TermsTest do
 
       u = user("tm-del")
 
-      assert json_response(post(signed_in(u), "/api/account/delete", %{"confirm" => true}), 200) ==
+      assert json_response(
+               post(signed_in(u), "/api/account/delete", %{"confirm" => "DELETE"}),
+               200
+             ) ==
                %{"ok" => true}
 
       assert Accounts.get_user(u.id) == nil

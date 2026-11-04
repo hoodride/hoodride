@@ -14,6 +14,19 @@ await journey("settings: the drawer, your car, Go online without one", async (br
   await dan.waitFor(`document.getElementById("car-note").textContent === "Add it before you drive"`, "no car yet");
   check(await dan.eval(`document.getElementById("settings-change").classList.contains("hidden")`), "no Change box for a dev account");
   check((await dan.eval(`document.getElementById("logout-note").textContent`)) === "On all your devices", "sign out: on all devices");
+  // the GitHub mark between Sign out and the legal links, at least 24 px
+  // from each (WCAG 2.2's spacing for small targets) — Delete account stays
+  // last and alone (owner, 2026-11-04), on a small phone and a usual one
+  for (const width of [360, 390]) {
+    await dan.phone(width, 740);
+    const gaps = await dan.eval(`(() => {
+      const box = (e) => e.getBoundingClientRect();
+      const gap = (a, b) => Math.round(Math.max(b.top - a.bottom, a.top - b.bottom, b.left - a.right, a.left - b.right));
+      const [cat, dc] = [...document.querySelectorAll(".drawer-source img")].map(box), out = box(document.getElementById("btn-logout")), del = box(document.getElementById("btn-delete"));
+      return { signOut: Math.min(gap(out, cat), gap(out, dc)), delete: Math.min(gap(cat, del), gap(dc, del)), apart: gap(cat, dc), deleteLast: del.top > Math.max(cat.bottom, dc.bottom), oneLine: Math.round(box(document.querySelector(".drawer-legal")).height) < 30 };
+    })()`);
+    check(gaps.signOut >= 24 && gaps.delete >= 24 && gaps.apart >= 24 && gaps.deleteLast && gaps.oneLine, `${width} px: GitHub and Discord ≥ 24 px from Sign out, Delete and each other; Delete last, on one line`, gaps);
+  }
   await dan.eval(`closeSettings(), true`);
 
   step("Go online with no car: the car form opens first");

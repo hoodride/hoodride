@@ -296,7 +296,11 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   line-height: 0;
 }
 .source-login .source-link { padding: 12px; }
-.drawer-legal .source-link { vertical-align: middle; padding: 10px 4px; margin: -10px 0; }
+/* the menu: its own line between Sign out and the legal links, lined up
+   with their text; the margins keep both at least 24 px away, and the gap
+   keeps GitHub and Discord 24 px apart */
+.drawer-source { display: flex; align-items: center; gap: 24px; margin: 14px 10px 6px; line-height: 0; }
+.drawer-source .source-link { padding: 10px; margin: 0 -10px; }
 /* a button that looks like the link beside it (Delete account) */
 .link-button { background: none; border: 0; padding: 4px 0; font: inherit; color: var(--muted); text-decoration: underline; cursor: pointer; }
 .link-button:hover, .link-button:focus-visible { color: var(--text); }
@@ -309,6 +313,8 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 .drawer.confirming > :not(.drawer-confirm):not(.drawer-close) { display: none; }
 .drawer.confirming .drawer-confirm { display: flex; }
 .delete-error { color: var(--danger); }
+/* locked until DELETE is typed: plainly not ready */
+#delete-yes:disabled { opacity: 0.4; cursor: default; }
 
 /* "Your car": a centred sheet over everything (Settings, or Go online) */
 .car-backdrop { position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,0.55); }

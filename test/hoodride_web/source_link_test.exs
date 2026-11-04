@@ -9,6 +9,7 @@ defmodule HoodrideWeb.SourceLinkTest do
 
   @static "priv/static"
   @repo "https://github.com/hoodride/hoodride"
+  @discord "https://discord.gg/ehce7eGQFt"
 
   test "GitHub's white Invertocat, exactly as GitHub ships it" do
     svg = File.read!(Path.join(@static, "github-invertocat-white.svg"))
@@ -16,6 +17,16 @@ defmodule HoodrideWeb.SourceLinkTest do
     # GitHub_Logos.zip → SVG/GitHub_Invertocat_White.svg (brand.github.com, 2026-11-04)
     assert :crypto.hash(:sha256, svg) |> Base.encode16(case: :lower) ==
              "ccd84c89b1056345608fc3489357f8acc7397e49a3cdc2d418b6c8016911d47b"
+
+    refute svg =~ ~r/<script|on\w+=|href=/i
+  end
+
+  test "Discord's white symbol, exactly as Discord ships it" do
+    svg = File.read!(Path.join(@static, "discord-symbol-white.svg"))
+
+    # discord.com/branding → Discord_Symbol_White/Discord-Symbol-White.svg (2026-11-04)
+    assert :crypto.hash(:sha256, svg) |> Base.encode16(case: :lower) ==
+             "de4cc484cdc0e3a8f3a58a84b0c80c5ac8acefeebf730930545ff3b279b5d0a3"
 
     refute svg =~ ~r/<script|on\w+=|href=/i
   end
@@ -32,22 +43,42 @@ defmodule HoodrideWeb.SourceLinkTest do
              link <>
                ~s(<img src="github-invertocat-white.svg" alt="" width="20" height="20" /></a>)
 
+    # the menu: its own line between Sign out and the legal links — not
+    # beside Delete account, which stays last (owner, 2026-11-04)
     [legal] = Regex.run(~r{<p class="drawer-legal muted">.*?</p>}s, html)
+    refute legal =~ "source-link"
 
-    assert legal =~
-             ~s(<a href="/privacy">Privacy Policy</a> · ) <>
+    [source] = Regex.run(~r{<p class="drawer-source">.*?</p>}s, html)
+
+    # GitHub, then Discord (owner, 2026-11-04: the menu only)
+    assert source ==
+             ~s(<p class="drawer-source">) <>
                link <>
-               ~s(<img src="github-invertocat-white.svg" alt="" width="16" height="16" /></a>)
+               ~s(<img src="github-invertocat-white.svg" alt="" width="16" height="16" /></a>) <>
+               ~s(<a class="source-link" href="#{@discord}" target="_blank" rel="noopener" title="Hood Ride on Discord" aria-label="Hood Ride on Discord">) <>
+               ~s(<img src="discord-symbol-white.svg" alt="" width="21" height="16" /></a></p>)
+
+    # Discord: the menu only, not the sign-in page; the same invite as the README
+    refute login =~ "discord"
+    assert File.read!("README.md") =~ "(#{@discord})"
+
+    {logout, _} = :binary.match(html, ~s(id="btn-logout"))
+    {cat, _} = :binary.match(html, ~s(<p class="drawer-source">))
+    {delete, _} = :binary.match(html, ~s(id="btn-delete"))
+    assert logout < cat and cat < delete
 
     # and it's the README's repository
     assert File.read!("README.md") =~ "git clone #{@repo}.git"
   end
 
   test "served, kept for offline use, and credited as GitHub's" do
-    assert "github-invertocat-white.svg" in HoodrideWeb.static_paths()
-    assert File.read!(Path.join(@static, "sw.js")) =~ ~s("github-invertocat-white.svg")
+    for f <- ~w(github-invertocat-white.svg discord-symbol-white.svg) do
+      assert f in HoodrideWeb.static_paths()
+      assert File.read!(Path.join(@static, "sw.js")) =~ ~s("#{f}")
+    end
 
-    assert File.read!("THIRD-PARTY.md") =~
-             "`github-invertocat-white.svg` is GitHub's own logo, unchanged"
+    third = File.read!("THIRD-PARTY.md")
+    assert third =~ "`github-invertocat-white.svg` is GitHub's own logo, unchanged"
+    assert third =~ "`discord-symbol-white.svg` is Discord's own symbol, unchanged"
   end
 end

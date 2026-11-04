@@ -531,10 +531,17 @@ function renderSettings() {
 }
 
 // ----- delete account: a second, explicit step -----
+// and typed, not just tapped (owner, 2026-11-04): the red button wakes only
+// once the box says DELETE — any case, spaces ignored (a phone capitalizes
+// the first letter by itself); the server checks the same word
+const deleteTyped = () => $("delete-typed").value.trim().toLowerCase() === "delete";
+
 function showDeleteConfirm() {
   if (state.ride) return;
   $("delete-error").classList.add("hidden");
-  $("delete-yes").disabled = false;
+  // every time empty and locked: never left half-typed from last time
+  $("delete-typed").value = "";
+  $("delete-yes").disabled = true;
   $("settings-sheet").classList.add("confirming");
   $("delete-cancel").focus(); // the safe choice has focus
 }
@@ -544,19 +551,19 @@ function hideDeleteConfirm() {
 }
 
 async function deleteAccount() {
-  if (state.ride) return;
+  if (state.ride || !deleteTyped()) return;
   $("delete-yes").disabled = true;
   const fail = (msg) => {
     $("delete-error").textContent = msg;
     $("delete-error").classList.remove("hidden");
-    $("delete-yes").disabled = false;
+    $("delete-yes").disabled = !deleteTyped();
   };
   let res;
   try {
     res = await fetch("/api/account/delete", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ confirm: true }),
+      body: JSON.stringify({ confirm: $("delete-typed").value }),
     });
   } catch (_) {
     return fail("Couldn't reach Hood Ride — check your connection and try again.");
@@ -577,6 +584,7 @@ async function deleteAccount() {
   if (reason === "in_ride") return fail("End your ride first.");
   if (reason === "request_waiting") return fail("Cancel your ride request first.");
   if (res.status === 401) return location.reload(); // already signed out
+  if (reason === "confirm") return fail("Type DELETE to confirm.");
   fail("Couldn't delete your account — please try again.");
 }
 
@@ -586,6 +594,16 @@ $("delete-cancel").addEventListener("click", () => {
   $("btn-delete").focus();
 });
 $("delete-yes").addEventListener("click", deleteAccount);
+$("delete-typed").addEventListener("input", () => {
+  $("delete-yes").disabled = !deleteTyped();
+});
+// Enter (the keyboard's "done") deletes only once the word is right
+$("delete-typed").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    if (deleteTyped()) deleteAccount();
+  }
+});
 
 // open/shut by class, so it slides; `inert` while shut keeps its buttons out
 // of reach (tab order, screen readers) though it's only moved off screen
