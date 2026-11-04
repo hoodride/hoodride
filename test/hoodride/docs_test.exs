@@ -169,6 +169,29 @@ defmodule Hoodride.DocsTest do
     for s <- scripts, do: refute(File.read!(s) =~ "e2e_", s)
   end
 
+  # a script someone runs (`deploy/install_beam.sh`, the service's
+  # `bin/server`) must be executable in git itself: on a Linux clone from
+  # GitHub, git's mode is all there is. Packing on Windows had hidden it —
+  # all six were stored 644, "Permission denied" at SELF_HOSTING step 3
+  # (found 2026-11-04). Templates (.eex) are read, not run.
+  test "every script is stored executable" do
+    {out, 0} = System.cmd("git", ~w(ls-files -s))
+
+    scripts =
+      for line <- String.split(out, "\n", trim: true),
+          [mode, _hash, _stage, path] = String.split(line, ~r/\s+/, parts: 4),
+          not String.ends_with?(path, ".eex"),
+          File.regular?(path),
+          match?("#!" <> _, File.read!(path)),
+          do: {path, mode}
+
+    assert {"deploy/install_beam.sh", "100755"} in scripts
+    assert {"rel/overlays/bin/server", "100755"} in scripts
+
+    for {path, mode} <- scripts,
+        do: assert(mode == "100755", "#{path} is stored #{mode}: not executable on a Linux clone")
+  end
+
   test "the server guide says what hoodride.app actually runs on" do
     guide = doc("SELF_HOSTING.md")
     assert guide =~ "Ubuntu 24.04"
