@@ -12,10 +12,10 @@
 // reconnectAfterMs — both HoodSync.reconnectBackoff, the app's own — and a
 // closed socket starts over unless it was told session_moved.
 //
-// Run: node e2e_join_deadline.mjs [rounds]   (server on :4000, dev_login on)
+// Run: node test_load/join_deadline.mjs [rounds]   (server on :4000, dev_login on)
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
-const HoodSync = require("./priv/static/sync.js");
+const HoodSync = require("../priv/static/sync.js");
 
 const BASE = "http://127.0.0.1:4000";
 const WS = "ws://127.0.0.1:4000/socket/websocket?vsn=2.0.0";

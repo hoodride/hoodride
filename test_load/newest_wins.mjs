@@ -2,7 +2,7 @@
 // that IGNORES "session_moved" (a hacked or outdated app). Proves the SERVER
 // closes the old socket on its own, and measures how fast.
 //
-// Run: node e2e_newest_wins.mjs   (server on :4000, dev_login enabled)
+// Run: node test_load/newest_wins.mjs   (server on :4000, dev_login enabled)
 
 const BASE = "http://127.0.0.1:4000";
 const WS = "ws://127.0.0.1:4000/socket/websocket?vsn=2.0.0";

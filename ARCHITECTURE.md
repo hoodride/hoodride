@@ -721,7 +721,7 @@ Design notes:
     in prod. `GOOGLE_SETUP.md`: Testing mode (≤100 listed accounts) for the
     friend beta; publish + domain + privacy policy to open to anyone.
   - Tests: login_lockdown_test (35), session.test (+1), 24 mutants;
-    e2e_newest_wins (+5 live); Chrome: sign-in, header socket (no token in the
+    test_load/newest_wins (+5 live); Chrome: sign-in, header socket (no token in the
     URL), real Sign out, a tunnel-like dev_login refused.
 - Hammer algorithm `fix_window_per_key`, chosen from its source: O(1)
   direct-key lookups, atomic counters, windows anchored at a key's first
@@ -768,7 +768,7 @@ Design notes:
     promises; newest-wins breaks "auto never kicks the chosen device"; a
     live-only tab id breaks it after a restart; stamps without the server's
     memory let a zombie in during a blip. Then session_stamp_test (19) +
-    session.test.mjs (7), 18 mutants all killed, e2e_newest_wins (13 new
+    session.test.mjs (7), 18 mutants all killed, test_load/newest_wins (13 new
     checks on real sockets), and the monster's "stale tab returns" chaos (a
     replaced tab reconnects with its old stamp: must be refused, the live
     tab undisturbed). The monster counts an old tab's 1006 loss of the
@@ -798,7 +798,7 @@ Design notes:
 - Tests: 16 in abuse_limits_test (budget math with an injected clock, every
   boundary, cross-session counting, cold-contact rules both orders,
   slow-decline cooldown, newest wins written failing-first); 9 mutants all
-  killed. Plus `e2e_newest_wins.mjs` (real websockets, run against a live
+  killed. Plus `test_load/newest_wins.mjs` (real websockets, run against a live
   server): an old client that IGNORES session_moved is still closed by the
   server, in under 1 ms, with session_moved delivered first — ChannelTest
   can't prove this (its transport is the test process), and the browser
@@ -1698,7 +1698,7 @@ principle is budget-driven selection, which we already own:
 no per-IP budgets, config/loadtest.exs) as a release in WSL Ubuntu, the
 server PINNED to N cores (`taskset`; Erlang starts one scheduler per core it
 may use — unpinned, a VPS uses all of them), the crowd on the other cores:
-`e2e_capacity.mjs` (shards of Node processes, a WebSocket client on
+`test_load/capacity.mjs` (shards of Node processes, a WebSocket client on
 `node:http` — Node 20's experimental one lost connections and hid HTTP 500s).
 20% drivers driving non-stop at ~36 km/h (car updates through the app's own
 send filter: a new spot or the 20 s heartbeat), 80% riders panning every
@@ -2463,7 +2463,7 @@ still advised.
   device: `/api/state` reads the account once and updates the cookie.
 - **A new version** (a new date in both places): everyone is asked again;
   an open app's next token fetch gets 403 and reloads into the screen.
-- The load scripts (`e2e_*.mjs`) agree through dev_login
+- The load scripts (`test_load/*.mjs`) agree through dev_login
   (`{"agree_terms": true}`); the journeys tap the real button
   (`signIn` in test_browser/cdp.mjs). The `terms` journey: the screen
   first, no token; offline → "Couldn't reach Hood Ride — try again";

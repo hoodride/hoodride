@@ -18,7 +18,7 @@
 // few thousand sockets). Meant for the loadtest build (config/loadtest.exs:
 // prod + dev_login + no per-IP budgets) on Linux:
 //
-//   SERVER_PID=<beam pid> node e2e_capacity.mjs \
+//   SERVER_PID=<beam pid> node test_load/capacity.mjs \
 //     [steps=1000,2000,5000] [shards=4] [hold_s=30]
 //
 // Server memory/CPU come from /proc/SERVER_PID (Linux); without it, they're
@@ -29,10 +29,10 @@ import http from "node:http";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
-const h3 = require("./priv/static/h3-js.umd.js");
-const F = require("./priv/static/sendfilter.js");
+const h3 = require("../priv/static/h3-js.umd.js");
+const F = require("../priv/static/sendfilter.js");
 // the app's own reconnect backoff (full jitter, 1 s doubling to 10 s)
-const HoodSync = require("./priv/static/sync.js");
+const HoodSync = require("../priv/static/sync.js");
 
 const BASE = process.env.HOOD_BASE || "http://127.0.0.1:4000";
 const WS = BASE.replace(/^http/, "ws") + "/socket/websocket?vsn=2.0.0";
@@ -54,7 +54,7 @@ const PARKED = Number(process.env.PARKED ?? 0.5);
 const DELAY_EVERY = 10;
 const timed = (id) => id % DELAY_EVERY === 0;
 const wall = () => performance.timeOrigin + performance.now();
-const HoodViewport = require("./priv/static/viewport.js");
+const HoodViewport = require("../priv/static/viewport.js");
 const ZOOM_MIX = ZOOMS === "ring" ? [] : ZOOMS.split(",").map((z) => z.split(":").map(Number));
 const pickZoom = () => {
   let r = Math.random() * ZOOM_MIX.reduce((a, [, w]) => a + w, 0);

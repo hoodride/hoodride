@@ -2,9 +2,9 @@
 // to verify coarse-hex counts move with boundary crossings.
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
-const h3 = require("./priv/static/h3-js.umd.js");
+const h3 = require("../priv/static/h3-js.umd.js");
 // the app's own rule for a browsing car's spot (sticky, block-level)
-const F = require("./priv/static/sendfilter.js");
+const F = require("../priv/static/sendfilter.js");
 let spot = null;
 
 const BASE = "http://127.0.0.1:4000";

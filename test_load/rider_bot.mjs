@@ -1,10 +1,10 @@
 ﻿// A rider, minus the human: raises a hand near the demo location, engages
 // the first driver who comes online in that cell (messages, then requests),
 // re-requests after a decline, rides, and raises the hand again afterwards.
-// Run:  node e2e_rider_bot.mjs
+// Run:  node test_load/rider_bot.mjs
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
-const h3 = require("./priv/static/h3-js.umd.js");
+const h3 = require("../priv/static/h3-js.umd.js");
 
 const BASE = "http://127.0.0.1:4000";
 const WS = "ws://127.0.0.1:4000/socket/websocket?vsn=2.0.0";

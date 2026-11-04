@@ -322,7 +322,7 @@ defmodule HoodrideWeb.AuthController do
           photo: params["photo"]
         })
 
-      # the load and test scripts (e2e_*.mjs) skip the Terms screen: they
+      # the load and test scripts (test_load/*.mjs) skip the Terms screen: they
       # say {"agree_terms": true}. The browser journeys tap the real button.
       if params["agree_terms"] == true, do: :ok = Accounts.agree_to_terms(user.id)
       user = Accounts.get_user(user.id)

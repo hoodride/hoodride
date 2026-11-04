@@ -10,7 +10,7 @@
 //      (every phone after a deploy).
 //   4. DEADLINE: 15 s later (past the 10 s join deadline) all still open.
 //
-// Run: node e2e_load.mjs [users=300]   (server on :4000, dev_login on)
+// Run: node test_load/load.mjs [users=300]   (server on :4000, dev_login on)
 import { execSync } from "node:child_process";
 
 const BASE = "http://127.0.0.1:4000";

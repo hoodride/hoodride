@@ -146,6 +146,29 @@ defmodule Hoodride.DocsTest do
         do: assert(yours =~ "`#{f}`", "#{f} shows the name but 'Make it yours' doesn't list it")
   end
 
+  # the load and stress scripts live in test_load/, beside test_js/ and
+  # test_browser/ — not loose at the top of the repository (owner,
+  # 2026-11-04); each loads the app's own code from ../priv/static
+  test "the load scripts: in test_load/, and what they load exists" do
+    {top, 0} = System.cmd("git", ~w(ls-files))
+    loose = top |> String.split("\n", trim: true) |> Enum.filter(&(&1 =~ ~r{^[^/]+\.mjs$}))
+    assert loose == [], "scripts loose at the top: #{inspect(loose)}"
+
+    scripts = Path.wildcard("test_load/*.mjs")
+    assert length(scripts) >= 9
+
+    for s <- scripts,
+        [_, path] <- Regex.scan(~r/require\("([^"]+)"\)/, File.read!(s)) do
+      assert String.starts_with?(path, "../priv/static/"), "#{s} loads #{path}"
+
+      assert File.exists?(Path.expand(path, "test_load")),
+             "#{s} loads #{path}, which doesn't exist"
+    end
+
+    # their own "Run:" lines say where they are now
+    for s <- scripts, do: refute(File.read!(s) =~ "e2e_", s)
+  end
+
   test "the server guide says what hoodride.app actually runs on" do
     guide = doc("SELF_HOSTING.md")
     assert guide =~ "Ubuntu 24.04"

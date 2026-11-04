@@ -23,15 +23,15 @@
 //   L8 after the crowd leaves, a fresh observer sees no car and no ✋
 // Plus reply times per action and the server's memory, wave after wave.
 //
-// Run: node e2e_monster.mjs [agents=150] [seconds_per_wave=150] [waves=2] [seed] [chaos=1]
+// Run: node test_load/monster.mjs [agents=150] [seconds_per_wave=150] [waves=2] [seed] [chaos=1]
 //      (server on :4000, dev_login on)
 import { createRequire } from "node:module";
 import { exec } from "node:child_process";
 const require = createRequire(import.meta.url);
-const h3 = require("./priv/static/h3-js.umd.js");
-const F = require("./priv/static/sendfilter.js");
-const HoodSync = require("./priv/static/sync.js");
-const HoodRehydrate = require("./priv/static/rehydrate.js");
+const h3 = require("../priv/static/h3-js.umd.js");
+const F = require("../priv/static/sendfilter.js");
+const HoodSync = require("../priv/static/sync.js");
+const HoodRehydrate = require("../priv/static/rehydrate.js");
 
 const BASE = "http://127.0.0.1:4000";
 const WS = "ws://127.0.0.1:4000/socket/websocket?vsn=2.0.0";
@@ -1070,7 +1070,7 @@ async function report(t, agents) {
 }
 
 // ================= self-test: do the laws bite? =================
-// `node e2e_monster.mjs selftest` feeds each checker a frame that breaks its
+// `node test_load/monster.mjs selftest` feeds each checker a frame that breaks its
 // law and confirms it is flagged — a checker that never fails proves nothing.
 if (process.argv[2] === "selftest") {
   const fake = { me: { id: 1, name: "Selftest" }, cookie: "" };

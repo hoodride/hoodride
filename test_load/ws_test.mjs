@@ -1,6 +1,6 @@
 // Real-wire end-to-end test: two genuine websocket clients (rider + driver)
 // run the full Hood Ride protocol against the LIVE server over actual TCP.
-// Run with the server up:  node e2e_ws_test.mjs
+// Run with the server up:  node test_load/ws_test.mjs
 import process from "node:process";
 
 const BASE = "http://127.0.0.1:4000";

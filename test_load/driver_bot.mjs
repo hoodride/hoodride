@@ -1,18 +1,18 @@
 // A real driver, minus the human: logs in over the wire, cruises near the
 // demo location, answers chat, accepts requests, drives to the pickup.
-// Run while the browser rider is open:  node e2e_driver_bot.mjs
+// Run while the browser rider is open:  node test_load/driver_bot.mjs
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
-const h3 = require("./priv/static/h3-js.umd.js");
+const h3 = require("../priv/static/h3-js.umd.js");
 // the app's own rule for a browsing car's spot (sticky, block-level)
-const F = require("./priv/static/sendfilter.js");
+const F = require("../priv/static/sendfilter.js");
 let spot = null;
 
 const BASE = "http://127.0.0.1:4000";
 const WS = "ws://127.0.0.1:4000/socket/websocket?vsn=2.0.0";
 const RES = 8;
 
-// name and start offset configurable: node e2e_driver_bot.mjs [name] [dLat] [dLng]
+// name and start offset configurable: node test_load/driver_bot.mjs [name] [dLat] [dLng]
 const BOT_NAME = process.argv[2] || "DeShawn-Bot";
 let pos = {
   lat: 40.7128 + (parseFloat(process.argv[3]) || 0.0032),
