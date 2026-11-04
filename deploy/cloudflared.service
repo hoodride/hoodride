@@ -1,0 +1,28 @@
+# /etc/systemd/system/cloudflared.service — the tunnel (setup.sh installs it).
+#
+# Instead of `cloudflared service install` (which runs it as root): its own
+# user, in the hoodride group, so it can reach the app's socket and nothing else.
+[Unit]
+Description=Cloudflare Tunnel for Hood Ride
+After=network-online.target hoodride.service
+Wants=network-online.target
+
+[Service]
+User=cloudflared
+Group=cloudflared
+SupplementaryGroups=hoodride
+ExecStart=/usr/bin/cloudflared --no-autoupdate tunnel --config /etc/cloudflared/config.yml run
+Restart=on-failure
+RestartSec=5
+
+# one open connection to the app's socket per connected person — like the
+# app's own LimitNOFILE (systemd's default soft limit is 1024)
+LimitNOFILE=1048576
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

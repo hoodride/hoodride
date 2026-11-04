@@ -1,0 +1,2 @@
+# keep LF everywhere: the deploy scripts run on Linux
+* text=auto eol=lf

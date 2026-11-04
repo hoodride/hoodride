@@ -1,0 +1,28 @@
+<!doctype html>
+<!--
+  The link-preview picture's source (priv/static/og.png, 1200x630 — the
+  Open Graph size; HoodrideWeb.LinkPreviewTest). Owner, 2026-11-02: the
+  sign-in screen's look — the car, "Hood Ride" in yellow, its line.
+  The car and words fill most of it (owner, 2026-11-02: "bigger"); a
+  square crop (WhatsApp) clips their edges, but WhatsApp prints the name
+  and line as text beside it.
+  To change it: edit this, put car.png (priv/static) beside it, then render
+  with the Edge on this machine (no download), e.g. from Git Bash, as one
+  line:
+    "/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
+      --headless=new --disable-gpu --hide-scrollbars
+      --user-data-dir=<a temp folder> --force-device-scale-factor=1
+      --window-size=1200,630 --screenshot=<path>/og.png
+      "file:///<this folder>/og.html"
+  and copy og.png to priv/static/. Its ?vsn= changes with it, so apps that
+  saved the old preview fetch the new one.
+-->
+<html><head><meta charset="utf-8"><style>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; }
+  body { background: #111111; display: flex; flex-direction: column; align-items: center; justify-content: center;
+         font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
+  img { width: 470px; height: auto; display: block; margin-bottom: -6px; }
+  h1 { margin: 0; font-size: 150px; line-height: 1.05; font-weight: 800; letter-spacing: -4px; color: #ffc107; }
+  p { margin: 14px 0 0; font-size: 60px; color: #a0a0a0; font-weight: 500; }
+</style></head>
+<body><img src="car.png" alt=""><h1>Hood Ride</h1><p>Rides from your neighborhood</p></body></html>

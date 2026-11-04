@@ -1,0 +1,73 @@
+# /etc/systemd/system/hoodride.service — the app (setup.sh installs it).
+#
+# Listens on a Unix socket only (SOCKET_PATH in /etc/hoodride/env); cloudflared
+# reaches it as a member of the hoodride group. Nothing listens on the network
+# but Erlang's own node ports, on 127.0.0.1 (rel/vm.args.eex, rel/env.sh.eex).
+[Unit]
+Description=Hood Ride
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=hoodride
+Group=hoodride
+# PHX_HOST, SECRET_KEY_BASE, RELEASE_COOKIE, Google keys, SOCKET_PATH, …
+EnvironmentFile=/etc/hoodride/env
+Environment=DATABASE_PATH=/var/lib/hoodride/hoodride.db
+ExecStart=/opt/hoodride/current/bin/server
+# SIGTERM: the BEAM shuts down cleanly (closes the socket, flushes the database)
+TimeoutStopSec=30
+Restart=on-failure
+RestartSec=3
+
+# /run/hoodride: made fresh on every start, removed on stop — holds the socket
+# (HoodrideWeb.SocketFile still checks it: a start by hand meets no systemd)
+RuntimeDirectory=hoodride hoodride/tmp
+RuntimeDirectoryMode=0750
+# the socket: rwx for the hoodride group (cloudflared), nothing for others
+UMask=0007
+# /var/lib/hoodride: the database — only the hoodride user may enter, so the
+# group's members (cloudflared) can't read it
+StateDirectory=hoodride
+StateDirectoryMode=0700
+WorkingDirectory=/var/lib/hoodride
+# the release's own scratch files (rpc/remote), off the read-only release
+Environment=RELEASE_TMP=/run/hoodride/tmp
+
+# one open file per connected person: pairs with +Q 1048576 (rel/vm.args.eex);
+# 1048576 is the most Linux allows one program (fs.nr_open)
+LimitNOFILE=1048576
+
+# hardening: the app writes only its state and runtime folders
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+# and what it never needs (systemd-analyze security, 2026-11-02): no special
+# powers at all (it runs as hoodride and only opens a Unix socket), no clock,
+# kernel log, hostname, other programs' /proc, realtime or namespaces.
+# Not MemoryDenyWriteExecute: the BEAM's JIT writes the code it runs.
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectClock=true
+ProtectKernelLogs=true
+ProtectHostname=true
+ProtectProc=invisible
+LockPersonality=true
+RestrictRealtime=true
+RestrictNamespaces=true
+RemoveIPC=true
+# sockets: its own (Unix), the internet (Google sign-in; the node's own
+# ports on 127.0.0.1) and netlink (the BEAM reads its addresses)
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+[Install]
+WantedBy=multi-user.target

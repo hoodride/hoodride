@@ -1,0 +1,19 @@
+## Customize flags given to the VM: https://www.erlang.org/doc/man/erl.html
+## -mode/-name/-sname/-setcookie are configured via env vars, do not set them here
+
+## Erlang "ports" (NOT port numbers: the VM's handles to the outside — every
+## network connection, the Unix socket's included; files aren't ports since
+## OTP 21) the VM may hold at once — one per connected person. Linux's
+## default is 65536 (Windows: 8192). 1048576 = the most Linux lets one program
+## open (fs.nr_open) and systemd's ceiling; it reserves ~15 MB at start-up
+## (measured in WSL: 31 → 46 MB; 16M would be 286 MB). Pairs with
+## LimitNOFILE=1048576 in deploy/hoodride.service — change them together.
+## Memory and CPU run out long before this.
++Q 1048576
+
+## The node's own port (for `bin/hoodride rpc` / `remote`) on 127.0.0.1 only —
+## by default it listens on every address. epmd: ERL_EPMD_ADDRESS in env.sh.eex.
+-kernel inet_dist_use_interface {127,0,0,1}
+
+## Tweak GC to run more often
+##-env ERL_FULLSWEEP_AFTER 10

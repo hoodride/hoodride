@@ -1,0 +1,12 @@
+# /etc/cloudflared/config.yml — fill in TUNNEL_ID and the hostname
+# (SELF_HOSTING.md, step 6). Owned root:cloudflared, mode 0640.
+tunnel: TUNNEL_ID
+credentials-file: /etc/cloudflared/TUNNEL_ID.json
+
+ingress:
+  # the app's Unix socket (SOCKET_PATH in /etc/hoodride/env) — a NAMED tunnel
+  # only: quick tunnels can't target a socket
+  - hostname: hood.example.com
+    service: unix:/run/hoodride/app.sock
+  # anything else: refused
+  - service: http_status:404

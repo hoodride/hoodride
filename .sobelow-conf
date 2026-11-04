@@ -1,0 +1,18 @@
+[
+  verbose: false,
+  private: false,
+  skip: true,
+  router: "lib/hoodride_web/router.ex",
+  exit: "low",
+  format: "txt",
+  # Config.CSRF reviewed: no server-rendered forms exist; session cookie is
+  # SameSite=Lax (cross-site POSTs carry no cookie), and the OAuth flow is
+  # protected against login-CSRF with a session-bound `state` parameter.
+  ignore: ["Config.CSRF"],
+  # skip: true honours `# sobelow_skip ["Type"]` above a function. The 18
+  # marked 2026-10-29 were each reviewed: fixed text replies, our own files
+  # by constant names, photo names random or matching Avatars.valid_name?.
+  # Mark a new finding only after the same review. (Not .sobelow-skips: it
+  # keys on line numbers, so any edit above would re-flag it.)
+  ignore_files: []
+]

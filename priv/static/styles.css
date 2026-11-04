@@ -1,0 +1,746 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #111111;
+  --card: #1d1d1f;
+  --text: #f5f5f5;
+  --muted: #9a9a9a;
+  --accent: #ffc107;
+  --accent-text: #111111;
+  --danger: #e5484d;
+  --radius: 14px;
+}
+
+html, body { height: 100%; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.screen {
+  display: none;
+  min-height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  gap: 32px;
+}
+.screen.active { display: flex; }
+
+/* ----- Buttons ----- */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.06s ease, opacity 0.15s ease;
+}
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.5; cursor: wait; }
+
+.btn-google { background: #ffffff; color: #1f1f1f; width: 100%; }
+.btn-facebook { background: #1877f2; color: #ffffff; width: 100%; }
+.btn-primary { background: var(--accent); color: var(--accent-text); }
+.btn-small { padding: 8px 14px; font-size: 14px; background: var(--card); color: var(--text); }
+.btn-compact { padding: 10px 16px; font-size: 14px; }
+.btn-pill {
+  background: var(--card);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-size: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+.btn-pill.on { background: var(--accent); color: var(--accent-text); }
+/* a link styled as a button (Navigate — a real link, navlink.js) */
+a.btn { text-decoration: none; }
+.btn-go { background: var(--accent); color: var(--accent-text); font-size: 17px; font-weight: 800; }
+.btn-go.on { background: var(--card); color: var(--text); }
+/* Need a ride: dark (its ✋ is yellow), the main button's size; raised, a
+   yellow ring and yellow words — you're waiting */
+.btn-ask { font-size: 17px; font-weight: 800; }
+.btn-ask.on { background: var(--card); color: var(--accent); box-shadow: 0 0 0 3px var(--accent), 0 2px 10px rgba(0,0,0,0.4); }
+.btn-danger { background: var(--danger); color: #fff; }
+
+/* ----- Login ----- */
+.brand { text-align: center; }
+/* the owner's car (car.png), not the emoji: the same on every phone */
+/* (tucked close to the name under it: owner, 2026-10-31) */
+.brand-car { display: block; width: 190px; height: auto; margin: 0 auto -2px; }
+/* the car beside words (top bar, buttons, banners): text-sized */
+.car-icon { height: 1.15em; width: auto; vertical-align: -0.25em; margin-right: 0.35em; }
+/* in a button the button's own 10 px gap already separates it: a space's
+   width in all (owner, 2026-10-31: "Drive" was too wide) */
+.btn .car-icon { margin-right: calc(0.35em - 10px); }
+/* the other icons (✋ 📍 🧭 💬 — icons.js): square pictures, the same way */
+.emoji-icon { height: 1.2em; width: 1.2em; vertical-align: -0.25em; margin-right: 0.35em; }
+.btn .emoji-icon { margin-right: calc(0.35em - 10px); }
+.brand h1 {
+  font-size: 40px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--accent);
+}
+.tagline { color: var(--muted); margin-top: 4px; }
+.about { color: var(--text); opacity: 0.85; max-width: 320px; margin: 14px auto 0; font-size: 15px; line-height: 1.45; }
+.fineprint a, .drawer-legal a { color: var(--accent); }
+
+.boot-status {
+  text-align: center;
+  opacity: 0.75;
+  margin: 24px 0 8px;
+}
+
+.auth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 340px;
+}
+
+.fineprint {
+  color: var(--muted);
+  font-size: 12px;
+  position: fixed;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  left: 0;
+  right: 0;
+  padding: 0 16px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* ----- Terms: once per account, before the map ----- */
+.terms-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 360px;
+}
+/* the car again, smaller than on the sign-in screen: still Hood Ride */
+/* (as tight under it as the sign-in name: the card's 18 px gap taken back, -2 px) */
+.terms-car { display: block; width: 120px; height: auto; margin: 0 auto -20px; }
+.terms-card h1 { font-size: 28px; line-height: 1.1; font-weight: 800; color: var(--accent); text-align: center; }
+.terms-line { text-align: center; line-height: 1.45; text-wrap: balance; }
+.terms-line a { color: var(--accent); }
+.terms-error { color: var(--danger); text-align: center; font-size: 14px; }
+
+.muted { color: var(--muted); font-size: 14px; }
+.hidden { display: none !important; }
+
+/* ===== Map screen ===== */
+.screen-map { padding: 0; }
+.screen-map.active { display: block; }
+/* the PAGE never pinch-zooms on the map screen — only the map does (a pinch
+   on the top bar zoomed the page, and the pinch back out landed on the map:
+   stuck big; owner's iPhone, 2026-10-29). On everything inside: WebKit
+   reads touch-action only up to the nearest scrolling area. MapLibre's own
+   canvas rules are more specific and still win (the map's pinch). The
+   sign-in screen and the privacy page stay zoomable. zoom_css.test.mjs */
+.screen-map, .screen-map * { touch-action: pan-x pan-y; }
+/* …and the page itself, while the map screen shows (app.js show() marks
+   html "on-map"): a touch that reaches html/body — an edge, the address bar
+   sliding, the drawer opening — still zoomed the page (owner's iPhone,
+   2026-10-30). The standard fix: touch-action on html and body */
+html.on-map, html.on-map body { touch-action: pan-x pan-y; }
+
+#map {
+  position: absolute;
+  inset: 0;
+  height: 100dvh;
+  width: 100%;
+}
+
+.topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.65), transparent);
+  /* the fade (it keeps the white title readable) spans the map: clicks and
+     drags pass through it to the map, its cars and ✋ — only the buttons
+     catch them (test_js/marker_css) */
+  pointer-events: none;
+}
+.topbar button { pointer-events: auto; }
+.topbar-title { font-weight: 800; font-size: 18px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
+.topbar-right { display: flex; gap: 8px; }
+.topbar-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+
+/* your photo, top left: opens Settings (sign out lives there) */
+.btn-account {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: #333;
+  overflow: hidden;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.btn-account:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.account-photo { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Settings: a drawer from the left (where the photo button is), over a dimmed
+   map that closes it. Off screen when shut — `inert` (app.js) keeps its
+   buttons out of reach then. */
+.drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: rgba(0,0,0,0.45);
+  opacity: 0;
+  visibility: hidden;
+  /* hidden only AFTER fading out; visible at once when opening (below) */
+  transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+}
+.drawer-backdrop.open { opacity: 1; visibility: visible; transition: opacity 0.2s ease, visibility 0s; }
+.drawer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 21;
+  width: min(80vw, 360px);
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+  padding: calc(16px + env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));
+  transform: translateX(-105%);
+  visibility: hidden;
+  /* hidden only AFTER sliding out; visible AT ONCE when opening — focus can't
+     land in a still-hidden drawer (an animated visibility starts hidden) */
+  transition: transform 0.2s ease, visibility 0s linear 0.2s;
+}
+.drawer.open { transform: none; visibility: visible; transition: transform 0.2s ease, visibility 0s; }
+@media (prefers-reduced-motion: reduce) {
+  .drawer, .drawer-backdrop { transition: none; }
+}
+.drawer-close { top: calc(12px + env(safe-area-inset-top)); right: 12px; font-size: 18px; }
+.drawer-me { display: flex; align-items: center; gap: 12px; padding: 8px 36px 16px 4px; min-width: 0; border-bottom: 1px solid #333; }
+.drawer-me strong { font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#settings-name:focus { outline: none; }
+/* name, then "Change" under it */
+.drawer-me-text { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+.drawer-change {
+  background: none; border: 0; padding: 4px 0; margin: 0;
+  color: var(--accent); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+}
+/* the Change box: where name and photo come from, and what to do */
+.drawer-box {
+  margin: 12px 4px 4px; padding: 12px 14px; border-radius: var(--radius);
+  background: #262628; line-height: 1.4;
+}
+.drawer-box p { margin: 0 0 6px; }
+.drawer-box-action {
+  display: inline-block; margin: 2px 0 12px;
+  color: var(--accent); font-weight: 600; text-decoration: none;
+}
+.drawer-box .settings-refresh-note { font-size: 13px; margin: 0; }
+.drawer-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding-top: 8px; }
+.drawer-bottom { border-top: 1px solid #333; padding-top: 8px; }
+.drawer-row {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  min-height: 56px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.drawer-row:hover, .drawer-row:focus-visible { background: #2c2c2e; }
+.settings-danger .settings-label { color: var(--danger); font-weight: 700; }
+.drawer-row:disabled { cursor: default; background: transparent; }
+.drawer-legal { margin: 8px 10px 0; font-size: 13px; }
+/* a button that looks like the link beside it (Delete account) */
+.link-button { background: none; border: 0; padding: 4px 0; font: inherit; color: var(--muted); text-decoration: underline; cursor: pointer; }
+.link-button:hover, .link-button:focus-visible { color: var(--text); }
+.link-button:disabled { opacity: 0.5; cursor: default; text-decoration: none; }
+
+/* the delete confirmation replaces the drawer's contents */
+.drawer-confirm { display: none; flex-direction: column; gap: 12px; padding: 40px 6px 8px; }
+.drawer-confirm h2 { font-size: 20px; margin: 0; }
+.drawer-confirm p { margin: 0; line-height: 1.45; }
+.drawer.confirming > :not(.drawer-confirm):not(.drawer-close) { display: none; }
+.drawer.confirming .drawer-confirm { display: flex; }
+.delete-error { color: var(--danger); }
+
+/* "Your car": a centred sheet over everything (Settings, or Go online) */
+.car-backdrop { position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,0.55); }
+/* pinned near the TOP, centred across: it grows only downward, so the Make
+   box stays put when its suggestions open (centred, the whole form jumped
+   up ~95 px at the first letter) — and on a phone it stays clear of the
+   keyboard, which covers the bottom half */
+.car-sheet {
+  position: fixed;
+  z-index: 41;
+  top: calc(5vh + env(safe-area-inset-top));
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: min(92vw, 380px);
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 18px;
+  background: var(--card);
+  border-radius: 18px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.car-sheet h2 { margin: 0; font-size: 20px; }
+/* focused by code when the box opens (not a Tab stop, nothing to press):
+   no ring — app.js openCarSheet */
+.car-sheet h2:focus { outline: none; }
+.car-sheet p { margin: 0; line-height: 1.4; }
+.car-field { display: flex; flex-direction: column; gap: 4px; font-size: 14px; font-weight: 600; }
+.car-field select, .car-field input {
+  font: inherit; font-weight: 400; font-size: 16px; /* 16px: iOS doesn't zoom in */
+  padding: 10px 12px; min-height: 44px;
+  border-radius: 10px; border: 1px solid #3a3a3c; background: #2c2c2e; color: var(--text);
+}
+.car-field [aria-invalid="true"] { border-color: var(--danger); }
+/* the Make suggestions: right under the box, in the form's own flow (never
+   clipped, never off-screen); each row a full 44 px tap target */
+.car-suggest {
+  list-style: none; margin: -8px 0 0; padding: 4px;
+  border-radius: 10px; border: 1px solid #3a3a3c; background: #2c2c2e;
+}
+.car-suggest li { min-height: 44px; display: flex; align-items: center; padding: 0 10px; border-radius: 8px; cursor: pointer; }
+.car-suggest li[aria-selected="true"], .car-suggest li:hover { background: #3a3a3c; }
+.drawer-row:disabled .settings-label { color: var(--muted); }
+
+.banner {
+  position: absolute;
+  top: calc(62px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: var(--card);
+  color: var(--text);
+  padding: 10px 18px;
+  border-radius: 18px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  /* wraps, never cut off: a "blocked" message carries the steps to fix it,
+     and "…" hid exactly that part on a phone (owner's iPhone, 2026-10-29).
+     max-content + a cap: short messages stay one line; balance: no lone
+     last word */
+  width: max-content;
+  max-width: min(92vw, 560px);
+  white-space: normal;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.bottom-controls {
+  position: absolute;
+  bottom: calc(22px + env(safe-area-inset-bottom));
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 14px;
+  /* the row spans the screen's width: touches beside and between its
+     buttons pass through to the map (drag, pinch, its cars and ✋), as the
+     top bar's do — only the buttons catch them (owner, 2026-11-02;
+     test_js/marker_css) */
+  pointer-events: none;
+}
+.bottom-controls > * { pointer-events: auto; }
+
+.btn-locate {
+  position: absolute;
+  right: 14px;
+  bottom: calc(96px + env(safe-area-inset-bottom));
+  z-index: 10;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--card);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  transition: transform 0.06s ease;
+}
+.btn-locate:active { transform: scale(0.94); }
+
+/* ----- Markers ----- */
+.marker-me {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #1a73e8;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 0 rgba(26,115,232,0.5);
+  animation: pulse 2s infinite;
+}
+/* finding your location (owner, 2026-11-01): the 📍 on Need a ride / GO
+   ONLINE pulses — only after 1 s (NN/g: a looped animation under 1 s
+   distracts), slow and small; still for anyone whose phone asks for less
+   motion (the words still say what's happening) */
+.btn.searching .emoji-icon { animation: seeking 1.2s ease-in-out 1s infinite; }
+@keyframes seeking {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.6; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn.searching .emoji-icon { animation: none; }
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(26,115,232,0.45); }
+  70% { box-shadow: 0 0 0 14px rgba(26,115,232,0); }
+  100% { box-shadow: 0 0 0 0 rgba(26,115,232,0); }
+}
+
+/* 44 px: the smallest comfortable touch target (Apple HIG 44 pt; Material 48 dp) */
+.marker-bubble {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 2px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+.marker-bubble.hand { border-color: #50b86c; }
+/* click-through insides: the pressed element is always the marker itself.
+   Its icons are redrawn as cars/hands update; a redraw between button-down
+   and button-up replaced the pressed icon and the click was dropped
+   (test_js/marker_css) */
+.marker-bubble > * { pointer-events: none; }
+/* a PILE: several in one block — a visible stack, not an abstract number */
+/* (no `position` here: MapLibre places markers absolutely — test_js/marker_css) */
+.marker-bubble.pile { width: 74px; border-radius: 22px; }
+.marker-bubble .pile-icon { position: absolute; top: 50%; transform: translate(-50%, -50%); line-height: 1; }
+.marker-bubble img.pile-icon, .marker-bubble .marker-car { width: 30px; height: auto; }
+.marker-bubble.pile img.pile-icon { width: 26px; }
+/* a ✋ is square: a little narrower than a car to look the same size */
+.marker-bubble img.pile-icon[src^="hand"], .marker-bubble .marker-icon { width: 26px; }
+.marker-bubble.pile img.pile-icon[src^="hand"] { width: 22px; }
+.marker-bubble.pile .pile-icon-0 { left: 26%; }
+.marker-bubble.pile .pile-icon-1 { left: 50%; }
+.marker-bubble.pile .pile-icon-2 { left: 74%; }
+.marker-bubble:not(.pile) .pile-icon-0 { left: 50%; }
+.marker-bubble .pile-more {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 11px;
+  background: var(--accent);
+  color: #111;
+  font: 700 12px/22px system-ui, sans-serif;
+  text-align: center;
+}
+
+/* ----- Pile list: who is in this block ----- */
+.pile-sheet {
+  position: absolute;
+  bottom: calc(86px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 12;
+  background: var(--card);
+  border-radius: 18px;
+  padding: 12px 8px 8px;
+  width: min(calc(100vw - 32px), 380px);
+  max-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.pile-header { display: flex; align-items: center; padding: 0 40px 8px 10px; font-weight: 700; }
+.pile-list { overflow-y: auto; display: flex; flex-direction: column; }
+.pile-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.pile-row:hover, .pile-row:focus-visible { background: #2c2c2e; }
+.pile-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#btn-msg:disabled { opacity: 0.5; cursor: default; }
+.marker-pin { font-size: 30px; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); }
+.marker-pin img { display: block; width: 34px; height: 34px; }
+
+/* ----- Peer card ----- */
+.peer-card {
+  position: absolute;
+  bottom: calc(86px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 11;
+  background: var(--card);
+  border-radius: 18px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(92vw, 380px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--accent);
+  background: #333;
+}
+.avatar-card { width: 52px; height: 52px; flex-shrink: 0; }
+.peer-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.peer-info strong { font-size: 16px; }
+/* who they are, then where: a line each. The car is how a rider finds the
+   right driver, so it's never cut — it wraps on a narrow phone; the
+   distance stays one line */
+.peer-meta { display: flex; flex-direction: column; }
+#peer-where { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.peer-meta > span:empty { display: none; }
+.card-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+}
+/* on the profile card the ✕ sits IN the row, after Message — pinned to the
+   corner it overlapped the button's top-right (a tap there closed the card)
+   — with a 44 px tap area (Apple's minimum; Google's is 48 dp), reaching
+   into the card's padding so the text keeps its room */
+.peer-card .card-close {
+  position: static;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  margin: -6px -12px -6px -6px;
+  padding: 0;
+}
+
+/* ----- Chat ----- */
+.chat {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 12;
+  height: min(48dvh, 420px);
+  background: var(--card);
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+}
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 44px 12px 18px;
+  border-bottom: 1px solid #2c2c2e;
+  position: relative;
+}
+/* the name, with "about 0.4 mi away · 20 min ago" on a small line under it
+   (like a messenger's "last seen"); both shorten with … on a narrow phone */
+.chat-title { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.chat-title > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#chat-name { font-weight: 700; font-size: 16px; }
+.chat-dist { font-size: 12px; opacity: 0.7; }
+.chat-dist:empty { display: none; }
+.chat-header .card-close { top: 14px; }
+
+.chat-back { position: static; font-size: 22px; padding: 0 6px; }
+
+.chat-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.chat-item:hover { background: #2c2c2e; }
+.avatar-mini { width: 40px; height: 40px; border-width: 2px; flex-shrink: 0; }
+.chat-item-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.chat-item-info .muted { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* each takes its own direction (dir="auto": Arabic reads right to left) but
+   stays at the left under the photo — dir alone would push an Arabic line
+   to the far side of the row */
+.chat-item-info strong, .chat-item-info .muted { text-align: left; }
+/* the right side of a row: how long ago, then the unread count */
+.chat-item-side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.chat-time { font-size: 12px; }
+/* read rows: the name in normal weight — so unread ones stand out */
+.chat-item-info strong { font-weight: 500; }
+/* unread: name and last message bold and bright, like chat apps */
+.chat-item.unread strong, .chat-item.unread .chat-item-info .muted, .chat-item.unread .chat-time {
+  color: var(--text); font-weight: 700; opacity: 1;
+}
+.unread-dot {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  /* the app decides where the chat scrolls (HoodChatScroll): the browser's
+     scroll anchoring (Safari 27+, Chrome 56+, Firefox 66+) moved the list as
+     the keyboard opened, away from the bottom */
+  overflow-anchor: none;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.msg {
+  max-width: 75%;
+  padding: 9px 13px;
+  border-radius: 16px;
+  font-size: 15px;
+  line-height: 1.35;
+  word-wrap: break-word;
+}
+.msg.me { align-self: flex-end; background: var(--accent); color: var(--accent-text); border-bottom-right-radius: 4px; }
+.msg.them { align-self: flex-start; background: #2c2c2e; border-bottom-left-radius: 4px; }
+/* the "about a block" note (off — index.html #chat-note) */
+.chat-note { margin: 0; padding: 6px 12px 0; font-size: 12px; opacity: 0.75; }
+.msg { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.msg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* tap a message → this chip FLOATS beside it (msgcopy.js place()): over the
+   chat, never in its flow, so no message moves */
+.chat-messages { position: relative; }
+.msg-copy {
+  position: absolute;
+  z-index: 2;
+  margin: 0;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid #3a3a3c;
+  background: #1c1c1e;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+/* small to look at, 44 px to hit (Apple 44 pt, Material 48 dp; WCAG 2.5.8) */
+.msg-copy::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  min-height: 44px;
+}
+
+/* the 500-character warning above the box: from 400, and over the limit
+   red AND in words (never color alone) */
+.chat-count { margin: 0; padding: 6px 14px 0; font-size: 12px; color: var(--muted); text-align: right; }
+.chat-count.over { color: var(--danger); font-weight: 600; }
+/* read by screen readers, not shown */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.chat-form {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  border-top: 1px solid #2c2c2e;
+}
+.chat-form input {
+  flex: 1;
+  background: #2c2c2e;
+  border: none;
+  border-radius: 999px;
+  padding: 11px 16px;
+  color: var(--text);
+  font-size: 16px; /* 16px: iOS doesn't zoom the page in on tap */
+  font-family: inherit;
+  outline: none;
+}
+
+/* "↓ New message": over the bottom of the messages, above the text box,
+   while one waits below (HoodChatScroll) */
+.chat-jump {
+  align-self: center;
+  position: relative;
+  z-index: 3;
+  margin: -46px 0 8px;
+  min-height: 38px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+
+/* Navigate's map app (index.html #nav-sheet): the car box's look, one big
+   choice per app, named (Google's guidance: name the app on the button) */
+.nav-choice { display: block; text-align: center; text-decoration: none; background: #2c2c2e; color: var(--text); }
+#nav-sheet p { text-align: center; }

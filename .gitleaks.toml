@@ -1,0 +1,19 @@
+# Secret scan settings (`mix hoodride.secrets`, part of `mix precommit`).
+# gitleaks' own rules, plus the few values below that only LOOK like
+# secrets — each matched by its file AND its line, with why it's harmless.
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "The keys for running on your own computer and in tests. The server's own key is set only in /etc/hoodride/env (config/runtime.exs) and is never in the code."
+condition = "AND"
+paths = ['''^(\./)?config/(dev|test)\.exs$''']
+regexTarget = "line"
+regexes = ['''^\s*secret_key_base: "''']
+
+[[allowlists]]
+description = "The sample WebSocket key from the WebSocket standard itself (RFC 6455: base64 of 'the sample nonce'), used in a test."
+condition = "AND"
+paths = ['''^(\./)?test/hoodride_web/ws_frame_limit_test\.exs$''']
+regexes = ['''^dGhlIHNhbXBsZSBub25jZQ==$''']

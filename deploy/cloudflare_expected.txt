@@ -1,0 +1,3 @@
+/ static.cloudflareinsights.com/beacon.min.js
+/privacy static.cloudflareinsights.com/beacon.min.js
+/privacy /cdn-cgi/…/email-decode.min.js
