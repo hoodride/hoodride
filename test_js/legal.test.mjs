@@ -48,6 +48,10 @@ function label(lang, msgid) {
   throw new Error(`${lang}: no "${msgid}" in its .po`);
 }
 
+// where Firefox's own translation keeps "Do Not Track" in English
+// (mozilla-l10n/firefox-l10n, preferences.ftl: do-not-track-removal3)
+const DNT_ENGLISH = ["it", "de", "zh-Hant", "ja", "th", "tr", "pl", "cs", "hu"];
+
 // the buttons each page names: the reader must find them by the same words
 const LABELS = {
   privacy: ["Privacy Policy", "Delete account", "Refresh from Google", "Change", "Navigate", "Sign out"],
@@ -129,6 +133,19 @@ for (const page of ["privacy", "terms"]) {
         assert.equal(body.split(gloss).length - 1, 1, "the damages in English beside the translation, once");
         const s13 = body.match(/<h2>13\.[\s\S]*?<\/p>/)[0];
         assert.ok(s13.includes(gloss), "in section 13");
+      }
+
+      // "Do Not Track" (owner, 2026-11-05 — the Termly style): the language's
+      // own term first, the standard's name in brackets, marked English; the
+      // name alone where Firefox's own translation keeps it in English
+      if (page === "privacy") {
+        const heads = all(body, /<h2>([^\n]*?Do Not Track[^\n]*?)<\/h2>/g);
+        assert.equal(heads.length, 1, "one Do Not Track heading");
+        if (DNT_ENGLISH.includes(lang)) assert.equal(heads[0], "Do Not Track", "kept as the standard's name (as Firefox does here)");
+        else {
+          const m = heads[0].match(/^(.+) <span lang="en" dir="ltr">\(Do Not Track\)<\/span>$/);
+          assert.ok(m && !/Do Not Track/.test(m[1]) && m[1].trim().length > 1, `the local term first, then (Do Not Track): ${heads[0]}`);
+        }
       }
 
       // the app's buttons by their own names in this language
