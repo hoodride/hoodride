@@ -87,6 +87,8 @@ const FITS_ALL = (langs) => `(async () => {
       document.head.appendChild(s);
     });
     if (HoodI18n.lang() !== lang) { out.push({ lang, screen: "catalog", in: HoodI18n.lang(), over: -1 }); continue; }
+    // (as the server serves it: Arabic, Hebrew, Urdu mirrored)
+    document.documentElement.dir = ["ar", "he", "ur"].includes(lang) ? "rtl" : "ltr";
     // the rider's map, a car's card, the chat with it
     mode("rider");
     refreshControls();
@@ -254,7 +256,7 @@ await journey("languages: no English left in a made-up language, nothing cut off
   // are: everything fits. The longest short labels, measured against
   // English (French, Russian, Greek, German — "Terms" → "Nutzungsbedingungen"),
   // and wide scripts (Tamil, Japanese); if these fit, shorter ones do
-  for (const lang of ["es", "fr", "ru", "el", "de", "ta", "ja"]) {
+  for (const lang of ["es", "fr", "ru", "el", "de", "ta", "ja", "ar"]) {
     step(`${lang}: the same screens, every word fits`);
     const p = await browser.visitor(`BT-${lang}`);
     await p.phone(390, 780, 2);
@@ -263,6 +265,10 @@ await journey("languages: no English left in a made-up language, nothing cut off
     await p.goto(`${BASE}/`);
     await p.waitFor(`!!document.getElementById("auth-buttons") && !document.getElementById("auth-buttons").classList.contains("hidden")`, `${lang}: the sign-in buttons`);
     check(await p.eval(`HoodI18n.lang() === ${JSON.stringify(lang)} && document.documentElement.lang === ${JSON.stringify(lang)}`), `${lang}: the page served in it`);
+    if (lang === "ar") {
+      // right to left: the page mirrors (styles.css: start/end, never left/right)
+      check(await p.eval(`document.documentElement.dir === "rtl"`), "ar: served right to left");
+    }
     const fits = async (q, where) => {
       await q.waitFor(SETTLED, `${where}: settled`);
       const spills = await q.eval(SPILLS);
@@ -271,6 +277,21 @@ await journey("languages: no English left in a made-up language, nothing cut off
     await fits(p, "the sign-in screen");
     const white = await p.eval(`HoodCar.colorName("White")`);
     await walk(p, fits, white);
+    if (lang === "ar") {
+      // mirrored: the profile picture top right, the locate button bottom
+      // left, the menu sliding in from the right
+      const sides = await p.eval(`(async () => {
+        const r = (id) => document.getElementById(id).getBoundingClientRect();
+        const out = { account: r("btn-account").left > innerWidth / 2, locate: r("btn-locate").right < innerWidth / 2 };
+        openSettings();
+        await new Promise((ok) => setTimeout(ok, 400));
+        const d = document.getElementById("settings-sheet").getBoundingClientRect();
+        out.menu = Math.round(d.right) === innerWidth && d.left > 0;
+        closeSettings();
+        return out;
+      })()`);
+      check(sides.account && sides.locate && sides.menu, "ar: mirrored — profile top right, locate bottom left, menu from the right", sides);
+    }
     check(p.errors.length === 0, `${lang}: no page errors`, p.errors);
     await p.close();
   }

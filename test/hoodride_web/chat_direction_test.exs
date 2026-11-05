@@ -35,11 +35,13 @@ defmodule HoodrideWeb.ChatDirectionTest do
   end
 
   # dir="auto" also ALIGNS a right-to-left line right: an Arabic preview
-  # jumped to the far side of the row (Chrome check). The layout is
-  # left-to-right; only the reading order inside flips
-  test "the name and preview stay under each other on the left" do
+  # jumped to the far side of the row (Chrome check). The row's own side
+  # stays — the page's start: left in English, right in Arabic, Hebrew,
+  # Urdu (start, not left: the page mirrors — 2026-11-05); only the
+  # reading order inside flips
+  test "the name and preview stay under each other at the page's start" do
     css = File.read!("priv/static/styles.css")
-    assert css =~ ~r/\.chat-item-info strong, \.chat-item-info \.muted \{ text-align: left; \}/
+    assert css =~ ~r/\.chat-item-info strong, \.chat-item-info \.muted \{ text-align: start; \}/
   end
 
   test "a refused message with stacked marks says why" do

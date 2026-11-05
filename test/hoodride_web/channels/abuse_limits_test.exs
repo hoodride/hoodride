@@ -145,6 +145,12 @@ defmodule HoodrideWeb.AbuseLimitsTest do
 
     for i <- 1..60, do: push(ride_a, "pos", %{"lat" => 1.0 + i / 1000, "lng" => 2.0})
 
+    # asked straight after the flood — the channel answers in order, the
+    # allowance still spent. (Asked after the wait below it once got through:
+    # the allowance refills one every 0.5 s, and on a busy machine the
+    # waiting took longer — 2026-11-05)
+    assert {:error, %{reason: "rate_limited"}} = reply(ride_a, "arrived", %{})
+
     # the partner's broadcast stream stops at the burst allowance
     received =
       Stream.repeatedly(fn ->
@@ -158,7 +164,6 @@ defmodule HoodrideWeb.AbuseLimitsTest do
       |> length()
 
     assert received == 31
-    assert {:error, %{reason: "rate_limited"}} = reply(ride_a, "arrived", %{})
   end
 
   # ===== Part 3: newest wins — one live session per account =====

@@ -137,6 +137,48 @@ defmodule HoodrideWeb.LangTest do
       assert catalog < app
     end
 
+    # Arabic, Hebrew, Urdu read right to left: the whole page mirrors
+    # (owner, 2026-11-05)
+    test "a right-to-left language: the page served dir=rtl; the others not" do
+      for lang <- ~w(ar he ur) do
+        assert asking(lang) |> get("/") |> html_response(200) =~
+                 ~s(<html lang="#{lang}" dir="rtl">)
+      end
+
+      for lang <- ~w(en es ja) do
+        refute asking(lang) |> get("/") |> html_response(200) =~ ~s(dir="rtl")
+      end
+    end
+
+    # it mirrors by itself only if nothing is pinned to a side: start/end,
+    # never left/right, for what isn't symmetric (a centered or full-width
+    # thing — left: 0 with right: 0, left: 50% — is the same either way)
+    test "the styles mirror: no one-sided left/right" do
+      css = File.read!("priv/static/styles.css") |> String.replace(~r{/\*.*?\*/}s, "")
+
+      for bad <- [
+            ~r/margin-(left|right)\s*:/,
+            ~r/padding-(left|right)\s*:/,
+            ~r/text-align\s*:\s*(left|right)/,
+            ~r/border-(top|bottom)-(left|right)-radius/,
+            ~r/(?<![-\w])float\s*:/
+          ] do
+        refute css =~ bad, "#{inspect(bad)}: use start/end (inline) so right-to-left pages mirror"
+      end
+
+      # a lone `right:` (or `left:`) pins one side: allowed only beside its
+      # pair (full width) or as a centred 50%
+      for [rule] <- Regex.scan(~r/\{[^}]*\}/, css),
+          one =
+            Regex.match?(~r/(?<![-\w])right\s*:/, rule) !=
+              Regex.match?(~r/(?<![-\w])left\s*:/, rule),
+          one do
+        # (or a spot inside a symmetric bubble — the pile's icons at 26/50/74%:
+        # mirrored they'd only swap identical icons)
+        assert rule =~ ~r/left\s*:\s*\d+%/, "pinned to one side: #{String.slice(rule, 0, 120)}"
+      end
+    end
+
     test "the page for an address that doesn't exist: in the language too" do
       conn = asking("en-XA") |> get("/no/such/page")
       html = html_response(conn, 404)

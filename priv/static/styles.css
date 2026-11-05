@@ -79,13 +79,13 @@ a.btn { text-decoration: none; }
 /* (tucked close to the name under it: owner, 2026-10-31) */
 .brand-car { display: block; width: 190px; height: auto; margin: 0 auto -2px; }
 /* the car beside words (top bar, buttons, banners): text-sized */
-.car-icon { height: 1.15em; width: auto; vertical-align: -0.25em; margin-right: 0.35em; }
+.car-icon { height: 1.15em; width: auto; vertical-align: -0.25em; margin-inline-end: 0.35em; }
 /* in a button the button's own 10 px gap already separates it: a space's
    width in all (owner, 2026-10-31: "Drive" was too wide) */
-.btn .car-icon { margin-right: calc(0.35em - 10px); }
+.btn .car-icon { margin-inline-end: calc(0.35em - 10px); }
 /* the other icons (✋ 📍 🧭 💬 — icons.js): square pictures, the same way */
-.emoji-icon { height: 1.2em; width: 1.2em; vertical-align: -0.25em; margin-right: 0.35em; }
-.btn .emoji-icon { margin-right: calc(0.35em - 10px); }
+.emoji-icon { height: 1.2em; width: 1.2em; vertical-align: -0.25em; margin-inline-end: 0.35em; }
+.btn .emoji-icon { margin-inline-end: calc(0.35em - 10px); }
 .brand h1 {
   font-size: 40px;
   line-height: 1.1;
@@ -220,7 +220,7 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 0;
+  inset-inline-start: 0;
   z-index: 21;
   width: min(80vw, 360px);
   display: flex;
@@ -234,12 +234,14 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
      land in a still-hidden drawer (an animated visibility starts hidden) */
   transition: transform 0.2s ease, visibility 0s linear 0.2s;
 }
+/* right to left: it slides in from the right (its shadow on the left) */
+[dir="rtl"] .drawer { transform: translateX(105%); box-shadow: -4px 0 20px rgba(0,0,0,0.5); }
 .drawer.open { transform: none; visibility: visible; transition: transform 0.2s ease, visibility 0s; }
 @media (prefers-reduced-motion: reduce) {
   .drawer, .drawer-backdrop { transition: none; }
 }
-.drawer-close { top: calc(12px + env(safe-area-inset-top)); right: 12px; font-size: 18px; }
-.drawer-me { display: flex; align-items: center; gap: 12px; padding: 8px 36px 16px 4px; min-width: 0; border-bottom: 1px solid #333; }
+.drawer-close { top: calc(12px + env(safe-area-inset-top)); inset-inline-end: 12px; font-size: 18px; }
+.drawer-me { display: flex; align-items: center; gap: 12px; padding: 8px 0 16px; padding-inline: 4px 36px; min-width: 0; border-bottom: 1px solid #333; }
 .drawer-me strong { font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #settings-name:focus { outline: none; }
 /* name, then "Change" under it */
@@ -275,7 +277,7 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   background: transparent;
   color: inherit;
   font: inherit;
-  text-align: left;
+  text-align: start;
   cursor: pointer;
 }
 .drawer-row:hover, .drawer-row:focus-visible { background: #2c2c2e; }
@@ -412,7 +414,7 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 
 .btn-locate {
   position: absolute;
-  right: 14px;
+  inset-inline-end: 14px;
   bottom: calc(96px + env(safe-area-inset-bottom));
   z-index: 10;
   width: 48px;
@@ -494,7 +496,7 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 .marker-bubble .pile-more {
   position: absolute;
   top: -8px;
-  right: -8px;
+  inset-inline-end: -8px;
   min-width: 22px;
   height: 22px;
   padding: 0 5px;
@@ -534,7 +536,7 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   background: transparent;
   color: inherit;
   font: inherit;
-  text-align: left;
+  text-align: start;
   cursor: pointer;
 }
 .pile-row:hover, .pile-row:focus-visible { background: #2c2c2e; }
@@ -577,7 +579,7 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 .card-close {
   position: absolute;
   top: 8px;
-  right: 10px;
+  inset-inline-end: 10px;
   background: none;
   border: none;
   color: var(--muted);
@@ -627,7 +629,8 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  padding: 14px 44px 12px 18px;
+  padding: 14px 0 12px;
+  padding-inline: 18px 44px;
   border-bottom: 1px solid #2c2c2e;
   position: relative;
 }
@@ -661,9 +664,9 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 .chat-item-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .chat-item-info .muted { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* each takes its own direction (dir="auto": Arabic reads right to left) but
-   stays at the left under the photo — dir alone would push an Arabic line
-   to the far side of the row */
-.chat-item-info strong, .chat-item-info .muted { text-align: left; }
+   stays at the page's start, under the photo — dir alone would push an
+   Arabic name to the far side of an English row */
+.chat-item-info strong, .chat-item-info .muted { text-align: start; }
 /* the right side of a row: how long ago, then the unread count */
 .chat-item-side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
 .chat-time { font-size: 12px; }
@@ -702,8 +705,8 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   line-height: 1.35;
   word-wrap: break-word;
 }
-.msg.me { align-self: flex-end; background: var(--accent); color: var(--accent-text); border-bottom-right-radius: 4px; }
-.msg.them { align-self: flex-start; background: #2c2c2e; border-bottom-left-radius: 4px; }
+.msg.me { align-self: flex-end; background: var(--accent); color: var(--accent-text); border-end-end-radius: 4px; }
+.msg.them { align-self: flex-start; background: #2c2c2e; border-end-start-radius: 4px; }
 /* the "about a block" note (off — index.html #chat-note) */
 .chat-note { margin: 0; padding: 6px 12px 0; font-size: 12px; opacity: 0.75; }
 .msg { cursor: pointer; -webkit-tap-highlight-color: transparent; }
@@ -737,7 +740,7 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 
 /* the 500-character warning above the box: from 400, and over the limit
    red AND in words (never color alone) */
-.chat-count { margin: 0; padding: 6px 14px 0; font-size: 12px; color: var(--muted); text-align: right; }
+.chat-count { margin: 0; padding: 6px 14px 0; font-size: 12px; color: var(--muted); text-align: end; }
 .chat-count.over { color: var(--danger); font-weight: 600; }
 /* read by screen readers, not shown */
 .sr-only {

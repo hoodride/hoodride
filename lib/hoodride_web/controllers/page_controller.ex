@@ -28,7 +28,16 @@ defmodule HoodrideWeb.PageController do
 
   def in_language(html, lang) do
     html
-    |> String.replace(~s(<html lang="en">), ~s(<html lang="#{lang}">), global: false)
+    |> String.replace(
+      ~s(<html lang="en">),
+      # (right-to-left languages: the whole page mirrors — styles.css uses
+      # start/end, never left/right)
+      if(I18n.rtl?(lang),
+        do: ~s(<html lang="#{lang}" dir="rtl">),
+        else: ~s(<html lang="#{lang}">)
+      ),
+      global: false
+    )
     |> then(
       &Regex.replace(~r{<script src="(/?)i18n\.js(\?vsn=[^"]*)?"></script>}, &1, fn tag,
                                                                                     root,

@@ -1,0 +1,1186 @@
+# Hood Ride in Hebrew. A first translation (2026-11-04).
+# Plural forms by name, in this order: one, two, other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: he\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=3; plural=(n == 1 ? 0 : n == 2 ? 1 : 2);\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(הבקשה בוטלה)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "אישור הנסיעה"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "מאשרים את הנסיעה…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "מאשרים…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "צריך להוסיף אותה לפני הנהיגה"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "הוספת הרכב שלך"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "השאלה תופיע בפעם הראשונה שתנווטו"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "חזרה"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "חזרה לדף הכניסה"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "לפני שמתחילים"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "בז׳"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "בז׳"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "שחורה"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "שחורה"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "כחולה"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "כחולה"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "חומה"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "חומה"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "המשך השימוש מהווה הסכמה ל{terms} ול{privacy} שלנו."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "אין חיבור ל-Hood Ride — מנסים שוב…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "אין חיבור ל-Hood Ride — כדאי לנסות שוב"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "ביטול"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "ביטול הבקשה"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "קודם צריך לבטל את בקשת הנסיעה"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "קודם צריך לבטל את בקשת הנסיעה."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "מרכוז לפי המיקום שלי"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "שינוי"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "אפשר לשנות בכל שלב: מקישים על תמונת הפרופיל בפינה הימנית העליונה ואז על {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "שינוי ב-{provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "שיניתם אותם?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "צ׳אט"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "הצ׳אט עם {name} הסתיים — לא היו פעילים כבר זמן מה"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "צ׳אטים"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "צריך לבדוק את השדות: {fields} (עד {max} תווים בכל אחד)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "בחירה…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "סגירה"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "סגירת ההגדרות"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "צבע"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "מתחברים…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "בעיה בחיבור — מנסים שוב"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "החיבור אופס — מקישים על התחברות כדי לחזור לנהוג"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "החיבור אופס — אם עדיין צריך נסיעה, מקישים שוב על ✋"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "החיבור אופס — הנסיעה הסתיימה באופן לא צפוי, צריך לתאם אותה מחדש"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "החיבור אופס — בקשת הנסיעה אבדה, צריך לבקש שוב"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "המשך עם Facebook"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "המשך עם Google"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "הועתק ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "העתקה"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "העתקת ההודעה"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "לא ניתן היה לאשר"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "לא ניתן היה להעתיק"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "לא ניתן היה למחוק את החשבון — כדאי לנסות שוב."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "אין חיבור ל-Hood Ride — כדאי לבדוק את החיבור לאינטרנט ולנסות שוב."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "אין חיבור ל-Hood Ride — כדאי לנסות שוב"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "אין חיבור לשרת — כדאי לנסות שוב"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "הרענון האוטומטי נכשל — מקישים על תמונת הפרופיל בפינה הימנית העליונה, ואז על שינוי ואז על רענון מ-Google"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "אי אפשר לרענן כרגע — כדאי לנסות שוב מאוחר יותר"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "אי אפשר לשמור כרגע — כדאי לנסות שוב בעוד רגע."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "השמירה נכשלה — כדאי לנסות שוב"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "לא ניתן היה לשלוח את הבקשה"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "הכניסה נכשלה — כדאי לנסות שוב"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "היציאה נכשלה — כדאי לנסות שוב"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "מחיקה"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "דחייה"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "מחיקת החשבון"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "מחיקת החשבון שלי"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "למחוק את החשבון?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "הדגמה"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "נהיגה"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "נהג"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "הנהג לא יכול לקחת את הנסיעה הזו — כדאי לנסות נהג אחר"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "סיום הנסיעה"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "קודם צריך לסיים את הנסיעה"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "קודם צריך לסיים את הנסיעה."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "קודם צריך לסיים את הנסיעה הנוכחית"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "ניתוק"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "התחברות"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "כדאי לחכות דקה לפני שמבקשים שוב מהנהג הזה"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "מעבר ל-Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "זהב"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "זהב"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "זה יכול לקחת ל-Google קצת זמן"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "אפורה"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "אפורה"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "ירוקה"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "ירוקה"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride ב-Discord"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride נפתח במכשיר אחר"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "אני מסכים/ה"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "הגעתי"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "יציאה מההדגמה"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "יצרן"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "יצרנים"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "מפה"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "משוב על המפה"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "סמן במפה"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "נפגשים כאן"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "הודעה"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "ההודעה לא נשלחה — יש חיבור?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "ההודעה לא נשלחה — כדאי לנסות שוב"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "יש בהודעה יותר מדי סימנים על אות אחת"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "ההודעה ארוכה מדי — עד {max} תווים"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "הודעה…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "דגם"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "ניווט"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "אפליקציית ניווט"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "דרושה נסיעה"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "שכנים מסיעים שכנים. רואים מכוניות ואנשים בסביבה שצריכים נסיעה, שולחים הודעות ונוסעים יחד."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "לא זמין"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "בכל המכשירים שלך"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "פתיחת מסלול ב-"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "כתומה"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "כתומה"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "צבע אחר"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "הדף לא נמצא"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "הדף לא נמצא — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "בדרך לאסוף את {name} · מקישים על 🧭 כדי לנווט"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "בדרך לאסוף את {name} · {seen} · מקישים על 🧭 כדי לנווט"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "יש לקרוא את {terms} ואת {privacy} שלנו ולאשר אותם."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "מדיניות הפרטיות"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "מדיניות הפרטיות"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "סגולה"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "סגולה"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "מתחברים מחדש ל-Hood Ride…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "אדומה"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "אדומה"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "רענון מ-Google"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "הבקשה בוטלה"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "הבקשה נדחתה"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "תוקף הבקשה פג — אפשר לבקש שוב או לנסות נהג אחר"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "בקשת נסיעה"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "הבקשה נשלחה…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "מבקשים נסיעה…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "שולחים בקשה…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "הנסיעה הסתיימה"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "נסיעה עם {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "הנוסעים לא רואים אותך. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "הנוסעים מחפשים אותו כשבאים לאסוף אותם. צריך להוסיף אותו כדי להתחבר."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "הנוסעים רואים את זה כדי שיוכלו למצוא אותך"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "נסיעות עם השכנים"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "אתרי Safari (או שם הדפדפן שלך, אם הוא לא Safari)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "שמירה"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "שמירה והתחברות"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "שליחה"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "הגדרות"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "הגדרות ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "הגדרות › אפליקציות › {app} › הרשאות › מיקום"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "הגדרות › פרטיות ואבטחה › שירותי מיקום › {app} › מיקום מדויק: מופעל"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "הגדרות › פרטיות ואבטחה › שירותי מיקום › {app} › בעת השימוש ביישום, ומפעילים את מיקום מדויק"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "הצגה או הסתרה של הקרדיטים של המפה"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "יציאה"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "נכנסים…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "כסופה"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "כסופה"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "קוד המקור ב-GitHub"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "מקישים כדי להסיר"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "התנאים"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "הנהג הזה כבר לא בסביבה"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "הנוסע הזה כבר לא מחפש נסיעה"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "אי אפשר לבטל את הפעולה הזו. החשבון יימחק, הוא יוסר מהמפה, השיחות ייסגרו ותתבצע יציאה בכל המכשירים. כניסה מחדש בהמשך תיצור חשבון חדש."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "הדף הזה לא קיים."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "מאוחר מדי — הבקשה בוטלה"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "יותר מדי ניסיונות כניסה כושלים מהרשת שלך — כדאי לנסות שוב מאוחר יותר."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "יש להקליד {word} לאישור"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "יש להקליד {word} לאישור."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "יש עדכון — מקישים כדי לטעון מחדש"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "שימוש כאן"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "לבנה"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "לבנה"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "צהובה"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "צהובה"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "כבר יש לך בקשה פתוחה"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "אפשר לרענן אחרי הנסיעה"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "אפשר לרענן את השם והתמונה אחרי הנסיעה"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "הגעת · אוספים את {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "פנית להרבה אנשים חדשים — כדאי לנסות שוב מאוחר יותר"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "רעננת הרבה פעמים — כדאי לנסות שוב בעוד כמה דקות"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "פתחת הרבה צ׳אטים חדשים — כדאי לנסות שוב מאוחר יותר"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "הרכב שלך"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "השם והתמונה שלך מגיעים מ-{provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "הנוסע שלך"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "צריך להגדיל את המפה כדי לראות מי בסביבה"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "אישרתי! בדרך 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "סבבה, אני רואה אותך"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "סגור, סבבה"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "סבבה, אז אני בא אליך"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "צריך לאפשר מיקום מדויק לאתר הזה בהגדרות הדפדפן"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "מגיע עוד כמה דקות"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "לוחצים על הסמל מימין לסרגל הכתובות (בראש הדפדפן) › מיקום › הפעלה"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "צבע"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "מעולה, אני מחכה לך"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "קיבלתי, בדרך לסיכה שלך 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "הגעתי! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "היי! אני ליד המכבסה ברחוב 3, אפשר לאסוף אותי? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "נראה לאחרונה לפני יותר משעה"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "נראה לאחרונה לפני {n} דק׳"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "יצרן"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "דגם"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "בסביבה"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "עכשיו"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "יוצא עוד רגע 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "פותחים את התפריט › הגדרות › אתרים והורדות › הרשאות אתר › מיקום"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "פותחים את ההגדרות של הדפדפן › פרטיות ואבטחה › הגדרות האתר › מיקום › מאפשרים ל-Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "פותחים את {app} › ⋮ › הגדרות › הגדרות לאתרים › מיקום › מאפשרים ל-Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "פותחים את ⋮ › הגדרות › הגדרות אתר › מיקום › לבקש לאפשר"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "כדי שהנהג יוכל למצוא אותך"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "כדי ששותף הנסיעה יוכל למצוא אותך"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "מעולה, נתראה עוד מעט!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "מקישים על הסמל מימין לסרגל הכתובות (בראש המסך) › הרשאות › מיקום › הפעלה (אם צריך לבחור, בוחרים מדויק)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "כדי לבקש נסיעה"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "כדי לנהוג"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "כדי להראות איפה המיקום שלך"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "מפעילים את המיקום (מחליקים למטה › מיקום)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "מפעילים את שירותי מיקום (הגדרות › פרטיות ואבטחה)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "מפעילים את המיקום במכשיר הזה"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "כן, אני יכול לאסוף אותך"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "כן, בבקשה! אני ליד הספסלים 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "היי, מה קורה?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "היי, ראיתי את היד ✋ צריך איסוף?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "בטוח? אני עדיין תקוע פה 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "הדפדפן שלך"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · הנהג שלך"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{make} {model} {color}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "{count} מכונית באזור"
+msgstr[1] "{count} מכוניות באזור"
+msgstr[2] "{count} מכוניות באזור"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "{count} מכונית כאן"
+msgstr[1] "{count} מכוניות כאן"
+msgstr[2] "{count} מכוניות כאן"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "נשאר {count} תו"
+msgstr[1] "נשארו {count} תווים"
+msgstr[2] "נשארו {count} תווים"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count} תו מיותר"
+msgstr[1] "{count} תווים מיותרים"
+msgstr[2] "{count} תווים מיותרים"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count} תו מיותר — צריך לקצר את ההודעה כדי לשלוח"
+msgstr[1] "{count} תווים מיותרים — צריך לקצר את ההודעה כדי לשלוח"
+msgstr[2] "{count} תווים מיותרים — צריך לקצר את ההודעה כדי לשלוח"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} אדם כאן"
+msgstr[1] "{count} אנשים כאן"
+msgstr[2] "{count} אנשים כאן"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} אדם כאן רוצה נסיעה"
+msgstr[1] "{count} אנשים כאן רוצים נסיעה"
+msgstr[2] "{count} אנשים כאן רוצים נסיעה"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "במרחק {distance}"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} הגיע/ה"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} בנסיעה כרגע"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} בדרך"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} לא זמין/ה כרגע"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} לא זמין/ה כרגע — כדאי לנסות נהג אחר"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} לא מופיע/ה בתצוגה — צריך להגדיל את המפה ולמצוא שוב את הרכב"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} התנתק/ה — כדאי לנסות נהג אחר"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "לפני {n} שע׳"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} ק״מ"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} מייל"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "לפני {n} דק׳"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} ימ׳"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} שע׳"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} דק׳"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site} — ובטלפון: {steps} › אישור, כשהאפשרות שימוש במיקום מדויק מופעלת"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · מתחברים מחדש…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps} — או, אם בחרת במיקום משוער ל-Hood Ride: מקישים על הסמל מימין לכתובת האתר › הרשאות › איפוס ההרשאות, ואז מנסים שוב ובוחרים מדויק"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › שימוש במיקום מדויק"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. Hood Ride ייטען מחדש כשחוזרים."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ הודעה חדשה"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ רגע, לאט יותר"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ מחכים לנהג…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ שולחים מהר מדי — רגע, לאט יותר"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ מחפשים נסיעה…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ נהגים בסביבה רואים שצריך נסיעה"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ דרושה נסיעה"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ מישהו בסביבה רוצה נסיעה"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ רוצה נסיעה"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 צ׳אט"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 צ׳אט ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 כשהדפדפן מבקש, צריך לאפשר גישה למיקום — Hood Ride צריך אותו {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 מאתרים את המיקום שלך…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 הגישה למיקום חסומה ל-Hood Ride — צריך לאפשר אותה {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 המיקום כבוי במכשיר הזה — {steps} {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 נפגשים כאן"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 נקודת המפגש נקבעה — הנהג רואה אותה"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 הזזת הסיכה"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 הסיכה הוסרה — הנהג יגיע אליך"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 שיתוף המיקום"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 שיתוף המיקום כדי ששותף הנסיעה יוכל למצוא אותך"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 מקישים על המפה במקום שבו רוצים להיפגש"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 מחכים למיקום שלך — הנוסעים עוד לא רואים אותך"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 המיקום שלך משוער בלבד — צריך להפעיל את מיקום מדויק {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 ביקש/ה נסיעה"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 נסיעה"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 במצב מחובר"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 מחכים למיקום המדויק של {name} — אפשר גם לבקש לסמן 📍 נקודת מפגש"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} נראה/תה שם לאחרונה לפני יותר משעה"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} נראה/תה שם לאחרונה לפני {n} דק׳"

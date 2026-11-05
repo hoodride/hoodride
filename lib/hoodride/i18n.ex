@@ -23,8 +23,9 @@ defmodule Hoodride.I18n do
   # every language with a catalog, English first. A new one: its .po, then
   # its tag here (a test keeps the two the same)
   # (Apple's App Store list, one version of each language, plus Filipino
-  # and Swahili — owner, 2026-11-04; right-to-left Arabic, Hebrew, Urdu next)
-  @known ~w(en es pt-BR fr it ca de nl sv da nb fi zh-Hans zh-Hant ja ko vi th id ms fil tr ru uk pl cs sk hr sl ro hu el sw hi bn mr te ta gu kn ml or pa en-XA)
+  # and Swahili — owner, 2026-11-04; Arabic, Hebrew, Urdu read right to
+  # left: rtl/0)
+  @known ~w(en es pt-BR fr it ca de nl sv da nb fi zh-Hans zh-Hant ja ko vi th id ms fil tr ru uk pl cs sk hr sl ro hu el sw hi bn mr te ta gu kn ml or pa ar he ur en-XA)
 
   # the pseudo-language's catalog comes from the list, not a .po
   @pseudo "en-XA"
@@ -46,6 +47,11 @@ defmodule Hoodride.I18n do
       wanted -> Enum.filter(@known, &(&1 == "en" or &1 in wanted))
     end
   end
+
+  @rtl ~w(ar he ur)
+
+  @doc "Whether a language reads right to left (the page then mirrors: dir=\"rtl\")."
+  def rtl?(lang), do: lang in @rtl
 
   @doc "A language's script, as the page asks for it (none for English)."
   def script("en"), do: nil
@@ -103,7 +109,10 @@ defmodule Hoodride.I18n do
     "kn" => ~w(one other),
     "ml" => ~w(one other),
     "or" => ~w(one other),
-    "pa" => ~w(one other)
+    "pa" => ~w(one other),
+    "ar" => ~w(zero one two few many other),
+    "he" => ~w(one two other),
+    "ur" => ~w(one other)
   }
 
   @doc """
