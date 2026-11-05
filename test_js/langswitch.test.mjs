@@ -119,3 +119,26 @@ test("every other name people type finds its language", () => {
   ])
     assert.ok(found(q).includes(tag), `${q} → ${tag}: ${found(q)}`);
 });
+
+// ----- the five added 2026-11-05: Haitian Creole and Hmong aren't in CLDR
+// (browsers show English names): their own names, as Wikipedia lists them /
+// as the language writes itself; every common way of typing each found -----
+test("the five new languages, each in its own words", () => {
+  assert.equal(L.name("ht"), "Kreyòl ayisyen");
+  assert.equal(L.name("hmn"), "Hmoob");
+  assert.equal(L.name("so"), "Soomaali");
+  assert.equal(L.name("am"), "አማርኛ");
+  assert.equal(L.name("fa"), "فارسی");
+});
+
+test("found by every common name: Farsi, Dari, Hmong, Mong, Haitian, Creole…", () => {
+  const five = ["en", "ht", "so", "am", "fa", "hmn"];
+  const top = (q) => L.search(five, q, "en")[0]?.tag;
+  for (const [q, tag] of [
+    ["farsi", "fa"], ["persian", "fa"], ["dari", "fa"], ["فارسی", "fa"],
+    ["hmong", "hmn"], ["mong", "hmn"], ["hmoob", "hmn"], ["hmong daw", "hmn"],
+    ["haitian", "ht"], ["creole", "ht"], ["kreyol", "ht"],
+    ["somali", "so"], ["soomaali", "so"], ["amharic", "am"], ["አማርኛ", "am"],
+  ])
+    assert.equal(top(q), tag, q);
+});

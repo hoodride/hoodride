@@ -25,7 +25,7 @@ defmodule Hoodride.I18n do
   # (Apple's App Store list, one version of each language, plus Filipino
   # and Swahili — owner, 2026-11-04; Arabic, Hebrew, Urdu read right to
   # left: rtl/0)
-  @known ~w(en es pt-BR fr it ca de nl sv da nb fi zh-Hans zh-Hant ja ko vi th id ms fil tr ru uk pl cs sk hr sl ro hu el sw hi bn mr te ta gu kn ml or pa ar he ur en-XA)
+  @known ~w(en es pt-BR fr it ca de nl sv da nb fi zh-Hans zh-Hant ja ko vi th id ms fil tr ru uk pl cs sk hr sl ro hu el sw hi bn mr te ta gu kn ml or pa ar he ur ht so am fa hmn en-XA)
 
   # the pseudo-language's catalog comes from the list, not a .po
   @pseudo "en-XA"
@@ -98,7 +98,15 @@ defmodule Hoodride.I18n do
     "pa" => "ਪੰਜਾਬੀ",
     "ar" => "العربية",
     "he" => "עברית",
-    "ur" => "اردو"
+    "ur" => "اردو",
+    # Haitian Creole and Hmong aren't in CLDR (browsers show their English
+    # names): their own names as Wikipedia lists them (MediaWiki Names.php:
+    # "Kreyòl ayisyen") and as the language writes itself ("lus Hmoob")
+    "ht" => "Kreyòl ayisyen",
+    "so" => "Soomaali",
+    "am" => "አማርኛ",
+    "fa" => "فارسی",
+    "hmn" => "Hmoob"
   }
 
   @doc "A language's name in its own words (the pseudo-language: its tag)."
@@ -111,7 +119,7 @@ defmodule Hoodride.I18n do
   """
   def addressed, do: Enum.reject(on(), &(&1 in ["en", @pseudo]))
 
-  @rtl ~w(ar he ur)
+  @rtl ~w(ar he ur fa)
 
   @doc "Whether a language reads right to left (the page then mirrors: dir=\"rtl\")."
   def rtl?(lang), do: lang in @rtl
@@ -175,8 +183,22 @@ defmodule Hoodride.I18n do
     "pa" => ~w(one other),
     "ar" => ~w(zero one two few many other),
     "he" => ~w(one two other),
-    "ur" => ~w(one other)
+    "ur" => ~w(one other),
+    # the five US-community languages (owner, 2026-11-05: Haitian Creole,
+    # Somali, Amharic, Persian, Hmong — the languages US cities and states
+    # translate into that Hood Ride lacked). CLDR has Somali's, Amharic's
+    # and Persian's; Haitian Creole and Hmong have no CLDR plural rules
+    # (browsers fall back to another language's) — both use one form
+    # whatever the number: "other" alone, so no fallback is ever asked
+    "ht" => ~w(other),
+    "so" => ~w(one other),
+    "am" => ~w(one other),
+    "fa" => ~w(one other),
+    "hmn" => ~w(other)
   }
+
+  @doc "A language's CLDR plural categories, in its translation file's order."
+  def plural_categories(lang), do: Map.fetch!(@plural_categories, lang)
 
   @doc """
   The catalog i18n.js loads — `%{"lang" => lang, "messages" => %{key => text}}`

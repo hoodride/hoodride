@@ -27,10 +27,19 @@ defmodule Hoodride.OpenSourceTest do
            "Apache License\n                           Version 2.0, January 2004"},
           {"phoenix.min.js", "phoenix.LICENSE.txt", "Copyright (c) 2014 Chris McCord"},
           {"icons.js", "fluent-emoji.LICENSE.txt", "Copyright (c) Microsoft Corporation."},
-          {"translate.svg", "material-symbols.LICENSE.txt", "Apache License"}
+          {"translate.svg", "material-symbols.LICENSE.txt", "Apache License"},
+          {"fonts/NotoSansEthiopic-Regular.ttf", "fonts/noto-sans-ethiopic.OFL.txt",
+           "SIL OPEN FONT LICENSE Version 1.1"},
+          {"fonts/NotoSansEthiopic-Bold.ttf", "fonts/noto-sans-ethiopic.OFL.txt",
+           "SIL OPEN FONT LICENSE Version 1.1"}
         ] do
       assert File.read!(Path.join(@static, license)) =~ must, license
-      assert file in HoodrideWeb.static_paths() and license in HoodrideWeb.static_paths(), license
+      assert File.regular?(Path.join(@static, file)), file
+      # served: the file, or its folder (fonts/), among the static paths
+      served =
+        &(&1 in HoodrideWeb.static_paths() or hd(Path.split(&1)) in HoodrideWeb.static_paths())
+
+      assert served.(file) and served.(license), license
       assert root("THIRD-PARTY.md") =~ "`#{license}`", license
     end
 

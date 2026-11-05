@@ -14,8 +14,10 @@
   const COOKIE = "hoodride_lang";
 
   // how these languages name themselves in language menus (CLDR alone
-  // gives "Indonesia", "Melayu")
-  const OWN = { id: "Bahasa Indonesia", ms: "Bahasa Melayu" };
+  // gives "Indonesia", "Melayu"; Haitian Creole and Hmong aren't in CLDR
+  // at all — browsers would show their English names: Wikipedia's own name
+  // for Haitian Creole, the language's own word for Hmong)
+  const OWN = { id: "Bahasa Indonesia", ms: "Bahasa Melayu", ht: "Kreyòl ayisyen", hmn: "Hmoob" };
 
   // a language's own name, capitalized as it writes it
   function name(tag) {
@@ -50,6 +52,9 @@
     pa: ["Panjabi"],
     ms: ["Malay"],
     id: ["Indonesian"],
+    ht: ["Haitian", "Creole", "Kreyòl"],
+    fa: ["Farsi", "Dari"],
+    hmn: ["Mong", "Hmong Daw", "Hmoob Dawb", "Moob"],
   };
 
   // as people type it: no capitals, no accents ("espanol" finds Español)

@@ -1,3 +1,22 @@
+/* Amharic's script (Ethiopic) for phones without a font for it (owner,
+   2026-11-05: not every phone has one — iPhones unconfirmed): Google's Noto Sans Ethiopic,
+   unchanged (fonts/, SIL OFL — THIRD-PARTY.md). unicode-range: a browser
+   fetches it only for Ethiopic letters its own fonts lack — never for
+   anyone else */
+@font-face {
+  font-family: "Noto Sans Ethiopic";
+  src: url("fonts/NotoSansEthiopic-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+1200-139F, U+2D80-2DDF, U+AB01-AB2E, U+1E7E0-1E7FE;
+}
+@font-face {
+  font-family: "Noto Sans Ethiopic";
+  src: url("fonts/NotoSansEthiopic-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+  unicode-range: U+1200-139F, U+2D80-2DDF, U+AB01-AB2E, U+1E7E0-1E7FE;
+}
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
@@ -14,7 +33,7 @@
 html, body { height: 100%; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Ethiopic", sans-serif;
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;

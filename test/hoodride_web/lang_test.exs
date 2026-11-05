@@ -43,7 +43,22 @@ defmodule HoodrideWeb.LangTest do
 
     # (languages, stage 2: the tags phones actually send)
     test "Chinese by script, Norwegian, Filipino, Portugal, old codes" do
-      on = ["en", "zh-Hans", "zh-Hant", "nb", "fil", "pt-BR", "he", "id", "en-XA"]
+      on = [
+        "en",
+        "zh-Hans",
+        "zh-Hant",
+        "nb",
+        "fil",
+        "pt-BR",
+        "he",
+        "id",
+        "en-XA",
+        "ht",
+        "so",
+        "am",
+        "fa",
+        "hmn"
+      ]
 
       for {asked, got} <- [
             {"zh-CN", "zh-Hans"},
@@ -64,7 +79,21 @@ defmodule HoodrideWeb.LangTest do
             {"iw", "he"},
             {"in-ID", "id"},
             {"en-GB", "en"},
-            {"en-XA", "en-XA"}
+            {"en-XA", "en-XA"},
+            # the five added 2026-11-05: the codes browsers send for them
+            {"ht", "ht"},
+            {"ht-HT", "ht"},
+            {"so-SO", "so"},
+            {"so-KE", "so"},
+            {"am-ET", "am"},
+            {"fa-IR", "fa"},
+            {"fa-AF", "fa"},
+            {"prs", "fa"},
+            {"prs-AF", "fa"},
+            {"hmn", "hmn"},
+            {"hmn-US", "hmn"},
+            {"mww", "hmn"},
+            {"hnj", "hmn"}
           ] do
         assert Lang.match(asked, on) == got,
                "#{asked} → #{inspect(Lang.match(asked, on))}, expected #{got}"
@@ -158,7 +187,7 @@ defmodule HoodrideWeb.LangTest do
     # Arabic, Hebrew, Urdu read right to left: the whole page mirrors
     # (owner, 2026-11-05)
     test "a right-to-left language: the page served dir=rtl; the others not" do
-      for lang <- ~w(ar he ur) do
+      for lang <- ~w(ar he ur fa) do
         assert build_conn() |> get("/" <> lang) |> html_response(200) =~
                  ~s(<html lang="#{lang}" dir="rtl">)
       end
@@ -410,6 +439,106 @@ defmodule HoodrideWeb.LangTest do
         # right under the back link
         assert html =~ ~r{<a class="back" href="[^"]*">[^<]*</a>\n  <details class="lang-row">}
       end
+    end
+  end
+
+  # the picked language kept by the SERVER, renewed on every page (owner,
+  # 2026-11-05): Safari caps a cookie written by the page at 7 days (WebKit,
+  # ITP 2.1); sent in the response it lives its year, from the last visit
+  # Amharic's script for phones without a font for it (owner, 2026-11-05)
+  test "the Ethiopic font: declared only for Ethiopic letters, in both stylesheets, and served" do
+    for {css, prefix} <- [{"priv/static/styles.css", ""}, {"priv/static/privacy.css", "/"}] do
+      text = File.read!(css)
+      faces = Regex.scan(~r/@font-face \{[^}]*\}/, text) |> List.flatten()
+      assert length(faces) == 2, css
+
+      for face <- faces do
+        assert face =~ ~s(font-family: "Noto Sans Ethiopic")
+        assert face =~ ~r/src: url\("#{prefix}fonts\/NotoSansEthiopic-(Regular|Bold)\.ttf"\)/
+        # only Ethiopic: nobody else ever downloads it
+        assert face =~ "unicode-range: U+1200-139F, U+2D80-2DDF, U+AB01-AB2E, U+1E7E0-1E7FE;"
+      end
+
+      assert text =~ ~r/font(-family)?:[^;]*"Noto Sans Ethiopic", sans-serif;/,
+             "#{css}: in the font list"
+    end
+
+    for f <- ~w(NotoSansEthiopic-Regular.ttf NotoSansEthiopic-Bold.ttf) do
+      conn = build_conn() |> get("/fonts/" <> f)
+      assert conn.status == 200, f
+      assert <<0, 1, 0, 0, _::binary>> = conn.resp_body
+    end
+  end
+
+  describe "the language cookie" do
+    defp lang_cookie(conn) do
+      conn
+      |> get_resp_header("set-cookie")
+      |> Enum.find(&String.starts_with?(&1, Lang.cookie() <> "="))
+    end
+
+    test "a picked language: sent back by the server on every page, for a year, the whole site" do
+      for path <- ["/", "/es", "/ja", "/privacy", "/ja/terms", "/no/such/page"] do
+        conn = asking("en") |> put_req_cookie(Lang.cookie(), "es") |> get(path)
+        set = lang_cookie(conn)
+        assert set, "#{path}: not renewed"
+        assert set =~ ~r/^hoodride_lang=es;/
+        assert set =~ "max-age=31536000"
+        assert set =~ "path=/"
+        assert set =~ ~r/SameSite=Lax/i
+        refute set =~ ~r/HttpOnly/i, "the page may read it (a language, not a secret)"
+      end
+    end
+
+    test "in its own spelling; nothing picked, or not a language switched on: nothing set" do
+      assert asking("en")
+             |> put_req_cookie(Lang.cookie(), "PT-br")
+             |> get("/privacy")
+             |> lang_cookie() =~
+               ~r/^hoodride_lang=pt-BR;/
+
+      for value <- [nil, "zz", "", "../x"] do
+        conn =
+          if value, do: asking("ja") |> put_req_cookie(Lang.cookie(), value), else: asking("ja")
+
+        assert conn |> get("/ja") |> lang_cookie() == nil, inspect(value)
+      end
+    end
+
+    # OWASP WSTG-SESS-02 (cookie attributes) and Cloudflare's caching rules
+    # (owner, 2026-11-05: "missing any?")
+    test "Secure on the https site; not on a local http one (it would never be sent)" do
+      conn = asking("en") |> put_req_cookie(Lang.cookie(), "es") |> Plug.Conn.fetch_cookies()
+
+      assert Lang.renew(conn, "https://hoodride.app").resp_cookies[Lang.cookie()].secure == true
+      assert Lang.renew(conn, "http://localhost:4000").resp_cookies[Lang.cookie()].secure == false
+
+      # the default: the site's own address
+      expected = String.starts_with?(HoodrideWeb.Endpoint.url(), "https:")
+      assert Lang.renew(conn).resp_cookies[Lang.cookie()].secure == expected
+    end
+
+    test "no Domain: hoodride.app's own cookie, never shared with a subdomain" do
+      for path <- ["/", "/ja", "/privacy"] do
+        set = asking("en") |> put_req_cookie(Lang.cookie(), "es") |> get(path) |> lang_cookie()
+        refute set =~ ~r/domain=/i, "#{path}: #{set}"
+      end
+    end
+
+    test "every page that renews it is private — no shared cache may keep one person's cookie" do
+      for path <- ["/", "/es", "/ja", "/privacy", "/ja/terms", "/no/such/page"] do
+        conn = asking("en") |> put_req_cookie(Lang.cookie(), "es") |> get(path)
+        assert lang_cookie(conn), path
+        [cache] = get_resp_header(conn, "cache-control")
+        assert cache =~ "private", "#{path}: #{cache}"
+      end
+    end
+
+    test "a pick comes back from the server at once — the page's own 7-day cookie replaced" do
+      # the switch writes the cookie and opens the language's page: that
+      # very answer carries the server's cookie
+      conn = build_conn() |> put_req_cookie(Lang.cookie(), "fr") |> get("/fr")
+      assert lang_cookie(conn) =~ ~r/^hoodride_lang=fr;.*max-age=31536000/
     end
   end
 

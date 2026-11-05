@@ -1,0 +1,1195 @@
+# Hood Ride in Somali. A first translation (2026-11-05).
+# Plural forms by name, in this order: one, other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: so\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(codsiga waa la laabtay)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "Aqbal safarka"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "Safarka waa la aqbalayaa…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "Aqbalaya…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "Ku dar ka hor intaadan wadin"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "Ku dar baabuurkaaga"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "Waa lagu weydiin doonaa marka ugu horreysa ee aad jihayso"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "Dib"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "Ku noqo bogga gelitaanka"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "Ka hor intaadan bilaabin"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "Bej"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "bej ah"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "Madow"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "madow"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "Buluug"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "buluug ah"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "Bunni"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "bunni ah"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "Haddii aad sii wadato, waxaad ogolaanaysaa {terms} iyo {privacy}."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Hood Ride lama gaari karo — mar kale ayaa la isku dayayaa…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Hood Ride lama gaari karo — isku day mar kale"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "Jooji"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "Jooji codsiga"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "Marka hore jooji codsiga safarka"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "Marka hore jooji codsiga safarka."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "Bartamee goobtayda"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "Beddel"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "Waad beddeli kartaa wakhti kasta: taabo sawirkaaga bidixda sare, kadib {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "Ka beddel {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "Ma beddeshay?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "Sheekeysi"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "Sheekeysiga {name} wuu dhammaaday — muddo ayuu maqnaa"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "Sheekeysiyo"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "Hubi: {fields} (ugu badnaan {max} xaraf midkiiba)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "Dooro…"
+
+#: priv/static/index.html
+msgid "Clear search"
+msgstr "Tirtir raadinta"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "Xir"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "Xir dejinta"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "Midab"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "Ku xirmaya…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "Cillad xiriir — mar kale ayaa la isku dayayaa"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "Xiriirka dib ayaa loo bilaabay — taabo KHADKA GAL si aad mar kale u waddo"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "Xiriirka dib ayaa loo bilaabay — mar kale taabo ✋ haddii aad weli safar u baahan tahay"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "Xiriirka dib ayaa loo bilaabay — safarkaagu si lama filaan ah ayuu u dhammaaday, fadlan dib u diyaari"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "Xiriirka dib ayaa loo bilaabay — codsigaaga safarka wuu lumay, fadlan mar kale codso"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Ku sii wad Facebook"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Ku sii wad Google"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "La koobiyeeyay ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "Koobiyee"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "Koobiyee fariinta"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "Lama aqbali karin"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "Lama koobiyeyn karin"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "Akoonkaaga lama tirtiri karin — fadlan isku day mar kale."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Hood Ride lama gaari karin — hubi xiriirkaaga oo isku day mar kale."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Hood Ride lama gaari karin — isku day mar kale"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "Server-ka lama gaari karin — isku day mar kale"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "Si toos ah looma cusboonaysiin karin — taabo sawirkaaga bidixda sare, kadib Beddel, kadib Ka cusboonaysii Google"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "Hadda lama cusboonaysiin karin — mar dambe isku day"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "Hadda lama kaydin karin — isku day wax yar kadib."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "Taas lama kaydin karin — isku day mar kale"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "Codsiga lama diri karin"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "Lama geli karin — isku day mar kale"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "Lagama bixi karin — isku day mar kale"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "TIRTIR"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "Diid"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "Tirtir akoonka"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "Tirtir akoonkayga"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "Ma tirtiraysaa akoonkaaga?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "Tijaabo"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "Wad"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "Darawal"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "Darawalku ma qaadi karo kan — isku day mid kale"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "Dhammee safarka"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "Marka hore dhammee safarkaaga"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "Marka hore dhammee safarkaaga."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "Marka hore dhammee safarka aad hadda ku jirto"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "KHADKA KA BAX"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "KHADKA GAL"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "Darawalkan sii daqiiqad ka hor intaadan mar kale codsan"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "U gudub Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "Dahabi"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "dahabi ah"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Google wuxuu qaadan karaa wax yar"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "Cawl"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "cawl ah"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "Cagaar"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "cagaaran"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride ee Discord"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride waxaa laga furay qalab kale"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "Waan ogolahay"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "Waan joogaa"
+
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/index.html
+msgid "Language"
+msgstr "Luuqad"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "Ka bax tijaabada"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "Summad"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "Summado"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "Khariidad"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "Faallo ku saabsan khariidadda"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "Calaamadda khariidadda"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "Halkan ku kulan"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "Fariin"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "Fariinta lama dirin — xiriirka?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "Fariinta lama dirin — isku day mar kale"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "Fariinta waxaa ku jira calaamado badan oo hal xaraf ku dul saaran"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "Fariintu aad bay u dheer tahay — ka yaree {max} xaraf"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "Fariin…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "Moodeel"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "Jihee"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "App-ka jihaynta"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "Safar baan u baahanahay"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "Deris deriskiisa safar siinaya. Arag baabuurta iyo dadka safar u baahan ee kuu dhow, isu dira fariimo, oo wada safra."
+
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "Luuqad lama helin"
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "Lama heli karo"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "Dhammaan qalabkaaga"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "Ku fur tilmaamaha"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "Oranji"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "oranji ah"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "Kale"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "Bogga lama helin"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "Bogga lama helin — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "Waxaad soo qaadaysaa {name} · taabo 🧭 si aad u jihayso"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "Waxaad soo qaadaysaa {name} · {seen} · taabo 🧭 si aad u jihayso"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "Fadlan akhri oo ogolow {terms} iyo {privacy}."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Siyaasadda Asturnaanta"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Siyaasadda Asturnaanta"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "Buluug-casaan"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "buluug-casaan ah"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Dib ugu xirmaya Hood Ride…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "Casaan"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "cas"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Ka cusboonaysii Google"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "Codsiga waa la joojiyay"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "Codsiga waa la diiday"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "Codsigu wuu dhacay — mar kale codso ama isku day darawal kale"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "Codso safar"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "La codsaday…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "Safarkaaga waa la codsanayaa…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "Codsanaya…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "Safarku wuu dhammaaday"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "Safar: {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "Rakaabku kuma arki karaan. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "Rakaabku way raadiyaan marka aad soo qaaddo. Ku dar si aad khadka u gasho."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "Rakaabku way arkaan tan si ay kuu helaan"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "Safarro xaafaddaada ah"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Safari Websites (ama magaca browser-kaaga, haddii aadan isticmaalin Safari)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "Kaydi"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "Kaydi oo khadka gal"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "Raadi luuqad"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "Dir"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "Dejinta"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "Dejinta ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "Settings › Apps › {app} › Permissions › Location"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "Settings › Privacy & Security › Location Services › {app} › While Using the App, oo shid Precise Location"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "Muuji ama qari tixraacyada khariidadda"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "Ka bax"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "Galaya…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "Qalin"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "qalin ah"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "Koodhka asalka ah ee GitHub"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "Taabo si aad u saarto"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "Shuruudaha"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "Darawalkaas hadda ma joogo"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "Rakaabkaas hadda safar ma raadinayo"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "Tan dib looma celin karo. Akoonkaaga waa la tirtirayaa, khariidadda waa lagaa saarayaa, sheekeysiyadaada waa la xirayaa, qalab kastana waa lagaa saarayaa. Haddii aad mar dambe gasho, akoon cusub ayaa bilaabmaya."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "Boggan ma jiro."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "Waa goor dambe — codsiga waa la laabtay"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "Isku dayo gelitaan oo badan oo fashilmay ayaa ka yimid shabakaddaada — mar dambe isku day."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "Qor {word} si aad u xaqiijiso"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "Qor {word} si aad u xaqiijiso."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "Cusboonaysiin ayaa diyaar ah — taabo si dib loogu furo"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "Halkan ku isticmaal"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "Cad"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "cad"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "Huruud"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "huruud ah"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "Waxaad horey u haysataa codsi furan"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "Waad cusboonaysiin kartaa safarkaaga kadib"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "Magacaaga iyo sawirkaaga waad cusboonaysiin kartaa safarkaaga kadib"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "Waad timid · waxaad soo qaadaysaa {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "Dad badan oo cusub ayaad la xiriirtay — mar dambe isku day"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "Marar badan ayaad cusboonaysiisay — isku day dhowr daqiiqo kadib"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "Sheekeysiyo badan oo cusub ayaad bilowday — mar dambe isku day"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "Baabuurkaaga"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "Magacaaga iyo sawirkaaga waxay ka yimaadaan {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "Rakaabkaaga"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "Soo dhowee si aad u aragto cidda agagaarka joogta"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "waan aqbalay! waan soo socdaa 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "hagaag, waan ku arkaa"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "hagaag, waa sax"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "hagaag, markaa adiga ayaan kuu imanayaa"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "dejinta browser-kaaga, u oggolow goobta saxda ah boggan"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "daqiiqado yar kadib ayaan imanayaa"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "guji astaanta bidixda ee bareegga cinwaanka (xagga sare ee browser-ka) › Location › Allow"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "midab"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "fiican, waan ku eegayaa"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "waa hagaag, waxaan u socdaa calaamaddaada 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "waan imid! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "haye! waxaan joogaa dhaqaanka dharka ee waddada 3aad, ma i soo qaadi kartaa? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "la arkay in ka badan saacad ka hor"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "la arkay {n} daqiiqo ka hor"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "summad"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "moodeel"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "kuu dhow"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "hadda"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "hadda ayaan soo baxayaa 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "fur liiska › Settings › Sites and downloads › Site permissions › Location"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "fur Settings-ka browser-kaaga › Privacy and security › Site settings › Location › oggolow Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "fur {app} › ⋮ › Settings › Site settings › Location › oggolow Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "fur ⋮ › Settings › Site settings › Location › Ask to allow"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "si darawalkaagu kuu helo"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "si saaxiibkaaga safarku kuu helo"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "fiican, dhowaan ayaan is arki doonnaa!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "taabo astaanta bidixda ee bareegga cinwaanka (xagga sare ee shaashadda) › Permissions › Location › Allow (dooro Precise haddii lagu weydiiyo)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "si aad safar u codsato"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "si aad u waddo"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "si loo muujiyo meesha aad joogto"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "shid Location (hoos u jiid › Location)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "shid Location Services (Settings › Privacy & Security)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "shid goobta qalabkan"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "haa, waan ku soo qaadi karaa"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "haa fadlan! waxaan joogaa kuraasta agtooda 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "haye, ka warran"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "haye, gacantaada ✋ ayaan arkay, ma rabtaa in lagu soo qaado?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "ma hubtaa? weli halkan ayaan ku xayiran ahay 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "browser-kaaga"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · darawalkaaga"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{make} {model} {color}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "{count} baabuur ayaa agagaarkan jira"
+msgstr[1] "{count} baabuur ayaa agagaarkan jira"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "{count} baabuur ayaa halkan jira"
+msgstr[1] "{count} baabuur ayaa halkan jira"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "{count} xaraf ayaa haray"
+msgstr[1] "{count} xaraf ayaa haray"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count} xaraf ayaa dheeraad ah"
+msgstr[1] "{count} xaraf ayaa dheeraad ah"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count} xaraf ayaa dheeraad ah — gaabi fariintaada si aad u dirto"
+msgstr[1] "{count} xaraf ayaa dheeraad ah — gaabi fariintaada si aad u dirto"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} qof ayaa halkan jooga"
+msgstr[1] "{count} qof ayaa halkan jooga"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} qof ayaa halkan safar u baahan"
+msgstr[1] "{count} qof ayaa halkan safar u baahan"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "{distance} u jira"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} wuu yimid"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} hadda safar ayuu ku jiraa"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} wuu soo socdaa"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} hadda lama heli karo"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} hadda lama heli karo — isku day darawal kale"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} lama arko — soo dhowee oo mar kale raadi baabuurkiisa"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} khadka wuu ka baxay — isku day darawal kale"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "{n} saac ka hor"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} mayl"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "{n} daqiiqo ka hor"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} maal"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} saac"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} daq"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site} — iyo taleefankaaga: {steps} › Allow, adigoo shidaya Use precise location"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · Dib u xirmaya…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps} — ama, haddii aad Hood Ride u dooratay Approximate: taabo astaanta bidixda ee cinwaanka › Permissions › Reset permissions, kadib mar kale isku day oo dooro Precise"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › Use precise location"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. Hood Ride dib ayuu u furmayaa markaad soo noqoto."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ Fariin cusub"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ Wax yar is deji"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ Sugaya darawalka…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ Aad baad u degdeg u diraysaa — wax yar is deji"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ Safar raadinaya…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ Darawallada kuu dhow waxay arki karaan inaad safar u baahan tahay"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ Safar baan u baahanahay"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ Qof kuu dhow ayaa safar u baahan"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ safar u baahan"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 Sheekeysi"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 Sheekeysi ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 Oggolow goobta marka browser-kaagu ku weydiiyo — Hood Ride wuu u baahan yahay {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 Raadinaya goobtaada…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Goobta waa u xiran tahay Hood Ride — oggolow {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 Goobta way ka dansan tahay qalabkan — {steps} {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 Halkan ku kulan"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 Meesha kulanka waa la dejiyay — darawalkaagu wuu arkaa"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 Dhaqaaji calaamadda"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 Calaamadda waa la saaray — darawalkaagu adiga ayuu kuu imanayaa"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 La wadaag goobtaada"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 La wadaag goobtaada si saaxiibkaaga safarku kuu helo"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 Taabo khariidadda meesha aad rabto inaad ku kulantaan"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 Sugaya goobtaada — rakaabku weli kuma arki karaan"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 Goobtaadu waa qiyaas keliya — shid Precise Location {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 safar ayuu codsaday"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 Raac"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 Khadka ayaad ku jirtaa"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 Sugaya goobta saxda ah ee {name} — ama ka codso inuu dejiyo meel kulan 📍"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} halkaas waxaa lagu arkay in ka badan saacad ka hor"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} halkaas waxaa lagu arkay {n} daqiiqo ka hor"

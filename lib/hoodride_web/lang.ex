@@ -49,7 +49,8 @@ defmodule HoodrideWeb.Lang do
   version we have of that language ("pt-PT" → "pt-BR"). Chinese by its
   script — Traditional for Taiwan, Hong Kong, Macau (BCP 47 likely
   subtags), Simplified otherwise; Norwegian (no, nn) → nb; Tagalog (tl) →
-  fil; old codes iw → he, in → id. Never the made-up en-XA but exactly.
+  fil; old codes iw → he, in → id; Hmong Daw (mww), Mong Leng (hnj) → hmn;
+  Dari (prs) → fa. Never the made-up en-XA but exactly.
   """
   def match(tag, on) do
     tag = tag |> String.downcase() |> alias_of()
@@ -78,6 +79,10 @@ defmodule HoodrideWeb.Lang do
       "tl" -> "fil"
       "iw" -> "he"
       "in" -> "id"
+      # Hmong: browsers say hmn; Microsoft's Hmong Daw is mww, Mong Leng hnj
+      p when p in ["mww", "hnj"] -> "hmn"
+      # Dari (Afghan Persian): the Persian translation
+      "prs" -> "fa"
       _ -> Enum.join([primary | rest], "-")
     end
   end
@@ -117,4 +122,39 @@ defmodule HoodrideWeb.Lang do
 
   @doc "Marks an answer as depending on the language."
   def vary(conn), do: put_resp_header(conn, "vary", "Accept-Language, Cookie")
+
+  # a year, from the last visit (the privacy policy: "a cookie remembers
+  # your choice for a year")
+  @year 365 * 24 * 60 * 60
+
+  @doc """
+  The language picked, kept by the SERVER and renewed on every page
+  (owner, 2026-11-05). The switch (app.js) writes the cookie in the page —
+  and Safari caps a cookie written that way at 7 days (WebKit, ITP 2.1:
+  "persistent cookies created through document.cookie, are capped to a
+  seven day expiry"; WebKit's advice: set it in the HTTP response). Sent
+  back from the server, the same cookie lives its year — and renewed on
+  each page (sliding expiration), it lasts until a year after the LAST
+  visit, not the pick. Only a picked language switched on, in its own
+  spelling; anything else is left alone. Readable by the page (not
+  HttpOnly: a language, not a secret), Lax, Secure on https.
+  """
+  def renew(conn, site \\ HoodrideWeb.Endpoint.url()) do
+    conn = fetch_cookies(conn)
+
+    with picked when is_binary(picked) <- conn.req_cookies[@cookie],
+         lang when is_binary(lang) <- match(picked, Hoodride.I18n.on()) do
+      put_resp_cookie(conn, @cookie, lang,
+        max_age: @year,
+        path: "/",
+        same_site: "Lax",
+        # (no domain: hoodride.app's own, not shared with any subdomain —
+        # OWASP WSTG-SESS-02)
+        secure: String.starts_with?(site, "https:"),
+        http_only: false
+      )
+    else
+      _ -> conn
+    end
+  end
 end

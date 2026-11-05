@@ -1,0 +1,1188 @@
+# Hood Ride in Haitian Creole. A first translation (2026-11-05).
+# Plural forms by name, in this order: other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: ht\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(demann anile)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "Aksepte woulib la"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "N ap aksepte woulib la…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "N ap aksepte…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "Ajoute l anvan ou kondui"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "Ajoute machin ou"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "Y ap mande ou premye fwa ou navige"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "Retounen"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "Retounen nan paj koneksyon an"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "Anvan ou kòmanse"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "Bèj"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "bèj"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "Nwa"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "nwa"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "Ble"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "ble"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "Mawon"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "mawon"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "Si ou kontinye, ou dakò ak {terms} ak {privacy} nou yo."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Pa ka jwenn Hood Ride — n ap eseye ankò…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Pa ka jwenn Hood Ride — eseye ankò"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "Anile"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "Anile demann lan"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "Anile demann woulib ou a anvan"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "Anile demann woulib ou a anvan."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "Santre sou pozisyon mwen"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "Chanje"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "Chanje l nenpòt lè: peze foto pwofil ou anwo agoch, apre {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "Chanje sou {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "Ou chanje yo?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "Chat"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "Chat ak {name} fini — li pa la depi kèk tan"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "Chat yo"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "Verifye {fields} (pa plis pase {max} lèt chak)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "Chwazi…"
+
+#: priv/static/index.html
+msgid "Clear search"
+msgstr "Efase rechèch la"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "Fèmen"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "Fèmen paramèt yo"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "Koulè"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "N ap konekte…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "Pwoblèm koneksyon — n ap eseye ankò"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "Koneksyon an rekòmanse — peze ANTRE AN LIY pou kondui ankò"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "Koneksyon an rekòmanse — peze ✋ ankò si ou toujou bezwen woulib"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "Koneksyon an rekòmanse — woulib ou a fini sanzatann, tanpri fè l ankò"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "Koneksyon an rekòmanse — demann woulib ou a pèdi, tanpri mande ankò"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Kontinye ak Facebook"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Kontinye ak Google"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "Kopye ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "Kopye"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "Kopye mesaj la"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "Pa t ka aksepte"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "Pa t ka kopye"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "Pa t ka efase kont ou — tanpri eseye ankò."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Pa t ka jwenn Hood Ride — verifye koneksyon ou epi eseye ankò."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Pa t ka jwenn Hood Ride — eseye ankò"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "Pa t ka jwenn sèvè a — eseye ankò"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "Pa t ka mete ajou otomatikman — peze foto pwofil ou anwo agoch, apre Chanje, apre Mete ajou ak Google"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "Pa ka mete ajou kounye a — eseye ankò pita"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "Pa ka anrejistre kounye a — eseye ankò nan yon ti moman."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "Pa t ka anrejistre sa — eseye ankò"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "Pa t ka voye demann lan"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "Pa t ka konekte — eseye ankò"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "Pa t ka dekonekte — eseye ankò"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "EFASE"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "Refize"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "Efase kont"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "Efase kont mwen"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "Efase kont ou?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "Demo"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "Kondui"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "Chofè"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "Chofè a pa ka pran sa a — eseye yon lòt"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "Fini woulib la"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "Fini woulib ou a anvan"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "Fini woulib ou a anvan."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "Fini woulib w ap fè a anvan"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "SOTI AN LIY"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "ANTRE AN LIY"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "Bay chofè sa a yon minit anvan ou mande ankò"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Ale sou Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "Dore"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "dore"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Google ka pran yon ti tan"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "Gri"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "gri"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "Vèt"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "vèt"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride sou Discord"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride louvri sou yon lòt aparèy"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "Mwen dakò"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "Mwen la"
+
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/index.html
+msgid "Language"
+msgstr "Lang"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "Kite demo a"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "Mak"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "Mak yo"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "Kat"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "Kòmantè sou kat la"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "Mak sou kat la"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "Kontre isit"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "Mesaj"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "Mesaj la pa t ale — koneksyon an?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "Mesaj la pa t ale — eseye ankò"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "Mesaj la gen twòp siy anpile sou yon sèl lèt"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "Mesaj la twò long — pa depase {max} karaktè"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "Mesaj…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "Modèl"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "Navige"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "Aplikasyon navigasyon"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "Bezwen woulib"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "Vwazen k ap bay vwazen woulib. Gade machin ak moun ki bezwen woulib toupre ou, voye mesaj bay youn lòt, epi fè woulib ansanm."
+
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "Pa jwenn okenn lang"
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "Pa disponib"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "Sou tout aparèy ou yo"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "Louvri direksyon nan"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "Oranj"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "oranj"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "Lòt"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "Paj la pa egziste"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "Paj la pa egziste — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "W ap pran {name} · peze 🧭 pou navige"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "W ap pran {name} · {seen} · peze 🧭 pou navige"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "Tanpri li epi dakò ak {terms} ak {privacy} nou yo."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Politik konfidansyalite"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Politik konfidansyalite"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "Vyolèt"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "vyolèt"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "N ap rekonekte ak Hood Ride…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "Wouj"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "wouj"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Mete ajou ak Google"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "Demann anile"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "Demann refize"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "Demann lan ekspire — mande ankò oswa eseye yon lòt chofè"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "Mande woulib"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "Demann voye…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "N ap mande woulib ou a…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "N ap mande…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "Woulib la fini"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "Woulib ak {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "Pasaje yo pa ka wè ou. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "Pasaje yo chèche l lè ou vin pran yo. Ajoute l pou antre an liy."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "Pasaje yo wè sa pou yo ka jwenn ou"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "Woulib nan katye ou"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Safari Websites (oswa non navigatè ou, si ou pa sèvi ak Safari)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "Anrejistre"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "Anrejistre epi antre an liy"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "Chèche yon lang"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "Voye"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "Paramèt"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "Paramèt ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "Settings › Apps › {app} › Permissions › Location"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "Settings › Privacy & Security › Location Services › {app} › While Using the App, epi limen Precise Location"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "Montre oswa kache kredi kat la"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "Dekonekte"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "N ap konekte…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "Ajan"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "ajan"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "Kòd sous la sou GitHub"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "Peze pou retire"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "Kondisyon"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "Chofè sa a pa la ankò"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "Pasaje sa a pa chèche ankò"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "Ou p ap ka defèt sa. Kont ou ap efase, ou ap soti sou kat la, konvèsasyon ou yo ap fèmen, epi ou ap dekonekte sou tout aparèy ou. Si ou konekte ankò pita, se yon kont tou nèf."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "Paj sa a pa egziste."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "Twò ta — demann lan te anile"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "Twòp koneksyon ki echwe sou rezo ou — eseye ankò pita."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "Tape {word} pou konfime"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "Tape {word} pou konfime."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "Gen yon mizajou — peze pou rechaje"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "Sèvi isit"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "Blan"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "blan"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "Jòn"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "jòn"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "Ou gen yon demann ki louvri deja"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "Ou ka mete ajou apre woulib ou a"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "Ou ka mete non ak foto ou ajou apre woulib ou a"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "Ou rive · w ap pran {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "Ou kontakte anpil moun tou nouvo — eseye ankò pita"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "Ou mete ajou twòp — eseye ankò nan kèk minit"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "Ou kòmanse anpil nouvo chat — eseye ankò pita"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "Machin ou"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "Non ak foto ou soti nan {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "Pasaje ou"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "Zoume pou wè ki moun ki bò isit"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "aksepte! m ap vini 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "oke, m wè ou"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "oke, dakò"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "oke, m ap vin jwenn ou lè sa a"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "pèmèt lokalizasyon egzak pou sit sa a nan paramèt navigatè ou"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "m ap la nan kèk minit"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "klike sou ikòn ki agoch ba adrès la (anwo navigatè a) › Location › Allow"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "koulè"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "anfòm, m ap veye ou"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "oke, m pral kote pwen ou a 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "m la! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "alo! m bò lavri ki sou 3rd la, ou ka vin pran m? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "dènye fwa: gen plis pase inè"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "dènye fwa: gen {n} min"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "mak"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "modèl"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "toupre"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "kounye a"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "m ap vini touswit 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "louvri meni an › Settings › Sites and downloads › Site permissions › Location"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "louvri Settings navigatè ou › Privacy and security › Site settings › Location › pèmèt Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "louvri {app} › ⋮ › Settings › Site settings › Location › pèmèt Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "louvri ⋮ › Settings › Site settings › Location › Ask to allow"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "pou chofè ou ka jwenn ou"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "pou moun k ap fè woulib avè ou a ka jwenn ou"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "bon bagay, n ap wè talè!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "peze ikòn ki agoch ba adrès la (anwo ekran an) › Permissions › Location › Allow (chwazi Precise si li mande)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "pou mande woulib"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "pou kondui"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "pou montre kote ou ye"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "limen Location (glise desann › Location)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "limen Location Services (Settings › Privacy & Security)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "limen lokalizasyon pou aparèy sa a"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "wi, m ka vin pran ou"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "wi souple! m bò ban yo 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "sak pase"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "sak pase, m wè men ou ✋ ou bezwen woulib?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "ou sèten? m toujou bloke la a 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "navigatè ou"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · chofè ou"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{make} {model} {color}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "{count} machin bò isit"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "{count} machin isit"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "{count} karaktè ki rete"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count} karaktè an plis"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count} karaktè an plis — rakousi mesaj ou a pou voye l"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} moun isit"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} moun bezwen woulib isit"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "a {distance}"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} rive"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} nan yon woulib kounye a"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} ap vini"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} pa disponib kounye a"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} pa disponib kounye a — eseye yon lòt chofè"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "Ou pa wè {name} — zoume epi jwenn machin li ankò"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} soti an liy — eseye yon lòt chofè"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "gen {n} è"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} mi"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "gen {n} min"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n}j"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n}è"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n}m"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site} — epi sou telefòn ou: {steps} › Allow, ak Use precise location limen"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · N ap rekonekte…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps} — oswa, si ou te chwazi Approximate pou Hood Ride: peze ikòn ki agoch adrès la › Permissions › Reset permissions, epi eseye ankò e chwazi Precise"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › Use precise location"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. Hood Ride ap rechaje lè ou tounen."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ Nouvo mesaj"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ Ralanti yon ti kras"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ N ap tann chofè a…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ W ap voye twò vit — ralanti yon ti kras"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ N ap chèche woulib…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ Chofè ki toupre yo ka wè ou bezwen woulib"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ Bezwen woulib"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ Gen yon moun toupre ki bezwen woulib"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ bezwen woulib"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 Chat"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 Chat ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 Pèmèt lokalizasyon lè navigatè ou mande — Hood Ride bezwen l {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 N ap chèche pozisyon ou…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Lokalizasyon bloke pou Hood Ride — pèmèt li {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 Lokalizasyon fèmen sou aparèy sa a — {steps} {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 Kontre isit"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 Kote pou kontre a fikse — chofè ou wè l"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 Deplase pwen an"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 Pwen an retire — chofè ou ap vin jwenn ou"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 Pataje pozisyon ou"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 Pataje pozisyon ou pou moun k ap fè woulib avè ou a ka jwenn ou"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 Peze sou kat la kote ou vle kontre"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 N ap tann pozisyon ou — pasaje yo poko ka wè ou"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 Pozisyon ou pa egzak — limen Precise Location {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 mande yon woulib"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 Pran woulib"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 Ou an liy"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 N ap tann pozisyon egzak {name} — oswa mande l mete yon 📍 kote pou kontre"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 Dènye fwa yo te wè {name} la, sa gen plis pase inè"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 Dènye fwa yo te wè {name} la, sa gen {n} min"

@@ -20,7 +20,11 @@ import { createHash } from "node:crypto";
 
 const STATIC = new URL("../priv/static/", import.meta.url);
 const GETTEXT = new URL("../priv/gettext/", import.meta.url);
-const RTL = ["ar", "he", "ur"];
+// right to left: the app's own list (Hoodride.I18n @rtl) — one list, so a
+// new right-to-left language can't be missed here (Persian was, 2026-11-05)
+const RTL = readFileSync(new URL("../lib/hoodride/i18n.ex", import.meta.url), "utf8")
+  .match(/@rtl ~w\(([^)]*)\)/)[1]
+  .split(/\s+/);
 
 // every translated language: the app's own (a .po for each)
 const ALL = readdirSync(GETTEXT, { withFileTypes: true })

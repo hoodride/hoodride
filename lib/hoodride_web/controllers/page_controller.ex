@@ -18,8 +18,11 @@ defmodule HoodrideWeb.PageController do
   # The query is kept (?refresh= after a sign-in, ?demo=1).
   def index(conn, _params) do
     case Lang.pick(conn) do
-      "en" -> conn |> Lang.vary() |> home("en")
-      lang -> conn |> Lang.vary() |> redirect(to: address(lang, "") <> query(conn))
+      "en" ->
+        conn |> Lang.vary() |> Lang.renew() |> home("en")
+
+      lang ->
+        conn |> Lang.vary() |> Lang.renew() |> redirect(to: address(lang, "") <> query(conn))
     end
   end
 
@@ -42,6 +45,7 @@ defmodule HoodrideWeb.PageController do
       |> in_language(lang)
 
     conn
+    |> Lang.renew()
     |> put_resp_content_type("text/html")
     |> send_resp(200, html)
   end
@@ -169,6 +173,7 @@ defmodule HoodrideWeb.PageController do
 
     conn
     |> Lang.vary()
+    |> Lang.renew()
     |> put_resp_content_type("text/html")
     |> send_resp(404, "notfound.html" |> static() |> StaticVersions.stamp() |> in_language(lang))
   end
@@ -226,6 +231,7 @@ defmodule HoodrideWeb.PageController do
       |> with_language_row("/" <> name, lang, I18n.addressed())
 
     conn
+    |> Lang.renew()
     |> put_resp_content_type("text/html")
     |> send_resp(200, html)
   end

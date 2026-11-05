@@ -1,0 +1,1188 @@
+# Hood Ride in Hmong (White Hmong, RPA). A first translation (2026-11-05).
+# Plural forms by name, in this order: other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: hmn\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(rho kev thov tawm lawm)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "Txais kev caij tsheb"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "Tab tom txais kev caij tsheb…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "Tab tom txais…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "Ntxiv ua ntej koj tsav tsheb"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "Ntxiv koj lub tsheb"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "Yuav nug thawj zaug koj qhia kev"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "Rov qab"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "Rov qab mus rau nplooj nkag"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "Ua ntej koj pib"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "Av daj ntseg"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "xim av daj ntseg"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "Dub"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "dub"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "Xiav"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "xiav"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "Xim av"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "xim av"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "Thaum koj mus ntxiv, koj pom zoo rau peb {terms} thiab {privacy}."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Txuas tsis tau Hood Ride — tab tom sim dua…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Txuas tsis tau Hood Ride — sim dua"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "Tso tseg"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "Tso tseg kev thov"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "Tso tseg koj kev thov caij tsheb ua ntej"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "Tso tseg koj kev thov caij tsheb ua ntej."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "Qhia qhov chaw kuv nyob"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "Hloov"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "Hloov tau txhua lub sijhawm: nias koj daim duab sab saud laug, ces {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "Hloov ntawm {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "Koj hloov lawm puas?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "Sib tham"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "Kev sib tham nrog {name} xaus lawm — nws ncua mus ntev lawm"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "Kev sib tham"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "Kuaj {fields} (txhua yam tsis pub tshaj {max} tus ntawv)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "Xaiv…"
+
+#: priv/static/index.html
+msgid "Clear search"
+msgstr "Lwv kev nrhiav"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "Kaw"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "Kaw kev teeb tsa"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "Xim"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "Tab tom txuas…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "Kev txuas muaj teeb meem — tab tom sim dua"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "Kev txuas rov pib dua — nias MUS ONLINE txhawm rau tsav dua"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "Kev txuas rov pib dua — nias ✋ dua yog koj tseem xav caij tsheb"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "Kev txuas rov pib dua — koj kev caij tsheb xaus tsis tau xav txog, thov teeb tsa dua"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "Kev txuas rov pib dua — koj kev thov caij tsheb ploj lawm, thov rov thov dua"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Siv Facebook mus ntxiv"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Siv Google mus ntxiv"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "Theej lawm ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "Theej"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "Theej cov lus"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "Txais tsis tau"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "Theej tsis tau"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "Rho koj tus account tsis tau — thov sim dua."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Txuas tsis tau Hood Ride — kuaj koj kev txuas thiab sim dua."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Txuas tsis tau Hood Ride — sim dua"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "Txuas tsis tau lub server — sim dua"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "Hloov kho tsis tau nws tus kheej — nias koj daim duab sab saud laug, ces Hloov, ces Hloov kho los ntawm Google"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "Tam sim no hloov kho tsis tau — sim dua tom qab"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "Tam sim no khaws tsis tau — sim dua ib pliag ntxiv."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "Khaws tsis tau — sim dua"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "Xa kev thov tsis tau"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "Nkag tsis tau — sim dua"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "Tawm tsis tau — sim dua"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "RHO TAWM"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "Tsis txais"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "Rho account tawm"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "Rho kuv tus account tawm"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "Rho koj tus account tawm?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "Sim saib"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "Tsav tsheb"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "Tus tsav tsheb"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "Tus tsav tsheb tuaj tsis tau — sim lwm tus"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "Xaus kev caij tsheb"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "Xaus koj kev caij tsheb ua ntej"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "Xaus koj kev caij tsheb ua ntej."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "Ua kom tiav koj kev caij tsheb no ua ntej"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "MUS OFFLINE"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "MUS ONLINE"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "Tos ib feeb ua ntej rov thov tus tsav tsheb no dua"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Mus rau Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "Xim kub"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "xim kub"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Google yuav siv sijhawm me ntsis"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "Xim tshauv"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "xim tshauv"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "Ntsuab"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "ntsuab"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride ntawm Discord"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride raug qhib rau lwm lub cuab yeej"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "Kuv pom zoo"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "Kuv tuaj txog lawm"
+
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/index.html
+msgid "Language"
+msgstr "Hom lus"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "Tawm ntawm kev sim saib"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "Hom"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "Cov hom"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "Daim ntawv qhia chaw"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "Lus tawm tswv yim txog daim ntawv qhia chaw"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "Cim ntawm daim ntawv qhia chaw"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "Ntsib ntawm no"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "Xa lus"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "Cov lus xa tsis tau — kev txuas puas zoo?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "Cov lus xa tsis tau — sim dua"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "Cov lus muaj cim ntau dhau rau ib tus ntawv"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "Cov lus ntev dhau — tsis txhob tshaj {max} tus ntawv"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "Sau lus…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "Qauv"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "Qhia kev"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "App qhia kev"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "Xav caij tsheb"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "Neeg zej zog pab neeg zej zog caij tsheb. Pom tsheb thiab cov neeg xav caij tsheb nyob ze, sib xa lus, thiab caij tsheb ua ke."
+
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "Nrhiav tsis tau hom lus"
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "Tsis muaj"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "Rau tag nrho koj cov cuab yeej"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "Qhib kev qhia hauv"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "Txiv kab ntxwv"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "xim txiv kab ntxwv"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "Lwm yam"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "Nrhiav tsis tau nplooj no"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "Nrhiav tsis tau nplooj no — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "Tab tom mus tos {name} · nias 🧭 txhawm rau qhia kev"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "Tab tom mus tos {name} · {seen} · nias 🧭 txhawm rau qhia kev"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "Thov nyeem thiab pom zoo rau peb {terms} thiab {privacy}."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Txoj Cai Tswj Ntiag Tug"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Txoj Cai Tswj Ntiag Tug"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "Xim ntshav"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "xim ntshav"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Tab tom rov txuas rau Hood Ride…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "Liab"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "liab"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Hloov kho los ntawm Google"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "Kev thov raug tso tseg lawm"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "Kev thov tsis raug txais"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "Kev thov tas sijhawm lawm — rov thov dua lossis sim lwm tus tsav tsheb"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "Thov caij tsheb"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "Thov lawm…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "Tab tom thov koj kev caij tsheb…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "Tab tom thov…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "Kev caij tsheb xaus lawm"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "Caij tsheb nrog {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "Cov caij tsheb pom tsis tau koj. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "Cov caij tsheb saib nrhiav nws thaum koj tuaj tos lawv. Ntxiv nws txhawm rau mus online."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "Cov caij tsheb pom qhov no kom lawv nrhiav tau koj"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "Caij tsheb nrog neeg zej zog"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Safari Websites (lossis koj lub browser lub npe, yog koj tsis siv Safari)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "Khaws"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "Khaws & mus online"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "Nrhiav hom lus"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "Xa"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "Kev teeb tsa"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "Kev teeb tsa ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "Settings › Apps › {app} › Permissions › Location"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "Settings › Privacy & Security › Location Services › {app} › Precise Location: qhib"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "Settings › Privacy & Security › Location Services › {app} › While Using the App, thiab qhib Precise Location"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "Qhia lossis zais daim ntawv qhia chaw cov npe tshaj tawm"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "Tawm"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "Tab tom nkag…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "Xim nyiaj"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "xim nyiaj"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "Source code ntawm GitHub"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "Nias kom rho tawm"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "Cov Cai"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "Tus tsav tsheb ntawd tsis nyob ze lawm"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "Tus caij tsheb ntawd tsis nrhiav lawm"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "Qhov no thim tsis tau. Koj tus account yuav raug rho tawm, koj yuav raug tshem tawm ntawm daim ntawv qhia chaw, koj cov kev sib tham yuav raug kaw, thiab koj yuav raug tawm ntawm txhua lub cuab yeej. Yog koj rov nkag dua tom qab, yuav pib ib tus account tshiab."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "Tsis muaj nplooj no."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "Lig dhau lawm — kev thov raug rho tawm lawm"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "Koj lub network nkag tsis tau ntau zaus dhau — sim dua tom qab."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "Ntaus {word} kom paub tseeb"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "Ntaus {word} kom paub tseeb."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "Muaj qhov tshiab — nias kom rov thauj"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "Siv ntawm no"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "Dawb"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "dawb"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "Daj"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "daj"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "Koj twb muaj ib qho kev thov lawm"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "Koj hloov kho tau tom qab koj caij tsheb tas"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "Koj hloov kho tau koj lub npe thiab duab tom qab koj caij tsheb tas"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "Koj tuaj txog lawm · tab tom tos {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "Koj tau tiv tauj neeg tshiab ntau heev lawm — sim dua tom qab"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "Koj hloov kho ntau zaus lawm — sim dua ob peb feeb ntxiv"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "Koj pib kev sib tham tshiab ntau heev lawm — sim dua tom qab"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "Koj lub tsheb"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "Koj lub npe thiab duab los ntawm {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "Koj tus caij tsheb"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "Zoom los ze kom pom leej twg nyob ze"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "txais lawm! kuv tab tom tuaj 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "ok kuv pom koj lawm"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "ok zoo"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "ok, kuv tuaj cuag koj ntawd"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "cia lub vev xaib no siv qhov chaw tseeb hauv koj lub browser cov settings"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "tos me ntsis kuv tuaj txog"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "nias lub cim sab laug ntawm qhov chaw sau web address (sab saud ntawm lub browser) › Location › Allow"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "xim"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "zoo, kuv yuav saib tos koj"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "paub lawm, kuv tab tom mus rau koj tus pin 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "tuaj txog lawm! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "nyob zoo! kuv nyob ntawm lub khw ntxhua khaub ncaws ntawm 3rd, koj tuaj tos tau kuv puas? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "pom zaum kawg tshaj ib teev dhau los"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "pom zaum kawg {n} feeb dhau los"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "hom"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "qauv"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "nyob ze"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "tam sim no"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "kuv yuav tuaj tam sim no 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "qhib cov menu › Settings › Sites and downloads › Site permissions › Location"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "qhib koj lub browser cov Settings › Privacy and security › Site settings › Location › cia Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "qhib {app} › ⋮ › Settings › Site settings › Location › cia Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "qhib ⋮ › Settings › Site settings › Location › Ask to allow"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "kom koj tus tsav tsheb nrhiav tau koj"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "kom koj tus phooj ywg caij tsheb nrhiav tau koj"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "zoo heev, sib ntsib tsis ntev no!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "nias lub cim sab laug ntawm qhov chaw sau web address (sab saud ntawm lub vijtsam) › Permissions › Location › Allow (xaiv Precise yog nws nug)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "txhawm rau thov caij tsheb"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "txhawm rau tsav tsheb"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "txhawm rau qhia qhov chaw koj nyob"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "qhib Location (los tes nqis › Location)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "qhib Location Services (Settings › Privacy & Security)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "qhib qhov chaw nyob rau lub cuab yeej no"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "yog lawm kuv tuaj tos tau koj"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "ua tsaug! kuv nyob ntawm cov rooj zaum 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "nyob zoo, ua li cas"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "nyob zoo, pom koj txhais tes ✋ xav kom tuaj tos puas?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "tiag tiag? kuv tseem daig ntawm no 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "koj lub browser"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · koj tus tsav tsheb"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{make} {model} {color}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "{count} lub tsheb nyob ib ncig no"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "{count} lub tsheb nyob ntawm no"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "tseem tshuav {count} tus ntawv"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "ntau dhau {count} tus ntawv"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "ntau dhau {count} tus ntawv — txiav cov lus kom luv mam li xa tau"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} tus neeg nyob ntawm no"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} tus neeg xav caij tsheb ntawm no"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "deb {distance}"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} tuaj txog lawm"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} tab tom caij tsheb"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} tab tom tuaj"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} tam sim no tsis khoom"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} tam sim no tsis khoom — sim lwm tus tsav tsheb"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "Pom tsis tau {name} — zoom los ze thiab nrhiav nws lub tsheb dua"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} mus offline lawm — sim lwm tus tsav tsheb"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "{n} teev dhau los"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} mais"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "{n} feeb dhau los"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} hnub"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} teev"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} feeb"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site} — thiab hauv koj lub xov tooj {steps} › Allow, qhib Use precise location"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · Tab tom rov txuas…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps} — lossis, yog koj xaiv Approximate rau Hood Ride: nias lub cim sab laug ntawm web address › Permissions › Reset permissions, ces sim dua thiab xaiv Precise"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › Use precise location"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. Hood Ride yuav rov thauj thaum koj rov los."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ Lus tshiab"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ Maj mam me ntsis"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ Tab tom tos tus tsav tsheb…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ Koj xa ceev dhau — maj mam me ntsis"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ Tab tom nrhiav tsheb caij…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ Cov tsav tsheb nyob ze pom tau tias koj xav caij tsheb"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ Xav caij tsheb"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ Muaj ib tug neeg nyob ze xav caij tsheb"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ xav caij tsheb"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 Sib tham"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 Sib tham ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 Cia siv qhov chaw nyob thaum koj lub browser nug — Hood Ride xav tau nws {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 Tab tom nrhiav koj qhov chaw nyob…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Qhov chaw nyob raug thaiv rau Hood Ride — cia siv nws {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 Qhov chaw nyob raug kaw rau lub cuab yeej no — {steps} {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 Ntsib ntawm no"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 Teeb qhov chaw ntsib lawm — koj tus tsav tsheb pom nws"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 Txav tus pin"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 Rho tus pin tawm lawm — koj tus tsav tsheb yuav tuaj cuag koj"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 Qhia koj qhov chaw nyob"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 Qhia koj qhov chaw nyob kom koj tus phooj ywg caij tsheb nrhiav tau koj"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 Nias daim ntawv qhia chaw qhov koj xav ntsib"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 Tab tom tos koj qhov chaw nyob — cov caij tsheb tseem pom tsis tau koj"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 Koj qhov chaw nyob tsuas yog kwv yees xwb — qhib Precise Location {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 thov caij tsheb"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 Caij tsheb"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 Koj nyob online lawm"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 Tab tom tos {name} qhov chaw nyob tseeb — lossis thov nws teeb ib qho 📍 chaw ntsib"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 Pom {name} nyob qhov ntawd zaum kawg tshaj ib teev dhau los"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 Pom {name} nyob qhov ntawd zaum kawg {n} feeb dhau los"

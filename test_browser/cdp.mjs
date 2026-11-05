@@ -365,6 +365,11 @@ function page(cdp, sessionId, name) {
       }
       await send("Input.dispatchMouseEvent", { type: "mouseReleased", x: x2, y: y2, button: "left", buttons: 0, clickCount: 1 });
     },
+    // the cookies the browser itself keeps for this page (its own store:
+    // name, value, expires in seconds since 1970, session, secure…)
+    async cookies() {
+      return (await send("Network.getCookies", {})).cookies;
+    },
     // type into the focused field as a keyboard would (real input events)
     async type(text) {
       await send("Input.insertText", { text });

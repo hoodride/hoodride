@@ -225,6 +225,12 @@ await journey("languages: no English left in a made-up language, nothing cut off
   await ken.waitFor(`document.documentElement.lang === "es" && typeof HoodI18n !== "undefined" && HoodI18n.lang() === "es" && document.querySelector("#btn-lang-login .lang-current").textContent !== ""`, "back in Spanish", 15000);
   check(await ken.eval(`document.querySelector("#btn-lang-login .lang-current").textContent`) === "Español", "the button says Español", await ken.eval(`({ text: document.querySelector("#btn-lang-login").textContent, html: document.querySelector("#btn-lang-login").innerHTML.slice(0, 200), now: HoodI18n.lang(), errors: ${JSON.stringify(ken.errors)} })`));
   check(await ken.eval(`document.cookie.includes("hoodride_lang=es")`), "the choice kept");
+  // what the BROWSER keeps (its own store): the server's cookie, a year from
+  // now — not the page's own, which Safari caps at 7 days; not a session one
+  // (owner, 2026-11-05: WebKit ITP 2.1 — set it from the server)
+  const kept = (await ken.cookies()).find((c) => c.name === "hoodride_lang");
+  const daysLeft = kept && (kept.expires * 1000 - Date.now()) / 86_400_000;
+  check(kept && kept.value === "es" && !kept.session && daysLeft > 364 && daysLeft <= 366 && kept.path === "/" && kept.domain === "localhost", "the browser keeps the choice for a year (the server's cookie)", { ...kept, daysLeft });
   await ken.click("btn-lang-login");
   await ken.waitFor(`!document.getElementById("lang-sheet").classList.contains("hidden")`, "the list again");
   // opened on the language now, in the middle of the list (owner,
