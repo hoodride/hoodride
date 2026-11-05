@@ -264,7 +264,46 @@ defmodule Hoodride.I18n.Extract do
   defp regex(<<>>, acc, _cls), do: {Enum.reverse(acc), <<>>}
 
   @doc "Our pages with marked words (`data-t`, `data-t-attr` — HoodI18n.translatePage)."
-  def pages(dir \\ "priv/static"), do: [Path.join(dir, "index.html")]
+  def pages(dir \\ "priv/static"), do: Enum.map(~w(index.html notfound.html), &Path.join(dir, &1))
+
+  @doc "Our server code (its own words: `Hoodride.I18n.t(lang, \"…\")`)."
+  # (not the language code itself: its notes show calls as examples)
+  def server_sources(dir \\ "lib") do
+    dir
+    |> Path.join("**/*.ex")
+    |> Path.wildcard()
+    |> Enum.reject(&(&1 =~ ~r{/hoodride/i18n(\.ex|/)}))
+    |> Enum.sort()
+  end
+
+  @doc """
+  The server's own messages in one Elixir file: each
+  `Hoodride.I18n.t(lang, "…")` (or `I18n.t(…)`), the text plain — no
+  `\#{…}`, it would be built at run time. `{:ok, [message]}` or `{:error, [problem]}`.
+  """
+  def scan_ex(source, file) do
+    {found, problems} =
+      Regex.scan(~r/(?<![\w.])(?:Hoodride\.)?I18n\.t\(\s*[\w.]+\s*,\s*/, source, return: :index)
+      |> Enum.reduce({[], []}, fn [{start, len}], {found, problems} ->
+        line = line_of(source, start)
+        rest = binary_part(source, start + len, byte_size(source) - start - len)
+
+        case Regex.run(~r/^"((?:[^"\\#]|\\.|#(?!\{))*)"\s*\)/, rest) do
+          [_, text] ->
+            id = Regex.replace(~r/\\(.)/, text, "\\1")
+            {[%{context: nil, msgid: id, plural: nil, file: file, line: line} | found], problems}
+
+          nil ->
+            {found,
+             [
+               "#{file}:#{line}: I18n.t(…) needs plain \"text\" — a message must be written out to be translated"
+               | problems
+             ]}
+        end
+      end)
+
+    if problems == [], do: {:ok, Enum.reverse(found)}, else: {:error, Enum.reverse(problems)}
+  end
 
   # elements with no closing tag
   @void ~w(area base br col embed hr img input link meta source track wbr)
@@ -451,10 +490,15 @@ defmodule Hoodride.I18n.Extract do
   # sources/1 at build time (`mix hoodride.i18n.extract`, the tests) —
   # never a name from a request; this never runs in the app.
   # sobelow_skip ["Traversal.FileModule"]
-  def scan_all(files \\ sources() ++ pages()) do
+  def scan_all(files \\ sources() ++ pages() ++ server_sources()) do
     {found, problems} =
       Enum.reduce(files, {[], []}, fn file, {found, problems} ->
-        scan = if Path.extname(file) == ".html", do: &scan_html/2, else: &scan_js/2
+        scan =
+          case Path.extname(file) do
+            ".html" -> &scan_html/2
+            ".ex" -> &scan_ex/2
+            _ -> &scan_js/2
+          end
 
         case scan.(File.read!(file), file) do
           {:ok, ms} -> {found ++ ms, problems}

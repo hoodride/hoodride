@@ -17,10 +17,13 @@ defmodule HoodrideWeb.NotFoundTest do
       conn = get(build_conn(), path)
       assert conn.status == 404, "#{path}: #{conn.status}"
       body = conn.resp_body
-      assert body =~ "<title>Page not found — Hood Ride</title>", path
-      assert body =~ "<h1>Page not found</h1>", path
+      # (its words marked for translation — data-t, languages 2026-11-04)
+      assert body =~ "<title data-t>Page not found — Hood Ride</title>", path
+      assert body =~ "<h1 data-t>Page not found</h1>", path
       assert body =~ "This page doesn't exist."
-      assert body =~ ~s(<a class="home" href="/">Go to Hood Ride</a>), "#{path}: a way home"
+
+      assert body =~ ~s(<a class="home" href="/" data-t>Go to Hood Ride</a>),
+             "#{path}: a way home"
     end
 
     _ = conn
@@ -36,8 +39,9 @@ defmodule HoodrideWeb.NotFoundTest do
 
   test "its look and the car come by versioned address (the CSP: no inline style)", %{conn: conn} do
     body = get(build_conn(), "/a-typo").resp_body
-    assert body =~ ~r{href="privacy\.css\?vsn=[0-9a-f]+"}
-    assert body =~ ~r{src="car\.png\?vsn=[0-9a-f]+"}
+    # (from the root: the page shows at any depth — 2026-11-04)
+    assert body =~ ~r{href="/privacy\.css\?vsn=[0-9a-f]+"}
+    assert body =~ ~r{src="/car\.png\?vsn=[0-9a-f]+"}
     refute body =~ "<style"
     _ = conn
   end

@@ -23,6 +23,15 @@ end
 config :hoodride, HoodrideWeb.Endpoint,
   http: [port: String.to_integer(System.get_env("PORT", "4000"))]
 
+# the languages switched on, e.g. LANGUAGES=en,es (Hoodride.I18n): unset,
+# English only. A language stays off until its translation and its legal
+# pages are reviewed. (Tests switch on the made-up en-XA: config/test.exs)
+if languages = System.get_env("LANGUAGES") do
+  config :hoodride,
+         :languages,
+         String.split(languages, ",", trim: true) |> Enum.map(&String.trim/1)
+end
+
 # (:loadtest is the prod build for the capacity test: config/loadtest.exs)
 if config_env() in [:prod, :loadtest] do
   database_path =

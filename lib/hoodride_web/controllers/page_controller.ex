@@ -1,7 +1,8 @@
 defmodule HoodrideWeb.PageController do
   use HoodrideWeb, :controller
 
-  alias HoodrideWeb.{Build, StaticVersions}
+  alias Hoodride.I18n
+  alias HoodrideWeb.{Build, Lang, StaticVersions}
 
   # The page, stamped with the build it belongs to (HoodrideWeb.Build): the
   # app compares it with the server's build after every reconnect. Served
@@ -9,9 +10,33 @@ defmodule HoodrideWeb.PageController do
   # copy exists for the offline cache to keep.
   # sobelow_skip ["XSS.SendResp"]
   def index(conn, _params) do
+    lang = Lang.pick(conn)
+
     conn
+    |> Lang.vary()
     |> put_resp_content_type("text/html")
-    |> send_resp(200, with_link_preview(page()))
+    |> send_resp(200, page() |> with_link_preview() |> in_language(lang))
+  end
+
+  @doc """
+  A page in `lang` (HoodrideWeb.Lang, Hoodride.I18n): its `<html lang>`,
+  and that language's catalog script right after i18n.js — loaded before
+  the app runs, it translates the page's marked words (HoodI18n). English:
+  the page as it is.
+  """
+  def in_language(html, "en"), do: html
+
+  def in_language(html, lang) do
+    html
+    |> String.replace(~s(<html lang="en">), ~s(<html lang="#{lang}">), global: false)
+    |> then(
+      &Regex.replace(~r{<script src="(/?)i18n\.js(\?vsn=[^"]*)?"></script>}, &1, fn tag,
+                                                                                    root,
+                                                                                    _ ->
+        tag <>
+          "\n  " <> StaticVersions.stamp(~s(<script src="#{root}#{I18n.script(lang)}"></script>))
+      end)
+    )
   end
 
   # added per request, not in prepare/1: in prod the page is prepared at
@@ -27,9 +52,12 @@ defmodule HoodrideWeb.PageController do
   # map). The address stays as typed.
   # sobelow_skip ["XSS.SendResp"]
   def not_found(conn, _params) do
+    lang = Lang.pick(conn)
+
     conn
+    |> Lang.vary()
     |> put_resp_content_type("text/html")
-    |> send_resp(404, StaticVersions.stamp(static("notfound.html")))
+    |> send_resp(404, "notfound.html" |> static() |> StaticVersions.stamp() |> in_language(lang))
   end
 
   defp page, do: prepared(:index) || stamp_page(static("index.html"))
@@ -51,20 +79,31 @@ defmodule HoodrideWeb.PageController do
   # linked from the login screen and the drawer — Google's rules for the
   # policy its consent screen links to. Plain HTML, no app code; its look is
   # privacy.css, by versioned address (no inline <style> — HoodrideWeb.CSP).
-  # sobelow_skip ["XSS.SendResp"]
-  def privacy(conn, _params) do
-    conn
-    |> put_resp_content_type("text/html")
-    |> send_resp(200, StaticVersions.stamp(static("privacy.html")))
-  end
+  def privacy(conn, _params), do: legal(conn, "privacy")
 
   # The Terms of Use (Hoodride.Terms): public, like the privacy policy, and
   # styled by the same privacy.css
+  def terms(conn, _params), do: legal(conn, "terms")
+
+  # the legal pages are whole documents, translated and reviewed as one
+  # (stage 2): `privacy.es.html` beside `privacy.html` — English if a
+  # language has none yet. (Our own files, by names fixed here and a
+  # language from Lang.pick — one of Hoodride.I18n's own tags.)
   # sobelow_skip ["XSS.SendResp"]
-  def terms(conn, _params) do
+  defp legal(conn, name) do
     conn
+    |> Lang.vary()
     |> put_resp_content_type("text/html")
-    |> send_resp(200, StaticVersions.stamp(static("terms.html")))
+    |> send_resp(200, StaticVersions.stamp(static(legal_file(name, Lang.pick(conn)))))
+  end
+
+  @doc "The legal page's file for `lang`: its own if there is one, else English."
+  def legal_file(name, lang, exists? \\ &File.regular?/1) do
+    own = "#{name}.#{lang}.html"
+
+    if lang != "en" and exists?.(Application.app_dir(:hoodride, Path.join("priv/static", own))),
+      do: own,
+      else: "#{name}.html"
   end
 
   @doc """

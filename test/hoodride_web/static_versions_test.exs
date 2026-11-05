@@ -43,6 +43,21 @@ defmodule HoodrideWeb.StaticVersionsTest do
       File.write!(Path.join(dir, "a.js"), "two")
       assert StaticVersions.compute(dir, ["a.js"])["a.js"] != v["a.js"]
     end
+
+    # (the not-found page names its files from the root — 2026-11-04)
+    test "stamped by name, as written or from the root; anything else untouched" do
+      v = %{"a.js" => "abc123"}
+
+      assert StaticVersions.stamp(
+               ~s(<script src="a.js"></script><script src="/a.js"></script>),
+               v
+             ) ==
+               ~s(<script src="a.js?vsn=abc123"></script><script src="/a.js?vsn=abc123"></script>)
+
+      for kept <- [~s("b.js"), ~s("/x/a.js"), ~s("https://a.js"), ~s("a.js?vsn=old")] do
+        assert StaticVersions.stamp(kept, v) == kept
+      end
+    end
   end
 
   describe "the page" do

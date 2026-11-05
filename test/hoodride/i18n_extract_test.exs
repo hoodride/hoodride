@@ -221,6 +221,30 @@ defmodule Hoodride.I18n.ExtractTest do
     refute Enum.any?(ids, &(&1 in ["Hood Ride", "Google Maps", "Apple Maps", "Waze"]))
   end
 
+  # ----- the server's own words: Hoodride.I18n.t(lang, "…") -----
+  test "the server's messages: found, escapes read, interpolation refused" do
+    src = """
+    send_resp(conn, 429, Hoodride.I18n.t(lang, "Too many — try \\"later\\"."))
+    I18n.t(conn.assigns.lang, "Short # not interpolated")
+    # I18n.t(lang, "in a comment") counts too: only real calls should be written
+    """
+
+    {:ok, found} = Extract.scan_ex(src, "s.ex")
+
+    assert Enum.map(found, & &1.msgid) == [
+             ~s(Too many — try "later".),
+             "Short # not interpolated",
+             "in a comment"
+           ]
+
+    assert hd(found).line == 1
+
+    for bad <- [~S|I18n.t(lang, "Hi #{name}")|, ~S|I18n.t(lang, msg)|, ~S|I18n.t(lang, "a" <> b)|] do
+      assert {:error, [problem]} = Extract.scan_ex("\n" <> bad, "s.ex"), bad
+      assert problem =~ "s.ex:2:"
+    end
+  end
+
   test "the app's scripts: all readable, the shipped list up to date" do
     assert {:ok, found} = Extract.scan_all()
     assert File.read!("priv/gettext/default.pot") == Extract.pot(found)

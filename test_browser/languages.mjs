@@ -1,71 +1,19 @@
 // Every word the app shows comes from the translators' list (languages,
 // stage 1e — owner, 2026-11-04). The standard check ("pseudo-localization"):
-// a made-up language where every message is the English with each letter
-// swapped for an accented one ("Need a ride" → "⟦Ñééð á ŕíðé ~~~⟧") and made
-// about a third longer, as Spanish runs. Anything still in plain English
-// was missed — a word not marked or not wrapped; anything cut off or
-// spilling out wouldn't fit a longer language.
+// a made-up language, en-XA, where every message is the English with each
+// letter swapped for an accented one ("Need a ride" → "⟦Ñééð á ŕíðé ~~~~⟧")
+// and made about a third longer, as Spanish runs (Hoodride.I18n.pseudo_text;
+// switched on in tests only). Anything still in plain English was missed —
+// a word not marked or not wrapped; anything cut off or spilling out
+// wouldn't fit a longer language.
 //
-// The made-up language is loaded as a real one will be (1f): right after
-// i18n.js, before app.js runs — the page's marked words translated then,
-// every message later through t().
-import { readFileSync } from "node:fs";
+// Through the real loader (1f): Lia picks the language as the language
+// switch will (its cookie), the server serves the page in it — <html lang>,
+// the catalog right after i18n.js, before the app.
 import { journey, step, check, BASE } from "./cdp.mjs";
 
-// ----- the list (priv/gettext/default.pot) → a catalog (i18n.js's form)
-// (.po strings escape as JSON does: \" \\ \n \t)
-const unquote = (s) => JSON.parse(s);
-function readPot(path) {
-  const entries = [];
-  let cur = null;
-  let field = null;
-  for (const line of readFileSync(path, "utf8").split("\n")) {
-    const m = line.match(/^(msgctxt|msgid_plural|msgid|msgstr(?:\[\d\])?) (".*")$/);
-    if (m) {
-      // an entry starts at its context, or at a msgid when the one open has its own
-      if (m[1] === "msgctxt" || (m[1] === "msgid" && (!cur || cur.msgid !== undefined))) {
-        cur = {};
-        entries.push(cur);
-      }
-      field = m[1];
-      cur[field] = unquote(m[2]);
-    } else if (/^".*"$/.test(line) && cur && field) {
-      cur[field] += unquote(line);
-    }
-  }
-  return entries.filter((e) => e.msgid);
-}
-
-const LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const ACCENTED = "áƀçðéƒĝĥíĵķĺɱñóþǫŕšţúṽŵẋýžÁƁÇÐÉƑĜĤÍĴĶĹṀÑÓÞǪŔŠŢÚṼŴẊÝŽ";
-// the made-up language: letters accented, {placeholders} kept, a third longer
-export function pseudo(text) {
-  const swapped = text
-    .split(/(\{\w+\})/)
-    .map((part) => (/^\{\w+\}$/.test(part) ? part : [...part].map((c) => (LETTERS.includes(c) ? [...ACCENTED][LETTERS.indexOf(c)] : c)).join("")))
-    .join("");
-  return `⟦${swapped} ${"~".repeat(Math.ceil(text.length / 3))}⟧`;
-}
-
-function catalog() {
-  const messages = {};
-  for (const e of readPot(new URL("../priv/gettext/default.pot", import.meta.url))) {
-    const key = (e.msgctxt !== undefined ? e.msgctxt + "\u0004" : "") + e.msgid + (e.msgid_plural !== undefined ? "\u0000" + e.msgid_plural : "");
-    messages[key] = e.msgid_plural !== undefined ? { one: pseudo(e.msgid), other: pseudo(e.msgid_plural) } : pseudo(e.msgid);
-  }
-  return { lang: "en-XA", messages };
-}
-
-// loaded the moment i18n.js defines HoodI18n (before app.js), the page's
-// marked words translated then — as the loader will (1f)
-const LOAD = (c) => `(() => {
-  let real;
-  Object.defineProperty(window, "HoodI18n", {
-    configurable: true,
-    get: () => real,
-    set: (v) => { real = v; v.load(${JSON.stringify(c)}); v.translatePage(document); },
-  });
-})();`;
+// her pick, as the language switch keeps it (HoodrideWeb.Lang)
+const PICK = `(document.cookie = "hoodride_lang=en-XA; path=/; SameSite=Lax", true)`;
 
 // plain English on screen: words, labels and box hints of what's shown.
 // Allowed: names (people, places, brands, the map's credits) — `allow`
@@ -99,7 +47,6 @@ const SPILLS = `(() => [...document.querySelectorAll("button, .btn, .banner, .dr
   .map((el) => ({ in: el.id || el.className, text: el.textContent.trim().slice(0, 60), over: el.scrollWidth - el.clientWidth })))()`;
 
 await journey("languages: no English left in a made-up language, nothing cut off", async (browser) => {
-  const c = catalog();
   // names and words that are no language's: people, brands, places, the
   // demo's pretend people and cars (the car description is put together by
   // the server, in English — stage 2), the map's own credits
@@ -127,10 +74,11 @@ await journey("languages: no English left in a made-up language, nothing cut off
 
   step("Lia opens Hood Ride signed out, in the made-up language");
   const lia = await browser.visitor("BT-Lia");
-  await lia.beforeScripts(LOAD(c));
+  await lia.goto(`${BASE}/`);
+  await lia.eval(PICK);
   await lia.goto(`${BASE}/`);
   await lia.waitFor(`!!document.getElementById("auth-buttons") && !document.getElementById("auth-buttons").classList.contains("hidden")`, "the sign-in buttons");
-  check(await lia.eval(`HoodI18n.lang() === "en-XA"`), "the made-up language is loaded");
+  check(await lia.eval(`HoodI18n.lang() === "en-XA" && document.documentElement.lang === "en-XA"`), "the page served in the made-up language", await lia.eval(`[HoodI18n.lang(), document.documentElement.lang]`));
   check((await lia.eval(`document.querySelector(".fineprint").textContent`)).startsWith("⟦"), "the agreement line translated", await lia.eval(`document.querySelector(".fineprint").textContent`));
   check(await lia.eval(`document.querySelector('.fineprint a[href="/privacy"]').textContent.startsWith("⟦")`), "its links, too, still links");
   await leftEnglish(lia, "the sign-in screen");
@@ -171,5 +119,12 @@ await journey("languages: no English left in a made-up language, nothing cut off
   await lia.waitFor(`!document.getElementById("nav-sheet").classList.contains("hidden")`, "the map-app box");
   await leftEnglish(lia, "the map-app box");
   await lia.click("nav-cancel");
+
+  step("an address that doesn't exist: its page in the language too");
+  await lia.goto(`${BASE}/no/such/page`);
+  await lia.waitFor(`document.readyState === "complete"`, "the not-found page");
+  const page404 = `({ title: document.title, lang: document.documentElement.lang, loaded: typeof HoodI18n === "undefined" ? "no HoodI18n" : HoodI18n.lang(), scripts: [...document.scripts].map((s) => s.getAttribute("src")), h1: document.querySelector("h1").textContent })`;
+  check((await lia.eval(`document.title`)).startsWith("⟦"), "its title translated", await lia.eval(page404));
+  await leftEnglish(lia, "the not-found page");
   check(lia.errors.length === 0, "no page errors", lia.errors);
 });

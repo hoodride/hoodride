@@ -98,9 +98,17 @@ defmodule HoodrideWeb.AuthController do
 
   # sobelow_skip ["XSS.SendResp"]
   defp too_many_failures(conn) do
+    # (plain text, in the reader's language — Hoodride.I18n.t)
+    lang = HoodrideWeb.Lang.pick(conn)
+
     conn
+    |> HoodrideWeb.Lang.vary()
     |> put_resp_header("cache-control", "no-store")
-    |> send_resp(429, "Too many failed sign-ins from your network — try again later.")
+    |> put_resp_content_type("text/plain")
+    |> send_resp(
+      429,
+      Hoodride.I18n.t(lang, "Too many failed sign-ins from your network — try again later.")
+    )
   end
 
   defp start(conn, _p, {:back, why}), do: back(conn, why)

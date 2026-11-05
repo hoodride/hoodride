@@ -298,6 +298,10 @@ msgstr ""
 msgid "Give this driver a minute before asking again"
 msgstr ""
 
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr ""
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Gold"
@@ -425,6 +429,14 @@ msgstr ""
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Other"
+msgstr ""
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr ""
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
 msgstr ""
 
 #: priv/static/app.js
@@ -594,8 +606,16 @@ msgstr ""
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr ""
 
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr ""
+
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
+msgstr ""
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
 msgstr ""
 
 #: priv/static/index.html

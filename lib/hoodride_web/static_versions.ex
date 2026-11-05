@@ -50,12 +50,13 @@ defmodule HoodrideWeb.StaticVersions do
 
   @doc ~S"""
   `text` with every quoted app file name `"name"` (and `src="name"`,
-  `href="name"`) turned into `"name?vsn=…"`.
+  `href="name"`) turned into `"name?vsn=…"` — from the root too,
+  `"/name"` (the not-found page: any address deep).
   """
   def stamp(text, versions \\ current()) do
-    Regex.replace(~r/"([^"?:\/]+\.[a-z]+)"/, text, fn whole, name ->
+    Regex.replace(~r/"(\/?)([^"?:\/]+\.[a-z]+)"/, text, fn whole, root, name ->
       case versions do
-        %{^name => v} -> ~s("#{name}?vsn=#{v}")
+        %{^name => v} -> ~s("#{root}#{name}?vsn=#{v}")
         _ -> whole
       end
     end)
