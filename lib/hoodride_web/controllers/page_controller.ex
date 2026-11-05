@@ -8,14 +8,110 @@ defmodule HoodrideWeb.PageController do
   # app compares it with the server's build after every reconnect. Served
   # here (not by Plug.Static) for "/" AND "/index.html", so no unstamped
   # copy exists for the offline cache to keep.
-  # sobelow_skip ["XSS.SendResp"]
+  #
+  # Every language has its own address (owner, 2026-11-05 — Google: "different
+  # URLs for each language version", in subdirectories): English at /, Japanese
+  # at /ja, … Only the home page sends a visitor to their language (the
+  # language cookie, then the phone's): Google names an auto-redirecting home
+  # page as the x-default, and advises against redirecting any other page —
+  # /privacy is the English policy for everyone, /ja/privacy the Japanese one.
+  # The query is kept (?refresh= after a sign-in, ?demo=1).
   def index(conn, _params) do
-    lang = Lang.pick(conn)
+    case Lang.pick(conn) do
+      "en" -> conn |> Lang.vary() |> home("en")
+      lang -> conn |> Lang.vary() |> redirect(to: address(lang, "") <> query(conn))
+    end
+  end
+
+  @doc "The English page whatever the visitor's language: /index.html, the offline copy's own."
+  def english_index(conn, _params), do: home(conn, "en")
+
+  @doc "/ja, /pt-BR…: the app in that language. Any other first segment: not found."
+  def lang_index(conn, %{"lang" => tag} = params) do
+    with_language(conn, params, tag, "", &home(&1, &2))
+  end
+
+  # sobelow_skip ["XSS.SendResp"]
+  defp home(conn, lang) do
+    html =
+      page()
+      |> with_link_preview(address(lang, ""))
+      |> with_languages()
+      |> with_alternates("", lang, I18n.addressed())
+      |> localize_links(lang)
+      |> in_language(lang)
 
     conn
-    |> Lang.vary()
     |> put_resp_content_type("text/html")
-    |> send_resp(200, page() |> with_link_preview() |> with_languages() |> in_language(lang))
+    |> send_resp(200, html)
+  end
+
+  # a language address, checked: one switched on → `serve`; the same in other
+  # capitals (/JA, /pt-br) → its own spelling; /en… → the English address;
+  # a trailing slash → without; anything else → not found
+  defp with_language(conn, params, tag, rest, serve) do
+    langs = Enum.reject(I18n.on(), &(&1 == "en"))
+    own = Enum.find(langs, &(String.downcase(&1) == String.downcase(tag)))
+
+    cond do
+      String.downcase(tag) == "en" ->
+        conn |> put_status(301) |> redirect(to: address("en", rest) <> query(conn))
+
+      own == nil ->
+        not_found(conn, params)
+
+      own != tag or String.ends_with?(conn.request_path, "/") ->
+        conn |> put_status(301) |> redirect(to: address(own, rest) <> query(conn))
+
+      true ->
+        serve.(conn, own)
+    end
+  end
+
+  @doc "The address of a page (`rest`: empty, `/privacy` or `/terms`) in a language."
+  def address("en", ""), do: "/"
+  def address("en", rest), do: rest
+  def address(lang, rest), do: "/" <> lang <> rest
+
+  defp query(%Plug.Conn{query_string: ""}), do: ""
+  defp query(%Plug.Conn{query_string: q}), do: "?" <> q
+
+  @doc """
+  The page's alternates for search engines (Google's hreflang rules): the
+  same full list on every version — English, each language with its own
+  address, and x-default (English: the page a visitor without a language of
+  ours gets) — and the page's own address as canonical (never another
+  language's).
+  """
+  def with_alternates(html, rest, lang, langs) do
+    base = HoodrideWeb.Endpoint.url()
+
+    links =
+      [{"en", address("en", rest)} | Enum.map(langs, &{&1, address(&1, rest)})]
+      |> Enum.map_join(fn {tag, path} ->
+        ~s(  <link rel="alternate" hreflang="#{tag}" href="#{base}#{path}">\n)
+      end)
+
+    head =
+      ~s(  <link rel="canonical" href="#{base}#{address(lang, rest)}">\n) <>
+        links <>
+        ~s(  <link rel="alternate" hreflang="x-default" href="#{base}#{address("en", rest)}">\n)
+
+    String.replace(html, "</head>", head <> "</head>", global: false)
+  end
+
+  @doc """
+  A page's own links in its language: home, the terms and the privacy
+  policy (the files link to "/", "/terms", "/privacy" — one file per page
+  for every language). Only those exact addresses: the note's link to the
+  English original ("/privacy?lang=en") stays English.
+  """
+  def localize_links(html, "en"), do: html
+
+  def localize_links(html, lang) do
+    Regex.replace(~r{href="(/|/terms|/privacy)"}, html, fn _, path ->
+      ~s(href="#{address(lang, if(path == "/", do: "", else: path))}")
+    end)
   end
 
   @doc """
@@ -51,8 +147,8 @@ defmodule HoodrideWeb.PageController do
   # added per request, not in prepare/1: in prod the page is prepared at
   # start-up BEFORE the Endpoint starts, and Endpoint.url() raises then
   # (checked 2026-11-02) — the release would not have booted
-  defp with_link_preview(html),
-    do: String.replace(html, "</head>", link_preview() <> "</head>", global: false)
+  defp with_link_preview(html, path),
+    do: String.replace(html, "</head>", link_preview(path) <> "</head>", global: false)
 
   # the languages switched on, for the page's language switch (HoodLang;
   # one alone: no switch) — per request, as LANGUAGES is read at start-up
@@ -96,27 +192,69 @@ defmodule HoodrideWeb.PageController do
   # linked from the login screen and the drawer — Google's rules for the
   # policy its consent screen links to. Plain HTML, no app code; its look is
   # privacy.css, by versioned address (no inline <style> — HoodrideWeb.CSP).
-  def privacy(conn, params), do: legal(conn, "privacy", params)
+  def privacy(conn, _params), do: legal(conn, "privacy", "en")
 
   # The Terms of Use (Hoodride.Terms): public, like the privacy policy, and
   # styled by the same privacy.css
-  def terms(conn, params), do: legal(conn, "terms", params)
+  def terms(conn, _params), do: legal(conn, "terms", "en")
 
-  # the legal pages are whole documents, translated and reviewed as one
-  # (stage 2): `privacy.es.html` beside `privacy.html` — English if a
-  # language has none yet. (Our own files, by names fixed here and a
-  # language from Lang.pick — one of Hoodride.I18n's own tags.)
-  # A translated page links to its English original (it's what applies):
-  # `?lang=en` — English whatever the language cookie says. Only "en": any
-  # other value is ignored, the page as usual.
+  @doc "/ja/privacy, /ja/terms: the translated policy and terms."
+  def lang_privacy(conn, %{"lang" => tag} = params),
+    do: with_language(conn, params, tag, "/privacy", &legal(&1, "privacy", &2))
+
+  def lang_terms(conn, %{"lang" => tag} = params),
+    do: with_language(conn, params, tag, "/terms", &legal(&1, "terms", &2))
+
+  # the legal pages are whole documents, translated as one: `privacy.ja.html`
+  # beside `privacy.html` (English if a language had none). /privacy and
+  # /terms are English for everyone — no redirect (Google: don't redirect
+  # between language versions); a translated page notes that the English
+  # applies and links to it ("/privacy?lang=en": the English page, the
+  # parameter now changes nothing). Every version links to the others (the
+  # language row) and names them for search engines (alternates).
+  # (Our own files, by names fixed here and a language from the list.)
   # sobelow_skip ["XSS.SendResp"]
-  defp legal(conn, name, params) do
-    lang = if params["lang"] == "en", do: "en", else: Lang.pick(conn)
+  defp legal(conn, name, lang) do
+    html =
+      static(legal_file(name, lang))
+      # the files ask for "privacy.css" (beside them): from /ja/privacy that
+      # would be /ja/privacy.css — from the root instead, whatever the address
+      |> String.replace(~s(href="privacy.css"), ~s(href="/privacy.css"))
+      |> StaticVersions.stamp()
+      |> with_alternates("/" <> name, lang, I18n.addressed())
+      |> localize_links(lang)
+      |> with_language_row("/" <> name, lang, I18n.addressed())
 
     conn
-    |> Lang.vary()
     |> put_resp_content_type("text/html")
-    |> send_resp(200, StaticVersions.stamp(static(legal_file(name, lang))))
+    |> send_resp(200, html)
+  end
+
+  @doc """
+  The legal pages' language list (Google: "let the user switch the page
+  language"), under the back link: one line, "Language", that opens (a
+  plain <details> — these pages run no code) to every version by its own
+  name, the one shown marked as current. Search engines see the links
+  either way.
+  """
+  def with_language_row(html, rest, lang, langs) do
+    links =
+      ["en" | langs]
+      |> Enum.map_join(" · ", fn tag ->
+        current = if tag == lang, do: ~s( aria-current="page"), else: ""
+        dir = if I18n.rtl?(tag), do: ~s( dir="rtl"), else: ""
+
+        ~s(<a href="#{address(tag, rest)}" lang="#{tag}" hreflang="#{tag}"#{dir}#{current}>) <>
+          Plug.HTML.html_escape(I18n.name(tag)) <> "</a>"
+      end)
+
+    label = Plug.HTML.html_escape(I18n.t(lang, "Language"))
+
+    row =
+      ~s(\n  <details class="lang-row"><summary>#{label}: #{Plug.HTML.html_escape(I18n.name(lang))}</summary><p>) <>
+        links <> "</p></details>"
+
+    Regex.replace(~r{(<a class="back" href="[^"]*">[^<]*</a>)}, html, "\\1" <> row, global: false)
   end
 
   @doc "The legal page's file for `lang`: its own if there is one, else English."
@@ -175,7 +313,7 @@ defmodule HoodrideWeb.PageController do
   # the picture by versioned address so a saved preview refreshes when it
   # changes (og.png; source assets/og/). The line is the sign-in screen's.
   @preview_line "Rides from your neighborhood"
-  defp link_preview do
+  defp link_preview(path) do
     base = HoodrideWeb.Endpoint.url()
     image = base <> "/og.png?vsn=" <> (StaticVersions.of("og.png") || "")
 
@@ -185,7 +323,7 @@ defmodule HoodrideWeb.PageController do
       {"property", "og:site_name", "Hood Ride"},
       {"property", "og:title", "Hood Ride"},
       {"property", "og:description", @preview_line},
-      {"property", "og:url", base <> "/"},
+      {"property", "og:url", base <> path},
       {"property", "og:image", image},
       {"property", "og:image:width", "1200"},
       {"property", "og:image:height", "630"},

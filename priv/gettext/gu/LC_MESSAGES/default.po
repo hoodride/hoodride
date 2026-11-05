@@ -384,7 +384,7 @@ msgstr "હું સંમત છું"
 msgid "I'm here"
 msgstr "હું અહીં છું"
 
-#: priv/static/index.html
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/index.html
 msgid "Language"
 msgstr "ભાષા"
 

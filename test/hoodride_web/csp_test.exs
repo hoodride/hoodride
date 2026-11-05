@@ -126,7 +126,8 @@ defmodule HoodrideWeb.CSPTest do
       html = conn |> get("/privacy") |> html_response(200)
       v = HoodrideWeb.StaticVersions.current()["privacy.css"]
       assert v
-      assert html =~ ~s(href="privacy.css?vsn=#{v}")
+      # from the root: the same page also lives at /ja/privacy (2026-11-05)
+      assert html =~ ~s(href="/privacy.css?vsn=#{v}")
       assert get(build_conn(), "/privacy.css").status == 200
     end
   end

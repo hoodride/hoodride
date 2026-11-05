@@ -24,3 +24,9 @@ th { font-weight: 600; }
 /* a translated legal page (privacy.<lang>.html): the note under the date —
    a translation; the English version applies; a link to it */
 .translation-note { margin: 12px 0 20px; padding-inline-start: 12px; border-inline-start: 3px solid var(--accent); color: var(--muted); font-size: 15px; }
+/* the legal pages' languages (PageController.with_language_row): one line
+   that opens to every version, the current one marked */
+.lang-row { margin: 4px 0 8px; font-size: 14px; color: var(--muted); }
+.lang-row summary { cursor: pointer; }
+.lang-row p { margin: 8px 0 0; line-height: 2; }
+.lang-row a[aria-current] { color: var(--text); font-weight: 600; text-decoration: none; }

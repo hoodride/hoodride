@@ -129,6 +129,18 @@ defmodule HoodrideWeb.OfflineTest do
   # network-first worker that saved every answer replaced the good copy
   # (the behaviour: test_js/sw.test.mjs)
   test "the offline copy keeps only good answers, never an error page" do
-    assert @sw =~ "if (res.ok) caches.open(CACHE).then((c) => c.put(e.request, copy));"
+    # (the save: only inside the ok branch — a redirect or an error never)
+    assert @sw =~ "if (res.ok) {
+          const copy = res.clone();"
+
+    [saving] =
+      Regex.run(
+        ~r/if \(res\.ok\) \{.*?
+        \}/s,
+        @sw
+      )
+
+    assert saving =~ "c.put(e.request, copy);"
+    assert length(String.split(@sw, "c.put(")) - 1 == 2, "a save outside the ok branch"
   end
 end

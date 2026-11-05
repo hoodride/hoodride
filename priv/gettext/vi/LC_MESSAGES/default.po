@@ -384,7 +384,7 @@ msgstr "Tôi đồng ý"
 msgid "I'm here"
 msgstr "Tôi đến rồi"
 
-#: priv/static/index.html
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/index.html
 msgid "Language"
 msgstr "Ngôn ngữ"
 

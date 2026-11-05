@@ -384,7 +384,7 @@ msgstr "ମୁଁ ସହମତ"
 msgid "I'm here"
 msgstr "ମୁଁ ପହଞ୍ଚିଗଲି"
 
-#: priv/static/index.html
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/index.html
 msgid "Language"
 msgstr "ଭାଷା"
 

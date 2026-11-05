@@ -384,7 +384,7 @@ msgstr "ஏற்கிறேன்"
 msgid "I'm here"
 msgstr "வந்துவிட்டேன்"
 
-#: priv/static/index.html
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/index.html
 msgid "Language"
 msgstr "மொழி"
 

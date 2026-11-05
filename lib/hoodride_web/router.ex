@@ -63,10 +63,15 @@ defmodule HoodrideWeb.Router do
   # copy downloads it (sw.js ASSETS)
   scope "/", HoodrideWeb do
     get "/", PageController, :index
-    get "/index.html", PageController, :index
+    get "/index.html", PageController, :english_index
     get "/sw.js", PageController, :service_worker
     get "/privacy", PageController, :privacy
     get "/terms", PageController, :terms
+    # each language's own addresses (owner, 2026-11-05): /ja, /ja/privacy,
+    # /ja/terms — a language that isn't switched on: not found
+    get "/:lang", PageController, :lang_index
+    get "/:lang/privacy", PageController, :lang_privacy
+    get "/:lang/terms", PageController, :lang_terms
     get "/*path", PageController, :not_found
   end
 end

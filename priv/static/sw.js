@@ -5,8 +5,10 @@ const CACHE = "hoodride-dev";
 // offline-cache audit; maplibre is vendored so this list is complete).
 // Served as "app.js?vsn=<fingerprint>" — the page's exact addresses
 // (HoodrideWeb.StaticVersions): offline, only an exact match is found.
+// (not "./": the home page can be a redirect to the visitor's language,
+// /ja — a saved redirect can't be shown offline. The home page the person
+// opens is saved as it's used, below; index.html is the English fallback)
 const ASSETS = [
-  "./",
   "index.html",
   "styles.css",
   "app.js",
@@ -92,19 +94,36 @@ self.addEventListener("fetch", (e) => {
   // a copy here would hold others' photos past a sign-out, errors included
   if (url.pathname.startsWith("/avatars/")) return;
 
+  // the home page in a language (/, /ja, /pt-BR): "/" sends a visitor to
+  // theirs, so the one they opened is also kept as "/" — offline, "/" (the
+  // installed app's start) opens it, in their language
+  const home = url.pathname === "/" || /^\/[A-Za-z]{2,3}(-[A-Za-z0-9]+)?$/.test(url.pathname);
+  const saved = () =>
+    caches.match(e.request).then((hit) => {
+      if (hit || e.request.mode !== "navigate") return hit;
+      return caches.match(new Request(url.origin + "/")).then((h) => h || caches.match(new Request(url.origin + "/index.html")));
+    });
+
   e.respondWith(
     fetch(e.request)
       .then((res) => {
-        const copy = res.clone();
         // only a good answer: while the server is down Cloudflare answers
-        // with its own error page, which must never replace the good copy
-        if (res.ok) caches.open(CACHE).then((c) => c.put(e.request, copy));
+        // with its own error page, which must never replace the good copy.
+        // (A redirect is never ok here: never saved)
+        if (res.ok) {
+          const copy = res.clone();
+          const again = home ? res.clone() : null;
+          caches.open(CACHE).then((c) => {
+            c.put(e.request, copy);
+            if (again) c.put(new Request(url.origin + "/"), again);
+          });
+        }
         // the server down (Cloudflare's 502/530 page, a restart's 503): the
         // saved app instead — it says "Can't reach Hood Ride — retrying…" and
         // comes back by itself. A 4xx is a real answer: passed on
-        if (res.status >= 500) return caches.match(e.request).then((hit) => hit || res);
+        if (res.status >= 500) return saved().then((hit) => hit || res);
         return res;
       })
-      .catch(() => caches.match(e.request))
+      .catch(() => saved())
   );
 });

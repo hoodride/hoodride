@@ -125,7 +125,7 @@ defmodule HoodrideWeb.LangTest do
     end
 
     test "the app in another language: <html lang>, and its catalog right after i18n.js, before the app" do
-      html = asking("en-XA") |> get("/") |> html_response(200)
+      html = build_conn() |> get("/en-XA") |> html_response(200)
       assert html =~ ~s(<html lang="en-XA">)
       v = HoodrideWeb.StaticVersions.of("i18n-en-XA.js")
 
@@ -159,12 +159,12 @@ defmodule HoodrideWeb.LangTest do
     # (owner, 2026-11-05)
     test "a right-to-left language: the page served dir=rtl; the others not" do
       for lang <- ~w(ar he ur) do
-        assert asking(lang) |> get("/") |> html_response(200) =~
+        assert build_conn() |> get("/" <> lang) |> html_response(200) =~
                  ~s(<html lang="#{lang}" dir="rtl">)
       end
 
-      for lang <- ~w(en es ja) do
-        refute asking(lang) |> get("/") |> html_response(200) =~ ~s(dir="rtl")
+      for path <- ~w(/ /es /ja) do
+        refute build_conn() |> get(path) |> html_response(200) =~ ~s(dir="rtl")
       end
     end
 
@@ -237,39 +237,183 @@ defmodule HoodrideWeb.LangTest do
 
       assert PageController.legal_file("privacy", "es", has.([])) == "privacy.html"
       assert PageController.legal_file("terms", "en", has.(["terms.en.html"])) == "terms.html"
+    end
 
+    test "the legal pages: /privacy and /terms English for everyone; /ja/privacy Japanese" do
       for page <- ["/privacy", "/terms"] do
-        conn = asking("en-XA") |> get(page)
-        assert html_response(conn, 200) =~ ~s(<html lang="en">), "no en-XA document: English"
-        assert get_resp_header(conn, "vary") == ["Accept-Language, Cookie"]
+        # no redirect between language versions (Google): the address decides
+        for conn <- [asking("ja"), asking("en") |> put_req_cookie(Lang.cookie(), "es")] do
+          html = conn |> get(page) |> html_response(200)
+          assert html =~ ~s(<html lang="en">)
+          refute html =~ "translation-note"
+        end
+
+        ja = build_conn() |> put_req_cookie(Lang.cookie(), "es") |> get("/ja" <> page)
+        html = html_response(ja, 200)
+        assert html =~ ~s(<html lang="ja">), "the address decides, not the cookie"
+        # its style from the root: from /ja/privacy, "privacy.css" would be
+        # /ja/privacy.css, not there (the language journey found it)
+        assert html =~ ~r/href="\/privacy\.css\?vsn=\w+"/
+        # the note's link: the English original ("?lang=en" — still English)
+        assert html =~ ~s(<a href="#{page}?lang=en">)
+
+        assert build_conn() |> get(page <> "?lang=en") |> html_response(200) =~
+                 ~s(<html lang="en">)
+      end
+    end
+  end
+
+  # each language's own addresses (owner, 2026-11-05 — Google: separate URLs
+  # per language, in subdirectories; only the home page redirects; hreflang
+  # on every version; each canonical to itself)
+  describe "addresses" do
+    test "/: English stays; any other language is sent to its own home, the query kept" do
+      en = asking("en-US") |> get("/")
+      assert html_response(en, 200) =~ ~s(<html lang="en">)
+      assert get_resp_header(en, "vary") == ["Accept-Language, Cookie"]
+
+      ja = asking("ja") |> get("/")
+      assert redirected_to(ja, 302) == "/ja"
+      assert get_resp_header(ja, "vary") == ["Accept-Language, Cookie"]
+
+      # the language chosen (cookie) before the phone's; English chosen: stays
+      assert asking("ja") |> put_req_cookie(Lang.cookie(), "es") |> get("/") |> redirected_to(302) ==
+               "/es"
+
+      assert asking("ja") |> put_req_cookie(Lang.cookie(), "en") |> get("/") |> html_response(200) =~
+               ~s(<html lang="en">)
+
+      # a sign-in's note (?refresh=) and the demo go along
+      assert asking("pt-BR") |> get("/?refresh=failed") |> redirected_to(302) ==
+               "/pt-BR?refresh=failed"
+
+      assert asking("ar") |> get("/?demo=1") |> redirected_to(302) == "/ar?demo=1"
+    end
+
+    test "a language's address shows that language, whatever the cookie or the phone" do
+      for path <- ["/ja", "/ja/privacy", "/ja/terms"] do
+        conn = asking("de") |> put_req_cookie(Lang.cookie(), "es") |> get(path)
+        assert html_response(conn, 200) =~ ~s(<html lang="ja">), path
       end
     end
 
-    test "the legal pages in the reader's language; ?lang=en the English original" do
-      for page <- ["/privacy", "/terms"] do
-        # the cookie's language: its own copy, with the note linking to English
-        es = asking("en") |> put_req_cookie(Lang.cookie(), "es") |> get(page)
-        html = html_response(es, 200)
-        assert html =~ ~s(<html lang="es">)
-        assert html =~ ~s(<a href="#{page}?lang=en">)
-        # the stylesheet versioned, as on the English page
-        assert html =~ ~r/href="privacy\.css\?vsn=\w+"/
+    test "other spellings go to the address's own; not a language: not found" do
+      for {from, to} <- [
+            {"/JA", "/ja"},
+            {"/pt-br", "/pt-BR"},
+            {"/zh-hant/terms", "/zh-Hant/terms"},
+            {"/ja/", "/ja"},
+            {"/en", "/"},
+            {"/EN/privacy", "/privacy"},
+            {"/en/terms?x=1", "/terms?x=1"}
+          ] do
+        assert build_conn() |> get(from) |> redirected_to(301) == to, from
+      end
 
-        # the note's link: English whatever the cookie or the phone says
-        en = asking("es") |> put_req_cookie(Lang.cookie(), "es") |> get(page <> "?lang=en")
-        assert html_response(en, 200) =~ ~s(<html lang="en">)
-        assert get_resp_header(en, "vary") == ["Accept-Language, Cookie"]
+      for path <- ["/xx", "/xx/privacy", "/ja/nope", "/zzz/terms", "/.env"] do
+        assert build_conn() |> get(path) |> response(404), path
+      end
+    end
 
-        # any other value: ignored (never a file name from the address)
-        for odd <- ["fr", "../privacy", "es%00", ""] do
-          other =
-            asking("en") |> put_req_cookie(Lang.cookie(), "es") |> get(page <> "?lang=" <> odd)
+    test "a language not switched on has no address (and / never sends anyone to it)" do
+      before = Application.get_env(:hoodride, :languages)
+      Application.put_env(:hoodride, :languages, ["en", "es"])
 
-          assert html_response(other, 200) =~ ~s(<html lang="es">), "?lang=#{odd}"
+      try do
+        assert build_conn() |> get("/es") |> html_response(200) =~ ~s(<html lang="es">)
+        assert build_conn() |> get("/ja") |> response(404)
+        assert build_conn() |> get("/ja/privacy") |> response(404)
+        assert asking("ja") |> get("/") |> html_response(200) =~ ~s(<html lang="en">)
+        refute build_conn() |> get("/es") |> html_response(200) =~ ~s(hreflang="ja")
+      after
+        Application.put_env(:hoodride, :languages, before)
+      end
+    end
+
+    test "/index.html, the offline copy's own: English, never a redirect" do
+      html =
+        asking("ja")
+        |> put_req_cookie(Lang.cookie(), "es")
+        |> get("/index.html")
+        |> html_response(200)
+
+      assert html =~ ~s(<html lang="en">)
+    end
+
+    # Google's hreflang rules: every version lists itself and every other
+    # one, the same list on each (else ignored), full addresses, x-default
+    test "every version names all the versions, the same list on each; canonical: itself" do
+      base = HoodrideWeb.Endpoint.url()
+      langs = I18n.addressed()
+      refute "en-XA" in langs, "the test language is never announced"
+      assert length(langs) >= 45
+
+      for {rest, paths} <- [
+            {"", ["/", "/ja", "/ar", "/pt-BR"]},
+            {"/privacy", ["/privacy", "/ja/privacy"]},
+            {"/terms", ["/terms", "/zh-Hant/terms"]}
+          ] do
+        expected =
+          [{"en", base <> PageController.address("en", rest)}] ++
+            Enum.map(langs, &{&1, base <> PageController.address(&1, rest)}) ++
+            [{"x-default", base <> PageController.address("en", rest)}]
+
+        for path <- paths do
+          html = build_conn() |> get(path) |> html_response(200)
+
+          found =
+            Regex.scan(~r/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)">/, html,
+              capture: :all_but_first
+            )
+
+          assert Enum.map(found, &List.to_tuple/1) == expected, path
+          assert html =~ ~s(<link rel="canonical" href="#{base}#{path}">), path
+          assert length(Regex.scan(~r/rel="canonical"/, html)) == 1, path
         end
       end
     end
 
+    test "a page's own links stay in its language; the note's English link stays English" do
+      ja = build_conn() |> get("/ja") |> html_response(200)
+      assert ja =~ ~s(href="/ja/terms") and ja =~ ~s(href="/ja/privacy")
+      refute ja =~ ~s(href="/terms") or ja =~ ~s(href="/privacy")
+      assert ja =~ ~s(<meta property="og:url" content="#{HoodrideWeb.Endpoint.url()}/ja">)
+
+      terms = build_conn() |> get("/ja/terms") |> html_response(200)
+      assert terms =~ ~s(<a class="back" href="/ja">)
+      assert terms =~ ~s(href="/ja/privacy")
+      assert terms =~ ~s(href="/terms?lang=en")
+
+      en = build_conn() |> get("/") |> html_response(200)
+      assert en =~ ~s(href="/terms") and en =~ ~s(href="/privacy")
+    end
+
+    test "the legal pages list every version by its own name, the current one marked" do
+      for {path, lang} <- [{"/privacy", "en"}, {"/ja/terms", "ja"}, {"/ar/privacy", "ar"}] do
+        html = build_conn() |> get(path) |> html_response(200)
+        [row] = Regex.run(~r{<details class="lang-row">.*?</details>}s, html)
+
+        links =
+          Regex.scan(~r{<a href="([^"]+)" lang="([^"]+)" hreflang="[^"]+"[^>]*>([^<]+)</a>}, row,
+            capture: :all_but_first
+          )
+
+        assert length(links) == 1 + length(I18n.addressed()), path
+        assert ["/ja" <> _, "ja", "日本語"] = Enum.find(links, fn [_, l, _] -> l == "ja" end)
+
+        assert [[^lang]] =
+                 Regex.scan(~r{lang="([^"]+)"[^>]*aria-current="page"}, row,
+                   capture: :all_but_first
+                 )
+
+        assert row =~ "<summary>#{I18n.t(lang, "Language")}: #{I18n.name(lang)}</summary>"
+        # right under the back link
+        assert html =~ ~r{<a class="back" href="[^"]*">[^<]*</a>\n  <details class="lang-row">}
+      end
+    end
+  end
+
+  describe "the server's words" do
     test "the server's own words: the sign-in limit's message in the reader's language" do
       msg = "Too many failed sign-ins from your network — try again later."
       assert I18n.t("en-XA", msg) != msg

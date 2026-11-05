@@ -48,6 +48,69 @@ defmodule Hoodride.I18n do
     end
   end
 
+  # each language in its own words, for the legal pages' language links
+  # (plain pages, no app code): the same names as the app's switch, which
+  # gets them from the browser (HoodLang.name — test_js/langswitch.test.mjs
+  # checks these match it)
+  @names %{
+    "en" => "English",
+    "es" => "Español",
+    "pt-BR" => "Português (Brasil)",
+    "fr" => "Français",
+    "it" => "Italiano",
+    "ca" => "Català",
+    "de" => "Deutsch",
+    "nl" => "Nederlands",
+    "sv" => "Svenska",
+    "da" => "Dansk",
+    "nb" => "Norsk bokmål",
+    "fi" => "Suomi",
+    "zh-Hans" => "简体中文",
+    "zh-Hant" => "繁體中文",
+    "ja" => "日本語",
+    "ko" => "한국어",
+    "vi" => "Tiếng Việt",
+    "th" => "ไทย",
+    "id" => "Bahasa Indonesia",
+    "ms" => "Bahasa Melayu",
+    "fil" => "Filipino",
+    "tr" => "Türkçe",
+    "ru" => "Русский",
+    "uk" => "Українська",
+    "pl" => "Polski",
+    "cs" => "Čeština",
+    "sk" => "Slovenčina",
+    "hr" => "Hrvatski",
+    "sl" => "Slovenščina",
+    "ro" => "Română",
+    "hu" => "Magyar",
+    "el" => "Ελληνικά",
+    "sw" => "Kiswahili",
+    "hi" => "हिन्दी",
+    "bn" => "বাংলা",
+    "mr" => "मराठी",
+    "te" => "తెలుగు",
+    "ta" => "தமிழ்",
+    "gu" => "ગુજરાતી",
+    "kn" => "ಕನ್ನಡ",
+    "ml" => "മലയാളം",
+    "or" => "ଓଡ଼ିଆ",
+    "pa" => "ਪੰਜਾਬੀ",
+    "ar" => "العربية",
+    "he" => "עברית",
+    "ur" => "اردو"
+  }
+
+  @doc "A language's name in its own words (the pseudo-language: its tag)."
+  def name(lang), do: Map.get(@names, lang, lang)
+
+  @doc """
+  The languages that have their own addresses (/ja, /ja/privacy…) and are
+  announced to search engines: those switched on, English aside (it lives
+  at /), and never the pseudo-language (a test tool, not a language).
+  """
+  def addressed, do: Enum.reject(on(), &(&1 in ["en", @pseudo]))
+
   @rtl ~w(ar he ur)
 
   @doc "Whether a language reads right to left (the page then mirrors: dir=\"rtl\")."

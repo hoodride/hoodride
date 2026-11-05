@@ -274,16 +274,25 @@ await journey("languages: no English left in a made-up language, nothing cut off
   check(ken.errors.length === 0, "no page errors", ken.errors);
   await ken.close();
 
-  // the legal pages in the reader's language (owner, 2026-11-05): a note
-  // under the date — a translation; the English version applies — and a
-  // link to it that works whatever the language cookie says
-  step("Pia reads the privacy policy and the terms in Spanish, then the English originals; Ali in Arabic");
+  // the legal pages in every language (owner, 2026-11-05): each at its own
+  // address (/es/privacy); /privacy is the English one for everyone (Google:
+  // no redirect between language versions) and lists the others; the Spanish
+  // app links to its own; a translation notes the English applies, links to it
+  step("Pia, in Spanish: the app at /es links to /es/terms; /privacy is English and lists Español; the English originals; Ali in Arabic");
   const pia = await browser.visitor("BT-Pia");
   await pia.phone(390, 780, 2);
   await pia.goto(`${BASE}/`);
   await pia.eval(`(document.cookie = "hoodride_lang=es; path=/; SameSite=Lax", true)`);
+  await pia.goto(`${BASE}/`);
+  check(await pia.eval(`location.pathname`) === "/es", "/ sent her to /es", await pia.eval(`location.pathname`));
+  const appLinks = await pia.eval(`[...document.querySelectorAll(".fineprint a")].map((a) => a.getAttribute("href"))`);
+  check(JSON.stringify(appLinks) === JSON.stringify(["/es/terms", "/es/privacy"]), "the Spanish app links to the Spanish terms and policy", appLinks);
+  await pia.goto(`${BASE}/privacy`);
+  const plain = await pia.eval(`(() => { const d = document.querySelector("details.lang-row"); const es = d && d.querySelector('a[lang="es"]'); return { lang: document.documentElement.lang, list: !!d && d.querySelectorAll("a").length, es: es && es.getAttribute("href"), label: d && d.querySelector("summary").textContent, wide: document.documentElement.scrollWidth <= innerWidth }; })()`);
+  check(plain.lang === "en", "/privacy: English, even with Spanish chosen (no redirect)", plain);
+  check(plain.list >= 46 && plain.es === "/es/privacy" && plain.label === "Language: English" && plain.wide, "/privacy lists every language, Español → /es/privacy", plain);
   for (const [page, title] of [["privacy", "Política de privacidad"], ["terms", "Términos de uso"]]) {
-    await pia.goto(`${BASE}/${page}`);
+    await pia.goto(`${BASE}/es/${page}`);
     const es = await pia.eval(`(() => {
       const n = document.querySelector(".translation-note"), a = n && n.querySelector("a");
       const r = n && n.getBoundingClientRect();
@@ -300,9 +309,7 @@ await journey("languages: no English left in a made-up language, nothing cut off
   await pia.close();
   const ali = await browser.visitor("BT-Ali");
   await ali.phone(390, 780, 2);
-  await ali.goto(`${BASE}/`);
-  await ali.eval(`(document.cookie = "hoodride_lang=ar; path=/; SameSite=Lax", true)`);
-  await ali.goto(`${BASE}/privacy`);
+  await ali.goto(`${BASE}/ar/privacy`);
   const ar = await ali.eval(`(() => {
     const n = document.querySelector(".translation-note").getBoundingClientRect(), b = document.querySelector("main").getBoundingClientRect();
     const td = document.querySelector("td");
@@ -313,6 +320,28 @@ await journey("languages: no English left in a made-up language, nothing cut off
   check(ali.errors.length === 0, "ar: no page errors", ali.errors);
   await ali.close();
 
+  // offline (owner, 2026-11-05): "/" sends a Japanese phone to /ja — a
+  // saved redirect can't be shown offline, so the worker keeps the home he
+  // opened as "/" (sw.js): with no signal, "/" opens in Japanese
+  step("Oto, in Japanese: / → /ja; then no signal: / still opens, in Japanese");
+  const oto = await browser.visitor("BT-Oto");
+  await oto.phone(390, 780, 2);
+  await oto.goto(`${BASE}/`);
+  await oto.eval(`(document.cookie = "hoodride_lang=ja; path=/; SameSite=Lax", true)`);
+  await oto.goto(`${BASE}/`);
+  check(await oto.eval(`location.pathname`) === "/ja", "/ sent him to /ja", await oto.eval(`location.pathname`));
+  await oto.waitFor(`navigator.serviceWorker.ready.then(() => true)`, "the offline copy installed", 20000);
+  // opened again, now through the worker: the home is saved
+  await oto.goto(`${BASE}/ja`);
+  await oto.waitFor(`!!navigator.serviceWorker.controller`, "the worker in charge", 20000);
+  await oto.waitFor(`caches.match("/").then((r) => r ? r.text() : "").then((t) => t.includes('<html lang="ja">'))`, "the Japanese home saved as /", 20000);
+  await oto.offline(true);
+  await oto.goto(`${BASE}/`);
+  const off = await oto.eval(`({ lang: document.documentElement.lang, title: !!document.getElementById("screen-login") })`);
+  check(off.lang === "ja" && off.title, "no signal: / opened, in Japanese", off);
+  await oto.offline(false);
+  await oto.close();
+
   step("Lia opens Hood Ride signed out, in the made-up language");
   const lia = await browser.visitor("BT-Lia");
   await lia.phone(390, 780, 2);
@@ -322,7 +351,7 @@ await journey("languages: no English left in a made-up language, nothing cut off
   await lia.waitFor(`!!document.getElementById("auth-buttons") && !document.getElementById("auth-buttons").classList.contains("hidden")`, "the sign-in buttons");
   check(await lia.eval(`HoodI18n.lang() === "en-XA" && document.documentElement.lang === "en-XA"`), "the page served in the made-up language", await lia.eval(`[HoodI18n.lang(), document.documentElement.lang]`));
   check((await lia.eval(`document.querySelector(".fineprint").textContent`)).startsWith("⟦"), "the agreement line translated", await lia.eval(`document.querySelector(".fineprint").textContent`));
-  check(await lia.eval(`document.querySelector('.fineprint a[href="/privacy"]').textContent.startsWith("⟦")`), "its links, too, still links");
+  check(await lia.eval(`document.querySelector('.fineprint a[href$="/privacy"]').textContent.startsWith("⟦")`), "its links, too, still links");
   await leftEnglish(lia, "the sign-in screen");
 
   await walk(lia, leftEnglish, "⟦");

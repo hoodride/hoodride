@@ -384,7 +384,7 @@ msgstr "동의합니다"
 msgid "I'm here"
 msgstr "도착했어요"
 
-#: priv/static/index.html
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/index.html
 msgid "Language"
 msgstr "언어"
 

@@ -87,7 +87,9 @@ defmodule HoodrideWeb.StaticVersionsTest do
       versions = StaticVersions.current()
       assets = worker_assets(conn)
 
-      assert "./" in assets
+      # (not "./": the home page can be a redirect to the visitor's language —
+      # a saved redirect can't be shown offline; sw.js keeps the home opened)
+      refute "./" in assets
       assert "index.html" in assets
       assert "app.js?vsn=#{versions["app.js"]}" in assets
       assert "maplibre-gl.js?vsn=#{versions["maplibre-gl.js"]}" in assets

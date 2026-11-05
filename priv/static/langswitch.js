@@ -99,5 +99,9 @@
     return `${COOKIE}=${encodeURIComponent(tag)}; path=/; max-age=31536000; SameSite=Lax` + (secure ? "; Secure" : "");
   }
 
-  return { COOKIE, name, sorted, search, cookie };
+  // a language's home address: English at /, every other at /<tag>
+  // (HoodrideWeb.PageController.address — the same rule)
+  const home = (tag) => (tag === "en" ? "/" : "/" + tag);
+
+  return { COOKIE, name, sorted, search, cookie, home };
 });

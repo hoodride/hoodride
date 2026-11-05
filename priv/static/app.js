@@ -3830,7 +3830,10 @@ function closeLangSheet() {
 function pickLang(tag) {
   if (tag === LANG_NOW) return closeLangSheet();
   document.cookie = HoodLang.cookie(tag, location.protocol === "https:");
-  location.reload();
+  // each language has its own address (English /, Japanese /ja — the
+  // server's PageController.address): go to it, the query kept (?demo=1);
+  // the cookie makes / remember the choice
+  location.assign(HoodLang.home(tag) + location.search);
 }
 
 $("btn-lang-login").addEventListener("click", () => openLangSheet($("btn-lang-login")));

@@ -384,7 +384,7 @@ msgstr "我同意"
 msgid "I'm here"
 msgstr "我到了"
 
-#: priv/static/index.html
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/index.html
 msgid "Language"
 msgstr "语言"
 

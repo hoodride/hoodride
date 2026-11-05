@@ -4,6 +4,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
 
 const require = createRequire(import.meta.url);
 const L = require("../priv/static/langswitch.js");
@@ -76,4 +77,24 @@ test("search: the closest first — the whole name, then a start, then inside", 
 
 test("search: nothing matches — an empty list (the page says so)", () => {
   assert.deepEqual(found("zzqx"), []);
+});
+
+// ----- each language's own address (owner, 2026-11-05: Google — separate
+// URLs per language; English stays at /) -----
+test("a language's home address: English /, the rest /<tag> as the server spells it", () => {
+  assert.equal(L.home("en"), "/");
+  assert.equal(L.home("ja"), "/ja");
+  assert.equal(L.home("pt-BR"), "/pt-BR");
+  assert.equal(L.home("zh-Hant"), "/zh-Hant");
+});
+
+// the legal pages' language list is plain HTML: the server writes the
+// names (Hoodride.I18n.name) — the same as the app's switch shows
+test("the server's language names are the switch's own", () => {
+  const ex = readFileSync(new URL("../lib/hoodride/i18n.ex", import.meta.url), "utf8");
+  const block = ex.match(/@names %\{([\s\S]*?)\n  \}/)[1];
+  const names = Object.fromEntries([...block.matchAll(/"([^"]+)" => "([^"]+)"/g)].map((m) => [m[1], m[2]]));
+  const known = ex.match(/@known ~w\(([^)]*)\)/)[1].split(/\s+/).filter((t) => t !== "en-XA");
+  assert.deepEqual(Object.keys(names).sort(), [...known].sort(), "a name for every language");
+  for (const tag of known) assert.equal(names[tag], L.name(tag), tag);
 });
