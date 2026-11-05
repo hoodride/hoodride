@@ -44,6 +44,29 @@ defmodule Mix.Tasks.Hoodride.I18n.Extract do
         File.write!(@pot, pot)
         Mix.shell().info("#{@pot}: written (#{count(found)} messages)")
     end
+
+    merge_translations(Expo.PO.parse_string!(pot), "--check" in args)
+  end
+
+  # each language's .po in line with the list: new messages blank (to
+  # translate), gone ones dropped, translations kept (Extract.merge/2)
+  defp merge_translations(pot, check?) do
+    for path <- Path.wildcard("priv/gettext/*/LC_MESSAGES/default.po") do
+      current = File.read!(path)
+      merged = Extract.po(Extract.merge(pot, Expo.PO.parse_string!(current)))
+
+      cond do
+        merged == current ->
+          Mix.shell().info("#{path}: in line with the list")
+
+        check? ->
+          Mix.raise("#{path} isn't in line with the list — run `mix hoodride.i18n.extract`")
+
+        true ->
+          File.write!(path, merged)
+          Mix.shell().info("#{path}: merged (new messages blank)")
+      end
+    end
   end
 
   defp count(found), do: found |> Enum.uniq_by(&{&1.context, &1.msgid, &1.plural}) |> length()

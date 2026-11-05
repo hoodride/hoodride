@@ -64,6 +64,6 @@ config :hoodride, :map_batch_ms, 0
 config :hoodride, :sign_in_budget, nil
 config :hoodride, :sign_in_failures, nil
 
-# the made-up language switched on (Hoodride.I18n, en-XA): the languages
+# Spanish and the made-up language switched on (Hoodride.I18n, en-XA): the languages
 # journey checks no English is left through the real language loader
-config :hoodride, :languages, ~w(en en-XA)
+config :hoodride, :languages, ~w(en es en-XA)

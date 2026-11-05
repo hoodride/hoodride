@@ -5,6 +5,18 @@
 [extend]
 useDefault = true
 
+# Phoenix's own secret (the key that signs every session): any value, as
+# written. gitleaks' general rule only matches a value starting with a
+# letter or digit, and a base64 key (`mix phx.gen.secret`) starts with "+"
+# or "/" about 1 time in 32 — such a key slipped past (found 2026-11-04,
+# from a test that failed now and then)
+[[rules]]
+id = "phoenix-secret-key-base"
+description = "Phoenix secret_key_base"
+regex = '''secret_key_base:\s*"([^"\s]{20,})"'''
+secretGroup = 1
+keywords = ["secret_key_base"]
+
 [[allowlists]]
 description = "The keys for running on your own computer and in tests. The server's own key is set only in /etc/hoodride/env (config/runtime.exs) and is never in the code."
 condition = "AND"

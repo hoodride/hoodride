@@ -32,13 +32,13 @@ defmodule Hoodride.I18nTest do
       assert I18n.on() == ["en"]
     end
 
-    test "hoodride.app: unset, English only — the made-up one is on in tests alone" do
+    test "hoodride.app: unset, English only — Spanish and the made-up one are on in tests alone" do
       # only the LANGUAGES setting switches one on outside tests
       for f <- ~w(config/config.exs config/prod.exs config/dev.exs),
           do: refute(File.read!(f) =~ ":languages", f)
 
       assert File.read!("config/runtime.exs") =~ ~s[if languages = System.get_env("LANGUAGES") do]
-      assert File.read!("config/test.exs") =~ ~s[config :hoodride, :languages, ~w(en en-XA)]
+      assert File.read!("config/test.exs") =~ ~s[config :hoodride, :languages, ~w(en es en-XA)]
     end
   end
 

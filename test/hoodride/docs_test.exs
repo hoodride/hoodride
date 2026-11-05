@@ -142,8 +142,28 @@ defmodule Hoodride.DocsTest do
     # the checker itself sees the name where it should
     assert "priv/static/index.html" in showing and "priv/static/terms.html" in showing
 
+    # the language files are made from the translations, one per language:
+    # one general line covers them all, so a new language never touches the
+    # guide (owner, 2026-11-04 — docs don't list what's generated). Every
+    # other file is listed by its own name
+    generated = ~r|^priv/static/i18n-[A-Za-z]{2,3}(-[A-Za-z0-9]+)?\.js$|
+    assert yours =~ "`priv/static/i18n-<lang>.js`"
+    assert yours =~ "`priv/gettext/<lang>/LC_MESSAGES/default.po`"
+    assert Enum.any?(showing, &(&1 =~ generated)), "the checker sees a language file"
+
     for f <- showing,
+        not (f =~ generated),
         do: assert(yours =~ "`#{f}`", "#{f} shows the name but 'Make it yours' doesn't list it")
+  end
+
+  # the rename order (gettext practice: change a message inside the .po
+  # files BEFORE merging, or it comes back as a new, blank message)
+  test "'Make it yours': rename in the translations first, then extract, then build" do
+    [_, yours] = String.split(doc("SELF_HOSTING.md"), "## Make it yours", parts: 2)
+    {po, _} = :binary.match(yours, "**then** in every\n  `default.po`")
+    {extract, _} = :binary.match(yours, "`mix hoodride.i18n.extract`")
+    {build, _} = :binary.match(yours, "`mix hoodride.i18n.build`")
+    assert po < extract and extract < build
   end
 
   # the load and stress scripts live in test_load/, beside test_js/ and

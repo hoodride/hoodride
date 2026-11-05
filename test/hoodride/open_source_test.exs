@@ -92,6 +92,32 @@ defmodule Hoodride.OpenSourceTest do
 
     # the harmless look-alikes are matched by file AND line: the same kind of
     # value anywhere else is still caught
+    # a Phoenix key, whatever it starts with: gitleaks' general rule missed
+    # one starting with "+" or "/" (about 1 in 32 — this test failed now and
+    # then, 2026-11-04); our own rule (.gitleaks.toml) catches every one
+    test "a secret_key_base is caught whatever it starts with", %{tmp_dir: dir} = ctx do
+      if exe = ctx[:exe] do
+        File.cp!(Path.join(@root, ".gitleaks.toml"), Path.join(dir, ".gitleaks.toml"))
+        File.mkdir_p!(Path.join(dir, "config"))
+        body = Base.encode64(:crypto.strong_rand_bytes(48))
+
+        for first <- ["/", "+", "a", "Z", "7"] do
+          key = first <> binary_part(body, 1, byte_size(body) - 1)
+
+          File.write!(
+            Path.join(dir, "config/prod.exs"),
+            ~s(config :x,\n  secret_key_base: "#{key}"\n)
+          )
+
+          assert {:leaks, report} =
+                   Secrets.scan_files(exe, dir, [".gitleaks.toml", "config/prod.exs"]),
+                 first
+
+          refute report =~ key
+        end
+      end
+    end
+
     test "the allow list covers only its own files and lines", %{tmp_dir: dir} = ctx do
       if exe = ctx[:exe] do
         File.cp!(Path.join(@root, ".gitleaks.toml"), Path.join(dir, ".gitleaks.toml"))

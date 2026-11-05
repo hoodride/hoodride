@@ -238,6 +238,11 @@ msgstr ""
 msgid "Couldn't sign out — try again"
 msgstr ""
 
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr ""
+
 #: priv/static/index.html
 msgid "Decline"
 msgstr ""
@@ -619,11 +624,11 @@ msgid "Too many failed sign-ins from your network — try again later."
 msgstr ""
 
 #: priv/static/index.html
-msgid "Type DELETE to confirm"
+msgid "Type {word} to confirm"
 msgstr ""
 
 #: priv/static/app.js
-msgid "Type DELETE to confirm."
+msgid "Type {word} to confirm."
 msgstr ""
 
 #: priv/static/app.js

@@ -130,11 +130,17 @@ inviting anyone, change:
   (`og:` tags) shown when the link is shared
 - `priv/static/app.js` and `priv/static/sendfilter.js`: a few messages
   ("Can't reach Hood Ride…", the location-permission steps)
-- `priv/static/i18n-en-XA.js` (and any other `i18n-<lang>.js`): made from
-  those messages, never edited by hand. After changing the name, run
-  `mix hoodride.i18n.extract`, then `mix hoodride.i18n.build`; translations
-  you have (`priv/gettext/<lang>/LC_MESSAGES/default.po`) need the new
-  name too
+- the translations, `priv/gettext/<lang>/LC_MESSAGES/default.po` (one
+  per language): the name in their English lines (`msgid`) and their
+  translated ones (`msgstr`)
+- `priv/static/i18n-<lang>.js` (one per language): made from the
+  translations, never edited by hand
+
+  In that order: change the name in the files above, **then** in every
+  `default.po`, and only then run `mix hoodride.i18n.extract`, then
+  `mix hoodride.i18n.build`. (A message whose English changed is a new
+  message to the translations: changed in the `.po` first, it keeps its
+  translation; otherwise it comes back blank, to translate again.)
 
 **The pictures:**
 - `priv/static/car.png`, `car-avatar.png`, `icon-180.png`, `icon-192.png`,

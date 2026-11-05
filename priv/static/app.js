@@ -541,8 +541,14 @@ function renderSettings() {
 // ----- delete account: a second, explicit step -----
 // and typed, not just tapped (owner, 2026-11-04): the red button wakes only
 // once the box says DELETE — any case, spaces ignored (a phone capitalizes
-// the first letter by itself); the server checks the same word
-const deleteTyped = () => $("delete-typed").value.trim().toLowerCase() === "delete";
+// the first letter by itself); the server checks the same word. In the
+// reader's language (Cloudscape: the confirmation word is localized —
+// "ELIMINAR"); DELETE always works too (owner, 2026-11-04)
+const deleteWord = () => tc("the word typed to delete the account", "DELETE");
+const deleteTyped = () => {
+  const typed = $("delete-typed").value.trim().toLocaleLowerCase();
+  return typed === "delete" || typed === deleteWord().toLocaleLowerCase();
+};
 
 function showDeleteConfirm() {
   if (state.ride) return;
@@ -592,7 +598,7 @@ async function deleteAccount() {
   if (reason === "in_ride") return fail(t("End your ride first."));
   if (reason === "request_waiting") return fail(t("Cancel your ride request first."));
   if (res.status === 401) return location.reload(); // already signed out
-  if (reason === "confirm") return fail(t("Type DELETE to confirm."));
+  if (reason === "confirm") return fail(t("Type {word} to confirm.", { word: deleteWord() }));
   fail(t("Couldn't delete your account — please try again."));
 }
 

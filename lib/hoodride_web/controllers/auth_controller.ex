@@ -591,8 +591,10 @@ defmodule HoodrideWeb.AuthController do
     end
   end
 
+  # DELETE, or the word in any language the app knows (the screen asks for
+  # the reader's: "ELIMINAR") — whatever language the page was in
   defp typed_delete?(word) when is_binary(word),
-    do: word |> String.trim() |> String.downcase() == "delete"
+    do: (word |> String.trim() |> String.downcase()) in Hoodride.I18n.delete_words()
 
   defp typed_delete?(_), do: false
 

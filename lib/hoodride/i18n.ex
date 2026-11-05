@@ -22,7 +22,7 @@ defmodule Hoodride.I18n do
 
   # every language with a catalog, English first. A new one: its .po, then
   # its tag here (a test keeps the two the same)
-  @known ~w(en en-XA)
+  @known ~w(en es en-XA)
 
   # the pseudo-language's catalog comes from the list, not a .po
   @pseudo "en-XA"
@@ -51,7 +51,8 @@ defmodule Hoodride.I18n do
   # CLDR's plural categories in gettext's msgstr[n] order, per language
   # (a .po's Plural-Forms numbers them; i18n.js picks by name, with
   # Intl.PluralRules). English and the pseudo-language: one, other
-  @plural_categories %{"en-XA" => ~w(one other)}
+  # Spanish: "many" is exact millions ("1 000 000 de autos" — CLDR 42+)
+  @plural_categories %{"en-XA" => ~w(one other), "es" => ~w(one many other)}
 
   @doc """
   The catalog i18n.js loads — `%{"lang" => lang, "messages" => %{key => text}}`
@@ -158,6 +159,26 @@ defmodule Hoodride.I18n do
   defp ordered(pair), do: pair
 
   # ----- the server's own words -----
+
+  @doc """
+  The words that confirm deleting an account, lowercase: "delete" and its
+  translation in every language the code knows (`tc("the word typed to
+  delete the account", "DELETE")` — what each screen asks for).
+  """
+  def delete_words do
+    key = "the word typed to delete the account\u0004DELETE"
+
+    for lang <- @known, reduce: ["delete"] do
+      words ->
+        case messages(lang) do
+          %{^key => word} when is_binary(word) and word != "" ->
+            Enum.uniq([String.downcase(word) | words])
+
+          _ ->
+            words
+        end
+    end
+  end
 
   @doc """
   The server's own message in `lang` (`t(lang, "…")`, collected like the

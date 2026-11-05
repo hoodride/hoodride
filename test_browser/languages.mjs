@@ -46,6 +46,48 @@ const SPILLS = `(() => [...document.querySelectorAll("button, .btn, .banner, .dr
   .filter((el) => el.getClientRects().length > 0 && !el.closest(".hidden") && el.scrollWidth > el.clientWidth + 1)
   .map((el) => ({ in: el.id || el.className, text: el.textContent.trim().slice(0, 60), over: el.scrollWidth - el.clientWidth })))()`;
 
+// the screens both languages are walked through: the demo's map, a car's
+// card, a chat, a ride, driving, the menu, the car form, the map-app box —
+// `look` checks each
+async function walk(p, look, colorStart) {
+    step("the demo in it: the map, a car's card, a chat, a ride; driving");
+    await p.goto(`${BASE}/?demo=1`);
+    await p.waitFor(`typeof DEMO !== "undefined" && DEMO && !!map && drivers.length > 0`, "the demo's pretend drivers", 15000);
+    await look(p, "the map");
+    await p.eval(`openMarkerCard(drivers[0], "driver"), true`);
+    await p.waitFor(`!document.getElementById("peer-card").classList.contains("hidden")`, "a car's card");
+    await look(p, "a car's card");
+    await p.click("btn-msg");
+    await p.waitFor(`!document.getElementById("chat").classList.contains("hidden")`, "the chat");
+    await look(p, "the chat");
+    await p.click("btn-ride-action");
+    await p.waitFor(`state.ride && state.ride.status === "connected"`, "the ride, accepted", 5000);
+    await p.click("chat-close");
+    await look(p, "in a ride");
+    await p.click("btn-endride");
+    await p.waitFor(`!state.ride`, "the ride ended");
+    await p.click("btn-mode");
+    await p.waitFor(`state.mode === "driver"`, "Drive");
+    await p.click("btn-online");
+    await p.waitFor(`state.online`, "online");
+    await look(p, "driving");
+
+    step("the menu, the car form, the map-app box");
+    await p.click("btn-account");
+    await p.waitFor(`settingsOpen()`, "the menu");
+    await look(p, "the menu");
+    await p.click("btn-car");
+    await p.waitFor(`carSheetOpen()`, "the car form");
+    check((await p.eval(`document.getElementById("car-color").options[1].text`)).startsWith(colorStart), "the colors, translated", await p.eval(`document.getElementById("car-color").options[1].text`));
+    await look(p, "the car form");
+    await p.click("car-cancel");
+    await p.waitFor(`!carSheetOpen()`, "the car form closed");
+    await p.eval(`openNavSheet({ lat: 40.71, lng: -74.0 }), true`);
+    await p.waitFor(`!document.getElementById("nav-sheet").classList.contains("hidden")`, "the map-app box");
+    await look(p, "the map-app box");
+    await p.click("nav-cancel");
+}
+
 await journey("languages: no English left in a made-up language, nothing cut off", async (browser) => {
   // names and words that are no language's: people, brands, places, the
   // demo's pretend people and cars (the car description is put together by
@@ -83,42 +125,7 @@ await journey("languages: no English left in a made-up language, nothing cut off
   check(await lia.eval(`document.querySelector('.fineprint a[href="/privacy"]').textContent.startsWith("⟦")`), "its links, too, still links");
   await leftEnglish(lia, "the sign-in screen");
 
-  step("the demo in it: the map, a car's card, a chat, a ride; driving");
-  await lia.goto(`${BASE}/?demo=1`);
-  await lia.waitFor(`typeof DEMO !== "undefined" && DEMO && !!map && drivers.length > 0`, "the demo's pretend drivers", 15000);
-  await leftEnglish(lia, "the map");
-  await lia.eval(`openMarkerCard(drivers[0], "driver"), true`);
-  await lia.waitFor(`!document.getElementById("peer-card").classList.contains("hidden")`, "a car's card");
-  await leftEnglish(lia, "a car's card");
-  await lia.click("btn-msg");
-  await lia.waitFor(`!document.getElementById("chat").classList.contains("hidden")`, "the chat");
-  await leftEnglish(lia, "the chat");
-  await lia.click("btn-ride-action");
-  await lia.waitFor(`state.ride && state.ride.status === "connected"`, "the ride, accepted", 5000);
-  await lia.click("chat-close");
-  await leftEnglish(lia, "in a ride");
-  await lia.click("btn-endride");
-  await lia.waitFor(`!state.ride`, "the ride ended");
-  await lia.click("btn-mode");
-  await lia.waitFor(`state.mode === "driver"`, "Drive");
-  await lia.click("btn-online");
-  await lia.waitFor(`state.online`, "online");
-  await leftEnglish(lia, "driving");
-
-  step("the menu, the car form, the map-app box");
-  await lia.click("btn-account");
-  await lia.waitFor(`settingsOpen()`, "the menu");
-  await leftEnglish(lia, "the menu");
-  await lia.click("btn-car");
-  await lia.waitFor(`carSheetOpen()`, "the car form");
-  check((await lia.eval(`document.getElementById("car-color").options[1].text`)).startsWith("⟦"), "the colors, translated", await lia.eval(`document.getElementById("car-color").options[1].text`));
-  await leftEnglish(lia, "the car form");
-  await lia.click("car-cancel");
-  await lia.waitFor(`!carSheetOpen()`, "the car form closed");
-  await lia.eval(`openNavSheet({ lat: 40.71, lng: -74.0 }), true`);
-  await lia.waitFor(`!document.getElementById("nav-sheet").classList.contains("hidden")`, "the map-app box");
-  await leftEnglish(lia, "the map-app box");
-  await lia.click("nav-cancel");
+  await walk(lia, leftEnglish, "⟦");
 
   step("an address that doesn't exist: its page in the language too");
   await lia.goto(`${BASE}/no/such/page`);
@@ -127,4 +134,24 @@ await journey("languages: no English left in a made-up language, nothing cut off
   check((await lia.eval(`document.title`)).startsWith("⟦"), "its title translated", await lia.eval(page404));
   await leftEnglish(lia, "the not-found page");
   check(lia.errors.length === 0, "no page errors", lia.errors);
+
+  // real Spanish (stage 2): its own words, as long as they really are —
+  // everything fits, nothing spills out or is cut off
+  step("Sol picks Spanish: the same screens, every word fits");
+  const sol = await browser.visitor("BT-Sol");
+  await sol.goto(`${BASE}/`);
+  await sol.eval(`(document.cookie = "hoodride_lang=es; path=/; SameSite=Lax", true)`);
+  await sol.goto(`${BASE}/`);
+  await sol.waitFor(`!!document.getElementById("auth-buttons") && !document.getElementById("auth-buttons").classList.contains("hidden")`, "the sign-in buttons");
+  check(await sol.eval(`HoodI18n.lang() === "es" && document.documentElement.lang === "es"`), "the page served in Spanish");
+  const fine = await sol.eval(`document.querySelector(".fineprint").textContent`);
+  check(fine === "Al continuar, aceptas nuestros Términos y nuestra Política de privacidad.", "the agreement line in Spanish, its links in place", fine);
+  const fits = async (p, where) => {
+    const spills = await p.eval(SPILLS);
+    check(spills.length === 0, `${where} in Spanish: every word fits`, spills);
+  };
+  await fits(sol, "the sign-in screen");
+  await walk(sol, fits, "Blanco");
+  check((await sol.eval(`document.getElementById("btn-online").textContent`)).includes("DESCONECTARSE"), "Spanish on the buttons", await sol.eval(`document.getElementById("btn-online").textContent`));
+  check(sol.errors.length === 0, "no page errors", sol.errors);
 });

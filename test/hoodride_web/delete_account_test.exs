@@ -174,9 +174,57 @@ defmodule HoodrideWeb.DeleteAccountTest do
       end
     end
 
+    # in the reader's language too (Cloudscape: the confirmation word is
+    # localized; owner, 2026-11-04) — and whatever language the page was in:
+    # the screen asking for one word while the server checks another is the
+    # AWS console's French bug
+    test "the word in the reader's language: ELIMINAR, any case", %{conn: conn} do
+      for {word, n} <- Enum.with_index(["ELIMINAR", "eliminar", " Eliminar "]) do
+        u = user("del-es-#{n}")
+
+        assert json_response(delete_account(signed_in(conn, u), %{"confirm" => word}), 200) == %{
+                 "ok" => true
+               }
+
+        refute Accounts.get_user(u.id)
+      end
+    end
+
+    test "every language's screen asks for a word the server accepts" do
+      words = Hoodride.I18n.delete_words()
+      assert "delete" in words and "eliminar" in words
+
+      for lang <- Hoodride.I18n.known(), lang != "en" do
+        source = File.read!(Path.join("priv/static", Hoodride.I18n.script(lang)))
+        [_, json] = Regex.run(~r/^HoodI18n\.load\((.*)\);$/m, source)
+
+        asked =
+          Jason.decode!(json)["messages"]["the word typed to delete the account\u0004DELETE"]
+
+        assert is_binary(asked), "#{lang}: no word to type"
+        assert String.downcase(asked) in words, "#{lang} asks for #{asked}"
+      end
+
+      # the sentences around it carry the word in, never a word of their own
+      pot = File.read!("priv/gettext/default.pot")
+      assert pot =~ ~s(msgid "Type {word} to confirm")
+      refute pot =~ "Type DELETE"
+    end
+
     test "not the word: refused, nothing deleted", %{conn: conn} do
       for {bad, n} <-
-            Enum.with_index([true, "true", "delet", "DELETE IT", "", nil, 1, %{"a" => 1}]) do
+            Enum.with_index([
+              true,
+              "true",
+              "delet",
+              "DELETE IT",
+              "",
+              nil,
+              1,
+              %{"a" => 1},
+              "BORRAR",
+              "eliminar ya"
+            ]) do
         u = user("del-bad-#{n}")
 
         assert json_response(delete_account(signed_in(conn, u), %{"confirm" => bad}), 400) == %{

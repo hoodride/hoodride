@@ -510,6 +510,38 @@ defmodule Hoodride.I18n.Extract do
   end
 
   @doc """
+  A language's translations (`po`, Expo.Messages) brought in line with the
+  list (`pot`): its header kept; each message the list has, with the
+  translation it had (same message, same kind — plain or plural), else
+  blank; messages no longer in the list dropped. What gettext's
+  `msgmerge` does, without fuzzy guesses (a near-miss translation shown as
+  right is worse than English).
+  """
+  def merge(%Messages{} = pot, %Messages{} = po) do
+    had = Map.new(po.messages, &{key(&1), &1})
+
+    messages =
+      for m <- pot.messages do
+        case had[key(m)] do
+          %{__struct__: same} = old when same == m.__struct__ -> %{m | msgstr: old.msgstr}
+          _ -> m
+        end
+      end
+
+    %{po | messages: messages}
+  end
+
+  # (a long text may be read back in pieces: compared whole)
+  defp key(%Message.Plural{} = m), do: {text(m.msgctxt), text(m.msgid), text(m.msgid_plural)}
+  defp key(%Message.Singular{} = m), do: {text(m.msgctxt), text(m.msgid)}
+
+  defp text(nil), do: nil
+  defp text(iodata), do: IO.iodata_to_binary(iodata)
+
+  @doc "A language's .po text."
+  def po(%Messages{} = po), do: po |> Expo.PO.compose() |> IO.iodata_to_binary()
+
+  @doc """
   The list file's contents: one entry per message (context + English;
   for a plural, its singular and plural), sorted, with the files it's in
   (no line numbers — they'd change with every edit nearby).

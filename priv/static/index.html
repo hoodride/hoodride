@@ -191,7 +191,7 @@
         <!-- typed, not just tapped (owner, 2026-11-04): the red button wakes
              only once the box says DELETE (any case); the server checks the
              word too -->
-        <label class="car-field" data-t>Type DELETE to confirm
+        <label class="car-field" data-t>Type <span data-t="the word typed to delete the account" data-t-slot="word">DELETE</span> to confirm
           <input id="delete-typed" type="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="done" maxlength="20" />
         </label>
         <p id="delete-error" class="delete-error hidden" role="alert"></p>

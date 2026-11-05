@@ -245,6 +245,46 @@ defmodule Hoodride.I18n.ExtractTest do
     end
   end
 
+  # a translation kept in line with the list (gettext's msgmerge, no fuzzy)
+  test "merge: translations kept, new messages blank, gone ones dropped, header kept" do
+    alias Expo.Message.{Plural, Singular}
+
+    {:ok, pot} =
+      Expo.PO.parse_string(
+        Extract.pot(
+          elem(
+            Extract.scan_js(
+              ~S|t("Save"); t("New one"); tn("{count} car", "{count} cars", n);|,
+              "a.js"
+            ),
+            1
+          )
+        )
+      )
+
+    po = %Expo.Messages{
+      headers: ["Language: es\n"],
+      messages: [
+        %Singular{msgid: ["Sa", "ve"], msgstr: ["Guardar"]},
+        %Singular{msgid: ["Gone"], msgstr: ["Ya no"]},
+        %Plural{
+          msgid: ["{count} car"],
+          msgid_plural: ["{count} cars"],
+          msgstr: %{0 => ["{count} auto"], 1 => ["{count} autos"]}
+        }
+      ]
+    }
+
+    merged = Extract.merge(pot, po)
+    assert merged.headers == ["Language: es\n"]
+    got = Map.new(merged.messages, &{IO.iodata_to_binary(&1.msgid), &1.msgstr})
+    assert got["Save"] == ["Guardar"], "a text read back in pieces still matches"
+    assert got["New one"] == [""]
+    assert got["{count} car"] == %{0 => ["{count} auto"], 1 => ["{count} autos"]}
+    refute Map.has_key?(got, "Gone")
+    assert "hoodride.i18n.extract --check" in Mix.Project.config()[:aliases][:precommit]
+  end
+
   test "the app's scripts: all readable, the shipped list up to date" do
     assert {:ok, found} = Extract.scan_all()
     assert File.read!("priv/gettext/default.pot") == Extract.pot(found)
