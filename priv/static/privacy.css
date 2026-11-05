@@ -9,7 +9,7 @@ h2 { font-size: 20px; margin: 32px 0 8px; padding-top: 16px; border-top: 1px sol
 a { color: var(--accent); }
 .muted { color: var(--muted); }
 table { border-collapse: collapse; width: 100%; font-size: 15px; }
-th, td { text-align: left; vertical-align: top; padding: 8px 6px; border-bottom: 1px solid var(--line); }
+th, td { text-align: start; vertical-align: top; padding: 8px 6px; border-bottom: 1px solid var(--line); }
 th { font-weight: 600; }
 .back { display: inline-block; margin-bottom: 8px; }
 @media (max-width: 520px) { table, thead, tbody, tr, th, td { display: block; } thead { display: none; } td { border: 0; padding: 2px 0; } tr { padding: 10px 0; border-bottom: 1px solid var(--line); } td:first-child { font-weight: 600; } }
@@ -21,3 +21,6 @@ th { font-weight: 600; }
    purpose (owner, 2026-11-02: tried the sign-in's -2 px, kept this) */
 .notfound h1 { margin-top: 12px; }
 .notfound .home { display: inline-block; margin-top: 16px; padding: 12px 24px; border-radius: 999px; background: #ffc107; color: #111111; font-weight: 700; text-decoration: none; }
+/* a translated legal page (privacy.<lang>.html): the note under the date —
+   a translation; the English version applies; a link to it */
+.translation-note { margin: 12px 0 20px; padding-inline-start: 12px; border-inline-start: 3px solid var(--accent); color: var(--muted); font-size: 15px; }

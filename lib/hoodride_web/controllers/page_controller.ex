@@ -96,22 +96,27 @@ defmodule HoodrideWeb.PageController do
   # linked from the login screen and the drawer — Google's rules for the
   # policy its consent screen links to. Plain HTML, no app code; its look is
   # privacy.css, by versioned address (no inline <style> — HoodrideWeb.CSP).
-  def privacy(conn, _params), do: legal(conn, "privacy")
+  def privacy(conn, params), do: legal(conn, "privacy", params)
 
   # The Terms of Use (Hoodride.Terms): public, like the privacy policy, and
   # styled by the same privacy.css
-  def terms(conn, _params), do: legal(conn, "terms")
+  def terms(conn, params), do: legal(conn, "terms", params)
 
   # the legal pages are whole documents, translated and reviewed as one
   # (stage 2): `privacy.es.html` beside `privacy.html` — English if a
   # language has none yet. (Our own files, by names fixed here and a
   # language from Lang.pick — one of Hoodride.I18n's own tags.)
+  # A translated page links to its English original (it's what applies):
+  # `?lang=en` — English whatever the language cookie says. Only "en": any
+  # other value is ignored, the page as usual.
   # sobelow_skip ["XSS.SendResp"]
-  defp legal(conn, name) do
+  defp legal(conn, name, params) do
+    lang = if params["lang"] == "en", do: "en", else: Lang.pick(conn)
+
     conn
     |> Lang.vary()
     |> put_resp_content_type("text/html")
-    |> send_resp(200, StaticVersions.stamp(static(legal_file(name, Lang.pick(conn)))))
+    |> send_resp(200, StaticVersions.stamp(static(legal_file(name, lang))))
   end
 
   @doc "The legal page's file for `lang`: its own if there is one, else English."

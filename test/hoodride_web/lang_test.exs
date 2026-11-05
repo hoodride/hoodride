@@ -245,6 +245,31 @@ defmodule HoodrideWeb.LangTest do
       end
     end
 
+    test "the legal pages in the reader's language; ?lang=en the English original" do
+      for page <- ["/privacy", "/terms"] do
+        # the cookie's language: its own copy, with the note linking to English
+        es = asking("en") |> put_req_cookie(Lang.cookie(), "es") |> get(page)
+        html = html_response(es, 200)
+        assert html =~ ~s(<html lang="es">)
+        assert html =~ ~s(<a href="#{page}?lang=en">)
+        # the stylesheet versioned, as on the English page
+        assert html =~ ~r/href="privacy\.css\?vsn=\w+"/
+
+        # the note's link: English whatever the cookie or the phone says
+        en = asking("es") |> put_req_cookie(Lang.cookie(), "es") |> get(page <> "?lang=en")
+        assert html_response(en, 200) =~ ~s(<html lang="en">)
+        assert get_resp_header(en, "vary") == ["Accept-Language, Cookie"]
+
+        # any other value: ignored (never a file name from the address)
+        for odd <- ["fr", "../privacy", "es%00", ""] do
+          other =
+            asking("en") |> put_req_cookie(Lang.cookie(), "es") |> get(page <> "?lang=" <> odd)
+
+          assert html_response(other, 200) =~ ~s(<html lang="es">), "?lang=#{odd}"
+        end
+      end
+    end
+
     test "the server's own words: the sign-in limit's message in the reader's language" do
       msg = "Too many failed sign-ins from your network — try again later."
       assert I18n.t("en-XA", msg) != msg

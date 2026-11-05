@@ -35,7 +35,11 @@ defmodule HoodrideWeb.NoCommentsTest do
     for page <- Minify.pages() do
       src = File.read!(Path.join(@static, page))
       min = File.read!(Path.join(out, page))
-      assert src =~ "<!--", "#{page}: the source keeps its notes"
+      # (the English pages keep developer notes — the strip is tested on
+      # them; the translations were written without any)
+      if page in ~w(index.html privacy.html terms.html notfound.html),
+        do: assert(src =~ "<!--", "#{page}: the source keeps its notes")
+
       refute min =~ "<!--", "#{page}: a comment left"
       assert words(min) == words(src), "#{page}: more than the comments changed"
     end

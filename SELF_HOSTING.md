@@ -121,6 +121,12 @@ inviting anyone, change:
 - `priv/static/terms.html`: your own terms. When you change them, also
   change the version in `lib/hoodride/terms.ex`, so everyone is asked to
   agree again.
+- `priv/static/privacy.<lang>.html` and `priv/static/terms.<lang>.html`
+  (one pair per language): translations of the two pages. Each names the
+  English page it was translated from, so once you change the English,
+  `test_js/legal.test.mjs` fails until each is translated again from
+  yours (the new fingerprint is in its message). Or delete them all, and
+  that test with them: every language then gets the English pages.
 
 **The name**, everywhere people see it:
 - `priv/static/index.html`: the page title, the sign-in screen and the top bar

@@ -274,6 +274,45 @@ await journey("languages: no English left in a made-up language, nothing cut off
   check(ken.errors.length === 0, "no page errors", ken.errors);
   await ken.close();
 
+  // the legal pages in the reader's language (owner, 2026-11-05): a note
+  // under the date — a translation; the English version applies — and a
+  // link to it that works whatever the language cookie says
+  step("Pia reads the privacy policy and the terms in Spanish, then the English originals; Ali in Arabic");
+  const pia = await browser.visitor("BT-Pia");
+  await pia.phone(390, 780, 2);
+  await pia.goto(`${BASE}/`);
+  await pia.eval(`(document.cookie = "hoodride_lang=es; path=/; SameSite=Lax", true)`);
+  for (const [page, title] of [["privacy", "Política de privacidad"], ["terms", "Términos de uso"]]) {
+    await pia.goto(`${BASE}/${page}`);
+    const es = await pia.eval(`(() => {
+      const n = document.querySelector(".translation-note"), a = n && n.querySelector("a");
+      const r = n && n.getBoundingClientRect();
+      return { lang: document.documentElement.lang, h1: document.querySelector("h1").textContent, note: !!n && r.height > 0 && r.right <= innerWidth, link: a && a.getAttribute("href"), styled: !!n && getComputedStyle(n).borderInlineStartWidth === "3px", wide: document.documentElement.scrollWidth <= innerWidth };
+    })()`);
+    check(es.lang === "es" && es.h1 === title, `${page}: in Spanish`, es);
+    check(es.note && es.styled && es.link === `/${page}?lang=en`, `${page}: the note under the date, linking to English`, es);
+    check(es.wide, `${page}: fits the phone`, es);
+    await pia.goto(`${BASE}${es.link}`);
+    check(await pia.eval(`document.documentElement.lang === "en" && !document.querySelector(".translation-note")`), `${page}: the English original, from the note's link`);
+    check(await pia.eval(`document.cookie.includes("hoodride_lang=es")`), `${page}: the Spanish choice still kept`);
+  }
+  check(pia.errors.length === 0, "no page errors", pia.errors);
+  await pia.close();
+  const ali = await browser.visitor("BT-Ali");
+  await ali.phone(390, 780, 2);
+  await ali.goto(`${BASE}/`);
+  await ali.eval(`(document.cookie = "hoodride_lang=ar; path=/; SameSite=Lax", true)`);
+  await ali.goto(`${BASE}/privacy`);
+  const ar = await ali.eval(`(() => {
+    const n = document.querySelector(".translation-note").getBoundingClientRect(), b = document.querySelector("main").getBoundingClientRect();
+    const td = document.querySelector("td");
+    return { dir: document.documentElement.dir, align: getComputedStyle(td).textAlign, noteRight: Math.round(b.right - n.right), noteLeft: Math.round(n.left - b.left), border: getComputedStyle(document.querySelector(".translation-note")).borderRightWidth };
+  })()`);
+  check(ar.dir === "rtl" && ar.border === "3px", "ar: right to left, the note's bar on the right", ar);
+  check(ar.align === "start", "ar: the tables from the right (start, not left)", ar);
+  check(ali.errors.length === 0, "ar: no page errors", ali.errors);
+  await ali.close();
+
   step("Lia opens Hood Ride signed out, in the made-up language");
   const lia = await browser.visitor("BT-Lia");
   await lia.phone(390, 780, 2);

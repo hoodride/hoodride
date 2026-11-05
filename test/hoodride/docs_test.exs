@@ -151,8 +151,16 @@ defmodule Hoodride.DocsTest do
     assert yours =~ "`priv/gettext/<lang>/LC_MESSAGES/default.po`"
     assert Enum.any?(showing, &(&1 =~ generated)), "the checker sees a language file"
 
+    # the legal pages' translations, one pair per language (2026-11-05):
+    # one general line too
+    legal = ~r|^priv/static/(privacy\|terms)\.[A-Za-z]{2,3}(-[A-Za-z0-9]+)?\.html$|
+    assert yours =~ "`priv/static/privacy.<lang>.html`"
+    assert yours =~ "`priv/static/terms.<lang>.html`"
+    assert Enum.any?(showing, &(&1 =~ legal)), "the checker sees a translated legal page"
+
     for f <- showing,
         not (f =~ generated),
+        not (f =~ legal),
         do: assert(yours =~ "`#{f}`", "#{f} shows the name but 'Make it yours' doesn't list it")
   end
 

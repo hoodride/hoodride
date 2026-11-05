@@ -46,8 +46,21 @@ defmodule Mix.Tasks.Hoodride.Minify do
   @doc "Our own stylesheets, minified with the JS."
   def css_files, do: @css
 
-  @doc "The pages the server sends (PageController): their comments are taken out."
-  def pages, do: @pages
+  @doc """
+  The pages the server sends (PageController): their comments are taken out.
+  With the legal pages' translations, one pair per language the code knows
+  (privacy.<lang>.html, terms.<lang>.html — test_js/legal.test.mjs keeps
+  one for every language), so a new language can't be left out.
+  """
+  def pages do
+    translated =
+      for lang <- Hoodride.I18n.known(),
+          lang not in ~w(en en-XA),
+          page <- ~w(privacy terms),
+          do: "#{page}.#{lang}.html"
+
+    @pages ++ translated
+  end
 
   @doc """
   The whole build: our JS and CSS minified from `from` into `out`, and the
@@ -58,7 +71,7 @@ defmodule Mix.Tasks.Hoodride.Minify do
     status = minify(entries, out, extra, keep)
 
     if status == 0 do
-      for page <- @pages do
+      for page <- pages() do
         html = File.read!(Path.join(from, page))
         File.write!(Path.join(out, page), strip_html_comments(html))
       end
