@@ -188,3 +188,69 @@ test("zoomed out past the whole world: the floor, with zero cell listings", () =
     assert.equal(listings, 0, `zoom ${zoom} listed cells ${listings} times`);
   }
 });
+
+// ----- gaps a mutation sweep found (Stryker, owner 2026-11-05) -----
+
+test("the budget: exactly that many cells is fine; one more is too many", () => {
+  const rect = screenAt(NYC, 15, PHONE);
+  const all = V.cellsInRect(h3, rect, 8, 1e6);
+  assert.ok(all.size > 2);
+  assert.equal(V.cellsInRect(h3, rect, 8, all.size).size, all.size, "exactly the limit: kept");
+  assert.equal(V.cellsInRect(h3, rect, 8, all.size - 1), null, "one over: null");
+});
+
+test("a whole-world view (360° or wider): every cell of the band, the same however it's written", () => {
+  const world = { n: 60, s: -60, w: -180, e: 180 };
+  const once = V.cellsInRect(h3, world, 0, 1e6);
+  // the truth, independently: H3 asked for the two halves (one rect from
+  // −180 to 180 is, to H3, a sliver on the date line — 12 cells)
+  const half = (w, e) => h3.polygonToCellsExperimental([[[60, w], [60, e], [-60, e], [-60, w]]], 0, OVERLAP);
+  const truth = new Set([...half(-180, 0), ...half(0, 180)]);
+  assert.equal(truth.size, 116);
+  assert.deepEqual([...once].sort(), [...truth].sort());
+  assert.deepEqual([...V.cellsInRect(h3, { ...world, w: -200, e: 200 }, 0, 1e6)].sort(), [...once].sort());
+  assert.deepEqual([...V.cellsInRect(h3, { ...world, w: 0, e: 360 }, 0, 1e6)].sort(), [...once].sort());
+});
+
+test("the estimate: twice as wide, twice the cells — up to the whole world, then no more", () => {
+  const half = V.estimatedCells(h3, { n: 10, s: -10, w: 0, e: 180 }, 3);
+  const whole = V.estimatedCells(h3, { n: 10, s: -10, w: -180, e: 180 }, 3);
+  const more = V.estimatedCells(h3, { n: 10, s: -10, w: -360, e: 360 }, 3);
+  assert.ok(Math.abs(whole / half - 2) < 1e-9, `${whole} vs ${half}`);
+  assert.equal(more, whole, "wider than the world: capped");
+});
+
+test("padding: one cell width each side, wider in longitude far from the equator", () => {
+  const res = 8;
+  const padKm = Math.sqrt(3) * h3.getHexagonEdgeLengthAvg(res, h3.UNITS.km);
+  const r = { n: 60.01, s: 59.99, e: 10.01, w: 9.99 };
+  const p = V.padRect(h3, r, res);
+  assert.ok(Math.abs(p.n - r.n - padKm / 111.32) < 1e-9);
+  assert.ok(Math.abs(r.s - p.s - padKm / 111.32) < 1e-9);
+  const expectedLng = padKm / (111.32 * Math.cos((60 * Math.PI) / 180));
+  assert.ok(Math.abs(p.e - r.e - expectedLng) < 1e-9, `${p.e - r.e} vs ${expectedLng}`);
+  assert.ok(Math.abs(r.w - p.w - expectedLng) < 1e-9);
+});
+
+test("contains: touching edges count as inside; a hair outside on any side doesn't", () => {
+  const o = { n: 10, s: 0, e: 10, w: 0 };
+  assert.ok(V.rectContains(o, { ...o }), "the same rect");
+  for (const side of ["n", "e"]) assert.equal(V.rectContains(o, { ...o, [side]: o[side] + 1e-9 }), false, side);
+  for (const side of ["s", "w"]) assert.equal(V.rectContains(o, { ...o, [side]: o[side] - 1e-9 }), false, side);
+});
+
+test("fallback of the fallback: both H3 listings throw — the cells under the corners and the centre", () => {
+  const broken = Object.create(h3);
+  broken.polygonToCellsExperimental = () => {
+    throw new Error("simulated");
+  };
+  broken.polygonToCells = () => {
+    throw new Error("simulated");
+  };
+  const rect = screenAt(NYC, 17, PHONE);
+  const cells = V.cellsInRect(broken, rect, 8, 1e6);
+  const c = { lat: (rect.n + rect.s) / 2, lng: (rect.e + rect.w) / 2 };
+  assert.ok(cells.has(h3.latLngToCell(c.lat, c.lng, 8)), "the centre's cell");
+  assert.ok(cells.has(h3.latLngToCell(rect.n, rect.w, 8)), "a corner's cell");
+  assert.ok(cells.size >= 1 && cells.size <= 5);
+});

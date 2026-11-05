@@ -49,7 +49,12 @@
   // CARTO H3 layer splits wide boxes for the same reason). So shift the rect
   // into range, and split it in two where it crosses 180°.
   function worldPieces(rect) {
-    if (rect.e - rect.w >= 360) return [{ ...rect, w: -180, e: 180 }];
+    // the whole world: in two halves — to H3, −180 and 180 are the same
+    // line, so one rect from −180 to 180 is a zero-width sliver on the date
+    // line (12 of the 116 coarsest cells in ±60°; a mutation sweep's test
+    // found it, owner 2026-11-05 — unreachable in the app, which never lists
+    // a view that wide)
+    if (rect.e - rect.w >= 360) return [{ ...rect, w: -180, e: 0 }, { ...rect, w: 0, e: 180 }];
     const k = Math.round((rect.e + rect.w) / 2 / 360);
     const w = rect.w - 360 * k;
     const e = rect.e - 360 * k;

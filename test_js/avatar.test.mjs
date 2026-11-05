@@ -74,3 +74,29 @@ test("as an image address: a data URL the page can show", () => {
   assert.ok(u.startsWith("data:image/svg+xml,"));
   assert.equal(decodeURIComponent(u.slice("data:image/svg+xml,".length)), A.svg("Dan"));
 });
+
+// ----- gaps a mutation sweep found (Stryker, owner 2026-11-05) -----
+
+test("a person's colour comes from the name alone — capitals and spaces around it never change it", () => {
+  // the rule, computed here on its own: the lowercased, trimmed name's code
+  // points hashed ×31, picking one of the colours
+  const expected = (name) => {
+    let h = 0;
+    for (const ch of name.trim().toLowerCase()) h = (h * 31 + ch.codePointAt(0)) >>> 0;
+    return A.COLORS[h % A.COLORS.length];
+  };
+  for (const name of ["Dan", "Jaylen", "María", "Ωmega", "李雷", "Zoe Ann"]) {
+    assert.equal(A.color(name), expected(name), name);
+    assert.equal(A.color(`  ${name.toUpperCase()}  `), expected(name), `${name}, in capitals with spaces`);
+  }
+  assert.equal(A.color(null), A.color(""), "no name: one fixed colour");
+});
+
+test("no letter to show: the grey silhouette (head and shoulders), never a coloured square", () => {
+  assert.equal(A.SILHOUETTE, "#666666");
+  const s = A.svg("🙂");
+  assert.match(s, /fill="#666666"/);
+  assert.match(s, /<circle /);
+  assert.match(s, /<path d="M16 96/);
+  assert.doesNotMatch(s, /<text/);
+});

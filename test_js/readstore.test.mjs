@@ -146,3 +146,77 @@ test("malformed or blocked storage: nothing remembered, nothing breaks", () => {
   assert.equal(R.read(null, 1), null);
   assert.doesNotThrow(() => R.save(null, 1, {}));
 });
+
+// ----- gaps a mutation sweep found (Stryker, owner 2026-11-05) -----
+
+test("a bookmark is exactly [number, number] under an all-digits id — every other shape is dropped", () => {
+  const s = memory();
+  R.save(s, 1, {
+    7: [100, 2],
+    "12a": [1, 2], // not all digits
+    a12: [1, 2],
+    "": [1, 2],
+    8: [1, 2, 3], // three numbers
+    9: [NaN, 1], // not a finite number
+    10: [1, Infinity],
+    11: "[1,2]", // text, not a list
+    12: { 0: 1, 1: 2 }, // list-like, not a list
+  });
+  assert.deepEqual(R.read(s, 1), { 7: [100, 2] });
+});
+
+test("a saved note that isn't an object (a list, a number, null): not a note — the first run's rule", () => {
+  const s = memory();
+  for (const raw of ["[]", "[[1,2]]", "5", "null", '"text"', "true"]) {
+    s.setItem(R.key(1), raw);
+    assert.equal(R.read(s, 1), null, raw);
+  }
+  R.save(s, 1, [[1, 2]]);
+  assert.deepEqual(R.read(s, 1), {}, "a list saved: nothing of it kept");
+});
+
+test("signed out (no account) or no storage: nothing read, saved or forgotten — even with storage working", () => {
+  const s = memory();
+  R.save(s, 1, { 7: [100, 2] });
+  R.save(s, null, { 8: [1, 1] });
+  R.save(s, undefined, { 8: [1, 1] });
+  assert.equal(s.length, 1);
+  assert.equal(R.read(s, null), null);
+  R.forget(s, undefined);
+  assert.deepEqual(R.read(s, 1), { 7: [100, 2] }, "someone else's left alone");
+  R.save(null, 1, { 9: [9, 9] });
+  R.forgetAll(null);
+  assert.deepEqual(R.read(s, 1), { 7: [100, 2] });
+});
+
+test("the chat on screen: its bookmark is the newer of the old one and its newest — never back", () => {
+  const note = { 7: [100, 5] };
+  // the old bookmark is newer than anything left in the chat: kept
+  assert.deepEqual(R.reconcile(note, [{ peerId: "7", theirs: [msg(90, 1)] }], "7").note, { 7: [100, 5] });
+  // a newer message: the bookmark moves to it
+  assert.deepEqual(R.reconcile(note, [{ peerId: "7", theirs: [msg(100, 6)] }], "7").note, { 7: [100, 6] });
+  // nothing of theirs, a bookmark: kept; nothing of theirs and no bookmark: none
+  assert.deepEqual(R.reconcile(note, [{ peerId: "7", theirs: [] }], "7").note, { 7: [100, 5] });
+  assert.deepEqual(R.reconcile({}, [{ peerId: "8", theirs: [] }], "8").note, {});
+});
+
+test("seen with nothing newer: the same note back, a copy (never the old object itself)", () => {
+  const note = { 7: [100, 5] };
+  const same = R.seen(note, "7", [msg(100, 5)]);
+  assert.deepEqual(same, note);
+  assert.notEqual(same, note, "a new object: the caller may change it");
+  const none = R.seen(note, "7", []);
+  assert.deepEqual(none, note);
+  assert.notEqual(none, note);
+});
+
+test("forgetAll removes every account's even when it's the last key (none skipped)", () => {
+  const s = memory();
+  s.setItem("other_first", "x");
+  R.save(s, 1, { 7: [1, 1] });
+  R.save(s, 2, { 7: [1, 1] });
+  R.forgetAll(s);
+  assert.equal(R.read(s, 1), null);
+  assert.equal(R.read(s, 2), null);
+  assert.equal(s.length, 1);
+});

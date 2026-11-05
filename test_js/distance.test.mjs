@@ -92,3 +92,50 @@ test("the label: distance, and the age only for a shared block", () => {
   assert.equal(D.label(here, null, flat, "mi"), "");
   assert.equal(D.label(null, { lat: 0.5, lng: 0, ageMs: null }, flat, "mi"), "", "no position of my own: nothing");
 });
+
+// ----- gaps a mutation sweep found (Stryker, owner 2026-11-05) -----
+const I18n = require("../priv/static/i18n.js");
+
+test("'nearby' stops exactly at 0.1 mi by road: one millimetre under is nearby, the line itself isn't", () => {
+  const line = (0.1 * 1609.34) / D.ROAD_FACTOR; // straight metres whose road distance is exactly 0.1 mi
+  assert.equal(D.distance(line - 0.001, "mi"), "nearby");
+  assert.equal(D.distance(line, "mi"), "0.1 mi");
+  assert.equal(D.away(line - 0.001, "km"), "nearby");
+  assert.equal(D.away(line, "km"), "0.2 km away");
+});
+
+test("the age: 59 minutes in minutes, 60 in hours", () => {
+  assert.equal(D.ago(59 * 60_000), "59 min ago");
+  assert.equal(D.ago(60 * 60_000), "1 h ago");
+  assert.equal(D.ago(119 * 60_000), "1 h ago");
+  assert.equal(D.ago(undefined), "");
+});
+
+test("long distances: no thousands separator (1234.5, not 1,234.5)", () => {
+  assert.equal(D.distance((1234.5 * 1000) / D.ROAD_FACTOR, "km"), "1234.5 km");
+});
+
+test("the number in the reader's language: German writes 0,8; the made-up test language writes English's", () => {
+  try {
+    I18n.load({ lang: "de", messages: {} });
+    assert.equal(D.distance(1000, "mi"), "0,8 mi");
+    I18n.load({ lang: "en-XA", messages: {} });
+    assert.equal(D.distance(1000, "mi"), "0.8 mi");
+    // a language the browser can't format: the plain number, never a crash
+    I18n.load({ lang: "not a tag!", messages: {} });
+    assert.equal(D.distance(1000, "mi"), "0.8 mi");
+  } finally {
+    I18n.load(null);
+  }
+});
+
+test("a browser without Intl.Locale: miles (never a crash)", () => {
+  const saved = Intl.Locale;
+  try {
+    Intl.Locale = undefined;
+    assert.equal(D.unitOf(["de-DE"]), "mi");
+  } finally {
+    Intl.Locale = saved;
+  }
+  assert.equal(D.unitOf(["de-DE"]), "km", "back: the real rule");
+});

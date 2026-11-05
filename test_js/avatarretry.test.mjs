@@ -43,3 +43,16 @@ test("a retry asks for a fresh copy (a failed answer is never reused)", () => {
   assert.equal(retryUrl("https://h/avatars/a.jpg", 1), "https://h/avatars/a.jpg?r=1");
   assert.equal(retryUrl("https://h/avatars/a.jpg?r=1", 2), "https://h/avatars/a.jpg?r=2");
 });
+
+// ----- gaps a mutation sweep found (Stryker, owner 2026-11-05) -----
+
+test("not a photo address at all: never retried (and never a crash)", () => {
+  for (const src of [null, undefined, 123, {}, "", "http://[", "data:image/svg+xml,/avatars/x"]) assert.equal(ours(src), false, String(src));
+});
+
+test("a retry replaces the previous retry mark, however many digits — never stacks them", () => {
+  assert.equal(retryUrl("/avatars/ab12.jpg", 1), "/avatars/ab12.jpg?r=1");
+  assert.equal(retryUrl("/avatars/ab12.jpg?r=1", 2), "/avatars/ab12.jpg?r=2");
+  assert.equal(retryUrl("/avatars/ab12.jpg?r=12", 13), "/avatars/ab12.jpg?r=13");
+  assert.equal(retryUrl("/avatars/r=1.jpg?r=3", 4), "/avatars/r=1.jpg?r=4", "only the mark at the end");
+});
