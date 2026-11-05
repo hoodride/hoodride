@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "Välj…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "Rensa sökning"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "Stäng"
 
@@ -456,6 +460,10 @@ msgstr "Behöver skjuts"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Grannar som skjutsar grannar. Se bilar och personer i närheten som behöver skjuts, skicka meddelanden till varandra och åk tillsammans."
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "Inga språk hittades"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "Inte tillgänglig"
@@ -602,6 +610,10 @@ msgstr "Spara"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Spara och gå online"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "Sök språk"
 
 #: priv/static/index.html
 msgid "Send"

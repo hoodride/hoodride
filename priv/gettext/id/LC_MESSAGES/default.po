@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "Pilih…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "Hapus pencarian"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "Tutup"
 
@@ -456,6 +460,10 @@ msgstr "Butuh tumpangan"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Tetangga memberi tumpangan untuk tetangga. Lihat mobil dan orang di sekitar yang butuh tumpangan, saling kirim pesan, dan berangkat bersama."
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "Bahasa tidak ditemukan"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "Tidak tersedia"
@@ -602,6 +610,10 @@ msgstr "Simpan"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Simpan & aktifkan"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "Cari bahasa"
 
 #: priv/static/index.html
 msgid "Send"

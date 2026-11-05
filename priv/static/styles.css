@@ -822,6 +822,62 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   cursor: pointer;
 }
 #screen-login { position: relative; }
+/* the search (Apple's search field: an icon, a hint of what it finds, a
+   Clear button — the browser's own on type=search; Google's the same) */
+.lang-search { position: relative; }
+.lang-search-icon {
+  position: absolute;
+  inset-inline-start: 12px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  background: currentColor;
+  opacity: 0.6;
+  pointer-events: none;
+  /* a magnifying glass, drawn here: a ring and a handle */
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='10' cy='10' r='6.5' fill='none' stroke='%23000' stroke-width='2.4'/%3E%3Cpath d='M15 15l6 6' stroke='%23000' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='10' cy='10' r='6.5' fill='none' stroke='%23000' stroke-width='2.4'/%3E%3Cpath d='M15 15l6 6' stroke='%23000' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.lang-search input {
+  box-sizing: border-box;
+  width: 100%;
+  font: inherit; font-size: 16px; /* 16px: iOS doesn't zoom in */
+  padding-block: 10px;
+  padding-inline: 40px 44px;
+  min-height: 44px;
+  border-radius: 10px; border: 1px solid #3a3a3c; background: #2c2c2e; color: var(--text);
+}
+/* the Clear button: our own, in every browser (owner, 2026-11-05). The
+   browser's own is non-standard (MDN: ::-webkit-search-cancel-button,
+   Chrome and Safari only) and off in Firefox (Mozilla bug 1654288) — so
+   theirs hidden, ours drawn, as Google's Material, Adobe, AWS, Equinor do:
+   at the field's end, only once something's typed, a 44px tap */
+.lang-search input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; display: none; }
+.lang-clear {
+  position: absolute;
+  inset-inline-end: 0;
+  top: 0;
+  width: 44px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+.lang-clear span {
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  opacity: 0.6;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' stroke='%23000' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18' stroke='%23000' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.lang-none { margin: 0; padding: 12px 10px; opacity: 0.75; }
 /* the list: every language, each in its own words; the current one ✓ */
 .lang-list { display: flex; flex-direction: column; gap: 2px; max-height: 60vh; overflow-y: auto; }
 .lang-list button {

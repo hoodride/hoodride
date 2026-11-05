@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "પસંદ કરો…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "શોધ સાફ કરો"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "બંધ કરો"
 
@@ -456,6 +460,10 @@ msgstr "રાઇડ જોઈએ છે"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "પડોશીઓ જ પડોશીઓને રાઇડ આપે છે. નજીકની કાર અને રાઇડ જોઈતી હોય તેવા લોકોને જુઓ, એકબીજાને મેસેજ કરો અને સાથે મુસાફરી કરો."
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "કોઈ ભાષા મળી નથી"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "ઉપલબ્ધ નથી"
@@ -602,6 +610,10 @@ msgstr "સેવ કરો"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "સેવ કરો અને ઑનલાઇન થાઓ"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "ભાષાઓ શોધો"
 
 #: priv/static/index.html
 msgid "Send"

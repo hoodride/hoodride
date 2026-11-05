@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "اختر…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "مسح البحث"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "إغلاق"
 
@@ -456,6 +460,10 @@ msgstr "أحتاج إلى توصيلة"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "جيران يوصلون جيرانهم. شاهد السيارات والأشخاص القريبين الذين يحتاجون إلى توصيلة، وتبادلوا الرسائل، وانطلقوا معًا."
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "لم يتم العثور على لغات"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "غير متاح"
@@ -602,6 +610,10 @@ msgstr "حفظ"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "الحفظ والاتصال"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "البحث عن لغة"
 
 #: priv/static/index.html
 msgid "Send"

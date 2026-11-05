@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "Seç…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "Aramayı temizle"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "Kapat"
 
@@ -456,6 +460,10 @@ msgstr "Araç lazım"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Komşular komşuları götürüyor. Yakındaki araçları ve araç arayan kişileri gör, mesajlaşın ve birlikte yola çıkın."
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "Dil bulunamadı"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "Kullanılamıyor"
@@ -602,6 +610,10 @@ msgstr "Kaydet"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Kaydet ve çevrimiçi ol"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "Dil ara"
 
 #: priv/static/index.html
 msgid "Send"

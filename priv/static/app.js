@@ -3771,26 +3771,51 @@ function renderLangSwitch() {
   $("lang-note").textContent = own;
 }
 
-function openLangSheet(from) {
-  langOpener = from;
+// the list for what's typed in the search (nothing: every language): the
+// closest matches first — own, English, this page's and other names
+function renderLangList() {
   const list = $("lang-list");
+  const found = HoodLang.search(LANGS, $("lang-search").value, LANG_NOW);
+  $("lang-none").classList.toggle("hidden", found.length > 0);
+  $("lang-clear").classList.toggle("hidden", $("lang-search").value === "");
+  list.classList.toggle("hidden", found.length === 0);
+  list.scrollTop = 0;
   list.replaceChildren(
-    ...HoodLang.sorted(LANGS).map(({ tag, name }) => {
+    ...found.map(({ tag, name }) => {
       const b = document.createElement("button");
       b.type = "button";
-      b.textContent = name;
       // each name in its own language and direction (a screen reader says
-      // it right; Arabic reads right to left in an English list)
+      // it right; Arabic reads right to left in an English list) — on the
+      // name, not the row: the rows line up with the page (on an Arabic
+      // page, English on the right too, as Arabic phones list them)
+      const n = document.createElement("span");
+      n.textContent = name;
+      n.lang = tag;
+      n.dir = "auto";
+      b.append(n);
       b.lang = tag;
-      b.dir = "auto";
       if (tag === LANG_NOW) b.setAttribute("aria-current", "true");
       b.addEventListener("click", () => pickLang(tag));
       return b;
     })
   );
+}
+
+function openLangSheet(from) {
+  langOpener = from;
+  $("lang-search").value = "";
+  renderLangList();
   $("lang-backdrop").classList.remove("hidden");
   $("lang-sheet").classList.remove("hidden");
+  // the title, not the search: a phone's keyboard stays down, the list in
+  // full view (tap the search to type)
   $("lang-title").focus({ focusVisible: false });
+  // the current language in view, in the middle, languages either side
+  // (W3C: the selected option shown on opening; centred, as pickers do) —
+  // the list alone scrolls (scrollIntoView would move the sheet too)
+  const list = $("lang-list");
+  const now = list.querySelector('[aria-current="true"]');
+  if (now) list.scrollTop = now.offsetTop - list.offsetTop - (list.clientHeight - now.offsetHeight) / 2;
 }
 
 function closeLangSheet() {
@@ -3811,6 +3836,21 @@ function pickLang(tag) {
 $("btn-lang-login").addEventListener("click", () => openLangSheet($("btn-lang-login")));
 $("btn-lang").addEventListener("click", () => openLangSheet($("btn-lang")));
 $("lang-cancel").addEventListener("click", closeLangSheet);
+$("lang-search").addEventListener("input", renderLangList);
+// × : the field empty, every language back, the cursor still in the field
+// (type again straight away — Equinor's search)
+$("lang-clear").addEventListener("click", () => {
+  $("lang-search").value = "";
+  renderLangList();
+  $("lang-search").focus();
+});
+// the keyboard's Search key: the keyboard goes down, the matches stay
+$("lang-search").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    e.target.blur();
+  }
+});
 $("lang-backdrop").addEventListener("click", closeLangSheet);
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && !$("lang-sheet").classList.contains("hidden")) closeLangSheet();

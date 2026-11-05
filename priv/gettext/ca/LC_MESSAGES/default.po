@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "Tria…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "Esborra la cerca"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "Tanca"
 
@@ -456,6 +460,10 @@ msgstr "Necessito un viatge"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Veïns que porten veïns. Mira els cotxes i les persones properes que necessiten un viatge, envieu-vos missatges i viatgeu junts."
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "No s'ha trobat cap idioma"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "No disponible"
@@ -602,6 +610,10 @@ msgstr "Desa"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Desa i connecta't"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "Cerca idiomes"
 
 #: priv/static/index.html
 msgid "Send"

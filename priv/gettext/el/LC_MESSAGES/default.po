@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "Επίλεξε…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "Απαλοιφή αναζήτησης"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "Κλείσιμο"
 
@@ -456,6 +460,10 @@ msgstr "Χρειάζομαι διαδρομή"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Γείτονες μεταφέρουν γείτονες. Δες αυτοκίνητα και ανθρώπους κοντά σου που χρειάζονται διαδρομή, στείλτε μηνύματα και πηγαίνετε μαζί."
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "Δεν βρέθηκαν γλώσσες"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "Μη διαθέσιμο"
@@ -602,6 +610,10 @@ msgstr "Αποθήκευση"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Αποθήκευση και έναρξη υπηρεσίας"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "Αναζήτηση γλωσσών"
 
 #: priv/static/index.html
 msgid "Send"

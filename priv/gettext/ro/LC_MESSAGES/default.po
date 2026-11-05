@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "Alege…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "Șterge căutarea"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "Închide"
 
@@ -456,6 +460,10 @@ msgstr "Am nevoie de o cursă"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Vecini care își duc vecinii. Vezi mașinile și oamenii din apropiere care au nevoie de o cursă, scrieți-vă și mergeți împreună."
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "Nu s-au găsit limbi"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "Indisponibil"
@@ -602,6 +610,10 @@ msgstr "Salvează"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Salvează și intră online"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "Caută limbi"
 
 #: priv/static/index.html
 msgid "Send"

@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "เลือก…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "ล้างการค้นหา"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "ปิด"
 
@@ -456,6 +460,10 @@ msgstr "ต้องการรถ"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "เพื่อนบ้านไปส่งเพื่อนบ้าน ดูรถและคนที่ต้องการรถในบริเวณใกล้เคียง ส่งข้อความหากัน แล้วเดินทางไปด้วยกัน"
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "ไม่พบภาษา"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "ไม่พร้อมใช้งาน"
@@ -602,6 +610,10 @@ msgstr "บันทึก"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "บันทึกและออนไลน์"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "ค้นหาภาษา"
 
 #: priv/static/index.html
 msgid "Send"

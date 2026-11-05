@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "Chọn…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "Xóa tìm kiếm"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "Đóng"
 
@@ -456,6 +460,10 @@ msgstr "Cần đi xe"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Hàng xóm chở hàng xóm. Xem xe và những người cần đi xe ở gần, nhắn tin cho nhau và cùng đi."
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "Không tìm thấy ngôn ngữ nào"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "Không khả dụng"
@@ -602,6 +610,10 @@ msgstr "Lưu"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Lưu và bật nhận chuyến"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "Tìm ngôn ngữ"
 
 #: priv/static/index.html
 msgid "Send"

@@ -365,6 +365,10 @@ function page(cdp, sessionId, name) {
       }
       await send("Input.dispatchMouseEvent", { type: "mouseReleased", x: x2, y: y2, button: "left", buttons: 0, clickCount: 1 });
     },
+    // type into the focused field as a keyboard would (real input events)
+    async type(text) {
+      await send("Input.insertText", { text });
+    },
     async tapAt(x, y) {
       for (const type of ["mousePressed", "mouseReleased"])
         await send("Input.dispatchMouseEvent", { type, x, y, button: "left", clickCount: 1 });

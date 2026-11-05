@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "Valitse…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "Tyhjennä haku"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "Sulje"
 
@@ -456,6 +460,10 @@ msgstr "Tarvitsen kyydin"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Naapurit antavat kyytejä naapureille. Näe lähellä olevat autot ja kyytiä tarvitsevat ihmiset, lähetä viestejä ja matkustakaa yhdessä."
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "Kieliä ei löytynyt"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "Ei saatavilla"
@@ -602,6 +610,10 @@ msgstr "Tallenna"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Tallenna ja siirry linjoille"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "Hae kieliä"
 
 #: priv/static/index.html
 msgid "Send"

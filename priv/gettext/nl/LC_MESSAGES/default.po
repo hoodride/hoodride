@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "Kies…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "Zoekopdracht wissen"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "Sluiten"
 
@@ -456,6 +460,10 @@ msgstr "Rit nodig"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Buren die buren een lift geven. Bekijk auto's en mensen in de buurt die een rit nodig hebben, stuur elkaar berichten en rij samen."
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "Geen talen gevonden"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "Niet beschikbaar"
@@ -602,6 +610,10 @@ msgstr "Opslaan"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Opslaan en online gaan"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "Talen zoeken"
 
 #: priv/static/index.html
 msgid "Send"

@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "Chagua…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "Futa utafutaji"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "Funga"
 
@@ -456,6 +460,10 @@ msgstr "Nahitaji usafiri"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Majirani wakiwapa majirani usafiri. Ona magari na watu wanaohitaji usafiri karibu nawe, tumianeni ujumbe, na msafiri pamoja."
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "Hakuna lugha iliyopatikana"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "Haipatikani"
@@ -602,6 +610,10 @@ msgstr "Hifadhi"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Hifadhi na uanze kazi"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "Tafuta lugha"
 
 #: priv/static/index.html
 msgid "Send"

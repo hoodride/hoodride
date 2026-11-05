@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "ఎంచుకోండి…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "శోధనను క్లియర్ చేయండి"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "మూసివేయండి"
 
@@ -456,6 +460,10 @@ msgstr "రైడ్ కావాలి"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "ఇరుగుపొరుగు వారికి ఇరుగుపొరుగు వారే రైడ్ ఇస్తారు. సమీపంలోని కార్లను, రైడ్ కావాల్సిన వ్యక్తులను చూడండి, ఒకరికొకరు మెసేజ్ చేసుకోండి, కలిసి ప్రయాణించండి."
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "భాషలు ఏవీ కనుగొనబడలేదు"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "అందుబాటులో లేదు"
@@ -602,6 +610,10 @@ msgstr "సేవ్ చేయండి"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "సేవ్ చేసి ఆన్‌లైన్‌కు వెళ్లండి"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "భాషలను వెతకండి"
 
 #: priv/static/index.html
 msgid "Send"

@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "Válassz…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "Keresés törlése"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "Bezárás"
 
@@ -456,6 +460,10 @@ msgstr "Fuvar kell"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Szomszéd viszi a szomszédot. Nézd meg a közeli autókat és a fuvart kereső embereket, írjatok egymásnak, és utazzatok együtt."
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "Nincs találat"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "Nem elérhető"
@@ -602,6 +610,10 @@ msgstr "Mentés"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Mentés, és online leszek"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "Nyelv keresése"
 
 #: priv/static/index.html
 msgid "Send"

@@ -293,7 +293,13 @@
   <div id="lang-backdrop" class="car-backdrop hidden"></div>
   <div id="lang-sheet" class="car-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="lang-title">
     <h2 id="lang-title" tabindex="-1" data-t>Language</h2>
+    <div class="lang-search">
+      <span class="lang-search-icon" aria-hidden="true"></span>
+      <input id="lang-search" type="search" placeholder="Search languages" aria-label="Search languages" data-t-attr="placeholder aria-label" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+      <button id="lang-clear" type="button" class="lang-clear hidden" aria-label="Clear search" data-t-attr="aria-label"><span aria-hidden="true"></span></button>
+    </div>
     <div id="lang-list" class="lang-list"></div>
+    <p id="lang-none" class="lang-none hidden" role="status" data-t>No languages found</p>
     <button id="lang-cancel" type="button" class="btn btn-small" data-t>Cancel</button>
   </div>
   <script src="i18n.js"></script>

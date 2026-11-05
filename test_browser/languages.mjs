@@ -227,6 +227,42 @@ await journey("languages: no English left in a made-up language, nothing cut off
   check(await ken.eval(`document.cookie.includes("hoodride_lang=es")`), "the choice kept");
   await ken.click("btn-lang-login");
   await ken.waitFor(`!document.getElementById("lang-sheet").classList.contains("hidden")`, "the list again");
+  // opened on the language now, in the middle of the list (owner,
+  // 2026-11-05: the W3C — the selected option shown on opening)
+  const mid = await ken.eval(`(() => {
+    const list = document.getElementById("lang-list"), b = list.querySelector('[aria-current="true"]');
+    const l = list.getBoundingClientRect(), r = b.getBoundingClientRect();
+    return { lang: b.lang, scrolled: list.scrollTop, off: Math.round((r.top + r.bottom) / 2 - (l.top + l.bottom) / 2), half: l.height / 2 };
+  })()`);
+  check(mid.lang === "es" && mid.scrolled > 0 && Math.abs(mid.off) < 30, "Español in the middle of the list", mid);
+  check(await ken.eval(`document.activeElement.id !== "lang-search"`), "the search not focused (no keyboard by itself)");
+  // the search: in Spanish, typing the English name finds it; an exact
+  // own name first; nothing — said so
+  const shown = () => ken.eval(`document.getElementById("lang-list").classList.contains("hidden") ? [] : [...document.querySelectorAll("#lang-list button")].map((b) => b.lang)`);
+  check(await ken.eval(`document.getElementById("lang-search").placeholder`) === "Buscar idiomas", "the hint in Spanish");
+  await ken.eval(`(document.getElementById("lang-search").focus(), true)`);
+  await ken.type("japan");
+  check(JSON.stringify(await shown()) === JSON.stringify(["ja"]), "typed 'japan': 日本語 alone", await shown());
+  await ken.eval(`(document.getElementById("lang-search").select(), true)`);
+  await ken.type("english");
+  check((await shown())[0] === "en", "typed 'english': English first", await shown());
+  await ken.eval(`(document.getElementById("lang-search").select(), true)`);
+  await ken.type("zzqx");
+  check((await shown()).length === 0, "nothing matches: no list", await shown());
+  check(await ken.eval(`!document.getElementById("lang-none").classList.contains("hidden") && document.getElementById("lang-none").textContent`) === "No se encontraron idiomas", "and it says so, in Spanish");
+  // the × (our own — the browser's is off in Firefox): a real tap on it
+  // empties the field, every language back, the cursor still there
+  const x = await ken.eval(`(() => { const r = document.getElementById("lang-clear").getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, label: document.getElementById("lang-clear").getAttribute("aria-label") }; })()`);
+  check(x.w >= 40 && x.label === "Borrar búsqueda", "the × shown, a full tap wide, named in Spanish", x);
+  // (Chrome can't report a style for its own × — getComputedStyle gives the
+  // field's: the rule, read from the page's loaded styles)
+  check(await ken.eval(`[...document.styleSheets].flatMap((s) => [...s.cssRules]).some((r) => /lang-search input::-webkit-search-cancel-button/.test(r.selectorText || "") && r.style.display === "none")`), "the browser's own × hidden (no two)");
+  await ken.tapAt(x.x, x.y);
+  await ken.waitFor(`document.getElementById("lang-search").value === ""`, "the field emptied by ×");
+  check((await shown()).length === listed.length, "every language back", (await shown()).length);
+  check(await ken.eval(`document.activeElement.id === "lang-search" && document.getElementById("lang-clear").classList.contains("hidden")`), "the cursor in the field, the × gone with the text");
+  await ken.eval(`(document.getElementById("lang-search").select(), true)`);
+  await ken.type("engl");
   await ken.eval(`[...document.querySelectorAll("#lang-list button")].find((b) => b.lang === "en").click(), true`);
   await ken.waitFor(`document.documentElement.lang === "en" && HoodI18n.lang() === "en" && document.querySelector("#btn-lang-login .lang-current").textContent === "English"`, "back in English", 15000);
   // and in the menu: the row with the language now
@@ -306,6 +342,24 @@ await journey("languages: no English left in a made-up language, nothing cut off
     if (lang === "ar") {
       // right to left: the page mirrors (styles.css: start/end, never left/right)
       check(await p.eval(`document.documentElement.dir === "rtl"`), "ar: served right to left");
+      // the language list lines up with the page: every name on the right
+      // (English too), the ✓ on the left (it once lined each name up by its
+      // own script — English on the left of an Arabic list)
+      const rows = await p.eval(`(async () => {
+        openLangSheet(document.getElementById("btn-lang-login"));
+        await new Promise((ok) => setTimeout(ok, 300));
+        const box = document.getElementById("lang-list").getBoundingClientRect();
+        const at = (tag) => {
+          const b = [...document.querySelectorAll("#lang-list button")].find((x) => x.lang === tag);
+          b.scrollIntoView({ block: "nearest" });
+          const n = b.querySelector("span").getBoundingClientRect(), r = b.getBoundingClientRect();
+          return { gapEnd: Math.round(r.right - n.right), gapStart: Math.round(n.left - r.left) };
+        };
+        const out = { en: at("en"), ar: at("ar") };
+        closeLangSheet();
+        return out;
+      })()`);
+      check(rows.en.gapEnd < rows.en.gapStart && rows.ar.gapEnd < rows.ar.gapStart, "ar: the language list on the right — English as well as العربية", rows);
     }
     const fits = async (q, where) => {
       await q.waitFor(SETTLED, `${where}: settled`);

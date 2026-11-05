@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "請選擇…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "清除搜尋"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "關閉"
 
@@ -456,6 +460,10 @@ msgstr "我要搭車"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "鄰居載鄰居。查看附近的車輛和需要搭車的人，互傳訊息，一起出發。"
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "找不到語言"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "無法使用"
@@ -602,6 +610,10 @@ msgstr "儲存"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "儲存並上線"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "搜尋語言"
 
 #: priv/static/index.html
 msgid "Send"

@@ -154,6 +154,10 @@ msgid "Choose…"
 msgstr "Wybierz…"
 
 #: priv/static/index.html
+msgid "Clear search"
+msgstr "Wyczyść wyszukiwanie"
+
+#: priv/static/index.html
 msgid "Close"
 msgstr "Zamknij"
 
@@ -456,6 +460,10 @@ msgstr "Szukam przejazdu"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Sąsiedzi podwożą sąsiadów. Zobacz samochody w pobliżu i osoby, które potrzebują przejazdu, napiszcie do siebie i jedźcie razem."
 
+#: priv/static/index.html
+msgid "No languages found"
+msgstr "Nie znaleziono języków"
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr "Niedostępne"
@@ -602,6 +610,10 @@ msgstr "Zapisz"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Zapisz i połącz się"
+
+#: priv/static/index.html
+msgid "Search languages"
+msgstr "Szukaj języka"
 
 #: priv/static/index.html
 msgid "Send"
