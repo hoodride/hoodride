@@ -30,7 +30,7 @@ defmodule HoodrideWeb.LinkPreviewTest do
     assert meta(html, "property", "og:site_name") == "Hood Ride"
     assert meta(html, "property", "og:type") == "website"
     # the same line as the sign-in screen
-    assert File.read!("priv/static/index.html") =~ ~s(<p class="tagline">#{@line}</p>)
+    assert File.read!("priv/static/index.html") =~ ~s(<p class="tagline" data-t>#{@line}</p>)
   end
 
   test "the address in full, the front page with its slash", %{conn: conn} do

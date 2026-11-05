@@ -36,7 +36,7 @@ defmodule HoodrideWeb.DrawerFocusTest do
   # the car sheet already starts on its title (a <select> would pop its
   # picker on iPhone), and already had its no-ring rule
   test "the car sheet's title: focused on open, no ring" do
-    assert @html =~ ~s(<h2 id="car-title" tabindex="-1">)
+    assert @html =~ ~s(<h2 id="car-title" tabindex="-1" data-t>)
     [open] = Regex.run(~r/function openCarSheet\(.*?\n}\n/s, @app)
     assert open =~ ~s[$("car-title").focus();]
     assert @css =~ ~s(.car-sheet h2:focus { outline: none; })

@@ -141,6 +141,86 @@ defmodule Hoodride.I18n.ExtractTest do
     end
   end
 
+  # ----- the page's own words: marks read by translatePage's rules -----
+  defp html_ids(src) do
+    {:ok, found} = Extract.scan_html(src, "p.html")
+    Enum.map(found, &{&1.context, &1.msgid})
+  end
+
+  test "a marked element's words; its value is the context; spaces as the browser shows them" do
+    src = """
+    <button data-t>Save</button>
+    <button data-t="nav button">Change</button>
+    <p data-t>
+      Riders see this
+      so they   can find you
+    </p>
+    <p>Not marked</p>
+    """
+
+    assert html_ids(src) == [
+             {nil, "Save"},
+             {"nav button", "Change"},
+             {nil, "Riders see this so they can find you"}
+           ]
+  end
+
+  test "a link inside a sentence is a named slot: one message" do
+    src =
+      ~s|<p data-t>By continuing, you agree to our <a href="/terms" data-t data-t-slot="terms">Terms</a> and <a data-t data-t-slot="privacy">Privacy&nbsp;Policy</a>.</p>|
+
+    assert html_ids(src) == [
+             {nil, "By continuing, you agree to our {terms} and {privacy}."},
+             {nil, "Terms"},
+             {nil, "Privacy Policy"}
+           ]
+  end
+
+  test "an icon before or a field after the words isn't part of them" do
+    src = """
+    <button data-t><img class="car-icon" src="car.png" alt="" />Drive</button>
+    <label data-t>Color
+      <select id="c"><option value="" data-t>Choose…</option></select>
+    </label>
+    <button data-t><svg viewBox="0 0 1 1"><path d="M0 0"/></svg><span>x</span>Go</button>
+    """
+
+    assert html_ids(src) == [{nil, "Drive"}, {nil, "Color"}, {nil, "Choose…"}, {nil, "Go"}]
+  end
+
+  test "attributes named in data-t-attr; comments and entities as the browser reads them" do
+    src = """
+    <!-- <p data-t>not this</p> -->
+    <button aria-label="Close settings" title="Shut &amp; go" data-t-attr="aria-label title">✕</button>
+    <input placeholder="Message…" data-t-attr="placeholder" />
+    """
+
+    assert html_ids(src) == [{nil, "Close settings"}, {nil, "Shut & go"}, {nil, "Message…"}]
+  end
+
+  test "refused, with where: an element between the words, no words, unclosed, a missing attribute" do
+    for {bad, why} <- [
+          {~s|<p data-t>Tap <b>here</b> now</p>|, "between the words"},
+          {~s|<button data-t><img src="x.png" /></button>|, "no words"},
+          {~s|<p data-t>never closed|, "isn't closed"},
+          {~s|<button data-t-attr="aria-label">x</button>|, "aria-label, which isn't there"}
+        ] do
+      assert {:error, [problem]} = Extract.scan_html("\n" <> bad, "p.html"), bad
+      assert problem =~ "p.html:2:"
+      assert problem =~ why
+    end
+  end
+
+  test "the page's marks are all readable, and its words are in the list" do
+    assert {:ok, found} = Extract.scan_html(File.read!("priv/static/index.html"), "index.html")
+    ids = Enum.map(found, & &1.msgid)
+    assert "By continuing, you agree to our {terms} and {privacy}." in ids
+    assert "Change it anytime: tap your profile picture at the top left, then {setting}" in ids
+    assert "Center on my location" in ids
+    # brand names stay as they are: never marked
+    refute Enum.any?(ids, &(&1 in ["Hood Ride", "Google Maps", "Apple Maps", "Waze"]))
+  end
+
   test "the app's scripts: all readable, the shipped list up to date" do
     assert {:ok, found} = Extract.scan_all()
     assert File.read!("priv/gettext/default.pot") == Extract.pot(found)

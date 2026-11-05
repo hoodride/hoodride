@@ -274,7 +274,7 @@ defmodule HoodrideWeb.CarTest do
   test "US spelling: the car form, its error, the privacy page" do
     html = File.read!("priv/static/index.html")
     app = File.read!("priv/static/app.js")
-    assert html =~ ~s(<label class="car-field">Color\n)
+    assert html =~ ~s(<label class="car-field" data-t>Color\n)
 
     assert app =~
              ~s[const CAR_FIELD_NAMES = { color: () => t("color"), make: () => t("make"), model: () => t("model") };]

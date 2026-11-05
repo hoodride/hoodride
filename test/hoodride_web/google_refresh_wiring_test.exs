@@ -31,7 +31,7 @@ defmodule HoodrideWeb.GoogleRefreshWiringTest do
     [me] = Regex.run(~r/<div class="drawer-me">.*?<\/div>\s*<\/div>/s, @html)
 
     assert me =~
-             ~s(<button id="settings-change" type="button" class="drawer-change hidden" aria-expanded="false" aria-controls="settings-change-box">Change</button>)
+             ~s(<button id="settings-change" type="button" class="drawer-change hidden" aria-expanded="false" aria-controls="settings-change-box" data-t>Change</button>)
 
     {name, _} = :binary.match(me, ~s(id="settings-name"))
     {change, _} = :binary.match(me, ~s(id="settings-change"))
@@ -46,14 +46,15 @@ defmodule HoodrideWeb.GoogleRefreshWiringTest do
     {link, _} = :binary.match(box, ~s(id="settings-source-link"))
     {refresh, _} = :binary.match(box, ~s(id="settings-refresh-link"))
     assert src < link and link < refresh
-    assert box =~ ~s(href="/auth/google?refresh=1">Refresh from Google</a>)
+    assert box =~ ~s(href="/auth/google?refresh=1" data-t>Refresh from Google</a>)
 
     # no closing periods — like the drawer's other short notes ("Add it
     # before you drive", "On all your devices"); owner, 2026-10-29
     assert box =~
-             ~s(<p id="settings-refresh-later" class="muted hidden">You can refresh after your ride</p>)
+             ~s(<p id="settings-refresh-later" class="muted hidden" data-t>You can refresh after your ride</p>)
 
-    assert box =~ ~s(<p class="muted settings-refresh-note">Google can take a little while</p>)
+    assert box =~
+             ~s(<p class="muted settings-refresh-note" data-t>Google can take a little while</p>)
 
     assert body("renderSource") =~
              ~s[t("Your name and photo come from {provider}", { provider: p.label });]

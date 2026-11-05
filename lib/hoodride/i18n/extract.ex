@@ -263,15 +263,200 @@ defmodule Hoodride.I18n.Extract do
 
   defp regex(<<>>, acc, _cls), do: {Enum.reverse(acc), <<>>}
 
-  @doc "Every message in our scripts: `{:ok, [message]}` or `{:error, [problem]}`."
+  @doc "Our pages with marked words (`data-t`, `data-t-attr` — HoodI18n.translatePage)."
+  def pages(dir \\ "priv/static"), do: [Path.join(dir, "index.html")]
+
+  # elements with no closing tag
+  @void ~w(area base br col embed hr img input link meta source track wbr)
+
+  @doc """
+  The marked words in one page — by translatePage's rules (i18n.js):
+  `data-t` (its value, if any, the context) takes the element's words, a
+  child marked `data-t-slot="name"` standing in as `{name}`; other child
+  elements only before or after the words. `data-t-attr="a b"`: those
+  attributes' values. `{:ok, [message]}` or `{:error, [problem]}`.
+  """
+  def scan_html(source, file) do
+    # comments out, every byte kept (positions and lines stay true)
+    html = Regex.replace(~r/<!--.*?-->/s, source, &blank/1)
+
+    {found, problems} =
+      Regex.scan(~r/<([a-zA-Z][\w-]*)((?:\s+[\w-]+(?:="[^"]*")?)*)\s*\/?>/, html, return: :index)
+      |> Enum.reduce({[], []}, fn [{start, len}, name_at, attrs_at], acc ->
+        attrs = attributes(part(html, attrs_at))
+        line = line_of(source, start)
+        name = String.downcase(part(html, name_at))
+
+        acc
+        |> marked_words(attrs, html, name, start + len, file, line)
+        |> marked_attrs(attrs, file, line)
+      end)
+
+    if problems == [], do: {:ok, Enum.reverse(found)}, else: {:error, Enum.reverse(problems)}
+  end
+
+  defp part(s, {at, len}), do: binary_part(s, at, len)
+
+  defp attributes(text) do
+    for [_, k | v] <- Regex.scan(~r/([\w-]+)(?:="([^"]*)")?/, text), into: %{} do
+      {k, unescape(List.first(v) || "")}
+    end
+  end
+
+  defp marked_words({found, problems}, %{"data-t" => ctx}, html, name, from, file, line) do
+    case children(html, name, from) do
+      {:ok, kids} ->
+        case words(kids) do
+          {:ok, ""} ->
+            {found, ["#{file}:#{line}: data-t on an element with no words" | problems]}
+
+          {:ok, id} ->
+            m = %{
+              context: if(ctx == "", do: nil, else: ctx),
+              msgid: id,
+              plural: nil,
+              file: file,
+              line: line
+            }
+
+            {[m | found], problems}
+
+          :error ->
+            {found,
+             [
+               "#{file}:#{line}: an element between the words — only a data-t-slot may stand there"
+               | problems
+             ]}
+        end
+
+      :error ->
+        {found, ["#{file}:#{line}: <#{name} data-t> isn't closed" | problems]}
+    end
+  end
+
+  defp marked_words(acc, _attrs, _html, _name, _from, _file, _line), do: acc
+
+  defp marked_attrs({found, problems}, %{"data-t-attr" => names} = attrs, file, line) do
+    Enum.reduce(String.split(names), {found, problems}, fn a, {found, problems} ->
+      case attrs do
+        %{^a => v} when v != "" ->
+          {[%{context: nil, msgid: v, plural: nil, file: file, line: line} | found], problems}
+
+        _ ->
+          {found, ["#{file}:#{line}: data-t-attr names #{a}, which isn't there" | problems]}
+      end
+    end)
+  end
+
+  defp marked_attrs(acc, _attrs, _file, _line), do: acc
+
+  # the element's direct children up to its closing tag: {:text, s} |
+  # {:slot, name} | :element
+  defp children(html, name, from), do: children(html, name, from, 0, [], [])
+
+  defp children(html, name, pos, depth, kids, text) do
+    case Regex.run(~r/<(\/?)([a-zA-Z][\w-]*)((?:\s+[\w-]+(?:="[^"]*")?)*)\s*(\/?)>/, html,
+           return: :index,
+           offset: pos
+         ) do
+      nil ->
+        :error
+
+      [{at, len}, close_at, tag_at, attrs_at, self_at] ->
+        between = binary_part(html, pos, at - pos)
+        text = if depth == 0, do: [between | text], else: text
+        tag = String.downcase(part(html, tag_at))
+        closing? = part(html, close_at) == "/"
+        empty? = part(html, self_at) == "/" or tag in @void
+        next = at + len
+
+        cond do
+          closing? and depth == 0 and tag == name ->
+            {:ok, Enum.reverse(flush(text, kids))}
+
+          closing? ->
+            children(html, name, next, depth - 1, kids, text)
+
+          depth == 0 ->
+            kid =
+              case attributes(part(html, attrs_at)) do
+                %{"data-t-slot" => slot} -> {:slot, slot}
+                _ -> :element
+              end
+
+            kids = [kid | flush(text, kids)]
+            children(html, name, next, if(empty?, do: 0, else: 1), kids, [])
+
+          true ->
+            children(html, name, next, if(empty?, do: depth, else: depth + 1), kids, text)
+        end
+    end
+  end
+
+  defp flush([], kids), do: kids
+
+  defp flush(text, kids),
+    do: [{:text, text |> Enum.reverse() |> IO.iodata_to_binary() |> unescape()} | kids]
+
+  # the words: text and slots, other elements only at either end
+  defp words(kids) do
+    words? = fn
+      {:text, s} -> tidy(s) != ""
+      {:slot, _} -> true
+      :element -> false
+    end
+
+    middle =
+      kids
+      |> Enum.drop_while(&(not words?.(&1)))
+      |> Enum.reverse()
+      |> Enum.drop_while(&(not words?.(&1)))
+      |> Enum.reverse()
+
+    if :element in middle do
+      :error
+    else
+      {:ok,
+       middle
+       |> Enum.map_join(fn
+         {:text, s} -> s
+         {:slot, name} -> "{#{name}}"
+       end)
+       |> tidy()}
+    end
+  end
+
+  # as the browser's text: runs of HTML white space are one space (a
+  # no-break space stays)
+  defp tidy(s), do: s |> String.replace(~r/[ \t\n\r\f]+/, " ") |> String.trim(" ")
+
+  defp unescape(s) do
+    Regex.replace(~r/&(#x[0-9a-fA-F]+|#[0-9]+|[a-zA-Z]+);/, s, fn whole, ref ->
+      case ref do
+        "#x" <> hex -> <<String.to_integer(hex, 16)::utf8>>
+        "#" <> dec -> <<String.to_integer(dec)::utf8>>
+        "nbsp" -> " "
+        "amp" -> "&"
+        "lt" -> "<"
+        "gt" -> ">"
+        "quot" -> "\""
+        "apos" -> "'"
+        _ -> whole
+      end
+    end)
+  end
+
+  @doc "Every message in our scripts and pages: `{:ok, [message]}` or `{:error, [problem]}`."
   # Reviewed (2026-11-04): the files are our own priv/static/*.js, listed by
   # sources/1 at build time (`mix hoodride.i18n.extract`, the tests) —
   # never a name from a request; this never runs in the app.
   # sobelow_skip ["Traversal.FileModule"]
-  def scan_all(files \\ sources()) do
+  def scan_all(files \\ sources() ++ pages()) do
     {found, problems} =
       Enum.reduce(files, {[], []}, fn file, {found, problems} ->
-        case scan_js(File.read!(file), file) do
+        scan = if Path.extname(file) == ".html", do: &scan_html/2, else: &scan_js/2
+
+        case scan.(File.read!(file), file) do
           {:ok, ms} -> {found ++ ms, problems}
           {:error, ps} -> {found, problems ++ ps}
         end

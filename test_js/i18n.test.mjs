@@ -97,3 +97,112 @@ test("a broken catalog is no catalog: English", () => {
     assert.equal(I.t("Need a ride"), "Need a ride");
   }
 });
+
+// ----- translatePage: the page's marked words (index.html) -----
+// a stand-in for the few DOM parts it uses (Node has no page)
+function textNode(value) {
+  return { nodeType: 3, nodeValue: value, get textContent() { return this.nodeValue; } };
+}
+function el(tag, attrs = {}, ...kids) {
+  const e = {
+    nodeType: 1,
+    tag,
+    attrs: { ...attrs },
+    childNodes: [],
+    ownerDocument: { createTextNode: textNode },
+    hasAttribute: (n) => n in e.attrs,
+    getAttribute: (n) => (n in e.attrs ? e.attrs[n] : null),
+    setAttribute: (n, v) => (e.attrs[n] = String(v)),
+    replaceChildren: (...ns) => (e.childNodes = ns),
+    querySelectorAll: (sel) => {
+      const name = sel.slice(1, -1); // "[data-t]"
+      const out = [];
+      const walk = (n) => n.childNodes.forEach((c) => c.nodeType === 1 && (c.hasAttribute(name) && out.push(c), walk(c)));
+      walk(e);
+      return out;
+    },
+    get text() {
+      return e.childNodes.map((c) => (c.nodeType === 3 ? c.nodeValue : `<${c.tag}>${c.text}</${c.tag}>`)).join("");
+    },
+  };
+  e.childNodes = kids.map((k) => (typeof k === "string" ? textNode(k) : k));
+  return e;
+}
+
+const PAGE_ES = {
+  lang: "es",
+  messages: {
+    Save: "Guardar",
+    ["nav" + "\u0004" + "Change"]: "Cambiar",
+    "By continuing, you agree to our {terms} and {privacy}.": "Al continuar, aceptas nuestra {privacy} y nuestros {terms}.",
+    Terms: "Términos",
+    "Privacy Policy": "Política de privacidad",
+    Color: "Color del auto",
+    Close: "Cerrar",
+    "Message…": "Mensaje…",
+  },
+};
+
+test("translatePage: in English the page is left exactly as it is", () => {
+  I.load(null);
+  const save = el("button", { "data-t": "" }, "\n  Save\n");
+  const page = el("body", {}, save);
+  I.translatePage(page);
+  assert.equal(save.text, "\n  Save\n");
+});
+
+test("translatePage: words, a context, slots moved as the language orders them (the same links)", () => {
+  const terms = el("a", { href: "/terms", "data-t": "", "data-t-slot": "terms" }, "Terms");
+  const privacy = el("a", { href: "/privacy", "data-t": "", "data-t-slot": "privacy" }, "Privacy Policy");
+  const fine = el("p", { "data-t": "" }, "By continuing, you agree to our ", terms, " and ", privacy, ".");
+  const save = el("button", { "data-t": "" }, "Save");
+  const change = el("button", { "data-t": "nav" }, "Change");
+  const page = el("body", {}, fine, save, change);
+  I.load(PAGE_ES);
+  try {
+    I.translatePage(page);
+    assert.equal(save.text, "Guardar");
+    assert.equal(change.text, "Cambiar");
+    assert.equal(fine.text, "Al continuar, aceptas nuestra <a>Política de privacidad</a> y nuestros <a>Términos</a>.");
+    assert.equal(fine.childNodes[1], privacy, "the same link element, moved");
+    assert.equal(privacy.attrs.href, "/privacy");
+  } finally {
+    I.load(null);
+  }
+});
+
+test("translatePage: an icon before and a field after stay; labels; untranslated stays English; twice is the same", () => {
+  const icon = el("img", { src: "car.png" });
+  const drive = el("button", { "data-t": "" }, icon, "Drive");
+  const select = el("select", {}, el("option", { "data-t": "" }, "Choose…"));
+  const color = el("label", { "data-t": "" }, "Color\n  ", select, "\n");
+  const close = el("button", { "aria-label": "Close", title: "Close", "data-t-attr": "aria-label" }, "✕");
+  const input = el("input", { placeholder: "Message…", "data-t-attr": "placeholder" });
+  const page = el("body", {}, drive, color, close, input);
+  I.load(PAGE_ES);
+  try {
+    I.translatePage(page);
+    I.translatePage(page);
+    assert.equal(drive.childNodes[0], icon);
+    assert.equal(drive.text, "<img></img>Drive", "no translation: the English");
+    assert.equal(color.childNodes[0].nodeValue, "Color del auto");
+    assert.equal(color.childNodes[1], select);
+    assert.equal(close.attrs["aria-label"], "Cerrar");
+    assert.equal(close.attrs.title, "Close", "only the attributes named");
+    assert.equal(input.attrs.placeholder, "Mensaje…");
+  } finally {
+    I.load(null);
+  }
+});
+
+test("translatePage: an element between the words is left alone (the collector refuses it too)", () => {
+  const b = el("b", {}, "here");
+  const p = el("p", { "data-t": "" }, "Tap ", b, " now");
+  I.load({ lang: "es", messages: { "Tap here now": "x", "Tap {x} now": "x" } });
+  try {
+    I.translatePage(el("body", {}, p));
+    assert.equal(p.text, "Tap <b>here</b> now");
+  } finally {
+    I.load(null);
+  }
+});

@@ -19,15 +19,15 @@
     <div class="brand">
       <img class="brand-car" src="car.png" alt="" />
       <h1>Hood Ride</h1>
-      <p class="tagline">Rides from your neighborhood</p>
+      <p class="tagline" data-t>Rides from your neighborhood</p>
       <!-- what the app is: this page is also Google's required public "home
            page" (it must describe the app and link the privacy policy) -->
-      <p class="about">Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together.</p>
+      <p class="about" data-t>Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together.</p>
     </div>
 
     <!-- until /api/state answers (HoodBoot): never the sign-in buttons for a
          server that just can't be reached -->
-    <p id="boot-status" class="boot-status" role="status">Connecting…</p>
+    <p id="boot-status" class="boot-status" role="status" data-t>Connecting…</p>
 
     <div id="auth-buttons" class="auth-buttons hidden">
       <!-- hidden until Facebook sign-in exists (the server has no provider) -->
@@ -35,7 +35,7 @@
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
           <path fill="currentColor" d="M24 12.07C24 5.41 18.63 0 12 0S0 5.41 0 12.07c0 6.02 4.39 11.02 10.13 11.93v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.79-4.7 4.53-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.61 23.09 24 18.09 24 12.07z"/>
         </svg>
-        <span>Continue with Facebook</span>
+        <span data-t>Continue with Facebook</span>
       </button>
 
       <button id="btn-google" class="btn btn-google">
@@ -45,15 +45,15 @@
           <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
           <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
         </svg>
-        <span>Continue with Google</span>
+        <span data-t>Continue with Google</span>
       </button>
     </div>
 
-    <p class="fineprint">By continuing, you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.</p>
+    <p class="fineprint" data-t>By continuing, you agree to our <a href="/terms" data-t data-t-slot="terms">Terms</a> and <a href="/privacy" data-t data-t-slot="privacy">Privacy Policy</a>.</p>
     <!-- the code is public, and the community (owner, 2026-11-04): GitHub's
          and Discord's own white marks, unchanged and small, as their brand
          rules ask -->
-    <p class="source-login"><a class="source-link" href="https://github.com/hoodride/hoodride" target="_blank" rel="noopener" title="Source code on GitHub" aria-label="Source code on GitHub"><img src="github-invertocat-white.svg" alt="" width="20" height="20" /></a><a class="source-link" href="https://discord.gg/ehce7eGQFt" target="_blank" rel="noopener" title="Hood Ride on Discord" aria-label="Hood Ride on Discord"><img src="discord-symbol-white.svg" alt="" width="26" height="20" /></a></p>
+    <p class="source-login"><a class="source-link" href="https://github.com/hoodride/hoodride" target="_blank" rel="noopener" title="Source code on GitHub" aria-label="Source code on GitHub" data-t-attr="title aria-label"><img src="github-invertocat-white.svg" alt="" width="20" height="20" /></a><a class="source-link" href="https://discord.gg/ehce7eGQFt" target="_blank" rel="noopener" title="Hood Ride on Discord" aria-label="Hood Ride on Discord" data-t-attr="title aria-label"><img src="discord-symbol-white.svg" alt="" width="26" height="20" /></a></p>
   </section>
 
   <!-- ===== Terms: once per account, before the map (Hoodride.Terms) ===== -->
@@ -61,9 +61,9 @@
   <section id="screen-terms" class="screen">
     <div class="terms-card">
       <img class="terms-car" src="car.png" alt="" />
-      <h1>Before you start</h1>
-      <p class="terms-line">Please read and agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy&nbsp;Policy</a>.</p>
-      <button id="btn-agree" class="btn btn-primary">I agree</button>
+      <h1 data-t>Before you start</h1>
+      <p class="terms-line" data-t>Please read and agree to our <a href="/terms" data-t data-t-slot="terms">Terms</a> and <a href="/privacy" data-t data-t-slot="privacy">Privacy&nbsp;Policy</a>.</p>
+      <button id="btn-agree" class="btn btn-primary" data-t>I agree</button>
       <p id="terms-error" class="terms-error hidden" role="alert"></p>
     </div>
   </section>
@@ -76,19 +76,19 @@
       <div class="topbar-left">
         <!-- your photo (or initial): opens Settings — sign out lives there,
              away from Drive and the main button, so it's never a misclick -->
-        <button id="btn-account" class="btn-account" aria-label="Settings" aria-haspopup="dialog" aria-expanded="false">
+        <button id="btn-account" class="btn-account" aria-label="Settings" data-t-attr="aria-label" aria-haspopup="dialog" aria-expanded="false">
           <img id="account-photo" class="account-photo" src="" alt="" />
         </button>
         <span class="topbar-title"><img class="car-icon" src="car.png" alt="" />Hood Ride</span>
       </div>
       <div class="topbar-right">
-        <button id="btn-mode" class="btn btn-small"><img class="car-icon" src="car.png" alt="" />Drive</button>
+        <button id="btn-mode" class="btn btn-small" data-t><img class="car-icon" src="car.png" alt="" />Drive</button>
       </div>
     </header>
 
     <div id="banner" class="banner hidden"></div>
 
-    <button id="btn-locate" class="btn-locate" aria-label="Center on my location">
+    <button id="btn-locate" class="btn-locate" aria-label="Center on my location" data-t-attr="aria-label">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
         <circle cx="12" cy="12" r="6"/>
         <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>
@@ -103,14 +103,14 @@
       <!-- GO ONLINE: yellow before the tap, dark once you're live (btn-go).
            Need a ride: dark, as the yellow hand vanished on yellow; once raised
            a yellow ring and yellow words (btn-ask; owner, 2026-11-01) -->
-      <button id="btn-hand" class="btn btn-pill btn-ask hidden"><img class="emoji-icon" src="hand.svg" alt="" data-emoji="&#x270B;" />Need a ride</button>
-      <button id="btn-online" class="btn btn-pill btn-go hidden">GO ONLINE</button>
-      <button id="btn-chat" class="btn btn-pill hidden"><img class="emoji-icon" src="chat.svg" alt="" data-emoji="&#x1F4AC;" />Chat</button>
-      <button id="btn-pin" class="btn btn-pill hidden"><img class="emoji-icon" src="pin.svg" alt="" data-emoji="&#x1F4CD;" />Meet here</button>
+      <button id="btn-hand" class="btn btn-pill btn-ask hidden" data-t><img class="emoji-icon" src="hand.svg" alt="" data-emoji="&#x270B;" />Need a ride</button>
+      <button id="btn-online" class="btn btn-pill btn-go hidden" data-t>GO ONLINE</button>
+      <button id="btn-chat" class="btn btn-pill hidden" data-t><img class="emoji-icon" src="chat.svg" alt="" data-emoji="&#x1F4AC;" />Chat</button>
+      <button id="btn-pin" class="btn btn-pill hidden" data-t><img class="emoji-icon" src="pin.svg" alt="" data-emoji="&#x1F4CD;" />Meet here</button>
       <!-- a real link the driver taps: the Maps app takes it, no blank tab (navlink.js) -->
-      <a id="btn-navigate" class="btn btn-pill hidden" href="https://www.google.com/maps" rel="noopener"><img class="emoji-icon" src="compass.svg" alt="" data-emoji="&#x1F9ED;" />Navigate</a>
-      <button id="btn-arrived" class="btn btn-pill hidden"><img class="car-icon" src="car.png" alt="" />I'm here</button>
-      <button id="btn-endride" class="btn btn-pill btn-danger hidden">End ride</button>
+      <a id="btn-navigate" class="btn btn-pill hidden" href="https://www.google.com/maps" rel="noopener" data-t><img class="emoji-icon" src="compass.svg" alt="" data-emoji="&#x1F9ED;" />Navigate</a>
+      <button id="btn-arrived" class="btn btn-pill hidden" data-t><img class="car-icon" src="car.png" alt="" />I'm here</button>
+      <button id="btn-endride" class="btn btn-pill btn-danger hidden" data-t>End ride</button>
     </div>
 
     <!-- tapped-marker card -->
@@ -120,14 +120,14 @@
         <strong id="peer-name"></strong>
         <span id="peer-meta" class="muted peer-meta"><span id="peer-what"></span><span id="peer-where"></span></span>
       </div>
-      <button id="btn-msg" class="btn btn-primary btn-compact">Message</button>
-      <button id="peer-close" class="card-close" aria-label="Close">✕</button>
+      <button id="btn-msg" class="btn btn-primary btn-compact" data-t>Message</button>
+      <button id="peer-close" class="card-close" aria-label="Close" data-t-attr="aria-label">✕</button>
     </div>
 
     <!-- pile list: everyone in one block (fuzzed markers share a spot) -->
     <div id="pile-sheet" class="pile-sheet hidden" role="dialog" aria-labelledby="pile-title">
       <div class="pile-header"><span id="pile-title"></span></div>
-      <button id="pile-close" class="card-close" aria-label="Close">✕</button>
+      <button id="pile-close" class="card-close" aria-label="Close" data-t-attr="aria-label">✕</button>
       <div id="pile-list" class="pile-list"></div>
     </div>
 
@@ -136,13 +136,13 @@
          built; sign out alone at the bottom -->
     <div id="settings-backdrop" class="drawer-backdrop"></div>
     <aside id="settings-sheet" class="drawer" role="dialog" aria-modal="true" aria-labelledby="settings-name" inert>
-      <button id="settings-close" class="card-close drawer-close" aria-label="Close settings">✕</button>
+      <button id="settings-close" class="card-close drawer-close" aria-label="Close settings" data-t-attr="aria-label">✕</button>
       <div class="drawer-me">
         <img id="settings-photo" class="avatar avatar-card" src="" alt="" />
         <div class="drawer-me-text">
           <strong id="settings-name" tabindex="-1"></strong>
           <!-- opens the box below (W3C disclosure pattern) -->
-          <button id="settings-change" type="button" class="drawer-change hidden" aria-expanded="false" aria-controls="settings-change-box">Change</button>
+          <button id="settings-change" type="button" class="drawer-change hidden" aria-expanded="false" aria-controls="settings-change-box" data-t>Change</button>
         </div>
       </div>
       <!-- name and photo come only from the sign-in (no changing them here):
@@ -152,51 +152,51 @@
         <p class="muted" id="settings-source"></p>
         <a id="settings-source-link" class="drawer-box-action" target="_blank" rel="noopener noreferrer"></a>
         <div id="settings-refresh" class="hidden">
-          <p class="muted">Changed them?</p>
-          <a id="settings-refresh-link" class="drawer-box-action" href="/auth/google?refresh=1">Refresh from Google</a>
-          <p class="muted settings-refresh-note">Google can take a little while</p>
+          <p class="muted" data-t>Changed them?</p>
+          <a id="settings-refresh-link" class="drawer-box-action" href="/auth/google?refresh=1" data-t>Refresh from Google</a>
+          <p class="muted settings-refresh-note" data-t>Google can take a little while</p>
         </div>
-        <p id="settings-refresh-later" class="muted hidden">You can refresh after your ride</p>
+        <p id="settings-refresh-later" class="muted hidden" data-t>You can refresh after your ride</p>
       </div><!-- /settings-change-box -->
-      <nav class="drawer-list" aria-label="Settings">
+      <nav class="drawer-list" aria-label="Settings" data-t-attr="aria-label">
         <!-- what riders look for (ARCHITECTURE.md "Your car"); not in the demo -->
         <button id="btn-car" class="drawer-row">
-          <span class="settings-label"><img class="car-icon" src="car.png" alt="" />Your car</span>
+          <span class="settings-label" data-t><img class="car-icon" src="car.png" alt="" />Your car</span>
           <span id="car-note" class="muted settings-note"></span>
         </button>
         <!-- which map app Navigate opens (owner, 2026-11-02; HoodNavLink) -->
         <button id="btn-navapp" class="drawer-row">
-          <span class="settings-label"><img class="emoji-icon" src="compass.svg" alt="" data-emoji="&#x1F9ED;" />Navigation app</span>
+          <span class="settings-label" data-t><img class="emoji-icon" src="compass.svg" alt="" data-emoji="&#x1F9ED;" />Navigation app</span>
           <span id="navapp-note" class="muted settings-note"></span>
         </button>
       </nav>
       <div class="drawer-bottom">
         <button id="btn-logout" class="drawer-row settings-danger">
-          <span class="settings-label">Sign out</span>
-          <span id="logout-note" class="muted settings-note">On all your devices</span>
+          <span class="settings-label" data-t>Sign out</span>
+          <span id="logout-note" class="muted settings-note" data-t>On all your devices</span>
         </button>
         <!-- the code (GitHub) and the community (Discord, Discord's own white
              symbol): their own line between Sign out and the legal links, with
              room on all sides — so Delete account stays last and alone
              (owner, 2026-11-04) -->
-        <p class="drawer-source"><a class="source-link" href="https://github.com/hoodride/hoodride" target="_blank" rel="noopener" title="Source code on GitHub" aria-label="Source code on GitHub"><img src="github-invertocat-white.svg" alt="" width="16" height="16" /></a><a class="source-link" href="https://discord.gg/ehce7eGQFt" target="_blank" rel="noopener" title="Hood Ride on Discord" aria-label="Hood Ride on Discord"><img src="discord-symbol-white.svg" alt="" width="21" height="16" /></a></p>
+        <p class="drawer-source"><a class="source-link" href="https://github.com/hoodride/hoodride" target="_blank" rel="noopener" title="Source code on GitHub" aria-label="Source code on GitHub" data-t-attr="title aria-label"><img src="github-invertocat-white.svg" alt="" width="16" height="16" /></a><a class="source-link" href="https://discord.gg/ehce7eGQFt" target="_blank" rel="noopener" title="Hood Ride on Discord" aria-label="Hood Ride on Discord" data-t-attr="title aria-label"><img src="discord-symbol-white.svg" alt="" width="21" height="16" /></a></p>
         <!-- delete account: a small link, not a big row — rare and permanent
              (its confirm step follows); blocked in a ride like sign out -->
-        <p class="drawer-legal muted"><a href="/terms">Terms</a> · <a href="/privacy">Privacy Policy</a><span id="delete-wrap"> · <button id="btn-delete" class="link-button">Delete account</button></span></p>
+        <p class="drawer-legal muted"><a href="/terms" data-t>Terms</a> · <a href="/privacy" data-t>Privacy Policy</a><span id="delete-wrap"> · <button id="btn-delete" class="link-button" data-t>Delete account</button></span></p>
       </div>
       <!-- delete: a second, explicit step (it can't be undone) -->
       <div id="delete-confirm" class="drawer-confirm" role="alertdialog" aria-labelledby="delete-title" aria-describedby="delete-desc">
-        <h2 id="delete-title">Delete your account?</h2>
-        <p id="delete-desc">This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account.</p>
+        <h2 id="delete-title" data-t>Delete your account?</h2>
+        <p id="delete-desc" data-t>This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account.</p>
         <!-- typed, not just tapped (owner, 2026-11-04): the red button wakes
              only once the box says DELETE (any case); the server checks the
              word too -->
-        <label class="car-field">Type DELETE to confirm
+        <label class="car-field" data-t>Type DELETE to confirm
           <input id="delete-typed" type="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="done" maxlength="20" />
         </label>
         <p id="delete-error" class="delete-error hidden" role="alert"></p>
-        <button id="delete-yes" class="btn btn-danger" disabled>Delete my account</button>
-        <button id="delete-cancel" class="btn btn-small">Cancel</button>
+        <button id="delete-yes" class="btn btn-danger" disabled data-t>Delete my account</button>
+        <button id="delete-cancel" class="btn btn-small" data-t>Cancel</button>
       </div>
     </aside>
 
@@ -206,56 +206,56 @@
          Apple Maps only on iPhone -->
     <div id="nav-backdrop" class="car-backdrop hidden"></div>
     <div id="nav-sheet" class="car-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="nav-title">
-      <h2 id="nav-title" tabindex="-1">Open directions in</h2>
+      <h2 id="nav-title" tabindex="-1" data-t>Open directions in</h2>
       <a id="nav-google" class="btn nav-choice" data-app="google" rel="noopener">Google Maps</a>
       <a id="nav-apple" class="btn nav-choice" data-app="apple" rel="noopener">Apple Maps</a>
       <a id="nav-waze" class="btn nav-choice" data-app="waze" rel="noopener">Waze</a>
-      <p class="muted">Change it anytime: tap your profile picture at the top left, then <strong>Navigation app</strong></p>
-      <button id="nav-cancel" type="button" class="btn btn-small">Cancel</button>
+      <p class="muted" data-t>Change it anytime: tap your profile picture at the top left, then <strong data-t data-t-slot="setting">Navigation app</strong></p>
+      <button id="nav-cancel" type="button" class="btn btn-small" data-t>Cancel</button>
     </div>
 
     <!-- "Your car": from Settings, and from Go online when none is set yet -->
     <div id="car-backdrop" class="car-backdrop hidden"></div>
     <form id="car-sheet" class="car-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="car-title" novalidate>
-      <h2 id="car-title" tabindex="-1">Your car</h2>
-      <p id="car-why" class="muted">Riders see this so they can find you</p>
-      <label class="car-field">Color
-        <select id="car-color"><option value="">Choose…</option></select>
+      <h2 id="car-title" tabindex="-1" data-t>Your car</h2>
+      <p id="car-why" class="muted" data-t>Riders see this so they can find you</p>
+      <label class="car-field" data-t>Color
+        <select id="car-color"><option value="" data-t>Choose…</option></select>
       </label>
       <!-- our own suggestions (HoodCar.suggest), in the form: Chrome drew its
            <datalist> popup outside the page, far to the left -->
-      <label class="car-field">Make
+      <label class="car-field" data-t>Make
         <input id="car-make" role="combobox" aria-autocomplete="list" aria-controls="car-make-list"
                aria-expanded="false" autocomplete="off" autocapitalize="words" placeholder="Honda" />
       </label>
-      <ul id="car-make-list" class="car-suggest hidden" role="listbox" aria-label="Makes"></ul>
-      <label class="car-field">Model
+      <ul id="car-make-list" class="car-suggest hidden" role="listbox" aria-label="Makes" data-t-attr="aria-label"></ul>
+      <label class="car-field" data-t>Model
         <input id="car-model" autocomplete="off" autocapitalize="words" placeholder="Civic" />
       </label>
       <p id="car-error" class="delete-error hidden" role="alert"></p>
-      <button id="car-save" class="btn btn-primary" type="submit">Save</button>
-      <button id="car-cancel" class="btn btn-small" type="button">Cancel</button>
+      <button id="car-save" class="btn btn-primary" type="submit" data-t>Save</button>
+      <button id="car-cancel" class="btn btn-small" type="button" data-t>Cancel</button>
     </form>
 
     <!-- chat panel -->
     <div id="chat" class="chat hidden">
       <div class="chat-header">
-        <button id="chat-back" class="card-close chat-back hidden" aria-label="Back">‹</button>
+        <button id="chat-back" class="card-close chat-back hidden" aria-label="Back" data-t-attr="aria-label">‹</button>
         <!-- the person you're talking to (an open chat; hidden on the list) -->
         <img id="chat-photo" class="avatar avatar-mini hidden" src="" alt="" />
         <div class="chat-title">
           <span id="chat-name"></span>
           <span id="chat-dist" class="chat-dist"></span>
         </div>
-        <button id="btn-decline" class="btn btn-danger btn-compact hidden">Decline</button>
-        <button id="btn-ride-action" class="btn btn-primary btn-compact hidden">Request ride</button>
+        <button id="btn-decline" class="btn btn-danger btn-compact hidden" data-t>Decline</button>
+        <button id="btn-ride-action" class="btn btn-primary btn-compact hidden" data-t>Request ride</button>
         <!-- "Requesting your ride…" for screen readers while it's on its way -->
         <p id="ride-action-status" class="sr-only" role="status"></p>
-        <button id="chat-close" class="card-close" aria-label="Close">✕</button>
+        <button id="chat-close" class="card-close" aria-label="Close" data-t-attr="aria-label">✕</button>
       </div>
       <div id="chat-messages" class="chat-messages"></div>
       <!-- scrolled up when a message came: it waits below (HoodChatScroll) -->
-      <button id="chat-jump" type="button" class="chat-jump hidden">↓ New message</button>
+      <button id="chat-jump" type="button" class="chat-jump hidden" data-t>↓ New message</button>
       <!-- off (owner, 2026-10-29): the privacy page's "who sees what" table
            still says it. To bring it back, uncomment this and the two
            chat-note lines in app.js (closeChat, renderChat):
@@ -267,8 +267,8 @@
       <p id="chat-count-sr" class="sr-only"></p>
       <p id="chat-count-alert" class="sr-only" role="alert"></p>
       <form id="chat-form" class="chat-form">
-        <input id="chat-input" dir="auto" autocomplete="off" placeholder="Message…" />
-        <button class="btn btn-primary btn-compact" type="submit">Send</button>
+        <input id="chat-input" dir="auto" autocomplete="off" placeholder="Message…" data-t-attr="placeholder" />
+        <button class="btn btn-primary btn-compact" type="submit" data-t>Send</button>
       </form>
     </div>
   </section>

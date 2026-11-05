@@ -139,7 +139,7 @@ defmodule HoodrideWeb.TermsTest do
 
       # the car above it, smaller than on the sign-in screen (owner, 2026-10-31)
       assert screen =~ ~s(<img class="terms-car" src="car.png" alt="" />
-      <h1>Before you start</h1>)
+      <h1 data-t>Before you start</h1>)
       css = File.read!("priv/static/styles.css")
       assert css =~ ~r/\.terms-car \{[^}]*width: 120px;/
       # as tight under the car as the sign-in screen's name (-2 px, line 1.1)
@@ -149,11 +149,11 @@ defmodule HoodrideWeb.TermsTest do
       # ("Privacy Policy" never split, and the line balanced: "Policy." sat
       # alone on a line of its own on a phone — owner, 2026-10-31)
       assert screen =~
-               ~s(<p class="terms-line">Please read and agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy&nbsp;Policy</a>.</p>)
+               ~s(<p class="terms-line" data-t>Please read and agree to our <a href="/terms" data-t data-t-slot="terms">Terms</a> and <a href="/privacy" data-t data-t-slot="privacy">Privacy&nbsp;Policy</a>.</p>)
 
       assert File.read!("priv/static/styles.css") =~ ~r/\.terms-line \{[^}]*text-wrap: balance;/
 
-      assert screen =~ ~s(<button id="btn-agree" class="btn btn-primary">I agree</button>)
+      assert screen =~ ~s(<button id="btn-agree" class="btn btn-primary" data-t>I agree</button>)
       refute screen =~ "<li>"
       refute screen =~ ~r/18|911/
     end
@@ -161,9 +161,9 @@ defmodule HoodrideWeb.TermsTest do
     test "linked from the sign-in screen (the agreement line), the drawer and the privacy page",
          %{conn: conn} do
       index = File.read!("priv/static/index.html")
-      [line] = Regex.run(~r{<p class="fineprint">.*?</p>}s, index)
-      assert line =~ ~s(<a href="/terms">Terms</a>)
-      assert line =~ ~s(<a href="/privacy">Privacy Policy</a>)
+      [line] = Regex.run(~r{<p class="fineprint" data-t>.*?</p>}s, index)
+      assert line =~ ~s(<a href="/terms" data-t data-t-slot="terms">Terms</a>)
+      assert line =~ ~s(<a href="/privacy" data-t data-t-slot="privacy">Privacy Policy</a>)
       [drawer] = Regex.run(~r{<p class="drawer-legal muted">.*?</p>}s, index)
       assert drawer =~ ~s(href="/terms")
       assert conn |> get("/privacy") |> html_response(200) =~ ~s(href="/terms")

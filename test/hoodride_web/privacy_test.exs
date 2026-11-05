@@ -200,7 +200,7 @@ defmodule HoodrideWeb.PrivacyTest do
       assert html =~ ~s(href="/privacy")
 
       assert html =~
-               ~s(<p class="fineprint">By continuing, you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.</p>)
+               ~s(<p class="fineprint" data-t>By continuing, you agree to our <a href="/terms" data-t data-t-slot="terms">Terms</a> and <a href="/privacy" data-t data-t-slot="privacy">Privacy Policy</a>.</p>)
     end
 
     # open to people anywhere (owner, 2026-10-31): GDPR Article 13's items,
@@ -275,7 +275,7 @@ defmodule HoodrideWeb.PrivacyTest do
       [sheet] = Regex.run(~r/<div id="nav-sheet".*?<\/div>/s, html)
 
       assert sheet =~
-               "Change it anytime: tap your profile picture at the top left, then <strong>Navigation app</strong>"
+               ~s(Change it anytime: tap your profile picture at the top left, then <strong data-t data-t-slot="setting">Navigation app</strong>)
 
       # what a person sees: no comments, no tags
       text =
@@ -289,7 +289,8 @@ defmodule HoodrideWeb.PrivacyTest do
 
     # nor any message the app shows (every one is in the translators' list):
     # Google refresh's failure said "open Settings" until 2026-11-04. The
-    # only "Settings" are the profile button's screen-reader name, and the
+    # only "Settings" are the screen-reader names of the profile button and
+    # the drawer's list ("Settings", "Settings ({name})"), and the
     # PHONE's or browser's Settings as a step in a menu path
     # ("Settings › Privacy & Security › …" — location help)
     test "no message the app shows sends people to the app's 'Settings'" do
@@ -301,7 +302,7 @@ defmodule HoodrideWeb.PrivacyTest do
       ours =
         Enum.filter(ids, &(String.replace(&1, ~r/Settings ›/, "") =~ "Settings"))
 
-      assert ours == ["Settings ({name})"]
+      assert ours == ["Settings", "Settings ({name})"]
       # (the location help is in the list: the rule above really looks at it)
       assert Enum.any?(ids, &(&1 =~ "Settings › Privacy & Security"))
       refute Enum.any?(ids, &(&1 =~ "round button"))

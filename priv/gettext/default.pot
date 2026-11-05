@@ -30,8 +30,16 @@ msgstr ""
 msgid "Asked the first time you navigate"
 msgstr ""
 
+#: priv/static/index.html
+msgid "Back"
+msgstr ""
+
 #: priv/static/app.js
 msgid "Back to the sign-in page"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Before you start"
 msgstr ""
 
 #: priv/static/car.js
@@ -54,12 +62,20 @@ msgctxt "car color"
 msgid "Brown"
 msgstr ""
 
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr ""
+
 #: priv/static/app.js
 msgid "Can't reach Hood Ride — retrying…"
 msgstr ""
 
 #: priv/static/app.js
 msgid "Can't reach Hood Ride — try again"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Cancel"
 msgstr ""
 
 #: priv/static/app.js
@@ -74,8 +90,28 @@ msgstr ""
 msgid "Cancel your ride request first."
 msgstr ""
 
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Change"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr ""
+
 #: priv/static/app.js
 msgid "Change on {provider} ↗"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Chat"
 msgstr ""
 
 #: priv/static/browse.js
@@ -88,6 +124,26 @@ msgstr ""
 
 #: priv/static/app.js
 msgid "Check the {fields} (up to {max} letters each)."
+msgstr ""
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Close"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Color"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Connecting…"
 msgstr ""
 
 #: priv/static/app.js
@@ -108,6 +164,14 @@ msgstr ""
 
 #: priv/static/rehydrate.js
 msgid "Connection reset — your ride request was lost, please ask again"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Continue with Google"
 msgstr ""
 
 #: priv/static/app.js
@@ -174,11 +238,27 @@ msgstr ""
 msgid "Couldn't sign out — try again"
 msgstr ""
 
+#: priv/static/index.html
+msgid "Decline"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr ""
+
 #: priv/static/app.js
 msgid "Demo"
 msgstr ""
 
-#: priv/static/app.js
+#: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr ""
 
@@ -190,7 +270,7 @@ msgstr ""
 msgid "Driver can't take this one — try another"
 msgstr ""
 
-#: priv/static/app.js
+#: priv/static/app.js, priv/static/index.html
 msgid "End ride"
 msgstr ""
 
@@ -210,7 +290,7 @@ msgstr ""
 msgid "GO OFFLINE"
 msgstr ""
 
-#: priv/static/app.js
+#: priv/static/app.js, priv/static/index.html
 msgid "GO ONLINE"
 msgstr ""
 
@@ -223,6 +303,10 @@ msgctxt "car color"
 msgid "Gold"
 msgstr ""
 
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr ""
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Gray"
@@ -233,12 +317,40 @@ msgctxt "car color"
 msgid "Green"
 msgstr ""
 
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr ""
+
 #: priv/static/app.js
 msgid "Hood Ride was opened on another device"
 msgstr ""
 
+#: priv/static/index.html
+msgid "I agree"
+msgstr ""
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr ""
+
 #: priv/static/app.js
 msgid "Leave demo"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Make"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Message"
 msgstr ""
 
 #: priv/static/app.js
@@ -257,12 +369,40 @@ msgstr ""
 msgid "Message too long — keep it under {max} characters"
 msgstr ""
 
+#: priv/static/index.html
+msgid "Message…"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Model"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr ""
+
 #: priv/static/app.js
 msgid "Not available"
 msgstr ""
 
-#: priv/static/app.js
+#: priv/static/app.js, priv/static/index.html
 msgid "On all your devices"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Open directions in"
 msgstr ""
 
 #: priv/static/car.js
@@ -283,6 +423,18 @@ msgstr ""
 msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
 msgstr ""
 
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr ""
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr ""
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Purple"
@@ -297,6 +449,10 @@ msgctxt "car color"
 msgid "Red"
 msgstr ""
 
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr ""
+
 #: priv/static/app.js
 msgid "Request cancelled"
 msgstr ""
@@ -309,7 +465,7 @@ msgstr ""
 msgid "Request expired — ask again or try another driver"
 msgstr ""
 
-#: priv/static/app.js
+#: priv/static/app.js, priv/static/index.html
 msgid "Request ride"
 msgstr ""
 
@@ -341,20 +497,32 @@ msgstr ""
 msgid "Riders look for it when you pick them up. Add it to go online."
 msgstr ""
 
-#: priv/static/app.js
+#: priv/static/app.js, priv/static/index.html
 msgid "Riders see this so they can find you"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
 msgstr ""
 
 #: priv/static/sendfilter.js
 msgid "Safari Websites (or your browser's name, if you don't use Safari)"
 msgstr ""
 
-#: priv/static/app.js
+#: priv/static/app.js, priv/static/index.html
 msgid "Save"
 msgstr ""
 
 #: priv/static/app.js
 msgid "Save & go online"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Send"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Settings"
 msgstr ""
 
 #: priv/static/app.js
@@ -373,7 +541,7 @@ msgstr ""
 msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
 msgstr ""
 
-#: priv/static/app.js
+#: priv/static/app.js, priv/static/index.html
 msgid "Sign out"
 msgstr ""
 
@@ -386,8 +554,16 @@ msgctxt "car color"
 msgid "Silver"
 msgstr ""
 
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr ""
+
 #: priv/static/app.js
 msgid "Tap to remove"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Terms"
 msgstr ""
 
 #: priv/static/app.js
@@ -398,8 +574,16 @@ msgstr ""
 msgid "That rider isn't looking anymore"
 msgstr ""
 
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr ""
+
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Type DELETE to confirm"
 msgstr ""
 
 #: priv/static/app.js
@@ -428,6 +612,10 @@ msgstr ""
 msgid "You already have an open request"
 msgstr ""
 
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr ""
+
 #: priv/static/googlerefresh.js
 msgid "You can refresh your name and photo after your ride"
 msgstr ""
@@ -448,7 +636,7 @@ msgstr ""
 msgid "You've started a lot of new chats — try again later"
 msgstr ""
 
-#: priv/static/app.js
+#: priv/static/app.js, priv/static/index.html
 msgid "Your car"
 msgstr ""
 
@@ -737,6 +925,10 @@ msgstr ""
 
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
+msgstr ""
+
+#: priv/static/index.html
+msgid "↓ New message"
 msgstr ""
 
 #: priv/static/app.js

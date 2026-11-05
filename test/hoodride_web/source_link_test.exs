@@ -35,7 +35,7 @@ defmodule HoodrideWeb.SourceLinkTest do
     html = File.read!(Path.join(@static, "index.html"))
 
     link =
-      ~s(<a class="source-link" href="#{@repo}" target="_blank" rel="noopener" title="Source code on GitHub" aria-label="Source code on GitHub">)
+      ~s(<a class="source-link" href="#{@repo}" target="_blank" rel="noopener" title="Source code on GitHub" aria-label="Source code on GitHub" data-t-attr="title aria-label">)
 
     [login] = Regex.run(~r{<p class="source-login">.*?</p>}s, html)
 
@@ -55,14 +55,14 @@ defmodule HoodrideWeb.SourceLinkTest do
              ~s(<p class="drawer-source">) <>
                link <>
                ~s(<img src="github-invertocat-white.svg" alt="" width="16" height="16" /></a>) <>
-               ~s(<a class="source-link" href="#{@discord}" target="_blank" rel="noopener" title="Hood Ride on Discord" aria-label="Hood Ride on Discord">) <>
+               ~s(<a class="source-link" href="#{@discord}" target="_blank" rel="noopener" title="Hood Ride on Discord" aria-label="Hood Ride on Discord" data-t-attr="title aria-label">) <>
                ~s(<img src="discord-symbol-white.svg" alt="" width="21" height="16" /></a></p>)
 
     # Discord on the sign-in page too, right after GitHub (owner,
     # 2026-11-04), sized to it; the same invite as the README
     assert login =~
              ~s(<img src="github-invertocat-white.svg" alt="" width="20" height="20" /></a>) <>
-               ~s(<a class="source-link" href="#{@discord}" target="_blank" rel="noopener" title="Hood Ride on Discord" aria-label="Hood Ride on Discord">) <>
+               ~s(<a class="source-link" href="#{@discord}" target="_blank" rel="noopener" title="Hood Ride on Discord" aria-label="Hood Ride on Discord" data-t-attr="title aria-label">) <>
                ~s(<img src="discord-symbol-white.svg" alt="" width="26" height="20" /></a></p>)
 
     assert File.read!("README.md") =~ "(#{@discord})"

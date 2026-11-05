@@ -88,6 +88,77 @@
     return fill(n === 1 ? singular : plural, all);
   }
 
+  // ----- the page's own words (index.html): marked, not wrapped -----
+  //   <button data-t>Save</button>          data-t="context": tc
+  //   <p data-t>By continuing, you agree to our
+  //     <a data-t data-t-slot="terms">Terms</a> and <a … data-t-slot="privacy">…</a>.</p>
+  //   → one message: "By continuing, you agree to our {terms} and {privacy}."
+  //     (the links stay the same elements, wherever the language puts them)
+  //   data-t-attr="aria-label title": those attributes' English is a message
+  // An element that isn't a slot (an icon, a <select>) may stand before or
+  // after the words, never between them. The collector (Hoodride.I18n.Extract
+  // scan_html) reads the same marks by the same rules. English changes
+  // nothing on the page; a language read at start-up (switching reloads).
+  const SPACE = /[ \t\n\r\f]+/g;
+  const tidy = (s) => s.replace(SPACE, " ").trim();
+  const isWords = (n) => (n.nodeType === 1 ? n.hasAttribute("data-t-slot") : n.nodeType === 3 && tidy(n.nodeValue) !== "");
+
+  // { lead, tail, slots, msgid, ctx }, or null (no words, or something in
+  // the way) — read once: the English, before any language replaced it
+  function readMarked(el) {
+    const kids = Array.from(el.childNodes).filter((n) => n.nodeType === 1 || n.nodeType === 3);
+    const first = kids.findIndex(isWords);
+    if (first < 0) return null;
+    let last = kids.length - 1;
+    while (!isWords(kids[last])) last--;
+    const slots = {};
+    let text = "";
+    for (const n of kids.slice(first, last + 1)) {
+      if (n.nodeType === 3) text += n.nodeValue;
+      else if (n.hasAttribute("data-t-slot")) {
+        const name = n.getAttribute("data-t-slot");
+        slots[name] = n;
+        text += `{${name}}`;
+      } else return null;
+    }
+    return { lead: kids.slice(0, first), tail: kids.slice(last + 1), slots, msgid: tidy(text), ctx: el.getAttribute("data-t") || "" };
+  }
+
+  const marked = new WeakMap();
+  const markedAttrs = new WeakMap();
+
+  function translatePage(root) {
+    if (lang === "en") return;
+    root.querySelectorAll("[data-t]").forEach((el) => {
+      if (!marked.has(el)) marked.set(el, readMarked(el));
+      const m = marked.get(el);
+      if (!m) return;
+      const text = m.ctx ? tc(m.ctx, m.msgid) : t(m.msgid);
+      const doc = el.ownerDocument;
+      const words = [];
+      text.split(/(\{\w+\})/).forEach((part) => {
+        const slot = /^\{(\w+)\}$/.exec(part);
+        if (slot && m.slots[slot[1]]) words.push(m.slots[slot[1]]);
+        else if (part) words.push(doc.createTextNode(part));
+      });
+      el.replaceChildren(...m.lead, ...words, ...m.tail);
+    });
+    root.querySelectorAll("[data-t-attr]").forEach((el) => {
+      if (!markedAttrs.has(el)) {
+        const english = {};
+        el.getAttribute("data-t-attr")
+          .split(SPACE)
+          .filter(Boolean)
+          .forEach((name) => {
+            if (el.hasAttribute(name)) english[name] = el.getAttribute(name);
+          });
+        markedAttrs.set(el, english);
+      }
+      const english = markedAttrs.get(el);
+      Object.keys(english).forEach((name) => el.setAttribute(name, t(english[name])));
+    });
+  }
+
   load(null);
-  return { load, t, tc, tn, fill, lang: () => lang, CTX, PLURAL };
+  return { load, t, tc, tn, fill, translatePage, lang: () => lang, CTX, PLURAL };
 });
