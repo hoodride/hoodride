@@ -1,0 +1,1179 @@
+# Hood Ride in Greek. A first translation (2026-11-04).
+# Plural forms by name, in this order: one, other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: el\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(το αίτημα ανακλήθηκε)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "Αποδοχή διαδρομής"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "Αποδοχή διαδρομής…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "Αποδοχή…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "Πρόσθεσέ το πριν οδηγήσεις"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "Πρόσθεσε το αυτοκίνητό σου"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "Θα σε ρωτήσουμε την πρώτη φορά που θα κάνεις πλοήγηση"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "Πίσω"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "Πίσω στη σελίδα σύνδεσης"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "Πριν ξεκινήσεις"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "Μπεζ"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "μπεζ"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "Μαύρο"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "μαύρο"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "Μπλε"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "μπλε"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "Καφέ"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "καφέ"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "Συνεχίζοντας, αποδέχεσαι τα εξής: {terms} και {privacy}."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Δεν είναι δυνατή η σύνδεση με το Hood Ride — νέα προσπάθεια…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Δεν είναι δυνατή η σύνδεση με το Hood Ride — δοκίμασε ξανά"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "Ακύρωση"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "Ακύρωση αιτήματος"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "Ακύρωσε πρώτα το αίτημα διαδρομής σου"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "Ακύρωσε πρώτα το αίτημα διαδρομής σου."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "Κεντράρισμα στην τοποθεσία μου"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "Αλλαγή"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "Άλλαξέ το όποτε θέλεις: πάτησε την εικόνα προφίλ σου πάνω αριστερά και μετά {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "Αλλαγή στο {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "Τα άλλαξες;"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "Συνομιλία"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "Η συνομιλία με {name} έληξε — λείπει εδώ και αρκετή ώρα"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "Συνομιλίες"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "Έλεγξε: {fields} (έως {max} γράμματα το καθένα)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "Επίλεξε…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "Κλείσιμο"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "Κλείσιμο ρυθμίσεων"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "Χρώμα"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "Σύνδεση…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "Πρόβλημα σύνδεσης — νέα προσπάθεια"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "Η σύνδεση διακόπηκε — πάτησε ΣΕ ΥΠΗΡΕΣΙΑ για να οδηγήσεις ξανά"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "Η σύνδεση διακόπηκε — πάτησε ξανά ✋ αν χρειάζεσαι ακόμα διαδρομή"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "Η σύνδεση διακόπηκε — η διαδρομή σου τερματίστηκε απρόσμενα, κανόνισέ τη ξανά"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "Η σύνδεση διακόπηκε — το αίτημα διαδρομής σου χάθηκε, ζήτησέ το ξανά"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Συνέχεια με Facebook"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Συνέχεια με Google"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "Αντιγράφηκε ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "Αντιγραφή"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "Αντιγραφή μηνύματος"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "Δεν ήταν δυνατή η αποδοχή"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "Δεν ήταν δυνατή η αντιγραφή"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "Δεν ήταν δυνατή η διαγραφή του λογαριασμού σου — δοκίμασε ξανά."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Δεν ήταν δυνατή η σύνδεση με το Hood Ride — έλεγξε τη σύνδεσή σου και δοκίμασε ξανά."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Δεν ήταν δυνατή η σύνδεση με το Hood Ride — δοκίμασε ξανά"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "Δεν ήταν δυνατή η σύνδεση με τον διακομιστή — δοκίμασε ξανά"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "Δεν ήταν δυνατή η αυτόματη ανανέωση — πάτησε την εικόνα προφίλ σου πάνω αριστερά, μετά Αλλαγή και μετά Ανανέωση από Google"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "Δεν ήταν δυνατή η ανανέωση τώρα — δοκίμασε ξανά αργότερα"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "Δεν ήταν δυνατή η αποθήκευση τώρα — δοκίμασε ξανά σε λίγο."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "Δεν ήταν δυνατή η αποθήκευση — δοκίμασε ξανά"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "Δεν ήταν δυνατή η αποστολή του αιτήματος"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "Δεν ήταν δυνατή η σύνδεση — δοκίμασε ξανά"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "Δεν ήταν δυνατή η αποσύνδεση — δοκίμασε ξανά"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "ΔΙΑΓΡΑΦΗ"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "Απόρριψη"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "Διαγραφή λογαριασμού"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "Διαγραφή του λογαριασμού μου"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "Διαγραφή του λογαριασμού σου;"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "Επίδειξη"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "Οδήγηση"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "Οδηγός"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "Ο οδηγός δεν μπορεί να αναλάβει αυτή τη διαδρομή — δοκίμασε άλλον"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "Τέλος διαδρομής"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "Τελείωσε πρώτα τη διαδρομή σου"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "Τελείωσε πρώτα τη διαδρομή σου."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "Τελείωσε πρώτα την τρέχουσα διαδρομή σου"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "ΕΚΤΟΣ ΥΠΗΡΕΣΙΑΣ"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "ΣΕ ΥΠΗΡΕΣΙΑ"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "Δώσε ένα λεπτό σε αυτόν τον οδηγό πριν ζητήσεις ξανά"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Μετάβαση στο Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "Χρυσό"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "χρυσό"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Η Google μπορεί να αργήσει λίγο"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "Γκρι"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "γκρι"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "Πράσινο"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "πράσινο"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Το Hood Ride στο Discord"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Το Hood Ride άνοιξε σε άλλη συσκευή"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "Συμφωνώ"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "Είμαι εδώ"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "Έξοδος από την επίδειξη"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "Μάρκα"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "Μάρκες"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "Χάρτης"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "Σχόλια για τον χάρτη"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "Δείκτης χάρτη"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "Συνάντηση εδώ"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "Μήνυμα"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "Το μήνυμα δεν στάλθηκε — υπάρχει σύνδεση;"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "Το μήνυμα δεν στάλθηκε — δοκίμασε ξανά"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "Το μήνυμα έχει πάρα πολλά σημάδια πάνω στο ίδιο γράμμα"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "Πολύ μεγάλο μήνυμα — κράτησέ το κάτω από {max} χαρακτήρες"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "Μήνυμα…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "Μοντέλο"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "Πλοήγηση"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "Εφαρμογή πλοήγησης"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "Χρειάζομαι διαδρομή"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "Γείτονες μεταφέρουν γείτονες. Δες αυτοκίνητα και ανθρώπους κοντά σου που χρειάζονται διαδρομή, στείλτε μηνύματα και πηγαίνετε μαζί."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "Μη διαθέσιμο"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "Σε όλες τις συσκευές σου"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "Άνοιγμα οδηγιών σε"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "Πορτοκαλί"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "πορτοκαλί"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "Άλλο"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "Η σελίδα δεν βρέθηκε"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "Η σελίδα δεν βρέθηκε — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "Παραλαβή: {name} · πάτησε 🧭 για πλοήγηση"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "Παραλαβή: {name} · {seen} · πάτησε 🧭 για πλοήγηση"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "Διάβασε και αποδέξου τα εξής: {terms} και {privacy}."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Πολιτική απορρήτου"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Πολιτική απορρήτου"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "Μωβ"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "μωβ"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Επανασύνδεση στο Hood Ride…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "Κόκκινο"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "κόκκινο"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Ανανέωση από Google"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "Το αίτημα ακυρώθηκε"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "Το αίτημα απορρίφθηκε"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "Το αίτημα έληξε — ζήτησε ξανά ή δοκίμασε άλλον οδηγό"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "Αίτημα διαδρομής"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "Ζητήθηκε…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "Αίτημα για τη διαδρομή σου…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "Αίτημα…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "Η διαδρομή ολοκληρώθηκε"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "Διαδρομή με {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "Οι επιβάτες δεν σε βλέπουν. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "Οι επιβάτες το αναζητούν όταν τους παραλαμβάνεις. Πρόσθεσέ το για να μπεις σε υπηρεσία."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "Οι επιβάτες το βλέπουν για να σε βρουν"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "Διαδρομές από τη γειτονιά σου"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Ιστότοποι Safari (ή το όνομα του προγράμματος περιήγησής σου, αν δεν χρησιμοποιείς Safari)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "Αποθήκευση"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "Αποθήκευση και έναρξη υπηρεσίας"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "Αποστολή"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "Ρυθμίσεις"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "Ρυθμίσεις ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "Ρυθμίσεις › Εφαρμογές › {app} › Άδειες › Τοποθεσία"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "Ρυθμίσεις › Απόρρητο και ασφάλεια › Υπηρεσίες τοποθεσίας › {app} › Ακριβής τοποθεσία: ενεργή"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "Ρυθμίσεις › Απόρρητο και ασφάλεια › Υπηρεσίες τοποθεσίας › {app} › Κατά τη χρήση της εφαρμογής, και ενεργοποίησε την Ακριβή τοποθεσία"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "Εμφάνιση ή απόκρυψη των αναφορών του χάρτη"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "Αποσύνδεση"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "Σύνδεση…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "Ασημί"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "ασημί"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "Πηγαίος κώδικας στο GitHub"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "Πάτησε για αφαίρεση"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "Όροι"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "Αυτός ο οδηγός δεν είναι πια κοντά"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "Αυτός ο επιβάτης δεν ψάχνει πια διαδρομή"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "Αυτό δεν αναιρείται. Ο λογαριασμός σου διαγράφεται, αφαιρείσαι από τον χάρτη, οι συνομιλίες σου κλείνουν και αποσυνδέεσαι από όλες τις συσκευές. Αν συνδεθείς ξανά αργότερα, θα ξεκινήσεις νέο λογαριασμό."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "Αυτή η σελίδα δεν υπάρχει."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "Πολύ αργά — το αίτημα ανακλήθηκε"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "Πάρα πολλές αποτυχημένες συνδέσεις από το δίκτυό σου — δοκίμασε ξανά αργότερα."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "Πληκτρολόγησε {word} για επιβεβαίωση"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "Πληκτρολόγησε {word} για επιβεβαίωση."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "Υπάρχει ενημέρωση — πάτησε για επαναφόρτωση"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "Χρήση εδώ"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "Λευκό"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "λευκό"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "Κίτρινο"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "κίτρινο"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "Έχεις ήδη ανοιχτό αίτημα"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "Μπορείς να κάνεις ανανέωση μετά τη διαδρομή σου"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "Μπορείς να ανανεώσεις το όνομα και τη φωτογραφία σου μετά τη διαδρομή"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "Έφτασες · παραλαβή: {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "Επικοινώνησες με πολλά νέα άτομα — δοκίμασε ξανά αργότερα"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "Έκανες πολλές ανανεώσεις — δοκίμασε ξανά σε λίγα λεπτά"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "Ξεκίνησες πολλές νέες συνομιλίες — δοκίμασε ξανά αργότερα"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "Το αυτοκίνητό σου"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "Το όνομα και η φωτογραφία σου προέρχονται από: {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "Ο επιβάτης σου"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "Κάνε μεγέθυνση για να δεις ποιος είναι κοντά"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "Το δέχτηκα! Έρχομαι 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "Εντάξει, σε βλέπω"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "Εντάξει, έγινε"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "Εντάξει, έρχομαι σε σένα τότε"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "επίτρεψε την ακριβή τοποθεσία για αυτόν τον ιστότοπο στις ρυθμίσεις του προγράμματος περιήγησής σου"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "Φτάνω σε λίγο"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "κάνε κλικ στο εικονίδιο αριστερά από τη γραμμή διευθύνσεων (στο πάνω μέρος του προγράμματος περιήγησης) › Τοποθεσία › Να επιτρέπεται"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "χρώμα"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "Τέλεια, θα σε περιμένω"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "Εντάξει, έρχομαι στο σημείο σου 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "Έφτασα! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "Γεια! Είμαι στο πλυντήριο στην 3η οδό, μπορείς να με πάρεις; 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "τελευταία εμφάνιση πριν από πάνω από μία ώρα"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "τελευταία εμφάνιση πριν από {n} λεπ."
+
+#: priv/static/app.js
+msgid "make"
+msgstr "μάρκα"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "μοντέλο"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "κοντά"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "τώρα"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "Ξεκινάω σε λίγο 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "άνοιξε το μενού › Ρυθμίσεις › Ιστότοποι και λήψεις › Άδειες ιστοτόπων › Τοποθεσία"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "άνοιξε τις Ρυθμίσεις του προγράμματος περιήγησής σου › Απόρρητο και ασφάλεια › Ρυθμίσεις ιστοτόπου › Τοποθεσία › επίτρεψε το Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "άνοιξε το {app} › ⋮ › Ρυθμίσεις › Ρυθμίσεις ιστοτόπου › Τοποθεσία › επίτρεψε το Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "άνοιξε το ⋮ › Ρυθμίσεις › Άδειες ιστοτόπων › Τοποθεσία › Ερώτηση για άδεια"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "για να σε βρει ο οδηγός σου"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "για να σε βρει ο συνεπιβάτης σου"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "Τέλεια, τα λέμε σε λίγο!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "πάτησε το εικονίδιο αριστερά από τη γραμμή διευθύνσεων (στο πάνω μέρος της οθόνης) › Άδειες › Τοποθεσία › Να επιτρέπεται (επίλεξε Ακριβής αν σε ρωτήσει)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "για να ζητήσεις διαδρομή"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "για να οδηγήσεις"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "για να δείξεις πού βρίσκεσαι"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "ενεργοποίησε την Τοποθεσία (σύρε προς τα κάτω › Τοποθεσία)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "ενεργοποίησε τις Υπηρεσίες τοποθεσίας (Ρυθμίσεις › Απόρρητο και ασφάλεια)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "ενεργοποίησε την τοποθεσία σε αυτή τη συσκευή"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "Ναι, μπορώ να σε πάρω"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "Ναι, παρακαλώ! Είμαι δίπλα στα παγκάκια 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "Γεια, τι λέει;"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "Γεια, είδα το χέρι σου ✋ Θες να σε πάρω;"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "Σίγουρα; Ακόμα περιμένω εδώ έξω 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "το πρόγραμμα περιήγησής σου"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · ο οδηγός σου"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{color} {make} {model}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "{count} αυτοκίνητο εδώ γύρω"
+msgstr[1] "{count} αυτοκίνητα εδώ γύρω"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "{count} αυτοκίνητο εδώ"
+msgstr[1] "{count} αυτοκίνητα εδώ"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "Απομένει {count} χαρακτήρας"
+msgstr[1] "Απομένουν {count} χαρακτήρες"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count} χαρακτήρας παραπάνω"
+msgstr[1] "{count} χαρακτήρες παραπάνω"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count} χαρακτήρας παραπάνω — συντόμευσε το μήνυμά σου για να σταλεί"
+msgstr[1] "{count} χαρακτήρες παραπάνω — συντόμευσε το μήνυμά σου για να σταλεί"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} άτομο εδώ"
+msgstr[1] "{count} άτομα εδώ"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} άτομο χρειάζεται διαδρομή εδώ"
+msgstr[1] "{count} άτομα χρειάζονται διαδρομή εδώ"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "σε απόσταση {distance}"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} έφτασε"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} κάνει διαδρομή αυτή τη στιγμή"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} έρχεται"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} δεν μπορεί αυτή τη στιγμή"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} δεν μπορεί αυτή τη στιγμή — δοκίμασε άλλον οδηγό"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} δεν φαίνεται στον χάρτη — κάνε μεγέθυνση και βρες ξανά το αυτοκίνητο"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} βγήκε εκτός υπηρεσίας — δοκίμασε άλλον οδηγό"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "πριν από {n} ώ."
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} χλμ."
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} μίλια"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "πριν από {n} λεπ."
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} ημ."
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} ώ."
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} λ."
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site} — και στο τηλέφωνό σου: {steps} › Επιτρέπεται, με ενεργή τη Χρήση ακριβούς τοποθεσίας"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · Επανασύνδεση…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps} — ή, αν επέλεξες Κατά προσέγγιση για το Hood Ride: πάτησε το εικονίδιο αριστερά από τη διεύθυνση web › Άδειες › Επαναφορά αδειών, δοκίμασε ξανά και επίλεξε Ακριβής"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › Χρήση ακριβούς τοποθεσίας"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. Το Hood Ride θα φορτώσει ξανά όταν επιστρέψεις."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ Νέο μήνυμα"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ Λίγο πιο αργά"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ Αναμονή για τον οδηγό…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ Στέλνεις πολύ γρήγορα — λίγο πιο αργά"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ Αναζήτηση διαδρομής…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ Οι οδηγοί κοντά σου βλέπουν ότι χρειάζεσαι διαδρομή"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ Χρειάζομαι διαδρομή"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ Κάποιος κοντά σου χρειάζεται διαδρομή"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ χρειάζεται διαδρομή"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 Συνομιλία"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 Συνομιλία ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 Επίτρεψε την τοποθεσία όταν σε ρωτήσει το πρόγραμμα περιήγησης — το Hood Ride τη χρειάζεται {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 Εύρεση της τοποθεσίας σου…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Η τοποθεσία είναι αποκλεισμένη για το Hood Ride — επίτρεψέ τη {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 Η τοποθεσία είναι απενεργοποιημένη σε αυτή τη συσκευή — {steps} {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 Συνάντηση εδώ"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 Ορίστηκε σημείο συνάντησης — ο οδηγός σου το βλέπει"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 Μετακίνηση δείκτη"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 Ο δείκτης αφαιρέθηκε — ο οδηγός σου θα έρθει σε σένα"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 Κοινοποίησε την τοποθεσία σου"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 Κοινοποίησε την τοποθεσία σου για να σε βρει ο συνεπιβάτης σου"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 Πάτησε στον χάρτη εκεί που θέλεις να συναντηθείτε"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 Αναμονή για την τοποθεσία σου — οι επιβάτες δεν σε βλέπουν ακόμα"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 Η τοποθεσία σου είναι μόνο κατά προσέγγιση — ενεργοποίησε την ακριβή τοποθεσία {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 ζήτησε διαδρομή"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 Μετακίνηση"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 Είσαι σε υπηρεσία"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 Αναμονή για ακριβή τοποθεσία από {name} — ή ζήτα να ορίσει ένα 📍 σημείο συνάντησης"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} εμφανίστηκε τελευταία φορά εκεί πριν από πάνω από μία ώρα"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} εμφανίστηκε τελευταία φορά εκεί πριν από {n} λεπ."

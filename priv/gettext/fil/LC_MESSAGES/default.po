@@ -1,0 +1,1179 @@
+# Hood Ride in Filipino. A first translation (2026-11-04).
+# Plural forms by name, in this order: one, other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: fil\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(binawi ang request)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "Tanggapin ang sakay"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "Tinatanggap ang sakay…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "Tinatanggap…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "Idagdag ito bago ka magmaneho"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "Idagdag ang kotse mo"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "Itatanong sa unang beses na mag-navigate ka"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "Bumalik"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "Bumalik sa page ng pag-sign in"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "Bago ka magsimula"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "Beige"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "beige"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "Itim"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "itim"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "Asul"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "asul"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "Kayumanggi"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "kayumanggi"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "Sa pagpapatuloy, sumasang-ayon ka sa aming {terms} at {privacy}."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Hindi maabot ang Hood Ride — sinusubukan ulit…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Hindi maabot ang Hood Ride — subukan ulit"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "Kanselahin"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "Kanselahin ang request"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "Kanselahin muna ang request mo ng sakay"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "Kanselahin muna ang request mo ng sakay."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "I-center sa lokasyon ko"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "Baguhin"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "Baguhin ito kahit kailan: i-tap ang profile picture mo sa kaliwang itaas, pagkatapos ay {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "Baguhin sa {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "Binago mo na?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "Chat"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "Natapos ang chat kay {name} — matagal na siyang wala"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "Mga Chat"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "Tingnan ang {fields} (hanggang {max} titik bawat isa)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "Pumili…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "Isara"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "Isara ang mga setting"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "Kulay"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "Kumokonekta…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "Problema sa koneksyon — sinusubukan ulit"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "Na-reset ang koneksyon — i-tap ang MAG-ONLINE para magmaneho ulit"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "Na-reset ang koneksyon — i-tap ulit ang ✋ kung kailangan mo pa ng sakay"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "Na-reset ang koneksyon — biglang natapos ang sakay mo, pakiayos ulit"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "Na-reset ang koneksyon — nawala ang request mo ng sakay, pakihingi ulit"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Magpatuloy gamit ang Facebook"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Magpatuloy gamit ang Google"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "Nakopya ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "Kopyahin"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "Kopyahin ang mensahe"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "Hindi matanggap"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "Hindi makopya"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "Hindi ma-delete ang account mo — pakisubukan ulit."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Hindi maabot ang Hood Ride — tingnan ang koneksyon mo at subukan ulit."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Hindi maabot ang Hood Ride — subukan ulit"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "Hindi maabot ang server — subukan ulit"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "Hindi ma-refresh nang awtomatiko — i-tap ang profile picture mo sa kaliwang itaas, pagkatapos ay Baguhin, pagkatapos ay I-refresh mula sa Google"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "Hindi ma-refresh ngayon — subukan ulit mamaya"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "Hindi ma-save ngayon — subukan ulit sa ilang sandali."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "Hindi ma-save iyan — subukan ulit"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "Hindi maipadala ang request"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "Hindi maka-sign in — subukan ulit"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "Hindi maka-sign out — subukan ulit"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "BURAHIN"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "Tanggihan"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "Burahin ang account"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "Burahin ang account ko"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "Burahin ang account mo?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "Demo"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "Magmaneho"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "Driver"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "Hindi ito makukuha ng driver — sumubok ng iba"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "Tapusin ang sakay"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "Tapusin muna ang sakay mo"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "Tapusin muna ang sakay mo."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "Tapusin muna ang kasalukuyang sakay mo"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "MAG-OFFLINE"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "MAG-ONLINE"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "Bigyan ng isang minuto ang driver na ito bago humingi ulit"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Pumunta sa Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "Ginto"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "ginto"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Medyo matagal minsan ang Google"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "Kulay-abo"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "abo"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "Berde"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "berde"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride sa Discord"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Nabuksan ang Hood Ride sa ibang device"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "Sumasang-ayon ako"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "Nandito na ako"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "Umalis sa demo"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "Brand"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "Mga brand"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "Mapa"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "Feedback sa mapa"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "Marker sa mapa"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "Dito tayo magkita"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "Mensahe"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "Hindi naipadala ang mensahe — may koneksyon ba?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "Hindi naipadala ang mensahe — subukan ulit"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "Masyadong maraming marka na nakapatong sa isang titik ang mensahe"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "Masyadong mahaba ang mensahe — panatilihin itong mas maikli sa {max} character"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "Mensahe…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "Modelo"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "Mag-navigate"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "App sa pag-navigate"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "Kailangan ng sakay"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "Magkakapitbahay na nagpapasakay sa isa't isa. Tingnan ang mga kotse at taong malapit na nangangailangan ng sakay, mag-message sa isa't isa, at sumakay nang magkasama."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "Hindi available"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "Sa lahat ng device mo"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "Buksan ang direksyon sa"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "Kahel"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "kahel"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "Iba pa"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "Hindi nahanap ang page"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "Hindi nahanap ang page — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "Susunduin si {name} · i-tap ang 🧭 para mag-navigate"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "Susunduin si {name} · {seen} · i-tap ang 🧭 para mag-navigate"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "Pakibasa at sumang-ayon sa aming {terms} at {privacy}."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Patakaran sa Privacy"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Patakaran sa Privacy"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "Lila"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "lila"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Kumokonekta ulit sa Hood Ride…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "Pula"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "pula"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "I-refresh mula sa Google"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "Kinansela ang request"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "Tinanggihan ang request"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "Nag-expire ang request — humingi ulit o sumubok ng ibang driver"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "Humingi ng sakay"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "Nahingi na…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "Hinihingi ang sakay mo…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "Humihingi…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "Tapos na ang sakay"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "Sakay kasama si {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "Hindi ka nakikita ng mga pasahero. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "Hinahanap ito ng mga pasahero kapag sinusundo mo sila. Idagdag ito para mag-online."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "Nakikita ito ng mga pasahero para mahanap ka nila"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "Mga sakay mula sa kapitbahayan mo"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Safari Websites (o ang pangalan ng browser mo, kung hindi ka gumagamit ng Safari)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "I-save"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "I-save at mag-online"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "Ipadala"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "Mga Setting"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "Mga Setting ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "Mga Setting › Mga App › {app} › Mga Pahintulot › Lokasyon"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "Settings › Privacy & Security › Location Services › {app} › Precise Location: naka-on"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "Settings › Privacy & Security › Location Services › {app} › While Using the App, at i-on ang Precise Location"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "Ipakita o itago ang mga credit ng mapa"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "Mag-sign out"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "Nagsa-sign in…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "Pilak"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "pilak"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "Source code sa GitHub"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "I-tap para alisin"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "Mga Tuntunin"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "Wala na sa paligid ang driver na iyon"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "Hindi na naghahanap ng sakay ang pasaherong iyon"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "Hindi na ito maa-undo. Buburahin ang account mo, aalisin ka sa mapa, isasara ang mga usapan mo, at masa-sign out ka sa bawat device. Kapag nag-sign in ka ulit sa ibang pagkakataon, bagong account ang sisimulan."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "Walang ganitong page."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "Huli na — binawi na ang request"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "Masyadong maraming bigong pag-sign in mula sa network mo — subukan ulit mamaya."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "I-type ang {word} para kumpirmahin"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "I-type ang {word} para kumpirmahin."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "May update — i-tap para i-reload"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "Gamitin dito"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "Puti"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "puti"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "Dilaw"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "dilaw"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "May bukas ka nang request"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "Puwede kang mag-refresh pagkatapos ng sakay mo"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "Puwede mong i-refresh ang pangalan at larawan mo pagkatapos ng sakay mo"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "Nakarating ka na · susunduin si {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "Marami ka nang kinontak na bagong tao — subukan ulit mamaya"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "Madalas ka nang nag-refresh — subukan ulit pagkalipas ng ilang minuto"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "Marami ka nang sinimulang bagong chat — subukan ulit mamaya"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "Ang kotse mo"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "Galing sa {provider} ang pangalan at larawan mo"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "Ang pasahero mo"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "Mag-zoom in para makita kung sino ang nasa paligid"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "Tinanggap ko! Papunta na ako 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "Sige, kita na kita"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "Sige, game"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "Sige, pupuntahan na lang kita"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "payagan ang eksaktong lokasyon para sa site na ito sa mga setting ng browser mo"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "Malapit na ako"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "i-click ang icon sa kaliwa ng address bar (sa itaas ng browser) › Lokasyon › Payagan"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "kulay"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "Sige, aabangan kita"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "Okay, papunta na ako sa pin mo 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "Nandito na ako! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "Hi! Nasa laundry shop ako sa 3rd Street, puwede mo ba akong sunduin? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "huling nakita mahigit isang oras na ang nakalipas"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "huling nakita {n} min ang nakalipas"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "brand"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "modelo"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "malapit"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "ngayon"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "Saglit lang, aalis na ako 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "buksan ang menu › Settings › Sites and downloads › Site permissions › Location"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "buksan ang Mga Setting ng browser mo › Privacy at seguridad › Mga setting ng site › Lokasyon › payagan ang Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "buksan ang {app} › ⋮ › Mga Setting › Mga setting ng site › Lokasyon › payagan ang Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "buksan ang ⋮ › Settings › Site permissions › Location › Ask to allow"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "para mahanap ka ng driver mo"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "para mahanap ka ng kasama mo sa sakay"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "Ayos, kita tayo mamaya!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "i-tap ang icon sa kaliwa ng address bar (sa itaas ng screen) › Mga Pahintulot › Lokasyon › Payagan (piliin ang Eksakto kung itanong)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "para humingi ng sakay"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "para magmaneho"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "para ipakita kung nasaan ka"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "i-on ang Lokasyon (mag-swipe pababa › Lokasyon)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "i-on ang Location Services (Settings › Privacy & Security)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "i-on ang lokasyon para sa device na ito"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "Oo, kaya kitang sunduin"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "Oo, please! Nasa may mga bangko ako 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "Uy, kumusta?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "Uy, nakita ko ang kamay mo ✋ kailangan mo ng sundo?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "Sigurado ka? Nandito pa rin ako, naghihintay 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "browser mo"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · ang driver mo"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{make} {model} na kulay {color}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "{count} kotse sa paligid"
+msgstr[1] "{count} kotse sa paligid"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "{count} kotse rito"
+msgstr[1] "{count} kotse rito"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "{count} character na lang ang natitira"
+msgstr[1] "{count} character na lang ang natitira"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "Sobra ng {count} character"
+msgstr[1] "Sobra ng {count} character"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "Sobra ng {count} character — paikliin ang mensahe mo para maipadala"
+msgstr[1] "Sobra ng {count} character — paikliin ang mensahe mo para maipadala"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} tao rito"
+msgstr[1] "{count} tao rito"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} tao ang nangangailangan ng sakay rito"
+msgstr[1] "{count} tao ang nangangailangan ng sakay rito"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "{distance} ang layo"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "Nakarating na si {name}"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "May sakay si {name} ngayon"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "Papunta na si {name}"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "Hindi available si {name} ngayon"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "Hindi available si {name} ngayon — sumubok ng ibang driver"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "Hindi makita si {name} — mag-zoom in at hanapin ulit ang kotse niya"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "Nag-offline na si {name} — sumubok ng ibang driver"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "{n} oras ang nakalipas"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} mi"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "{n} min ang nakalipas"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} araw"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} oras"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} min"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site} — at sa phone mo: {steps} › Payagan, na naka-on ang Gamitin ang eksaktong lokasyon"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · Kumokonekta ulit…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps} — o, kung pinili mo ang Tinatayang lokasyon para sa Hood Ride: i-tap ang icon sa kaliwa ng web address › Mga Pahintulot › I-reset ang mga pahintulot, pagkatapos ay subukan ulit at piliin ang Eksakto"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › Gamitin ang eksaktong lokasyon"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. Magre-reload ang Hood Ride pagbalik mo."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ Bagong mensahe"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ Dahan-dahan muna"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ Hinihintay ang driver…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ Masyadong mabilis ang pagpapadala mo — dahan-dahan muna"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ Naghahanap ng sakay…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ Nakikita ng mga driver sa malapit na kailangan mo ng sakay"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ Kailangan ng sakay"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ May malapit na nangangailangan ng sakay"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ kailangan ng sakay"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 Chat"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 Chat ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 Payagan ang lokasyon kapag nagtanong ang browser mo — kailangan ito ng Hood Ride {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 Hinahanap ang lokasyon mo…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Naka-block ang lokasyon para sa Hood Ride — payagan ito {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 Naka-off ang lokasyon sa device na ito — {steps} {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 Dito tayo magkita"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 Naitakda ang tagpuan — nakikita ito ng driver mo"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 Ilipat ang pin"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 Inalis ang pin — pupuntahan ka ng driver mo"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 Ibahagi ang lokasyon mo"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 Ibahagi ang lokasyon mo para mahanap ka ng kasama mo sa sakay"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 I-tap ang mapa kung saan mo gustong magkita"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 Hinihintay ang lokasyon mo — hindi ka pa nakikita ng mga pasahero"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 Tinatantya lang ang lokasyon mo — i-on ang Tumpak na Lokasyon {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 humingi ng sakay"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 Sumakay"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 Online ka na"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 Hinihintay ang eksaktong lokasyon ni {name} — o hilingin sa kanya na magtakda ng 📍 tagpuan"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 Huling nakita si {name} doon mahigit isang oras na ang nakalipas"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 Huling nakita si {name} doon {n} min ang nakalipas"

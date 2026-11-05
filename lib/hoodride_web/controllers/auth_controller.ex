@@ -436,7 +436,11 @@ defmodule HoodrideWeb.AuthController do
 
   # a driver, as their rider sees them: with their car (ARCHITECTURE.md
   # "Your car"; nil when none is set)
-  defp driver_person(d), do: Map.put(person(d), :car, Accounts.car_label(d))
+  defp driver_person(d),
+    do:
+      person(d)
+      |> Map.put(:car, Accounts.car_label(d))
+      |> Map.put(:car_parts, Accounts.car_parts(d))
 
   # {ride state, partner id}, or nil
   defp ride_of(user_id) do
@@ -594,7 +598,7 @@ defmodule HoodrideWeb.AuthController do
   # DELETE, or the word in any language the app knows (the screen asks for
   # the reader's: "ELIMINAR") — whatever language the page was in
   defp typed_delete?(word) when is_binary(word),
-    do: (word |> String.trim() |> String.downcase()) in Hoodride.I18n.delete_words()
+    do: Hoodride.I18n.typed_word(word) in Hoodride.I18n.delete_words()
 
   defp typed_delete?(_), do: false
 

@@ -1,0 +1,1179 @@
+# Hood Ride in Hindi. A first translation (2026-11-04).
+# Plural forms by name, in this order: one, other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: hi\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(अनुरोध वापस लिया गया)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "राइड स्वीकार करें"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "राइड स्वीकार की जा रही है…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "स्वीकार किया जा रहा है…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "ड्राइव करने से पहले इसे जोड़ें"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "अपनी कार जोड़ें"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "पहली बार नेविगेट करने पर पूछा जाएगा"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "वापस"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "साइन-इन पेज पर वापस जाएं"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "शुरू करने से पहले"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "बेज"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "बेज"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "काली"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "काली"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "नीली"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "नीली"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "भूरी"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "भूरी"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "जारी रखकर, आप हमारी {terms} और {privacy} से सहमत होते हैं।"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Hood Ride से कनेक्ट नहीं हो पा रहा — फिर से कोशिश की जा रही है…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Hood Ride से कनेक्ट नहीं हो पा रहा — फिर से कोशिश करें"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "रद्द करें"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "अनुरोध रद्द करें"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "पहले अपना राइड अनुरोध रद्द करें"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "पहले अपना राइड अनुरोध रद्द करें।"
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "मेरी लोकेशन को बीच में लाएं"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "बदलें"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "इसे कभी भी बदलें: सबसे ऊपर बाईं ओर अपनी प्रोफ़ाइल फ़ोटो पर टैप करें, फिर {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "{provider} पर बदलें ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "बदल दिए?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "चैट"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "{name} के साथ चैट खत्म हो गई — वे कुछ समय से दूर हैं"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "चैट"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "{fields} जांचें (हर एक में ज़्यादा से ज़्यादा {max} अक्षर)।"
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "चुनें…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "बंद करें"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "सेटिंग बंद करें"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "रंग"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "कनेक्ट हो रहा है…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "कनेक्शन में समस्या — फिर से कोशिश की जा रही है"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "कनेक्शन रीसेट हो गया — फिर से ड्राइव करने के लिए ऑनलाइन जाएं बटन पर टैप करें"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "कनेक्शन रीसेट हो गया — अगर अब भी राइड चाहिए, तो ✋ पर फिर से टैप करें"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "कनेक्शन रीसेट हो गया — आपकी राइड अचानक खत्म हो गई, कृपया इसे फिर से सेट करें"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "कनेक्शन रीसेट हो गया — आपका राइड अनुरोध खो गया, कृपया फिर से अनुरोध करें"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Facebook के साथ जारी रखें"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Google के साथ जारी रखें"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "कॉपी हो गया ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "कॉपी करें"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "मैसेज कॉपी करें"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "स्वीकार नहीं किया जा सका"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "कॉपी नहीं हो सका"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "आपका खाता नहीं मिटाया जा सका — कृपया फिर से कोशिश करें।"
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Hood Ride से कनेक्ट नहीं हो सका — अपना कनेक्शन जांचें और फिर से कोशिश करें।"
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Hood Ride से कनेक्ट नहीं हो सका — फिर से कोशिश करें"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "सर्वर से कनेक्ट नहीं हो सका — फिर से कोशिश करें"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "अपने-आप रीफ़्रेश नहीं हो सका — सबसे ऊपर बाईं ओर अपनी प्रोफ़ाइल फ़ोटो पर टैप करें, फिर बदलें, फिर Google से रीफ़्रेश करें"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "अभी रीफ़्रेश नहीं हो सका — बाद में फिर से कोशिश करें"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "अभी सेव नहीं हो सका — थोड़ी देर में फिर से कोशिश करें।"
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "सेव नहीं हो सका — फिर से कोशिश करें"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "अनुरोध नहीं भेजा जा सका"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "साइन इन नहीं हो सका — फिर से कोशिश करें"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "साइन आउट नहीं हो सका — फिर से कोशिश करें"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "मिटाएं"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "मना करें"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "खाता मिटाएं"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "मेरा खाता मिटाएं"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "अपना खाता मिटाना है?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "डेमो"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "ड्राइव करें"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "ड्राइवर"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "ड्राइवर यह राइड नहीं ले सकते — किसी दूसरे को आज़माएं"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "राइड खत्म करें"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "पहले अपनी राइड खत्म करें"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "पहले अपनी राइड खत्म करें।"
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "पहले अपनी मौजूदा राइड पूरी करें"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "ऑफ़लाइन जाएं"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "ऑनलाइन जाएं"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "दोबारा अनुरोध करने से पहले इस ड्राइवर को एक मिनट दें"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Hood Ride पर जाएं"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "सुनहरी"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "सुनहरी"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Google को थोड़ा समय लग सकता है"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "ग्रे"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "ग्रे"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "हरी"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "हरी"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Discord पर Hood Ride"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride किसी दूसरे डिवाइस पर खोला गया"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "मैं सहमत हूं"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "मैं यहां हूं"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "डेमो से बाहर निकलें"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "कंपनी"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "कंपनियां"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "मैप"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "मैप के बारे में सुझाव"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "मैप मार्कर"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "यहां मिलें"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "मैसेज"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "मैसेज नहीं भेजा गया — कनेक्शन है?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "मैसेज नहीं भेजा गया — फिर से कोशिश करें"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "मैसेज में एक ही अक्षर पर बहुत ज़्यादा चिह्न लगे हैं"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "मैसेज बहुत लंबा है — इसे {max} वर्णों से कम रखें"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "मैसेज…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "मॉडल"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "नेविगेट करें"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "नेविगेशन ऐप"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "राइड चाहिए"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "पड़ोसी, पड़ोसियों को राइड देते हैं। आस-पास की कारें और राइड चाहने वाले लोग देखें, एक-दूसरे को मैसेज करें और साथ चलें।"
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "उपलब्ध नहीं"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "आपके सभी डिवाइस पर"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "रास्ता इसमें खोलें"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "नारंगी"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "नारंगी"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "अन्य"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "पेज नहीं मिला"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "पेज नहीं मिला — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "{name} को पिक अप कर रहे हैं · नेविगेट करने के लिए 🧭 पर टैप करें"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "{name} को पिक अप कर रहे हैं · {seen} · नेविगेट करने के लिए 🧭 पर टैप करें"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "कृपया हमारी {terms} और {privacy} पढ़ें और उनसे सहमत हों।"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "निजता नीति"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "निजता नीति"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "बैंगनी"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "बैंगनी"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Hood Ride से फिर से कनेक्ट हो रहा है…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "लाल"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "लाल"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Google से रीफ़्रेश करें"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "अनुरोध रद्द किया गया"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "अनुरोध अस्वीकार किया गया"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "अनुरोध की समय-सीमा खत्म हो गई — फिर से अनुरोध करें या किसी दूसरे ड्राइवर को आज़माएं"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "राइड का अनुरोध करें"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "अनुरोध भेजा गया…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "आपकी राइड का अनुरोध किया जा रहा है…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "अनुरोध किया जा रहा है…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "राइड खत्म हुई"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "{name} के साथ राइड"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "राइडर आपको नहीं देख सकते। {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "पिक अप के समय राइडर इसे ही ढूंढते हैं। ऑनलाइन जाने के लिए इसे जोड़ें।"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "राइडर इसे देखते हैं ताकि वे आपको ढूंढ सकें"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "आपके पड़ोस की राइड"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Safari वेबसाइटें (या आपके ब्राउज़र का नाम, अगर आप Safari इस्तेमाल नहीं करते)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "सेव करें"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "सेव करें और ऑनलाइन जाएं"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "भेजें"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "सेटिंग"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "सेटिंग ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "सेटिंग › ऐप्लिकेशन › {app} › अनुमतियां › जगह की जानकारी"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "सेटिंग › गोपनीयता और सुरक्षा › स्थान सेवा › {app} › सटीक स्थान: चालू"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "सेटिंग › गोपनीयता और सुरक्षा › स्थान सेवा › {app} › ऐप का उपयोग करते समय, और सटीक स्थान चालू करें"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "मैप के क्रेडिट दिखाएं या छिपाएं"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "साइन आउट करें"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "साइन इन हो रहा है…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "सिल्वर"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "सिल्वर"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "GitHub पर सोर्स कोड"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "हटाने के लिए टैप करें"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "शर्तें"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "वह ड्राइवर अब आस-पास नहीं है"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "वह राइडर अब राइड नहीं ढूंढ रहा"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "इसे पहले जैसा नहीं किया जा सकता। आपका खाता हटा दिया जाएगा, आप मैप से हट जाएंगे, आपकी बातचीत बंद हो जाएंगी और हर डिवाइस से आप साइन आउट हो जाएंगे। बाद में फिर से साइन इन करने पर नया खाता शुरू होगा।"
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "यह पेज मौजूद नहीं है।"
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "बहुत देर हो गई — अनुरोध वापस ले लिया गया"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "आपके नेटवर्क से साइन इन की बहुत ज़्यादा कोशिशें नाकाम हुईं — बाद में फिर से कोशिश करें।"
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "पुष्टि करने के लिए {word} टाइप करें"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "पुष्टि करने के लिए {word} टाइप करें।"
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "अपडेट उपलब्ध है — रीलोड करने के लिए टैप करें"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "यहां इस्तेमाल करें"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "सफ़ेद"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "सफ़ेद"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "पीली"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "पीली"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "आपका एक अनुरोध पहले से खुला है"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "आप अपनी राइड के बाद रीफ़्रेश कर सकते हैं"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "आप अपनी राइड के बाद अपना नाम और फ़ोटो रीफ़्रेश कर सकते हैं"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "आप पहुंच गए · {name} को पिक अप कर रहे हैं"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "आपने बहुत सारे नए लोगों से संपर्क किया है — बाद में फिर से कोशिश करें"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "आपने बहुत बार रीफ़्रेश किया है — कुछ मिनट बाद फिर से कोशिश करें"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "आपने बहुत सारी नई चैट शुरू की हैं — बाद में फिर से कोशिश करें"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "आपकी कार"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "आपका नाम और फ़ोटो {provider} से आते हैं"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "आपका राइडर"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "आस-पास कौन है, यह देखने के लिए ज़ूम इन करें"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "मंज़ूर! रास्ते में हूं 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "ठीक है, आप दिख गए"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "ठीक है, पक्का"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "ठीक है, तो आपके पास ही पहुंचते हैं"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "अपने ब्राउज़र की सेटिंग में इस साइट के लिए सटीक लोकेशन की अनुमति दें"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "बस कुछ ही मिनट में वहां हूं"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "वेब पता बार के बाईं ओर बने आइकॉन पर क्लिक करें (ब्राउज़र में सबसे ऊपर) › जगह की जानकारी › अनुमति दें"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "रंग"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "बढ़िया, आपका इंतज़ार कर रहे हैं"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "ठीक है, आपके पिन की ओर आ रहे हैं 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "मैं यहाँ हूँ! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "नमस्ते! मैं तीसरी गली वाली लॉन्ड्री पर हूं, क्या मुझे ले सकते हैं? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "एक घंटे से ज़्यादा पहले देखा गया"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "{n} मिनट पहले देखा गया"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "कंपनी"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "मॉडल"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "आस-पास"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "अभी"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "बस एक सेकंड में निकल रहे हैं 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "मेन्यू खोलें › सेटिंग › साइटें और डाउनलोड › साइट अनुमतियां › जगह"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "अपने ब्राउज़र की सेटिंग खोलें › निजता और सुरक्षा › साइट की सेटिंग › जगह की जानकारी › Hood Ride को अनुमति दें"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "{app} खोलें › ⋮ › सेटिंग › साइट सेटिंग › जगह की जानकारी › Hood Ride को अनुमति दें"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "⋮ खोलें › सेटिंग › साइट अनुमतियां › जगह › अनुमति देने के लिए पूछें"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "ताकि आपका ड्राइवर आपको ढूंढ सके"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "ताकि आपका राइड पार्टनर आपको ढूंढ सके"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "बढ़िया, जल्दी मिलते हैं!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "वेब पता बार के बाईं ओर बने आइकॉन पर टैप करें (स्क्रीन में सबसे ऊपर) › अनुमतियां › जगह की जानकारी › अनुमति दें (पूछे जाने पर सटीक चुनें)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "ताकि आप राइड मांग सकें"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "ताकि आप ड्राइव कर सकें"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "ताकि दिख सके कि आप कहां हैं"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "जगह की जानकारी चालू करें (नीचे की ओर स्वाइप करें › जगह की जानकारी)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "स्थान सेवा चालू करें (सेटिंग › गोपनीयता और सुरक्षा)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "इस डिवाइस पर लोकेशन चालू करें"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "हां, आपको पिक कर लेते हैं"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "हां, प्लीज़! मैं बेंच के पास हूं 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "हाय, क्या हाल है?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "हाय, आपका हाथ देखा ✋ पिक अप चाहिए?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "पक्का? अभी भी यहीं इंतज़ार में हूं 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "आपका ब्राउज़र"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · आपका ड्राइवर"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{color} {make} {model}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "आस-पास {count} कार"
+msgstr[1] "आस-पास {count} कारें"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "यहां {count} कार"
+msgstr[1] "यहां {count} कारें"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "{count} वर्ण बाकी"
+msgstr[1] "{count} वर्ण बाकी"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count} वर्ण ज़्यादा"
+msgstr[1] "{count} वर्ण ज़्यादा"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count} वर्ण ज़्यादा — भेजने के लिए अपना मैसेज छोटा करें"
+msgstr[1] "{count} वर्ण ज़्यादा — भेजने के लिए अपना मैसेज छोटा करें"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "यहां {count} व्यक्ति"
+msgstr[1] "यहां {count} लोग"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "यहां {count} व्यक्ति को राइड चाहिए"
+msgstr[1] "यहां {count} लोगों को राइड चाहिए"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "{distance} दूर"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} पहुंच गए"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} अभी राइड पर हैं"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} रास्ते में हैं"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} अभी उपलब्ध नहीं हैं"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} अभी उपलब्ध नहीं हैं — किसी दूसरे ड्राइवर को आज़माएं"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} दिख नहीं रहे — ज़ूम इन करें और उनकी कार फिर से ढूंढें"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} ऑफ़लाइन हो गए — किसी दूसरे ड्राइवर को आज़माएं"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "{n} घंटे पहले"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} कि॰मी॰"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} मील"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "{n} मिनट पहले"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} दिन"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} घं"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} मि"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site} — और अपने फ़ोन में {steps} › अनुमति दें, साथ में जगह की सटीक जानकारी का इस्तेमाल करें चालू रखें"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · फिर से कनेक्ट हो रहा है…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps} — या, अगर आपने Hood Ride के लिए अनुमानित चुना था: वेब पते के बाईं ओर बने आइकॉन पर टैप करें › अनुमतियां › अनुमतियां रीसेट करें, फिर से कोशिश करें और सटीक चुनें"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › जगह की सटीक जानकारी का इस्तेमाल करें"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}। वापस आने पर Hood Ride फिर से लोड हो जाएगा।"
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ नया मैसेज"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ थोड़ा रुकें"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ ड्राइवर का इंतज़ार है…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ आप बहुत तेज़ी से भेज रहे हैं — थोड़ा रुकें"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ राइड ढूंढ रहे हैं…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ आस-पास के ड्राइवर देख सकते हैं कि आपको राइड चाहिए"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ राइड चाहिए"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ आस-पास किसी को राइड चाहिए"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ राइड चाहिए"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 चैट"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 चैट ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 ब्राउज़र के पूछने पर लोकेशन की अनुमति दें — Hood Ride को इसकी ज़रूरत है, {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 आपकी लोकेशन ढूंढी जा रही है…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Hood Ride के लिए लोकेशन ब्लॉक है — इसकी अनुमति दें, {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 इस डिवाइस पर लोकेशन बंद है — {steps}, {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 यहां मिलें"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 मिलने की जगह सेट हो गई — आपका ड्राइवर इसे देख सकता है"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 पिन खिसकाएं"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 पिन हटा दिया गया — आपका ड्राइवर आपके पास आएगा"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 अपनी लोकेशन शेयर करें"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 अपनी लोकेशन शेयर करें ताकि आपका राइड पार्टनर आपको ढूंढ सके"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 मैप पर उस जगह टैप करें जहां आप मिलना चाहते हैं"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 आपकी लोकेशन का इंतज़ार है — राइडर अभी आपको नहीं देख सकते"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 आपकी लोकेशन सिर्फ़ अनुमानित है — सटीक स्थान चालू करें, {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 राइड मांगी"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 राइड करें"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 आप ऑनलाइन हैं"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 {name} की सटीक लोकेशन का इंतज़ार है — या उनसे 📍 मिलने की जगह सेट करने को कहें"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} को आखिरी बार वहां एक घंटे से ज़्यादा पहले देखा गया था"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} को आखिरी बार वहां {n} मिनट पहले देखा गया था"

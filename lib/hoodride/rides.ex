@@ -149,7 +149,13 @@ defmodule Hoodride.Rides.Ride do
   # pickup ("Gray Honda Civic", or nil); the rider's side never does
   # (ARCHITECTURE.md "Your car")
   defp person(p, :driver),
-    do: %{id: p.id, name: p.name, photo: p.photo, car: Hoodride.Accounts.car_label(p)}
+    do: %{
+      id: p.id,
+      name: p.name,
+      photo: p.photo,
+      car: Hoodride.Accounts.car_label(p),
+      car_parts: Hoodride.Accounts.car_parts(p)
+    }
 
   defp person(p, :rider), do: %{id: p.id, name: p.name, photo: p.photo}
 

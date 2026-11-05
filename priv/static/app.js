@@ -222,10 +222,10 @@ function chatFor(peer) {
 
 // ===== Mock peers (demo) =====
 const DRIVER_SEEDS = [
-  { name: "DeShawn", car: "Gray Honda Civic", emoji: "😎", bg: "#4a90d9" },
-  { name: "Maria", car: "Red Toyota Corolla", emoji: "😊", bg: "#d94a8c" },
-  { name: "Tony", car: "Black Ford F-150", emoji: "🧢", bg: "#50b86c" },
-  { name: "Keisha", car: "White Nissan Altima", emoji: "💛", bg: "#b08ae0" },
+  { name: "DeShawn", car: HoodCar.describe({ color: "Gray", make: "Honda", model: "Civic" }), emoji: "😎", bg: "#4a90d9" },
+  { name: "Maria", car: HoodCar.describe({ color: "Red", make: "Toyota", model: "Corolla" }), emoji: "😊", bg: "#d94a8c" },
+  { name: "Tony", car: HoodCar.describe({ color: "Black", make: "Ford", model: "F-150" }), emoji: "🧢", bg: "#50b86c" },
+  { name: "Keisha", car: HoodCar.describe({ color: "White", make: "Nissan", model: "Altima" }), emoji: "💛", bg: "#b08ae0" },
 ];
 const HAND_RIDER = { name: "Jaylen", emoji: "🙋", bg: "#e0a030" };
 const REQUEST_RIDER = { name: "Aaliyah", emoji: "💃", bg: "#d9534a" };
@@ -545,9 +545,14 @@ function renderSettings() {
 // reader's language (Cloudscape: the confirmation word is localized —
 // "ELIMINAR"); DELETE always works too (owner, 2026-11-04)
 const deleteWord = () => tc("the word typed to delete the account", "DELETE");
+// compared the forgiving way, as the server does (Hoodride.I18n.typed_word):
+// no capitals, no accents or dots — "STERGE" for ȘTERGE, "sil" for SİL
+// (Turkish's two i's), spaces around ignored (translators, 2026-11-04)
+const plainWord = (s) =>
+  s.trim().normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/ı/g, "i");
 const deleteTyped = () => {
-  const typed = $("delete-typed").value.trim().toLocaleLowerCase();
-  return typed === "delete" || typed === deleteWord().toLocaleLowerCase();
+  const typed = plainWord($("delete-typed").value);
+  return typed === "delete" || typed === plainWord(deleteWord());
 };
 
 function showDeleteConfirm() {
@@ -681,7 +686,7 @@ async function loadMyCar() {
 
 function renderCarNote() {
   $("car-note").textContent =
-    state.myCar === undefined ? "" : state.myCar ? state.myCar.label : t("Add it before you drive");
+    state.myCar === undefined ? "" : state.myCar ? HoodCar.describe(state.myCar) : t("Add it before you drive");
 }
 
 function carSheetOpen() {
@@ -957,8 +962,15 @@ function ensurePeer(profile) {
   if (profile.name) peer.name = profile.name;
   if (profile.photo) peer.photo = profile.photo;
   // a driver's car, as their rider sees it (only riders are sent one)
-  if ("car" in profile) peer.car = profile.car;
+  if ("car" in profile) peer.car = carOf(profile);
   return peer;
+}
+
+// a car as the reader reads it: from its parts, in their language's order
+// ("Nissan Altima blanco" — HoodCar.describe); a server from before sends
+// only the English description
+function carOf(x) {
+  return x.car_parts ? HoodCar.describe(x.car_parts) : x.car;
 }
 
 // ===== Socket + user channel =====
@@ -1804,7 +1816,7 @@ function revealPeer(peer, done) {
     .receive("ok", (u) => {
       peer.name = u.name;
       peer.photo = u.photo;
-      if ("car" in u) peer.car = u.car;
+      if ("car" in u) peer.car = carOf(u);
       done("ok");
     })
     // "busy": the database couldn't answer — the person isn't gone, so say
@@ -2003,7 +2015,7 @@ const pileNames = HoodRevealQueue.create({
     if (e) {
       e.peer.name = u.name;
       e.peer.photo = u.photo;
-      if ("car" in u) e.peer.car = u.car;
+      if ("car" in u) e.peer.car = carOf(u);
     }
   },
   // they're leaving; their marker goes with driver_left / hand_down
@@ -2257,7 +2269,7 @@ function joinRideChannel() {
     const peer = state.ride.peer;
     peer.name = name;
     peer.photo = photo;
-    if ("car" in p) peer.car = p.car;
+    if ("car" in p) peer.car = carOf(p);
     setBanner(contextBanner());
     if (state.chatPeer === peer && !$("chat").classList.contains("hidden")) $("chat-name").textContent = name;
     if (state.cardPeer === peer) openPeerCard(peer);
@@ -2689,7 +2701,7 @@ function tick() {
         d.pos = stepToward(d.pos, target, 45);
         if (metersBetween(d.pos, target) < 35) {
           markArrived();
-          receiveMsg(d, "here! " + (d.car || ""));
+          receiveMsg(d, t("here! {car}", { car: d.car }));
         } else if (!state.pinArmed) {
           // (placing the pin: its hint stays — contextBanner)
           setBanner(CAR + t("{name} is on the way", { name: d.name }) + HoodCar.inLine(d.car) + " · " + away(metersBetween(d.pos, target)));

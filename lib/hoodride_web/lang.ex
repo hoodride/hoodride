@@ -45,13 +45,41 @@ defmodule HoodrideWeb.Lang do
 
   @doc """
   The language among `on` for one asked-for tag, or nil: the exact tag
-  (any case), else its language alone ("es-MX" → "es") — never another
-  region of it ("en-US" doesn't pick the made-up "en-XA").
+  (any case); else its language alone ("es-MX" → "es"); else the one
+  version we have of that language ("pt-PT" → "pt-BR"). Chinese by its
+  script — Traditional for Taiwan, Hong Kong, Macau (BCP 47 likely
+  subtags), Simplified otherwise; Norwegian (no, nn) → nb; Tagalog (tl) →
+  fil; old codes iw → he, in → id. Never the made-up en-XA but exactly.
   """
   def match(tag, on) do
-    tag = String.downcase(tag)
+    tag = tag |> String.downcase() |> alias_of()
+    primary = tag |> String.split("-") |> hd()
     exact = Enum.find(on, &(String.downcase(&1) == tag))
-    exact || Enum.find(on, &(&1 == tag |> String.split("-") |> hd()))
+
+    exact || Enum.find(on, &(&1 == primary)) ||
+      Enum.find(
+        on,
+        &(&1 != Hoodride.I18n.pseudo() and &1 |> String.split("-") |> hd() == primary)
+      )
+  end
+
+  @traditional ~w(tw hk mo hant)
+
+  defp alias_of("zh" <> _ = tag) do
+    parts = String.split(tag, "-")
+    if Enum.any?(parts, &(&1 in @traditional)), do: "zh-hant", else: "zh-hans"
+  end
+
+  defp alias_of(tag) do
+    [primary | rest] = String.split(tag, "-")
+
+    case primary do
+      p when p in ["no", "nn"] -> "nb"
+      "tl" -> "fil"
+      "iw" -> "he"
+      "in" -> "id"
+      _ -> Enum.join([primary | rest], "-")
+    end
   end
 
   @doc """

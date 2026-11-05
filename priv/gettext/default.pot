@@ -48,7 +48,17 @@ msgid "Beige"
 msgstr ""
 
 #: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr ""
+
+#: priv/static/car.js
 msgctxt "car color"
+msgid "Black"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
 msgid "Black"
 msgstr ""
 
@@ -58,7 +68,17 @@ msgid "Blue"
 msgstr ""
 
 #: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr ""
+
+#: priv/static/car.js
 msgctxt "car color"
+msgid "Brown"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
 msgid "Brown"
 msgstr ""
 
@@ -312,6 +332,11 @@ msgctxt "car color"
 msgid "Gold"
 msgstr ""
 
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr ""
+
 #: priv/static/index.html
 msgid "Google can take a little while"
 msgstr ""
@@ -322,7 +347,17 @@ msgid "Gray"
 msgstr ""
 
 #: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr ""
+
+#: priv/static/car.js
 msgctxt "car color"
+msgid "Green"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
 msgid "Green"
 msgstr ""
 
@@ -432,6 +467,11 @@ msgid "Orange"
 msgstr ""
 
 #: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr ""
+
+#: priv/static/car.js
 msgctxt "car color"
 msgid "Other"
 msgstr ""
@@ -469,12 +509,22 @@ msgctxt "car color"
 msgid "Purple"
 msgstr ""
 
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr ""
+
 #: priv/static/app.js
 msgid "Reconnecting to Hood Ride…"
 msgstr ""
 
 #: priv/static/car.js
 msgctxt "car color"
+msgid "Red"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
 msgid "Red"
 msgstr ""
 
@@ -587,6 +637,11 @@ msgctxt "car color"
 msgid "Silver"
 msgstr ""
 
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr ""
+
 #: priv/static/index.html
 msgid "Source code on GitHub"
 msgstr ""
@@ -645,7 +700,17 @@ msgid "White"
 msgstr ""
 
 #: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr ""
+
+#: priv/static/car.js
 msgctxt "car color"
+msgid "Yellow"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
 msgid "Yellow"
 msgstr ""
 
@@ -734,6 +799,10 @@ msgid "got it, heading to your pin 📍"
 msgstr ""
 
 #: priv/static/app.js
+msgid "here! {car}"
+msgstr ""
+
+#: priv/static/app.js
 msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
 msgstr ""
 
@@ -778,7 +847,7 @@ msgid "open {app} › ⋮ › Settings › Site settings › Location › allow 
 msgstr ""
 
 #: priv/static/sendfilter.js
-msgid "open ⋮ › Settings › Site permissions › Location › Ask to allow"
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr ""
 
 #: priv/static/sendfilter.js
@@ -854,6 +923,11 @@ msgstr ""
 msgid "{car} · your driver"
 msgstr ""
 
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr ""
+
 #: priv/static/app.js
 msgid "{count} car around here"
 msgid_plural "{count} cars around here"
@@ -900,6 +974,11 @@ msgstr[1] ""
 msgid "{distance} away"
 msgstr ""
 
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr ""
+
 #: priv/static/app.js
 msgid "{name} has arrived"
 msgstr ""
@@ -930,6 +1009,14 @@ msgstr ""
 
 #: priv/static/distance.js
 msgid "{n} h ago"
+msgstr ""
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr ""
+
+#: priv/static/distance.js
+msgid "{n} mi"
 msgstr ""
 
 #: priv/static/distance.js

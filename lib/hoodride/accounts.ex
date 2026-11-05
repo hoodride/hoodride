@@ -90,6 +90,18 @@ defmodule Hoodride.Accounts do
 
   def car_label(_), do: nil
 
+  @doc """
+  The car as its parts — `%{color, make, model}`, or nil (none set): the
+  app writes the description in the reader's language, in that language's
+  order ("Nissan Altima blanco" — HoodCar.describe). `car_label/1` is the
+  English, still sent for a copy of the app from before (languages, stage 2b).
+  """
+  def car_parts(%User{car_color: c, car_make: m, car_model: mo})
+      when is_binary(c) and is_binary(m) and is_binary(mo),
+      do: %{color: c, make: m, model: mo}
+
+  def car_parts(_), do: nil
+
   defp car(%User{car_color: c, car_make: m, car_model: mo} = u) when is_binary(c),
     do: %{color: c, make: m, model: mo, label: car_label(u)}
 

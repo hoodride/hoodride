@@ -1,0 +1,1172 @@
+# Hood Ride in Korean. A first translation (2026-11-04).
+# Plural forms by name, in this order: other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: ko\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(요청 취소됨)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "탑승 수락"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "탑승 수락 중…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "수락 중…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "운전하기 전에 추가하세요"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "차량 추가"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "처음 길 안내할 때 묻기"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "뒤로"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "로그인 페이지로 돌아가기"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "시작하기 전에"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "베이지색"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "베이지색"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "검은색"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "검은색"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "파란색"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "파란색"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "갈색"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "갈색"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "계속하면 {terms} 및 {privacy}에 동의하게 됩니다."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Hood Ride에 연결할 수 없어요. 다시 시도하는 중…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Hood Ride에 연결할 수 없어요. 다시 시도해 주세요"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "취소"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "요청 취소"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "먼저 탑승 요청을 취소하세요"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "먼저 탑승 요청을 취소하세요."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "내 위치로 이동"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "변경"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "언제든지 변경할 수 있어요. 왼쪽 위의 프로필 사진을 탭한 다음 {setting}을 탭하세요"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "{provider}에서 변경 ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "변경했나요?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "채팅"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "{name} 님과의 채팅이 종료됐어요. 한동안 접속하지 않았어요"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "채팅"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "{fields} 항목을 확인하세요(각각 최대 {max}자)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "선택…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "닫기"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "설정 닫기"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "색상"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "연결 중…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "연결에 문제가 있어요. 다시 시도하는 중"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "연결이 재설정됐어요. 다시 운전하려면 온라인 전환을 탭하세요"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "연결이 재설정됐어요. 아직 차가 필요하면 ✋를 다시 탭하세요"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "연결이 재설정됐어요. 운행이 예기치 않게 종료됐으니 다시 설정해 주세요"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "연결이 재설정됐어요. 탑승 요청이 사라졌으니 다시 요청해 주세요"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Facebook으로 계속하기"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Google로 계속하기"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "복사됨 ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "복사"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "메시지 복사"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "수락하지 못했어요"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "복사하지 못했어요"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "계정을 삭제하지 못했어요. 다시 시도해 주세요."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Hood Ride에 연결하지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Hood Ride에 연결하지 못했어요. 다시 시도해 주세요"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "서버에 연결하지 못했어요. 다시 시도해 주세요"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "자동으로 새로고침하지 못했어요. 왼쪽 위의 프로필 사진을 탭하고 변경, Google에서 새로고침을 차례로 탭하세요"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "지금은 새로고침할 수 없어요. 나중에 다시 시도해 주세요"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "지금은 저장할 수 없어요. 잠시 후 다시 시도해 주세요."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "저장하지 못했어요. 다시 시도해 주세요"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "요청을 보내지 못했어요"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "로그인하지 못했어요. 다시 시도해 주세요"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "로그아웃하지 못했어요. 다시 시도해 주세요"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "삭제"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "거절"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "계정 삭제"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "내 계정 삭제"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "계정을 삭제할까요?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "데모"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "운전하기"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "운전자"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "운전자가 이 요청을 받을 수 없어요. 다른 운전자를 찾아보세요"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "운행 종료"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "먼저 운행을 종료하세요"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "먼저 운행을 종료하세요."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "먼저 현재 운행을 마치세요"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "오프라인 전환"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "온라인 전환"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "이 운전자에게 다시 요청하기 전에 1분만 기다려 주세요"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Hood Ride로 이동"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "금색"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "금색"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Google은 시간이 조금 걸릴 수 있어요"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "회색"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "회색"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "초록색"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "초록색"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Discord의 Hood Ride"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "다른 기기에서 Hood Ride가 열렸어요"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "동의합니다"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "도착했어요"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "데모 나가기"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "제조사"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "제조사"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "지도"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "지도 의견 보내기"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "지도 마커"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "여기서 만나요"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "메시지"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "메시지를 보내지 못했어요. 인터넷에 연결되어 있나요?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "메시지를 보내지 못했어요. 다시 시도해 주세요"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "한 글자에 겹쳐진 기호가 너무 많아요"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "메시지가 너무 길어요. {max}자 미만으로 줄여 주세요"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "메시지…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "모델"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "길 안내"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "내비게이션 앱"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "태워 주세요"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "이웃이 이웃을 태워 주는 서비스예요. 근처의 차량과 차가 필요한 사람을 확인하고, 서로 메시지를 보내고, 함께 이동하세요."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "이용 불가"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "모든 기기에서"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "길 안내 열기"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "주황색"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "주황색"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "기타"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "페이지를 찾을 수 없어요"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "페이지를 찾을 수 없어요 — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "{name} 님 픽업 중 · 🧭를 탭해 길 안내"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "{name} 님 픽업 중 · {seen} · 🧭를 탭해 길 안내"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "{terms} 및 {privacy}을 읽고 동의해 주세요."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "개인정보 처리방침"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "개인정보 처리방침"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "보라색"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "보라색"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Hood Ride에 다시 연결하는 중…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "빨간색"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "빨간색"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Google에서 새로고침"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "요청이 취소됐어요"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "요청이 거절됐어요"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "요청이 만료됐어요. 다시 요청하거나 다른 운전자를 찾아보세요"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "탑승 요청"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "요청함…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "탑승 요청 중…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "요청 중…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "운행 종료됨"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "{name} 님과의 운행"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "탑승자에게 내 위치가 보이지 않아요. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "탑승자가 픽업할 때 이 차량을 찾아요. 차량을 추가하면 온라인으로 전환할 수 있어요."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "탑승자가 나를 찾을 수 있도록 표시돼요"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "우리 동네 이웃과 함께 타요"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Safari 웹 사이트(Safari를 사용하지 않는다면 사용 중인 브라우저 이름)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "저장"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "저장하고 온라인 전환"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "보내기"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "설정"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "설정({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "설정 › 앱 › {app} › 권한 › 위치"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "설정 › 개인정보 보호 및 보안 › 위치 서비스 › {app} › 정확한 위치: 켬"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "설정 › 개인정보 보호 및 보안 › 위치 서비스 › {app} › 앱을 사용하는 동안을 선택하고 정확한 위치 켜기"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "지도 출처 표시 또는 숨기기"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "로그아웃"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "로그인 중…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "은색"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "은색"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "GitHub의 소스 코드"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "탭하여 삭제"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "이용약관"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "그 운전자는 이제 근처에 없어요"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "그 탑승자는 이제 차를 찾고 있지 않아요"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "이 작업은 취소할 수 없어요. 계정이 삭제되고, 지도에서 사라지고, 대화가 종료되며, 모든 기기에서 로그아웃돼요. 나중에 다시 로그인하면 새 계정으로 시작해요."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "이 페이지는 존재하지 않아요."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "너무 늦었어요. 요청이 취소됐어요"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "사용 중인 네트워크에서 로그인 실패가 너무 많아요. 나중에 다시 시도해 주세요."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "확인하려면 '{word}'라고 입력하세요"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "확인하려면 '{word}'라고 입력하세요."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "업데이트가 있어요. 탭하여 새로고침하세요"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "여기서 사용"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "흰색"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "흰색"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "노란색"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "노란색"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "이미 진행 중인 요청이 있어요"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "운행이 끝난 후 새로고침할 수 있어요"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "운행이 끝난 후 이름과 사진을 새로고침할 수 있어요"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "도착했어요 · {name} 님 픽업 중"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "새로운 사람에게 너무 많이 연락했어요. 나중에 다시 시도해 주세요"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "새로고침을 너무 많이 했어요. 몇 분 후에 다시 시도해 주세요"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "새 채팅을 너무 많이 시작했어요. 나중에 다시 시도해 주세요"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "내 차량"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "이름과 사진은 {provider}에서 가져와요"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "내 탑승자"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "확대해서 근처에 누가 있는지 확인하세요"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "수락했어요! 지금 가요 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "네, 보여요"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "좋아요, 그렇게 해요"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "네, 그럼 그쪽으로 갈게요"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "브라우저 설정에서 이 사이트에 정확한 위치를 허용하세요"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "금방 도착해요"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "웹 주소 표시줄 왼쪽(브라우저 상단)의 아이콘을 클릭 › 위치 › 허용"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "색상"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "좋아요, 잘 보고 있을게요"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "알겠어요, 핀 위치로 가고 있어요 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "도착했어요! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "안녕하세요! 3번가 빨래방에 있는데 태워 주실 수 있나요? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "1시간 이상 전에 접속"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "{n}분 전에 접속"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "제조사"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "모델"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "근처"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "방금"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "곧 출발해요 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "메뉴 열기 › 설정 › 사이트 및 다운로드 › 사이트 권한 › 위치"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "브라우저의 설정 열기 › 개인 정보 보호 및 보안 › 사이트 설정 › 위치 › Hood Ride 허용"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "{app} 열기 › ⋮ › 설정 › 사이트 설정 › 위치 › Hood Ride 허용"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "⋮ 열기 › 설정 › 사이트 권한 › 위치 › 허용 여부 확인"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "운전자가 나를 찾을 수 있도록"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "함께 타는 상대가 나를 찾을 수 있도록"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "좋아요, 곧 봬요!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "웹 주소 표시줄 왼쪽(화면 상단)의 아이콘을 탭 › 권한 › 위치 › 허용(물어보면 정확한 위치 선택)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "탑승을 요청하려면"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "운전하려면"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "내 위치를 표시하려면"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "위치를 켜세요(아래로 스와이프 › 위치)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "위치 서비스를 켜세요(설정 › 개인정보 보호 및 보안)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "이 기기의 위치를 켜세요"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "네, 태우러 갈 수 있어요"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "네, 부탁드려요! 벤치 옆에 있어요 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "안녕하세요, 잘 지내요?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "안녕하세요, 손 든 거 봤어요 ✋ 태워 드릴까요?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "정말요? 아직 여기서 기다리고 있어요 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "사용 중인 브라우저"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · 내 운전자"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{color} {make} {model}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "이 근처 차량 {count}대"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "이곳 차량 {count}대"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "{count}자 남음"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count}자 초과"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count}자 초과했어요. 메시지를 줄여서 보내세요"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "이곳에 {count}명"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "이곳에서 {count}명이 차를 기다려요"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "{distance} 거리"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} 님이 도착했어요"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} 님은 지금 운행 중이에요"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} 님이 오고 있어요"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} 님은 지금 이용할 수 없어요"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} 님은 지금 이용할 수 없어요. 다른 운전자를 찾아보세요"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} 님이 화면에 보이지 않아요. 확대해서 차량을 다시 찾아보세요"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} 님이 오프라인이 됐어요. 다른 운전자를 찾아보세요"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "{n}시간 전"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n}km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n}마일"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "{n}분 전"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n}일"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n}시간"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n}분"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site}. 그리고 휴대폰의 {steps} › 허용에서 정확한 위치 사용을 켜세요"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · 다시 연결하는 중…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps}. 또는 Hood Ride에 대략적인 위치를 선택했다면 웹 주소 왼쪽의 아이콘을 탭 › 권한 › 권한 재설정을 탭한 다음, 다시 시도해서 정확한 위치를 선택하세요"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › 정확한 위치 사용"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. 돌아오면 Hood Ride가 새로고침돼요."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ 새 메시지"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ 잠시만 기다려 주세요"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ 운전자를 기다리는 중…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ 너무 빨리 보내고 있어요. 잠시만 기다려 주세요"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ 차를 찾는 중…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ 근처 운전자에게 차가 필요하다고 표시되고 있어요"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ 태워 주세요"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ 근처에 차가 필요한 사람이 있어요"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ 차가 필요해요"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 채팅"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 채팅({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 브라우저에서 물어보면 위치를 허용하세요. Hood Ride는 {why} 위치가 필요해요"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 내 위치를 찾는 중…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Hood Ride의 위치 접근이 차단되어 있어요. {why} 허용하세요: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 이 기기의 위치가 꺼져 있어요. {why} {steps}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 여기서 만나요"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 만날 장소를 설정했어요. 운전자에게 표시돼요"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 핀 이동"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 핀을 삭제했어요. 운전자가 내 위치로 올 거예요"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 내 위치 공유"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 함께 타는 상대가 나를 찾을 수 있도록 위치를 공유하세요"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 지도에서 만날 장소를 탭하세요"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 위치를 기다리는 중이에요. 아직 탑승자에게 보이지 않아요"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 현재 위치가 대략적이에요. {why} 정확한 위치를 켜세요: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 탑승을 요청했어요"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 탑승하기"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 온라인 상태예요"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 {name} 님의 정확한 위치를 기다리는 중이에요. 또는 📍 만날 장소를 설정해 달라고 요청하세요"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} 님이 1시간 이상 전에 마지막으로 그곳에 있었어요"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} 님이 {n}분 전에 마지막으로 그곳에 있었어요"

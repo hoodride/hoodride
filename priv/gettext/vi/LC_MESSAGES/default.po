@@ -1,0 +1,1172 @@
+# Hood Ride in Vietnamese. A first translation (2026-11-04).
+# Plural forms by name, in this order: other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: vi\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(đã rút lại yêu cầu)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "Nhận chuyến"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "Đang nhận chuyến…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "Đang nhận…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "Hãy thêm xe trước khi lái"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "Thêm xe của bạn"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "Sẽ được hỏi vào lần đầu bạn chỉ đường"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "Quay lại"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "Quay lại trang đăng nhập"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "Trước khi bắt đầu"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "Be"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "be"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "Đen"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "đen"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "Xanh dương"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "xanh dương"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "Nâu"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "nâu"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "Khi tiếp tục, bạn đồng ý với {terms} và {privacy} của chúng tôi."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Không kết nối được với Hood Ride — đang thử lại…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Không kết nối được với Hood Ride — hãy thử lại"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "Hủy"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "Hủy yêu cầu"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "Hãy hủy yêu cầu chuyến đi trước"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "Hãy hủy yêu cầu chuyến đi trước."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "Về vị trí của tôi"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "Thay đổi"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "Đổi bất cứ lúc nào: nhấn vào ảnh hồ sơ ở góc trên bên trái, rồi chọn {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "Thay đổi trên {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "Bạn đã đổi chưa?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "Trò chuyện"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "Cuộc trò chuyện với {name} đã kết thúc — người này đã vắng mặt một lúc"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "Cuộc trò chuyện"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "Hãy kiểm tra {fields} (mỗi mục tối đa {max} ký tự)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "Chọn…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "Đóng"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "Đóng cài đặt"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "Màu"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "Đang kết nối…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "Lỗi kết nối — đang thử lại"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "Kết nối đã được đặt lại — nhấn BẬT NHẬN CHUYẾN để lái tiếp"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "Kết nối đã được đặt lại — nhấn ✋ lần nữa nếu bạn vẫn cần đi xe"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "Kết nối đã được đặt lại — chuyến đi của bạn đã kết thúc ngoài ý muốn, hãy thiết lập lại"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "Kết nối đã được đặt lại — yêu cầu chuyến đi của bạn đã bị mất, hãy yêu cầu lại"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Tiếp tục với Facebook"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Tiếp tục với Google"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "Đã sao chép ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "Sao chép"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "Sao chép tin nhắn"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "Không thể nhận chuyến"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "Không thể sao chép"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "Không thể xóa tài khoản của bạn — vui lòng thử lại."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Không kết nối được với Hood Ride — hãy kiểm tra kết nối mạng và thử lại."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Không kết nối được với Hood Ride — hãy thử lại"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "Không kết nối được với máy chủ — hãy thử lại"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "Không thể tự động làm mới — hãy nhấn vào ảnh hồ sơ ở góc trên bên trái, chọn Thay đổi, rồi chọn Làm mới từ Google"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "Hiện không thể làm mới — hãy thử lại sau"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "Hiện không thể lưu — hãy thử lại sau giây lát."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "Không thể lưu — hãy thử lại"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "Không thể gửi yêu cầu"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "Không thể đăng nhập — hãy thử lại"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "Không thể đăng xuất — hãy thử lại"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "XÓA"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "Từ chối"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "Xóa tài khoản"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "Xóa tài khoản của tôi"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "Xóa tài khoản của bạn?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "Bản demo"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "Lái xe"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "Tài xế"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "Tài xế không nhận được chuyến này — hãy thử người khác"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "Kết thúc chuyến"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "Hãy kết thúc chuyến đi trước"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "Hãy kết thúc chuyến đi trước."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "Hãy hoàn tất chuyến đi hiện tại trước"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "TẮT NHẬN CHUYẾN"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "BẬT NHẬN CHUYẾN"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "Hãy đợi tài xế này một phút trước khi yêu cầu lại"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Đến Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "Vàng kim"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "vàng kim"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Google có thể mất một chút thời gian"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "Xám"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "xám"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "Xanh lá"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "xanh lá"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride trên Discord"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride đã được mở trên thiết bị khác"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "Tôi đồng ý"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "Tôi đến rồi"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "Thoát bản demo"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "Hãng xe"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "Các hãng xe"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "Bản đồ"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "Góp ý về bản đồ"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "Điểm đánh dấu trên bản đồ"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "Gặp ở đây"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "Tin nhắn"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "Chưa gửi được tin nhắn — kiểm tra kết nối?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "Chưa gửi được tin nhắn — hãy thử lại"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "Tin nhắn có quá nhiều dấu chồng lên một chữ cái"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "Tin nhắn quá dài — hãy viết dưới {max} ký tự"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "Nhắn tin…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "Mẫu xe"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "Chỉ đường"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "Ứng dụng chỉ đường"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "Cần đi xe"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "Hàng xóm chở hàng xóm. Xem xe và những người cần đi xe ở gần, nhắn tin cho nhau và cùng đi."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "Không khả dụng"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "Trên tất cả thiết bị của bạn"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "Mở chỉ đường bằng"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "Cam"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "cam"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "Khác"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "Không tìm thấy trang"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "Không tìm thấy trang — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "Đang đón {name} · nhấn 🧭 để chỉ đường"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "Đang đón {name} · {seen} · nhấn 🧭 để chỉ đường"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "Vui lòng đọc và đồng ý với {terms} và {privacy} của chúng tôi."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Chính sách quyền riêng tư"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Chính sách quyền riêng tư"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "Tím"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "tím"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Đang kết nối lại với Hood Ride…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "Đỏ"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "đỏ"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Làm mới từ Google"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "Đã hủy yêu cầu"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "Yêu cầu bị từ chối"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "Yêu cầu đã hết hạn — hãy yêu cầu lại hoặc thử tài xế khác"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "Yêu cầu chuyến"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "Đã yêu cầu…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "Đang yêu cầu chuyến đi…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "Đang yêu cầu…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "Chuyến đi đã kết thúc"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "Đi cùng {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "Hành khách không thấy bạn. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "Hành khách sẽ tìm xe này khi bạn đến đón. Hãy thêm xe để bật nhận chuyến."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "Hành khách sẽ thấy thông tin này để tìm bạn"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "Đi chung xe với hàng xóm"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Trang web Safari (hoặc tên trình duyệt của bạn, nếu bạn không dùng Safari)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "Lưu"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "Lưu và bật nhận chuyến"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "Gửi"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "Cài đặt"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "Cài đặt ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "Cài đặt › Ứng dụng › {app} › Quyền › Vị trí"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "Cài đặt › Quyền riêng tư & bảo mật › Dịch vụ định vị › {app} › Vị trí chính xác: bật"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "Cài đặt › Quyền riêng tư & bảo mật › Dịch vụ định vị › {app} › Khi dùng ứng dụng, và bật Vị trí chính xác"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "Hiện hoặc ẩn thông tin ghi công của bản đồ"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "Đăng xuất"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "Đang đăng nhập…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "Bạc"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "bạc"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "Mã nguồn trên GitHub"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "Nhấn để xóa"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "Điều khoản"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "Tài xế đó không còn ở gần nữa"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "Hành khách đó không còn tìm xe nữa"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "Thao tác này không thể hoàn tác. Tài khoản của bạn sẽ bị xóa, bạn bị gỡ khỏi bản đồ, các cuộc trò chuyện bị đóng và bạn bị đăng xuất trên mọi thiết bị. Nếu sau này đăng nhập lại, bạn sẽ bắt đầu với một tài khoản mới."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "Trang này không tồn tại."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "Quá muộn — yêu cầu đã bị rút lại"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "Có quá nhiều lần đăng nhập không thành công từ mạng của bạn — hãy thử lại sau."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "Nhập {word} để xác nhận"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "Nhập {word} để xác nhận."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "Đã có bản cập nhật — nhấn để tải lại"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "Dùng ở đây"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "Trắng"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "trắng"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "Vàng"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "vàng"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "Bạn đã có một yêu cầu đang mở"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "Bạn có thể làm mới sau chuyến đi"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "Bạn có thể làm mới tên và ảnh sau chuyến đi"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "Bạn đã đến nơi · đang đón {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "Bạn đã liên hệ với nhiều người mới — hãy thử lại sau"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "Bạn đã làm mới nhiều lần — hãy thử lại sau vài phút"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "Bạn đã bắt đầu nhiều cuộc trò chuyện mới — hãy thử lại sau"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "Xe của bạn"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "Tên và ảnh của bạn được lấy từ {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "Hành khách của bạn"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "Phóng to để xem ai ở gần"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "Nhận rồi nhé! Mình đang tới 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "Ok, thấy bạn rồi"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "Ok, chốt nhé"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "Ok, vậy mình tới chỗ bạn"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "cho phép vị trí chính xác cho trang web này trong phần cài đặt của trình duyệt"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "Vài phút nữa mình tới"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "nhấp vào biểu tượng bên trái thanh địa chỉ web (trên cùng trình duyệt) › Vị trí › Cho phép"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "màu"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "Ok, mình sẽ để ý"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "Rõ, mình đang tới chỗ ghim của bạn 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "Mình tới rồi! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "Chào! Mình đang ở tiệm giặt trên đường số 3, bạn đón mình được không? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "thấy lần cuối hơn một giờ trước"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "thấy lần cuối {n} phút trước"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "hãng xe"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "mẫu xe"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "gần đây"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "vừa xong"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "Chút nữa mình đi 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "mở menu › Cài đặt › Trang web và tải xuống › Quyền trang web › Vị trí"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "mở Cài đặt của trình duyệt › Quyền riêng tư và bảo mật › Cài đặt trang web › Vị trí › cho phép Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "mở {app} › ⋮ › Cài đặt › Cài đặt trang web › Vị trí › cho phép Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "mở ⋮ › Cài đặt › Quyền của trang web › Vị trí › Hỏi để cho phép"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "để tài xế tìm thấy bạn"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "để người đi cùng tìm thấy bạn"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "Tuyệt, hẹn gặp sớm nhé!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "nhấn vào biểu tượng bên trái thanh địa chỉ web (trên cùng màn hình) › Quyền › Vị trí › Cho phép (chọn Chính xác nếu được hỏi)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "để yêu cầu chuyến đi"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "để lái xe"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "để hiển thị vị trí của bạn"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "bật Vị trí (vuốt xuống › Vị trí)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "bật Dịch vụ định vị (Cài đặt › Quyền riêng tư & bảo mật)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "bật vị trí cho thiết bị này"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "Ừ, mình đón bạn được"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "Vâng, nhờ bạn nhé! Mình đang ở chỗ mấy băng ghế 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "Chào, sao rồi?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "Chào, thấy bạn giơ tay ✋ cần đón không?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "Chắc không? Mình vẫn đang kẹt ở đây 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "trình duyệt của bạn"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · tài xế của bạn"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{make} {model} màu {color}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "{count} xe quanh đây"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "{count} xe ở đây"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "Còn {count} ký tự"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "Thừa {count} ký tự"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "Thừa {count} ký tự — hãy rút ngắn tin nhắn để gửi"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} người ở đây"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} người cần đi xe ở đây"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "cách {distance}"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} đã đến"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} đang trong một chuyến đi"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} đang trên đường tới"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} hiện không khả dụng"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} hiện không khả dụng — hãy thử tài xế khác"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} không nằm trong khung nhìn — hãy phóng to và tìm lại xe của họ"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} đã tắt nhận chuyến — hãy thử tài xế khác"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "{n} giờ trước"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} dặm"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "{n} phút trước"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} ngày"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} giờ"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} phút"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site} — và trên điện thoại: {steps} › Cho phép, với Sử dụng vị trí chính xác đang bật"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · Đang kết nối lại…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps} — hoặc, nếu bạn đã chọn Ước chừng cho Hood Ride: nhấn vào biểu tượng bên trái địa chỉ web › Quyền › Đặt lại quyền, rồi thử lại và chọn Chính xác"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › Sử dụng vị trí chính xác"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. Hood Ride sẽ tải lại khi bạn quay lại."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ Tin nhắn mới"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ Chậm lại chút nhé"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ Đang chờ tài xế…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ Bạn gửi quá nhanh — chậm lại chút nhé"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ Đang tìm xe…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ Tài xế ở gần có thể thấy bạn cần đi xe"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ Cần đi xe"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ Có người ở gần cần đi xe"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ cần đi xe"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 Trò chuyện"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 Trò chuyện ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 Hãy cho phép vị trí khi trình duyệt hỏi — Hood Ride cần vị trí {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 Đang tìm vị trí của bạn…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Vị trí đang bị chặn cho Hood Ride — hãy cho phép {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 Vị trí đang tắt trên thiết bị này — {steps} {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 Gặp ở đây"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 Đã đặt điểm hẹn — tài xế của bạn thấy điểm này"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 Di chuyển ghim"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 Đã xóa ghim — tài xế sẽ đến chỗ bạn"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 Chia sẻ vị trí của bạn"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 Chia sẻ vị trí để người đi cùng tìm thấy bạn"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 Nhấn vào bản đồ ở nơi bạn muốn gặp"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 Đang chờ vị trí của bạn — hành khách chưa thấy bạn"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 Vị trí của bạn chỉ là gần đúng — hãy bật Vị trí chính xác {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 đã yêu cầu chuyến đi"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 Đi xe"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 Bạn đang nhận chuyến"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 Đang chờ vị trí chính xác của {name} — hoặc nhờ họ đặt 📍 điểm hẹn"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} được thấy ở đó lần cuối hơn một giờ trước"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} được thấy ở đó lần cuối {n} phút trước"

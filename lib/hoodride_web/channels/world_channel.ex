@@ -253,7 +253,13 @@ defmodule HoodrideWeb.WorldChannel do
   # looking at a ✋ never gets a car, even one that rider set once
   # (ARCHITECTURE.md "Your car").
   defp revealed(u, :viewer),
-    do: %{id: u.id, name: u.name, photo: u.photo, car: Hoodride.Accounts.car_label(u)}
+    do: %{
+      id: u.id,
+      name: u.name,
+      photo: u.photo,
+      car: Hoodride.Accounts.car_label(u),
+      car_parts: Hoodride.Accounts.car_parts(u)
+    }
 
   defp revealed(u, _role), do: %{id: u.id, name: u.name, photo: u.photo}
 

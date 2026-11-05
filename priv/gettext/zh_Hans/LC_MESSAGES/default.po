@@ -1,0 +1,1172 @@
+# Hood Ride in Simplified Chinese. A first translation (2026-11-04).
+# Plural forms by name, in this order: other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: zh_Hans\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "（请求已撤回）"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "接受行程"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "正在接受行程…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "正在接受…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "开车前请先添加"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "添加你的车"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "首次导航时询问"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "返回"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "返回登录页面"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "开始之前"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "米色"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "米色"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "黑色"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "黑色"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "蓝色"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "蓝色"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "棕色"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "棕色"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "继续即表示你同意我们的{terms}和{privacy}。"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "无法连接 Hood Ride，正在重试…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "无法连接 Hood Ride，请重试"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "取消"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "取消请求"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "请先取消你的搭车请求"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "请先取消你的搭车请求。"
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "定位到我的位置"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "更改"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "随时可以更改：点按左上角的头像，然后点按{setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "在 {provider} 上更改 ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "已经改好了？"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "聊天"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "与{name}的聊天已结束：对方已离开一段时间"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "聊天"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "请检查{fields}（每项最多 {max} 个字）。"
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "请选择…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "关闭"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "关闭设置"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "颜色"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "正在连接…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "连接出现问题，正在重试"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "连接已重置，点按“上线”即可继续开车"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "连接已重置，如果你仍需要搭车，请再次点按 ✋"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "连接已重置，你的行程意外结束，请重新安排"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "连接已重置，你的搭车请求已丢失，请重新请求"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "使用 Facebook 继续"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "使用 Google 继续"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "已复制 ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "复制"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "复制消息"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "无法接受"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "无法复制"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "无法删除你的账号，请重试。"
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "无法连接 Hood Ride，请检查网络连接后重试。"
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "无法连接 Hood Ride，请重试"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "无法连接服务器，请重试"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "无法自动刷新：请点按左上角的头像，然后点按“更改”，再点按“从 Google 刷新”"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "暂时无法刷新，请稍后再试"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "暂时无法保存，请稍后再试。"
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "无法保存，请重试"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "无法发送请求"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "无法登录，请重试"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "无法退出登录，请重试"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "删除"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "拒绝"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "删除账号"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "删除我的账号"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "要删除你的账号吗？"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "演示"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "开车"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "司机"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "司机无法接这一单，请换一位试试"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "结束行程"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "请先结束你的行程"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "请先结束你的行程。"
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "请先完成当前行程"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "下线"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "上线"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "请等一分钟再向这位司机发送请求"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "前往 Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "金色"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "金色"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Google 可能需要一点时间"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "灰色"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "灰色"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "绿色"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "绿色"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride 的 Discord 社区"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride 已在另一台设备上打开"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "我同意"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "我到了"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "退出演示"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "品牌"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "品牌"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "地图"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "地图反馈"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "地图标记"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "在这里碰面"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "消息"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "消息未发送，网络有问题？"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "消息未发送，请重试"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "消息中某个字符上叠加的符号太多"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "消息太长，请控制在 {max} 个字符以内"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "消息…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "车型"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "导航"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "导航应用"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "我要搭车"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "邻里互助，顺路搭车。查看附近的车辆和需要搭车的人，互发消息，一起出行。"
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "不可用"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "在你的所有设备上"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "在以下应用中打开路线"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "橙色"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "橙色"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "其他"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "找不到页面"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "找不到页面 — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "正在接{name} · 点按 🧭 开始导航"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "正在接{name} · {seen} · 点按 🧭 开始导航"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "请阅读并同意我们的{terms}和{privacy}。"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "隐私政策"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "隐私政策"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "紫色"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "紫色"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "正在重新连接 Hood Ride…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "红色"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "红色"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "从 Google 刷新"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "请求已取消"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "请求已被拒绝"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "请求已过期，请重新请求或换一位司机"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "请求搭车"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "已请求…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "正在请求搭车…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "正在请求…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "行程已结束"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "与{name}的行程"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "乘客看不到你。{why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "乘客上车时会找这辆车。添加后即可上线。"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "乘客会看到这些信息，方便找到你"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "邻里之间的顺路车"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Safari浏览器网站（如果你不用 Safari，则为你所用浏览器的名称）"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "保存"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "保存并上线"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "发送"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "设置"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "设置（{name}）"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "设置 › 应用 › {app} › 权限 › 位置信息"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "设置 › 隐私与安全性 › 定位服务 › {app} › 精确位置：打开"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "设置 › 隐私与安全性 › 定位服务 › {app} › 使用 App 期间，并打开“精确位置”"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "显示或隐藏地图版权信息"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "退出登录"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "正在登录…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "银色"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "银色"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "GitHub 上的源代码"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "点按即可移除"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "服务条款"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "那位司机已经不在附近了"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "那位乘客已经不再找车了"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "此操作无法撤销。你的账号将被删除，你会从地图上消失，你的对话将被关闭，并且你会在所有设备上退出登录。以后再次登录将创建一个新账号。"
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "此页面不存在。"
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "太晚了，请求已被撤回"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "你的网络中登录失败次数过多，请稍后再试。"
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "输入{word}以确认"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "输入{word}以确认。"
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "有可用更新，点按即可重新加载"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "在这里使用"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "白色"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "白色"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "黄色"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "黄色"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "你已有一个未完成的请求"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "行程结束后即可刷新"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "行程结束后即可刷新你的名字和头像"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "你已到达 · 正在接{name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "你联系的新用户太多了，请稍后再试"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "你刷新的次数太多了，请过几分钟再试"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "你发起的新聊天太多了，请稍后再试"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "你的车"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "你的名字和头像来自 {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "你的乘客"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "放大地图，看看附近有谁"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "接单啦！马上到 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "好嘞，看到你了"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "好嘞，没问题"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "好，那我去找你"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "在浏览器设置中允许此网站使用精确位置"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "马上就到"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "点击网址栏左侧（浏览器顶部）的图标 › 位置信息 › 允许"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "颜色"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "好的，我留意着你"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "收到，正往你的标记点去 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "我到了！{car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "嗨！我在三街的洗衣店，能来接我一下吗？🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "一小时多前在线"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "{n} 分钟前在线"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "品牌"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "车型"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "附近"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "刚刚"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "马上出发 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "打开菜单 › 设置 › 网站和下载 › 网站权限 › 位置"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "打开浏览器的设置 › 隐私和安全 › 网站设置 › 位置信息 › 允许 Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "打开 {app} › ⋮ › 设置 › 网站设置 › 位置信息 › 允许 Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "打开 ⋮ › 设置 › 网站权限 › 位置 › 询问是否允许"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "以便司机找到你"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "以便同行的人找到你"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "太好了，一会儿见！"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "点按网址栏左侧（屏幕顶部）的图标 › 权限 › 位置信息 › 允许（如有询问，请选择“精确”）"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "以便请求搭车"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "以便开车接人"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "以便显示你的位置"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "开启位置信息（下滑 › 位置信息）"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "开启定位服务（设置 › 隐私与安全性）"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "开启此设备的位置信息"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "行，我可以去接你"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "好呀，麻烦了！我在长椅这边 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "嗨，在吗"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "嗨，看到你举手了 ✋ 要接你吗？"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "确定吗？我还在这儿等着呢 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "你的浏览器"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · 你的司机"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{color} {make} {model}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "这附近有 {count} 辆车"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "这里有 {count} 辆车"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "还可输入 {count} 个字符"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "超出 {count} 个字符"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "超出 {count} 个字符，请缩短消息后再发送"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "这里有 {count} 个人"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "这里有 {count} 个人需要搭车"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "距离 {distance}"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name}已到达"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name}正在行程中"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name}正在路上"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name}现在没空"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name}现在没空，请换一位司机"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name}不在视野中，请放大地图重新找到对方的车"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name}已下线，请换一位司机"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "{n} 小时前"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} 公里"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} 英里"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "{n} 分钟前"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n}天"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n}小时"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n}分钟"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site}；并在手机的{steps} › 允许，同时开启“使用精确位置”"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · 正在重新连接…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps}；或者，如果你为 Hood Ride 选择了“大致”：点按网址左侧的图标 › 权限 › 重置权限，然后重试并选择“精确”"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › 使用精确位置"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}。返回后 Hood Ride 会重新加载。"
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ 新消息"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ 请稍等一下"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ 正在等待司机…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ 你发送得太快了，请稍等一下"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ 正在找车…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ 附近的司机能看到你需要搭车"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ 我要搭车"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ 附近有人需要搭车"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ 需要搭车"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 聊天"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 聊天（{count}）"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 浏览器询问时请允许使用位置：Hood Ride 需要你的位置，{why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 正在查找你的位置…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Hood Ride 的位置权限已被阻止。请允许，{why}：{steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 此设备的位置信息已关闭：{steps}，{why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 在这里碰面"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 已设置碰面地点，你的司机可以看到"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 移动标记"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 标记已移除，你的司机会到你所在的位置"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 共享你的位置"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 共享你的位置，以便同行的人找到你"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 点按地图上你想碰面的地方"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 正在等待你的位置，乘客暂时还看不到你"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 你的位置只是大致位置。请开启“精确位置”，{why}：{steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 请求搭车"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 搭车"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 你已上线"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 正在等待{name}的确切位置，你也可以请对方设置一个 📍 碰面地点"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name}一小时多前最后出现在那里"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} {n} 分钟前最后出现在那里"

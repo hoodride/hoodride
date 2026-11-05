@@ -26,10 +26,13 @@ defmodule Mix.Tasks.Hoodride.Minify do
   @skip ~w(maplibre-gl.js phoenix.min.js h3-js.umd.js sw.js)
 
   @doc "The files minified: our own JS that's served."
+  # (and not the languages' catalogs, i18n-<lang>.js: generated, already
+  # compact data — minifying would only turn their letters into \u escapes,
+  # several times bigger; languages, 2026-11-04)
   def files do
     HoodrideWeb.static_paths()
     |> Enum.filter(&String.ends_with?(&1, ".js"))
-    |> Enum.reject(&(&1 in @skip))
+    |> Enum.reject(&(&1 in @skip or &1 =~ ~r/^i18n-.+\.js$/))
   end
 
   # No developer notes in what the public gets (owner, 2026-11-02): our own

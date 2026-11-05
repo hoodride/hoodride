@@ -1,0 +1,1172 @@
+# Hood Ride in Indonesian. A first translation (2026-11-04).
+# Plural forms by name, in this order: other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: id\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(permintaan ditarik)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "Terima perjalanan"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "Menerima perjalanan…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "Menerima…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "Tambahkan sebelum mengemudi"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "Tambahkan mobil Anda"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "Ditanyakan saat pertama kali Anda menavigasi"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "Kembali"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "Kembali ke halaman masuk"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "Sebelum memulai"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "Krem"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "krem"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "Hitam"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "hitam"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "Biru"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "biru"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "Cokelat"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "cokelat"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "Dengan melanjutkan, Anda menyetujui {terms} dan {privacy} kami."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Tidak dapat terhubung ke Hood Ride — mencoba lagi…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Tidak dapat terhubung ke Hood Ride — coba lagi"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "Batal"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "Batalkan permintaan"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "Batalkan permintaan tumpangan Anda dulu"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "Batalkan permintaan tumpangan Anda dulu."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "Pusatkan ke lokasi saya"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "Ubah"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "Ubah kapan saja: ketuk foto profil di kiri atas, lalu {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "Ubah di {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "Sudah diubah?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "Chat"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "Chat dengan {name} berakhir — dia sudah lama tidak aktif"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "Chat"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "Periksa {fields} (maksimal {max} huruf per kolom)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "Pilih…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "Tutup"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "Tutup setelan"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "Warna"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "Menghubungkan…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "Masalah koneksi — mencoba lagi"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "Koneksi direset — ketuk AKTIFKAN untuk mengemudi lagi"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "Koneksi direset — ketuk ✋ lagi jika Anda masih butuh tumpangan"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "Koneksi direset — perjalanan Anda berakhir secara tiba-tiba, silakan atur ulang"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "Koneksi direset — permintaan tumpangan Anda hilang, silakan minta lagi"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Lanjutkan dengan Facebook"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Lanjutkan dengan Google"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "Disalin ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "Salin"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "Salin pesan"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "Tidak dapat menerima"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "Tidak dapat menyalin"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "Tidak dapat menghapus akun Anda — silakan coba lagi."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Tidak dapat terhubung ke Hood Ride — periksa koneksi Anda dan coba lagi."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Tidak dapat terhubung ke Hood Ride — coba lagi"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "Tidak dapat terhubung ke server — coba lagi"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "Tidak dapat memperbarui otomatis — ketuk foto profil di kiri atas, lalu Ubah, lalu Perbarui dari Google"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "Tidak dapat memperbarui saat ini — coba lagi nanti"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "Tidak dapat menyimpan saat ini — coba lagi sebentar lagi."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "Tidak dapat menyimpan — coba lagi"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "Tidak dapat mengirim permintaan"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "Tidak dapat masuk — coba lagi"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "Tidak dapat keluar — coba lagi"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "HAPUS"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "Tolak"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "Hapus akun"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "Hapus akun saya"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "Hapus akun Anda?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "Demo"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "Mengemudi"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "Pengemudi"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "Pengemudi tidak bisa mengambil perjalanan ini — coba yang lain"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "Akhiri perjalanan"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "Akhiri perjalanan Anda dulu"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "Akhiri perjalanan Anda dulu."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "Selesaikan perjalanan Anda saat ini dulu"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "NONAKTIFKAN"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "AKTIFKAN"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "Beri pengemudi ini waktu semenit sebelum meminta lagi"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Buka Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "Emas"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "emas"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Google mungkin perlu sedikit waktu"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "Abu-abu"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "abu-abu"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "Hijau"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "hijau"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride di Discord"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride dibuka di perangkat lain"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "Saya setuju"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "Saya sudah sampai"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "Keluar dari demo"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "Merek"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "Daftar merek"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "Peta"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "Masukan tentang peta"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "Penanda peta"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "Ketemu di sini"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "Pesan"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "Pesan tidak terkirim — koneksi bermasalah?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "Pesan tidak terkirim — coba lagi"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "Pesan memiliki terlalu banyak tanda yang ditumpuk pada satu huruf"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "Pesan terlalu panjang — buat kurang dari {max} karakter"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "Pesan…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "Model"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "Navigasi"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "Aplikasi navigasi"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "Butuh tumpangan"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "Tetangga memberi tumpangan untuk tetangga. Lihat mobil dan orang di sekitar yang butuh tumpangan, saling kirim pesan, dan berangkat bersama."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "Tidak tersedia"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "Di semua perangkat Anda"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "Buka petunjuk arah di"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "Oranye"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "oranye"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "Lainnya"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "Halaman tidak ditemukan"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "Halaman tidak ditemukan — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "Menjemput {name} · ketuk 🧭 untuk navigasi"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "Menjemput {name} · {seen} · ketuk 🧭 untuk navigasi"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "Harap baca dan setujui {terms} dan {privacy} kami."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Kebijakan Privasi"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Kebijakan Privasi"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "Ungu"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "ungu"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Menghubungkan kembali ke Hood Ride…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "Merah"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "merah"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Perbarui dari Google"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "Permintaan dibatalkan"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "Permintaan ditolak"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "Permintaan kedaluwarsa — minta lagi atau coba pengemudi lain"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "Minta tumpangan"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "Diminta…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "Meminta tumpangan Anda…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "Meminta…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "Perjalanan selesai"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "Perjalanan dengan {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "Penumpang tidak dapat melihat Anda. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "Penumpang mencarinya saat Anda menjemput mereka. Tambahkan untuk mulai aktif."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "Penumpang melihat ini agar bisa menemukan Anda"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "Tumpangan dari lingkungan Anda"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Situs Web Safari (atau nama browser Anda, jika tidak memakai Safari)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "Simpan"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "Simpan & aktifkan"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "Kirim"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "Setelan"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "Setelan ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "Setelan › Aplikasi › {app} › Izin › Lokasi"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "Pengaturan › Privasi & Keamanan › Layanan Lokasi › {app} › Lokasi Tepat: nyala"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "Pengaturan › Privasi & Keamanan › Layanan Lokasi › {app} › Saat Menggunakan App, lalu nyalakan Lokasi Tepat"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "Tampilkan atau sembunyikan kredit peta"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "Keluar"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "Sedang masuk…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "Perak"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "perak"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "Kode sumber di GitHub"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "Ketuk untuk menghapus"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "Ketentuan"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "Pengemudi itu sudah tidak ada di sekitar"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "Penumpang itu sudah tidak mencari tumpangan"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "Tindakan ini tidak dapat dibatalkan. Akun Anda dihapus, Anda dihilangkan dari peta, percakapan Anda ditutup, dan Anda dikeluarkan dari semua perangkat. Jika nanti masuk lagi, Anda akan memulai dengan akun baru."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "Halaman ini tidak ada."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "Terlambat — permintaan sudah ditarik"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "Terlalu banyak upaya masuk yang gagal dari jaringan Anda — coba lagi nanti."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "Ketik {word} untuk mengonfirmasi"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "Ketik {word} untuk mengonfirmasi."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "Pembaruan tersedia — ketuk untuk memuat ulang"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "Gunakan di sini"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "Putih"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "putih"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "Kuning"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "kuning"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "Anda sudah punya permintaan yang terbuka"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "Anda bisa memperbarui setelah perjalanan"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "Anda bisa memperbarui nama dan foto setelah perjalanan"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "Anda sudah sampai · menjemput {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "Anda sudah menghubungi banyak orang baru — coba lagi nanti"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "Anda sudah sering memperbarui — coba lagi dalam beberapa menit"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "Anda sudah memulai banyak chat baru — coba lagi nanti"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "Mobil Anda"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "Nama dan foto Anda berasal dari {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "Penumpang Anda"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "Perbesar untuk melihat siapa yang ada di sekitar"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "Diterima! Aku jalan sekarang 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "Oke, aku lihat kamu"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "Oke, siap"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "Oke, aku ke tempatmu ya"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "izinkan lokasi presisi untuk situs ini di setelan browser Anda"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "Sebentar lagi sampai"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "klik ikon di sebelah kiri kolom alamat web (bagian atas browser) › Lokasi › Izinkan"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "warna"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "Sip, aku tunggu ya"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "Oke, menuju pin kamu 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "Aku sudah sampai! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "Hai! Aku di binatu di Jalan 3, bisa jemput aku? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "terakhir terlihat lebih dari satu jam lalu"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "terakhir terlihat {n} menit lalu"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "merek"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "model"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "di sekitar"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "baru saja"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "Bentar lagi berangkat 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "buka menu › Pengaturan › Situs dan unduhan › Izin situs › Lokasi"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "buka Setelan browser Anda › Privasi dan keamanan › Setelan situs › Lokasi › izinkan Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "buka {app} › ⋮ › Setelan › Setelan situs › Lokasi › izinkan Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "buka ⋮ › Pengaturan › Izin situs › Lokasi › Tanya untuk mengizinkan"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "agar pengemudi bisa menemukan Anda"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "agar teman perjalanan Anda bisa menemukan Anda"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "Mantap, sampai ketemu!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "ketuk ikon di sebelah kiri kolom alamat web (bagian atas layar) › Izin › Lokasi › Izinkan (pilih Presisi jika ditanya)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "untuk meminta tumpangan"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "untuk mengemudi"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "untuk menunjukkan lokasi Anda"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "aktifkan Lokasi (geser ke bawah › Lokasi)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "aktifkan Layanan Lokasi (Pengaturan › Privasi & Keamanan)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "aktifkan lokasi untuk perangkat ini"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "Ya, aku bisa jemput kamu"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "Iya, tolong ya! Aku di dekat bangku-bangku 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "Hai, apa kabar?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "Hai, lihat tanganmu ✋ perlu dijemput?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "Yakin? Aku masih nunggu di sini 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "browser Anda"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · pengemudi Anda"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{make} {model} {color}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "{count} mobil di sekitar sini"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "{count} mobil di sini"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "Sisa {count} karakter"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "Kelebihan {count} karakter"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "Kelebihan {count} karakter — persingkat pesan Anda untuk mengirim"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} orang di sini"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} orang butuh tumpangan di sini"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "{distance} dari sini"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} sudah sampai"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} sedang dalam perjalanan lain"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} sedang menuju ke sini"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} sedang tidak tersedia"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} sedang tidak tersedia — coba pengemudi lain"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} tidak terlihat — perbesar peta dan temukan mobilnya lagi"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} sudah tidak aktif — coba pengemudi lain"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "{n} jam lalu"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} mil"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "{n} mnt lalu"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} hr"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} j"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} mnt"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site} — lalu di ponsel Anda: {steps} › Izinkan, dengan Gunakan lokasi presisi aktif"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · Menghubungkan kembali…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps} — atau, jika Anda memilih Perkiraan untuk Hood Ride: ketuk ikon di sebelah kiri alamat web › Izin › Reset izin, lalu coba lagi dan pilih Presisi"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › Gunakan lokasi presisi"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. Hood Ride akan dimuat ulang saat Anda kembali."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ Pesan baru"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ Pelan-pelan sebentar"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ Menunggu pengemudi…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ Anda mengirim terlalu cepat — pelan-pelan sebentar"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ Mencari tumpangan…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ Pengemudi di sekitar bisa melihat Anda butuh tumpangan"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ Butuh tumpangan"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ Seseorang di sekitar butuh tumpangan"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ butuh tumpangan"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 Chat"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 Chat ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 Izinkan lokasi saat browser meminta — Hood Ride memerlukannya {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 Mencari lokasi Anda…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Lokasi diblokir untuk Hood Ride — izinkan {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 Lokasi nonaktif di perangkat ini — {steps} {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 Ketemu di sini"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 Titik temu ditetapkan — pengemudi Anda bisa melihatnya"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 Pindahkan pin"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 Pin dihapus — pengemudi akan datang ke tempat Anda"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 Bagikan lokasi Anda"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 Bagikan lokasi Anda agar teman perjalanan Anda bisa menemukan Anda"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 Ketuk peta di tempat Anda ingin bertemu"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 Menunggu lokasi Anda — penumpang belum bisa melihat Anda"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 Lokasi Anda hanya perkiraan — aktifkan Lokasi Tepat {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 meminta tumpangan"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 Menumpang"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 Anda sedang aktif"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 Menunggu lokasi akurat {name} — atau minta dia memasang 📍 titik temu"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} terakhir terlihat di sana lebih dari satu jam lalu"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} terakhir terlihat di sana {n} menit lalu"

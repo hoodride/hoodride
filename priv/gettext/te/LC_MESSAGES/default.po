@@ -1,0 +1,1179 @@
+# Hood Ride in Telugu. A first translation (2026-11-04).
+# Plural forms by name, in this order: one, other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: te\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(రిక్వెస్ట్ వెనక్కి తీసుకోబడింది)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "రైడ్‌ను అంగీకరించండి"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "రైడ్‌ను అంగీకరిస్తోంది…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "అంగీకరిస్తోంది…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "డ్రైవ్ చేసే ముందు దాన్ని జోడించండి"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "మీ కారును జోడించండి"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "మీరు మొదటిసారి నావిగేట్ చేసినప్పుడు అడుగుతుంది"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "వెనుకకు"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "సైన్ ఇన్ పేజీకి తిరిగి వెళ్లండి"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "మీరు ప్రారంభించే ముందు"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "బేజ్"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "బేజ్ రంగు"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "నలుపు"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "నలుపు రంగు"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "నీలం"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "నీలం రంగు"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "గోధుమ రంగు"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "గోధుమ రంగు"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "కొనసాగించడం ద్వారా, మీరు మా {terms}, {privacy}కు అంగీకరిస్తున్నారు."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Hood Rideకు కనెక్ట్ కాలేకపోతోంది. మళ్లీ ట్రై చేస్తోంది…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Hood Rideకు కనెక్ట్ కాలేకపోతోంది. మళ్లీ ట్రై చేయండి"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "రద్దు చేయండి"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "రిక్వెస్ట్‌ను రద్దు చేయండి"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "ముందుగా మీ రైడ్ రిక్వెస్ట్‌ను రద్దు చేయండి"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "ముందుగా మీ రైడ్ రిక్వెస్ట్‌ను రద్దు చేయండి."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "నా లొకేషన్‌ను మధ్యలో చూపించు"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "మార్చండి"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "దీన్ని ఎప్పుడైనా మార్చవచ్చు: ఎగువ ఎడమ వైపున ఉన్న మీ ప్రొఫైల్ ఫోటోను ట్యాప్ చేసి, ఆపై {setting}ను ట్యాప్ చేయండి"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "{provider}లో మార్చండి ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "వాటిని మార్చారా?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "చాట్"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "{name}తో చాట్ ముగిసింది: వారు కొంతసేపటి నుండి అందుబాటులో లేరు"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "చాట్‌లు"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "వీటిని చెక్ చేయండి: {fields} (ఒక్కొక్కటి గరిష్ఠంగా {max} అక్షరాలు)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "ఎంచుకోండి…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "మూసివేయండి"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "సెట్టింగ్‌లను మూసివేయండి"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "రంగు"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "కనెక్ట్ చేస్తోంది…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "కనెక్షన్ సమస్య. మళ్లీ ట్రై చేస్తోంది"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "కనెక్షన్ రీసెట్ అయింది. మళ్లీ డ్రైవ్ చేయడానికి ఆన్‌లైన్‌కు వెళ్లండి బటన్‌ను ట్యాప్ చేయండి"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "కనెక్షన్ రీసెట్ అయింది. మీకు ఇంకా రైడ్ కావాలంటే ✋ను మళ్లీ ట్యాప్ చేయండి"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "కనెక్షన్ రీసెట్ అయింది. మీ రైడ్ అనుకోకుండా ముగిసింది, దయచేసి దాన్ని మళ్లీ సెటప్ చేయండి"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "కనెక్షన్ రీసెట్ అయింది. మీ రైడ్ రిక్వెస్ట్ పోయింది, దయచేసి మళ్లీ రిక్వెస్ట్ చేయండి"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Facebookతో కొనసాగించండి"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Googleతో కొనసాగించండి"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "కాపీ అయింది ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "కాపీ చేయండి"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "మెసేజ్‌ను కాపీ చేయండి"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "అంగీకరించడం సాధ్యపడలేదు"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "కాపీ చేయడం సాధ్యపడలేదు"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "మీ ఖాతాను తొలగించడం సాధ్యపడలేదు. దయచేసి మళ్లీ ట్రై చేయండి."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Hood Rideకు కనెక్ట్ కాలేకపోయింది. మీ కనెక్షన్‌ను చెక్ చేసి, మళ్లీ ట్రై చేయండి."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Hood Rideకు కనెక్ట్ కాలేకపోయింది. మళ్లీ ట్రై చేయండి"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "సర్వర్‌కు కనెక్ట్ కాలేకపోయింది. మళ్లీ ట్రై చేయండి"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "ఆటోమేటిక్‌గా రిఫ్రెష్ చేయడం సాధ్యపడలేదు. ఎగువ ఎడమ వైపున ఉన్న మీ ప్రొఫైల్ ఫోటోను ట్యాప్ చేసి, ఆపై 'మార్చండి', ఆపై 'Google నుండి రిఫ్రెష్ చేయండి'ని ట్యాప్ చేయండి"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "ప్రస్తుతం రిఫ్రెష్ చేయడం సాధ్యపడలేదు. తర్వాత మళ్లీ ట్రై చేయండి"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "ప్రస్తుతం సేవ్ చేయడం సాధ్యపడలేదు. కాసేపటి తర్వాత మళ్లీ ట్రై చేయండి."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "దాన్ని సేవ్ చేయడం సాధ్యపడలేదు. మళ్లీ ట్రై చేయండి"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "రిక్వెస్ట్‌ను పంపడం సాధ్యపడలేదు"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "సైన్ ఇన్ చేయడం సాధ్యపడలేదు. మళ్లీ ట్రై చేయండి"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "సైన్ అవుట్ చేయడం సాధ్యపడలేదు. మళ్లీ ట్రై చేయండి"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "తొలగించు"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "తిరస్కరించండి"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "ఖాతాను తొలగించండి"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "నా ఖాతాను తొలగించండి"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "మీ ఖాతాను తొలగించాలా?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "డెమో"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "డ్రైవ్ చేయండి"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "డ్రైవర్"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "డ్రైవర్ ఈ రైడ్‌ను తీసుకోలేరు. వేరే డ్రైవర్‌ను ట్రై చేయండి"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "రైడ్‌ను ముగించండి"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "ముందుగా మీ రైడ్‌ను ముగించండి"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "ముందుగా మీ రైడ్‌ను ముగించండి."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "ముందుగా మీ ప్రస్తుత రైడ్‌ను పూర్తి చేయండి"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "ఆఫ్‌లైన్‌కు వెళ్లండి"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "ఆన్‌లైన్‌కు వెళ్లండి"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "మళ్లీ అడిగే ముందు ఈ డ్రైవర్‌కు ఒక నిమిషం సమయం ఇవ్వండి"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Hood Rideకు వెళ్లండి"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "బంగారు రంగు"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "బంగారు రంగు"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Googleకు కొంచెం సమయం పట్టవచ్చు"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "బూడిద రంగు"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "బూడిద రంగు"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "ఆకుపచ్చ"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "ఆకుపచ్చ రంగు"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Discordలో Hood Ride"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride మరో పరికరంలో తెరవబడింది"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "నేను అంగీకరిస్తున్నాను"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "నేను ఇక్కడ ఉన్నాను"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "డెమో నుండి నిష్క్రమించండి"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "కంపెనీ"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "కంపెనీలు"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "మ్యాప్"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "మ్యాప్ ఫీడ్‌బ్యాక్"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "మ్యాప్ మార్కర్"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "ఇక్కడ కలుద్దాం"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "మెసేజ్"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "మెసేజ్ వెళ్లలేదు. కనెక్షన్ ఉందా?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "మెసేజ్ వెళ్లలేదు. మళ్లీ ట్రై చేయండి"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "మెసేజ్‌లో ఒకే అక్షరంపై చాలా ఎక్కువ గుర్తులు ఉన్నాయి"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "మెసేజ్ చాలా పెద్దగా ఉంది. {max} కంటే తక్కువ అక్షరాలు ఉండేలా చూడండి"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "మెసేజ్…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "మోడల్"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "నావిగేట్ చేయండి"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "నావిగేషన్ యాప్"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "రైడ్ కావాలి"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "ఇరుగుపొరుగు వారికి ఇరుగుపొరుగు వారే రైడ్ ఇస్తారు. సమీపంలోని కార్లను, రైడ్ కావాల్సిన వ్యక్తులను చూడండి, ఒకరికొకరు మెసేజ్ చేసుకోండి, కలిసి ప్రయాణించండి."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "అందుబాటులో లేదు"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "మీ అన్ని పరికరాలలో"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "దిశలను దీనిలో తెరవండి"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "నారింజ"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "నారింజ రంగు"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "ఇతర"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "పేజీ కనుగొనబడలేదు"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "పేజీ కనుగొనబడలేదు — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "{name}ను పికప్ చేస్తున్నారు · నావిగేట్ చేయడానికి 🧭ను ట్యాప్ చేయండి"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "{name}ను పికప్ చేస్తున్నారు · {seen} · నావిగేట్ చేయడానికి 🧭ను ట్యాప్ చేయండి"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "దయచేసి మా {terms}, {privacy}ని చదివి అంగీకరించండి."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "గోప్యతా పాలసీ"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "గోప్యతా పాలసీ"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "ఊదా"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "ఊదా రంగు"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Hood Rideకు మళ్లీ కనెక్ట్ చేస్తోంది…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "ఎరుపు"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "ఎరుపు రంగు"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Google నుండి రిఫ్రెష్ చేయండి"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "రిక్వెస్ట్ రద్దు చేయబడింది"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "రిక్వెస్ట్ తిరస్కరించబడింది"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "రిక్వెస్ట్ గడువు ముగిసింది. మళ్లీ అడగండి లేదా వేరే డ్రైవర్‌ను ట్రై చేయండి"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "రైడ్ రిక్వెస్ట్ చేయండి"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "రిక్వెస్ట్ చేశారు…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "మీ రైడ్‌ను రిక్వెస్ట్ చేస్తోంది…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "రిక్వెస్ట్ చేస్తోంది…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "రైడ్ ముగిసింది"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "{name}తో రైడ్"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "ప్రయాణికులకు మీరు కనిపించడం లేదు. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "మీరు పికప్ చేసేటప్పుడు ప్రయాణికులు మీ కారు కోసం చూస్తారు. ఆన్‌లైన్‌కు వెళ్లడానికి దాన్ని జోడించండి."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "ప్రయాణికులు మిమ్మల్ని కనుగొనగలిగేలా వారికి ఇది కనిపిస్తుంది"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "మీ ఇరుగుపొరుగు వారితో రైడ్‌లు"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Safari వెబ్‌సైట్‌లు (లేదా మీరు Safari ఉపయోగించకపోతే, మీ బ్రౌజర్ పేరు)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "సేవ్ చేయండి"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "సేవ్ చేసి ఆన్‌లైన్‌కు వెళ్లండి"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "పంపండి"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "సెట్టింగ్‌లు"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "సెట్టింగ్‌లు ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "సెట్టింగ్‌లు › యాప్‌లు › {app} › అనుమతులు › లొకేషన్"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "సెట్టింగ్స్ › గోప్యత, భద్రత › లొకేషన్ సర్వీస్‌లు › {app} › ఖచ్చితమైన లొకేషన్: ఆన్"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "సెట్టింగ్స్ › గోప్యత, భద్రత › లొకేషన్ సర్వీస్‌లు › {app} › యాప్‌ను ఉపయోగిస్తున్నప్పుడు, ఆపై ఖచ్చితమైన లొకేషన్‌ను ఆన్ చేయండి"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "మ్యాప్ క్రెడిట్‌లను చూపించండి లేదా దాచండి"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "సైన్ అవుట్ చేయండి"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "సైన్ ఇన్ చేస్తోంది…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "వెండి రంగు"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "వెండి రంగు"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "GitHubలో సోర్స్ కోడ్"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "తీసివేయడానికి ట్యాప్ చేయండి"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "నిబంధనలు"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "ఆ డ్రైవర్ ఇప్పుడు సమీపంలో లేరు"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "ఆ ప్రయాణికుడు ఇప్పుడు రైడ్ కోసం చూడటం లేదు"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "దీన్ని రద్దు చేయలేరు. మీ ఖాతా తీసివేయబడుతుంది, మీరు మ్యాప్ నుండి తీసివేయబడతారు, మీ సంభాషణలు మూసివేయబడతాయి, అన్ని పరికరాలలో మీరు సైన్ అవుట్ చేయబడతారు. తర్వాత మళ్లీ సైన్ ఇన్ చేస్తే కొత్త ఖాతా ప్రారంభమవుతుంది."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "ఈ పేజీ లేదు."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "ఆలస్యమైంది: రిక్వెస్ట్ వెనక్కి తీసుకోబడింది"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "మీ నెట్‌వర్క్ నుండి చాలా సైన్ ఇన్ ప్రయత్నాలు విఫలమయ్యాయి. తర్వాత మళ్లీ ట్రై చేయండి."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "నిర్ధారించడానికి {word} అని టైప్ చేయండి"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "నిర్ధారించడానికి {word} అని టైప్ చేయండి."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "అప్‌డేట్ అందుబాటులో ఉంది. రీలోడ్ చేయడానికి ట్యాప్ చేయండి"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "ఇక్కడ ఉపయోగించండి"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "తెలుపు"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "తెలుపు రంగు"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "పసుపు"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "పసుపు రంగు"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "మీకు ఇప్పటికే ఒక ఓపెన్ రిక్వెస్ట్ ఉంది"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "మీ రైడ్ తర్వాత మీరు రిఫ్రెష్ చేయవచ్చు"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "మీ రైడ్ తర్వాత మీ పేరు, ఫోటోను రిఫ్రెష్ చేయవచ్చు"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "మీరు చేరుకున్నారు · {name}ను పికప్ చేస్తున్నారు"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "మీరు చాలా మంది కొత్త వ్యక్తులను సంప్రదించారు. తర్వాత మళ్లీ ట్రై చేయండి"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "మీరు చాలాసార్లు రిఫ్రెష్ చేశారు. కొన్ని నిమిషాల తర్వాత మళ్లీ ట్రై చేయండి"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "మీరు చాలా కొత్త చాట్‌లు ప్రారంభించారు. తర్వాత మళ్లీ ట్రై చేయండి"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "మీ కారు"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "మీ పేరు, ఫోటో {provider} నుండి వస్తాయి"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "మీ ప్రయాణికుడు"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "చుట్టుపక్కల ఎవరున్నారో చూడటానికి జూమ్ ఇన్ చేయండి"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "ఓకే చేశాను! దారిలో ఉన్నాను 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "సరే, మీరు కనిపిస్తున్నారు"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "సరే, డన్"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "సరే, అయితే నేనే మీ దగ్గరికి వస్తున్నాను"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "మీ బ్రౌజర్ సెట్టింగ్‌లలో ఈ సైట్‌కు కచ్చితమైన లొకేషన్‌ను అనుమతించండి"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "కొన్ని నిమిషాల్లో వస్తాను"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "వెబ్ అడ్రస్ బార్‌కు (బ్రౌజర్ పైభాగంలో) ఎడమ వైపున ఉన్న చిహ్నాన్ని క్లిక్ చేయండి › లొకేషన్ › అనుమతించండి"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "రంగు"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "సరే, మీ కోసం చూస్తుంటాను"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "అర్థమైంది, మీ పిన్ దగ్గరికి వస్తున్నాను 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "వచ్చేశాను! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "హాయ్! నేను 3వ వీధిలోని లాండ్రీ దగ్గర ఉన్నాను, నన్ను పికప్ చేసుకోగలరా? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "చివరిగా గంట కంటే ముందు కనిపించారు"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "చివరిగా {n} నిమి. క్రితం కనిపించారు"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "కంపెనీ"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "మోడల్"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "సమీపంలో"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "ఇప్పుడు"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "ఒక్క నిమిషంలో బయలుదేరుతున్నాను 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "మెనూను తెరవండి › సెట్టింగ్‌లు › సైట్‌లు, డౌన్‌లోడ్‌లు › సైట్ అనుమతులు › లొకేషన్"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "మీ బ్రౌజర్ సెట్టింగ్‌లను తెరవండి › గోప్యత, సెక్యూరిటీ › సైట్ సెట్టింగ్‌లు › లొకేషన్ › Hood Rideను అనుమతించండి"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "{app}ను తెరవండి › ⋮ › సెట్టింగ్‌లు › సైట్ సెట్టింగ్‌లు › లొకేషన్ › Hood Rideను అనుమతించండి"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "⋮ను తెరవండి › సెట్టింగ్‌లు › సైట్ అనుమతులు › లొకేషన్ › అనుమతించడానికి అడగండి"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "మీ డ్రైవర్ మిమ్మల్ని కనుగొనగలిగేలా"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "మీతో రైడ్ చేసే వ్యక్తి మిమ్మల్ని కనుగొనగలిగేలా"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "సూపర్, త్వరలో కలుద్దాం!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "వెబ్ అడ్రస్ బార్‌కు (స్క్రీన్ పైభాగంలో) ఎడమ వైపున ఉన్న చిహ్నాన్ని ట్యాప్ చేయండి › అనుమతులు › లొకేషన్ › అనుమతించండి (అడిగితే ఖచ్చితమైన లొకేషన్ ఎంచుకోండి)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "రైడ్ అడగడానికి"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "డ్రైవ్ చేయడానికి"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "మీరు ఎక్కడ ఉన్నారో చూపించడానికి"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "లొకేషన్‌ను ఆన్ చేయండి (కిందికి స్వైప్ చేయండి › లొకేషన్)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "లొకేషన్ సర్వీస్‌లను ఆన్ చేయండి (సెట్టింగ్స్ › గోప్యత, భద్రత)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "ఈ పరికరానికి లొకేషన్‌ను ఆన్ చేయండి"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "అవును, నేను మిమ్మల్ని పికప్ చేసుకుంటాను"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "అవును, ప్లీజ్! నేను బెంచీల దగ్గర ఉన్నాను 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "హాయ్, ఏంటి సంగతి?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "హాయ్, మీ చేయి చూశాను ✋ పికప్ కావాలా?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "నిజంగానా? నేను ఇంకా ఇక్కడే ఉన్నాను 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "మీ బ్రౌజర్"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · మీ డ్రైవర్"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{color} {make} {model}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "ఇక్కడ చుట్టుపక్కల {count} కారు"
+msgstr[1] "ఇక్కడ చుట్టుపక్కల {count} కార్లు"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "ఇక్కడ {count} కారు"
+msgstr[1] "ఇక్కడ {count} కార్లు"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "{count} అక్షరం మిగిలి ఉంది"
+msgstr[1] "{count} అక్షరాలు మిగిలి ఉన్నాయి"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count} అక్షరం ఎక్కువగా ఉంది"
+msgstr[1] "{count} అక్షరాలు ఎక్కువగా ఉన్నాయి"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count} అక్షరం ఎక్కువగా ఉంది: పంపడానికి మీ మెసేజ్‌ను చిన్నది చేయండి"
+msgstr[1] "{count} అక్షరాలు ఎక్కువగా ఉన్నాయి: పంపడానికి మీ మెసేజ్‌ను చిన్నది చేయండి"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "ఇక్కడ {count} వ్యక్తి"
+msgstr[1] "ఇక్కడ {count} మంది"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "ఇక్కడ {count} వ్యక్తికి రైడ్ కావాలి"
+msgstr[1] "ఇక్కడ {count} మందికి రైడ్ కావాలి"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "{distance} దూరంలో"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} చేరుకున్నారు"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} ప్రస్తుతం రైడ్‌లో ఉన్నారు"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} దారిలో ఉన్నారు"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} ప్రస్తుతం అందుబాటులో లేరు"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} ప్రస్తుతం అందుబాటులో లేరు. వేరే డ్రైవర్‌ను ట్రై చేయండి"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} కనిపించడం లేదు. జూమ్ ఇన్ చేసి, వారి కారును మళ్లీ కనుగొనండి"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} ఆఫ్‌లైన్‌కు వెళ్లారు. వేరే డ్రైవర్‌ను ట్రై చేయండి"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "{n} గం. క్రితం"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} కి.మీ."
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} మైళ్లు"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "{n} నిమి. క్రితం"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} రో"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} గం"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} నిమి"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site}. అలాగే మీ ఫోన్‌లో: {steps} › అనుమతించండి, ఖచ్చితమైన లొకేషన్‌ను ఉపయోగించండి ఆన్‌లో ఉండాలి"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · మళ్లీ కనెక్ట్ చేస్తోంది…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps}. లేదా, మీరు Hood Ride కోసం రమారమి లొకేషన్ ఎంచుకుంటే: వెబ్ అడ్రస్‌కు ఎడమ వైపున ఉన్న చిహ్నాన్ని ట్యాప్ చేయండి › అనుమతులు › అనుమతులను రీసెట్ చేయండి, ఆపై మళ్లీ ట్రై చేసి, ఖచ్చితమైన లొకేషన్ ఎంచుకోండి"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › ఖచ్చితమైన లొకేషన్‌ను ఉపయోగించండి"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. మీరు తిరిగి వచ్చినప్పుడు Hood Ride రీలోడ్ అవుతుంది."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ కొత్త మెసేజ్"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ కొంచెం ఆగండి"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ డ్రైవర్ కోసం వేచి ఉంది…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ మీరు చాలా వేగంగా పంపుతున్నారు. కొంచెం ఆగండి"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ రైడ్ కోసం వెతుకుతోంది…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ మీకు రైడ్ కావాలని సమీపంలోని డ్రైవర్‌లకు కనిపిస్తోంది"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ రైడ్ కావాలి"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ సమీపంలో ఒకరికి రైడ్ కావాలి"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ రైడ్ కావాలి"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 చాట్"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 చాట్ ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 మీ బ్రౌజర్ అడిగినప్పుడు లొకేషన్‌ను అనుమతించండి. {why} Hood Rideకు ఇది అవసరం"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 మీ లొకేషన్‌ను కనుగొంటోంది…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Hood Ride కోసం లొకేషన్ బ్లాక్ చేయబడింది. {why} దాన్ని అనుమతించండి: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 ఈ పరికరంలో లొకేషన్ ఆఫ్‌లో ఉంది. {why}, {steps}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 ఇక్కడ కలుద్దాం"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 కలిసే చోటు సెట్ అయింది: మీ డ్రైవర్‌కు అది కనిపిస్తుంది"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 పిన్‌ను జరపండి"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 పిన్ తీసివేయబడింది: మీ డ్రైవర్ మీ దగ్గరికే వస్తారు"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 మీ లొకేషన్‌ను షేర్ చేయండి"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 మీతో రైడ్ చేసే వ్యక్తి మిమ్మల్ని కనుగొనగలిగేలా మీ లొకేషన్‌ను షేర్ చేయండి"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 మీరు కలవాలనుకునే చోట మ్యాప్‌పై ట్యాప్ చేయండి"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 మీ లొకేషన్ కోసం వేచి ఉంది. ప్రయాణికులకు మీరు ఇంకా కనిపించడం లేదు"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 మీ లొకేషన్ సుమారుగా మాత్రమే ఉంది. {why} ఖచ్చితమైన లొకేషన్‌ను ఆన్ చేయండి: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 రైడ్ రిక్వెస్ట్ చేశారు"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 రైడ్ చేయండి"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 మీరు ఆన్‌లైన్‌లో ఉన్నారు"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 {name} కచ్చితమైన లొకేషన్ కోసం వేచి ఉంది, లేదా 📍 కలిసే చోటును సెట్ చేయమని వారిని అడగండి"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} చివరిగా గంట కంటే ముందు అక్కడ కనిపించారు"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} చివరిగా {n} నిమి. క్రితం అక్కడ కనిపించారు"

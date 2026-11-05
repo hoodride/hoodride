@@ -68,7 +68,25 @@
   function distance(m, unit) {
     const road = m * ROAD_FACTOR;
     if (road < NEARBY_M) return t("nearby");
-    return `${(road / METERS_PER[unit]).toFixed(1)} ${unit}`;
+    // the number as the reader's language writes it ("0,8" in German), the
+    // unit as a message (a language may write it its own way)
+    const n = oneDecimal(road / METERS_PER[unit]);
+    return unit === "km" ? t("{n} km", { n }) : t("{n} mi", { n });
+  }
+
+  // one decimal, in the reader's language's digits and decimal mark; no
+  // thousands grouping (as toFixed). The made-up en-XA writes English's
+  function oneDecimal(x) {
+    const lang = I18n.lang && I18n.lang();
+    try {
+      return new Intl.NumberFormat(lang === "en-XA" ? "en" : lang || "en", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+        useGrouping: false,
+      }).format(x);
+    } catch (_) {
+      return x.toFixed(1);
+    }
   }
 
   // "0.8 mi away" | "nearby"

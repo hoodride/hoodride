@@ -247,8 +247,12 @@
           <span id="chat-name"></span>
           <span id="chat-dist" class="chat-dist"></span>
         </div>
-        <button id="btn-decline" class="btn btn-danger btn-compact hidden" data-t>Decline</button>
-        <button id="btn-ride-action" class="btn btn-primary btn-compact hidden" data-t>Request ride</button>
+        <!-- the ride's buttons, together: beside the name while there's room,
+             both on their own row under it when there isn't (styles.css) -->
+        <div class="chat-actions">
+          <button id="btn-decline" class="btn btn-danger btn-compact hidden" data-t>Decline</button>
+          <button id="btn-ride-action" class="btn btn-primary btn-compact hidden" data-t>Request ride</button>
+        </div>
         <!-- "Requesting your ride…" for screen readers while it's on its way -->
         <p id="ride-action-status" class="sr-only" role="status"></p>
         <button id="chat-close" class="card-close" aria-label="Close" data-t-attr="aria-label">✕</button>

@@ -1,0 +1,1172 @@
+# Hood Ride in Japanese. A first translation (2026-11-04).
+# Plural forms by name, in this order: other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: ja\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "（リクエストは取り消されました）"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "乗車を承諾"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "乗車を承諾しています…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "承諾しています…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "運転する前に追加してください"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "車を追加"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "初めてナビを使うときに確認"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "戻る"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "ログインページに戻る"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "はじめる前に"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "ベージュ"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "ベージュ"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "黒"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "黒"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "青"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "青"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "茶色"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "茶色"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "続行すると、{terms}と{privacy}に同意したことになります。"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Hood Ride に接続できません。再試行しています…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Hood Ride に接続できません。もう一度お試しください"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "リクエストをキャンセル"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "先に乗車リクエストをキャンセルしてください"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "先に乗車リクエストをキャンセルしてください。"
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "現在地を中心に表示"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "変更"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "いつでも変更できます：左上のプロフィール写真をタップして、{setting}をタップしてください"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "{provider} で変更 ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "変更しましたか？"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "チャット"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "{name}さんとのチャットは終了しました（しばらく応答がありません）"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "チャット"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "{fields}を確認してください（それぞれ{max}文字以内）。"
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "選択…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "閉じる"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "設定を閉じる"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "色"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "接続しています…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "接続に問題があります。再試行しています"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "接続がリセットされました。もう一度運転するには「オンラインにする」をタップしてください"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "接続がリセットされました。まだ乗車が必要な場合は、もう一度 ✋ をタップしてください"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "接続がリセットされました。乗車が予期せず終了しました。もう一度設定してください"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "接続がリセットされました。乗車リクエストが失われました。もう一度リクエストしてください"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Facebook で続行"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Google で続行"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "コピーしました ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "コピー"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "メッセージをコピー"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "承諾できませんでした"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "コピーできませんでした"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "アカウントを削除できませんでした。もう一度お試しください。"
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Hood Ride に接続できませんでした。接続を確認して、もう一度お試しください。"
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Hood Ride に接続できませんでした。もう一度お試しください"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "サーバーに接続できませんでした。もう一度お試しください"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "自動で更新できませんでした。左上のプロフィール写真をタップし、「変更」、「Google から更新」の順にタップしてください"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "今は更新できません。後でもう一度お試しください"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "今は保存できません。しばらくしてからもう一度お試しください。"
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "保存できませんでした。もう一度お試しください"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "リクエストを送信できませんでした"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "ログインできませんでした。もう一度お試しください"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "ログアウトできませんでした。もう一度お試しください"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "削除"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "断る"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "アカウントを削除"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "アカウントを削除する"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "アカウントを削除しますか？"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "デモ"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "運転する"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "ドライバー"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "このドライバーは対応できません。別のドライバーをお試しください"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "乗車を終了"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "先に乗車を終了してください"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "先に乗車を終了してください。"
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "先に現在の乗車を終了してください"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "オフラインにする"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "オンラインにする"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "このドライバーに再度リクエストするまで1分ほどお待ちください"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Hood Ride へ移動"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "ゴールド"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "ゴールド"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Google は少し時間がかかることがあります"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "グレー"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "グレー"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "緑"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "緑"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Discord の Hood Ride"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride が別のデバイスで開かれました"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "同意する"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "着きました"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "デモを終了"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "メーカー"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "メーカー"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "地図"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "地図のフィードバック"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "地図のマーカー"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "ここで待ち合わせ"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "メッセージ"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "メッセージを送信できませんでした。接続を確認してください"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "メッセージを送信できませんでした。もう一度お試しください"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "1つの文字に重ねられた記号が多すぎます"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "メッセージが長すぎます。{max}文字未満にしてください"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "メッセージ…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "車種"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "ナビ"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "ナビアプリ"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "乗せてほしい"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "ご近所どうしで送り合う相乗りアプリ。近くの車や乗せてほしい人を地図で見て、メッセージを送り合い、一緒に移動しましょう。"
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "利用できません"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "すべてのデバイスで"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "経路を開くアプリ"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "オレンジ"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "オレンジ"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "その他"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "ページが見つかりません"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "ページが見つかりません — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "{name}さんを迎えに行っています · 🧭 をタップしてナビ開始"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "{name}さんを迎えに行っています · {seen} · 🧭 をタップしてナビ開始"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "{terms}と{privacy}を読んで同意してください。"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "プライバシーポリシー"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "プライバシーポリシー"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "紫"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "紫"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Hood Ride に再接続しています…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "赤"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "赤"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Google から更新"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "リクエストはキャンセルされました"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "リクエストは断られました"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "リクエストの期限が切れました。もう一度リクエストするか、別のドライバーをお試しください"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "乗車をリクエスト"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "リクエスト済み…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "乗車をリクエストしています…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "リクエストしています…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "乗車が終了しました"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "{name}さんとの乗車"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "乗客にはあなたが表示されていません。{why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "乗客は迎えのときにこの車を目印にします。追加するとオンラインにできます。"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "乗客があなたを見つけられるように表示されます"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "ご近所どうしの相乗り"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Safari Webサイト（Safari 以外を使っている場合はそのブラウザ名）"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "保存"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "保存してオンラインにする"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "送信"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "設定"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "設定（{name}）"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "設定 › アプリ › {app} › 権限 › 位置情報"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "設定 › プライバシーとセキュリティ › 位置情報サービス › {app} › 正確な位置情報：オン"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "設定 › プライバシーとセキュリティ › 位置情報サービス › {app} › このアプリの使用中、さらに「正確な位置情報」をオン"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "地図のクレジットを表示または非表示"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "ログアウト"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "ログインしています…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "シルバー"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "シルバー"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "GitHub のソースコード"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "タップして削除"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "利用規約"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "そのドライバーはもう近くにいません"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "その乗客はもう探していません"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "この操作は元に戻せません。アカウントが削除され、地図から表示が消え、会話は終了し、すべてのデバイスでログアウトされます。後でもう一度ログインすると、新しいアカウントになります。"
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "このページは存在しません。"
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "間に合いませんでした。リクエストは取り消されました"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "お使いのネットワークからのログイン失敗が多すぎます。後でもう一度お試しください。"
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "確認のため「{word}」と入力してください"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "確認のため「{word}」と入力してください。"
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "アップデートがあります。タップして再読み込み"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "ここで使う"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "白"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "白"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "黄色"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "黄色"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "すでに未完了のリクエストがあります"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "乗車後に更新できます"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "名前と写真は乗車後に更新できます"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "到着しました · {name}さんをお迎え中"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "新しい相手に連絡しすぎています。後でもう一度お試しください"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "更新の回数が多すぎます。数分後にもう一度お試しください"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "新しいチャットを始めすぎています。後でもう一度お試しください"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "あなたの車"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "名前と写真は {provider} から取得しています"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "あなたの乗客"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "拡大すると近くにいる人が見えます"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "承諾したよ！今向かってる 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "了解、見えたよ"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "オッケー、了解"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "わかった、じゃあそっちに行くね"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "ブラウザの設定で、このサイトに正確な位置情報を許可してください"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "もうすぐ着くよ"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "アドレスバーの左にあるアイコン（ブラウザ上部）をクリック › 位置情報 › 許可"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "色"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "了解、気をつけて見てるね"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "了解、ピンの場所に向かうね 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "着きました！{car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "こんにちは！3番街のコインランドリーにいるんだけど、乗せてもらえる？🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "最終確認は1時間以上前"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "最終確認は{n}分前"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "メーカー"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "車種"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "近く"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "たった今"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "すぐ出るね 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "メニューを開く › 設定 › サイトとダウンロード › サイトの権限 › 位置情報"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "ブラウザの設定を開く › プライバシーとセキュリティ › サイトの設定 › 位置情報 › Hood Ride を許可"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "{app} を開く › ⋮ › 設定 › サイトの設定 › 位置情報 › Hood Ride を許可"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "⋮ を開く › 設定 › サイトの許可設定 › 位置情報 › 許可を確認"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "ドライバーがあなたを見つけられるように"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "相乗り相手があなたを見つけられるように"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "よかった、じゃあまたすぐにね！"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "アドレスバーの左にあるアイコン（画面上部）をタップ › 権限 › 位置情報 › 許可（確認されたら「正確」を選択）"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "乗車をリクエストするために"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "運転するために"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "現在地を表示するために"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "位置情報をオンにしてください（下にスワイプ › 位置情報）"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "位置情報サービスをオンにしてください（設定 › プライバシーとセキュリティ）"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "このデバイスの位置情報をオンにしてください"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "うん、迎えに行けるよ"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "ぜひお願い！ベンチのところにいるよ 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "やあ、元気？"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "やあ、手を挙げてるのが見えたよ ✋ 迎えに行こうか？"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "ほんと？まだここで待ってるんだけど 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "お使いのブラウザ"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · あなたのドライバー"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{color}の{make} {model}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "このあたりに車が{count}台"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "ここに車が{count}台"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "残り{count}文字"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count}文字オーバー"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count}文字オーバーしています。メッセージを短くしてから送信してください"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "ここに{count}人"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "ここで{count}人が乗せてほしいと待っています"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "{distance}先"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name}さんが到着しました"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name}さんは乗車中です"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name}さんが向かっています"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name}さんは今は対応できません"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name}さんは今は対応できません。別のドライバーをお試しください"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name}さんが表示範囲にいません。拡大して、もう一度車を探してください"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name}さんがオフラインになりました。別のドライバーをお試しください"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "{n}時間前"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} マイル"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "{n}分前"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n}日"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n}時間"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n}分"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site}。さらにスマートフォンの{steps} › 許可 で「正確な現在地情報を使用」をオンにしてください"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · 再接続しています…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps}。または、Hood Ride に「おおよそ」を選んだ場合：アドレスの左にあるアイコンをタップ › 権限 › 権限をリセット の後、もう一度試して「正確」を選択してください"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › 正確な現在地情報を使用"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}。戻ってくると Hood Ride が再読み込みされます。"
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ 新しいメッセージ"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ 少し待ってください"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ ドライバーを待っています…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ 送信が速すぎます。少し待ってください"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ 乗せてくれる車を探しています…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ 近くのドライバーに、あなたが乗車を希望していることが表示されています"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ 乗せてほしい"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ 近くに乗せてほしい人がいます"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ 乗せてほしい"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 チャット"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 チャット（{count}）"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 ブラウザで確認されたら位置情報を許可してください。Hood Ride では{why}位置情報が必要です"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 現在地を探しています…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Hood Ride の位置情報がブロックされています。{why}許可してください：{steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 このデバイスの位置情報がオフになっています。{why}、{steps}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 ここで待ち合わせ"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 待ち合わせ場所を設定しました。ドライバーに表示されています"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 ピンを移動"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 ピンを削除しました。ドライバーがあなたのところに来ます"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 現在地を共有"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 相乗り相手があなたを見つけられるように現在地を共有してください"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 待ち合わせたい場所を地図上でタップしてください"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 現在地を待っています。乗客にはまだ表示されていません"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 現在地はおおよその位置です。{why}「正確な位置情報」をオンにしてください：{steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 乗車をリクエストしました"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 乗る"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 オンラインです"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 {name}さんの正確な位置を待っています。または 📍 待ち合わせ場所を設定するよう頼んでください"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name}さんが最後にそこにいたのは1時間以上前です"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name}さんが最後にそこにいたのは{n}分前です"

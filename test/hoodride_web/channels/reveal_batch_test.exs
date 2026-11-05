@@ -65,8 +65,21 @@ defmodule HoodrideWeb.RevealBatchTest do
              Enum.sort_by(
                [
                  # a rider looking at cars: each car too (none set here)
-                 %{id: a.id, name: "rb-a", photo: "https://example.test/rb-a.png", car: nil},
-                 %{id: b.id, name: "rb-b", photo: "https://example.test/rb-b.png", car: nil}
+                 # (car_parts: the car for the reader's language — languages 2b)
+                 %{
+                   id: a.id,
+                   name: "rb-a",
+                   photo: "https://example.test/rb-a.png",
+                   car: nil,
+                   car_parts: nil
+                 },
+                 %{
+                   id: b.id,
+                   name: "rb-b",
+                   photo: "https://example.test/rb-b.png",
+                   car: nil,
+                   car_parts: nil
+                 }
                ],
                & &1.id
              )

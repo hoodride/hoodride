@@ -202,7 +202,7 @@ defmodule HoodrideWeb.DeleteAccountTest do
           Jason.decode!(json)["messages"]["the word typed to delete the account\u0004DELETE"]
 
         assert is_binary(asked), "#{lang}: no word to type"
-        assert String.downcase(asked) in words, "#{lang} asks for #{asked}"
+        assert Hoodride.I18n.typed_word(asked) in words, "#{lang} asks for #{asked}"
       end
 
       # the sentences around it carry the word in, never a word of their own

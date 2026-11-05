@@ -146,6 +146,11 @@ defmodule HoodrideWeb.CarTest do
 
       assert {:ok, %{users: [%{car: "Gray Honda Civic"}]}} =
                TestClient.request(rider, "world", "reveal", %{"ids" => [d.id]})
+
+      # and its parts, for the reader's language (HoodCar.describe —
+      # "Honda Civic gris"; languages 2b)
+      assert {:ok, %{car_parts: %{color: "Gray", make: "Honda", model: "Civic"}}} =
+               TestClient.request(rider, "world", "reveal", %{"id" => d.id})
     end
 
     # the whole path for "Other": the card a rider taps, and the ride

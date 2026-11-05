@@ -19,6 +19,34 @@ test("the colors are exactly the server's list, in its order", () => {
   assert.deepEqual(C.COLORS, server);
 });
 
+// what riders read (languages 2b): written from the car's parts in the
+// reader's language and order. In English exactly what the server writes
+// (Hoodride.Accounts.car_label: "Gray Honda Civic", "Other" → "Honda Civic")
+test("the car described: English as the server writes it; Spanish in its own order", () => {
+  const I18n = require("../priv/static/i18n.js");
+  I18n.load(null);
+  for (const color of C.COLORS) {
+    const expected = color === "Other" ? "Honda Civic" : `${color} Honda Civic`;
+    assert.equal(C.describe({ color, make: "Honda", model: "Civic" }), expected);
+  }
+  assert.equal(C.describe(null), null);
+  assert.equal(C.describe({ color: "Gray" }), null, "no make or model: nothing to describe");
+
+  const es = {
+    [`car description${I18n.CTX}{color} {make} {model}`]: "{make} {model} {color}",
+    [`car color, describing a car${I18n.CTX}White`]: "blanco",
+    [`car color${I18n.CTX}White`]: "Blanco",
+  };
+  I18n.load({ lang: "es", messages: es });
+  try {
+    assert.equal(C.describe({ color: "White", make: "Nissan", model: "Altima" }), "Nissan Altima blanco");
+    assert.equal(C.colorName("White"), "Blanco", "the picker's own form");
+    assert.equal(C.describe({ color: "Other", make: "Nissan", model: "Altima" }), "Nissan Altima");
+  } finally {
+    I18n.load(null);
+  }
+});
+
 // the picker shows each color in the reader's language; the value sent
 // stays the server's English one (languages, 2026-11-04)
 test("every color has a name in the reader's language, the English key kept", () => {

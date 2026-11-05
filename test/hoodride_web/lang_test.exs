@@ -17,10 +17,14 @@ defmodule HoodrideWeb.LangTest do
       assert lang(build_conn()) == "en"
       assert lang(asking("en-XA")) == "en-XA"
       assert lang(asking("en-xa,en;q=0.5")) == "en-XA"
-      assert lang(asking("fr-FR,fr;q=0.9,en-XA;q=0.8")) == "en-XA"
+
+      assert lang(asking("eo,eu;q=0.9,en-XA;q=0.8")) == "en-XA",
+             "none of the first two: the third"
+
+      assert lang(asking("fr-FR,fr;q=0.9,en-XA;q=0.8")) == "fr"
       assert lang(asking("en;q=0.9,en-XA")) == "en-XA", "by weight, not by place"
       assert lang(asking("en-XA;q=0,en")) == "en", "q=0: not this one"
-      assert lang(asking("de,fr")) == "en", "none of ours: English"
+      assert lang(asking("eo,la")) == "en", "none of ours: English"
     end
 
     # (Spanish isn't here yet: the matching rule itself, on a list given)
@@ -34,6 +38,39 @@ defmodule HoodrideWeb.LangTest do
         assert Lang.match("fr-FR", on) == nil
       end
 
+      assert Lang.match("en-US", ["en-XA"]) == nil
+    end
+
+    # (languages, stage 2: the tags phones actually send)
+    test "Chinese by script, Norwegian, Filipino, Portugal, old codes" do
+      on = ["en", "zh-Hans", "zh-Hant", "nb", "fil", "pt-BR", "he", "id", "en-XA"]
+
+      for {asked, got} <- [
+            {"zh-CN", "zh-Hans"},
+            {"zh-SG", "zh-Hans"},
+            {"zh", "zh-Hans"},
+            {"zh-Hans-CN", "zh-Hans"},
+            {"zh-TW", "zh-Hant"},
+            {"zh-HK", "zh-Hant"},
+            {"zh-MO", "zh-Hant"},
+            {"zh-Hant", "zh-Hant"},
+            {"no", "nb"},
+            {"nn-NO", "nb"},
+            {"nb-NO", "nb"},
+            {"tl", "fil"},
+            {"fil-PH", "fil"},
+            {"pt-PT", "pt-BR"},
+            {"pt", "pt-BR"},
+            {"iw", "he"},
+            {"in-ID", "id"},
+            {"en-GB", "en"},
+            {"en-XA", "en-XA"}
+          ] do
+        assert Lang.match(asked, on) == got,
+               "#{asked} → #{inspect(Lang.match(asked, on))}, expected #{got}"
+      end
+
+      # the made-up language only by its own exact tag
       assert Lang.match("en-US", ["en-XA"]) == nil
     end
 

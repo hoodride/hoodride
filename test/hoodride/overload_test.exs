@@ -290,7 +290,7 @@ defmodule Hoodride.OverloadTest do
 
       assert_receive %Phoenix.Socket.Broadcast{event: "peer", payload: p}, 2_000
       # the driver's side: with their car, for the rider (none set here)
-      assert p == %{id: driver.id, name: "ov-nm-d", photo: nil, car: nil}
+      assert p == %{id: driver.id, name: "ov-nm-d", photo: nil, car: nil, car_parts: nil}
       # once: nothing more after the name is known
       refute_receive %Phoenix.Socket.Broadcast{event: "peer"}, 300
     end

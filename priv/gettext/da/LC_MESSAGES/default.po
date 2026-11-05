@@ -1,0 +1,1179 @@
+# Hood Ride in Danish. A first translation (2026-11-04).
+# Plural forms by name, in this order: one, other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: da\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(anmodning trukket tilbage)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "Accepter tur"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "Accepterer turen…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "Accepterer…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "Tilføj den, før du kører"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "Tilføj din bil"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "Du bliver spurgt første gang, du navigerer"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "Tilbage"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "Tilbage til login-siden"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "Før du starter"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "Beige"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "beige"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "Sort"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "sort"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "Blå"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "blå"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "Brun"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "brun"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "Når du fortsætter, accepterer du vores {terms} og vores {privacy}."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Kan ikke få forbindelse til Hood Ride. Prøver igen…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Kan ikke få forbindelse til Hood Ride. Prøv igen"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "Annuller"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "Annuller anmodning"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "Annuller først din anmodning om et lift"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "Annuller først din anmodning om et lift."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "Centrer på min placering"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "Skift"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "Skift når som helst: tryk på dit profilbillede øverst til venstre og derefter på {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "Skift på {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "Har du ændret dem?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "Chat"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "Chatten med {name} er afsluttet: personen har været væk et stykke tid"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "Chats"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "Tjek: {fields} (højst {max} bogstaver i hvert felt)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "Vælg…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "Luk"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "Luk indstillinger"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "Farve"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "Opretter forbindelse…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "Forbindelsesproblem. Prøver igen"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "Forbindelsen blev nulstillet. Tryk på GÅ ONLINE for at køre igen"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "Forbindelsen blev nulstillet. Tryk på ✋ igen, hvis du stadig har brug for et lift"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "Forbindelsen blev nulstillet. Din tur sluttede uventet, så aftal den igen"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "Forbindelsen blev nulstillet. Din anmodning om et lift gik tabt, så spørg igen"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Fortsæt med Facebook"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Fortsæt med Google"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "Kopieret ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "Kopiér"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "Kopiér besked"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "Kunne ikke acceptere"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "Kunne ikke kopiere"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "Din konto kunne ikke slettes. Prøv igen."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Kunne ikke få forbindelse til Hood Ride. Tjek din forbindelse, og prøv igen."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Kunne ikke få forbindelse til Hood Ride. Prøv igen"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "Kunne ikke få forbindelse til serveren. Prøv igen"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "Kunne ikke opdatere automatisk. Tryk på dit profilbillede øverst til venstre, derefter Skift og så Opdater fra Google"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "Kunne ikke opdatere lige nu. Prøv igen senere"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "Kunne ikke gemme lige nu. Prøv igen om lidt."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "Kunne ikke gemme. Prøv igen"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "Kunne ikke sende anmodningen"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "Kunne ikke logge ind. Prøv igen"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "Kunne ikke logge ud. Prøv igen"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "SLET"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "Afvis"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "Slet konto"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "Slet min konto"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "Vil du slette din konto?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "Demo"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "Kør"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "Chauffør"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "Chaufføren kan ikke tage denne tur. Prøv en anden"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "Afslut tur"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "Afslut først din tur"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "Afslut først din tur."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "Afslut først din nuværende tur"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "GÅ OFFLINE"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "GÅ ONLINE"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "Giv chaufføren et øjeblik, før du spørger igen"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Gå til Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "Guld"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "guldfarvet"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Google kan være lidt tid om det"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "Grå"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "grå"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "Grøn"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "grøn"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride på Discord"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride blev åbnet på en anden enhed"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "Jeg accepterer"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "Jeg er her"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "Forlad demoen"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "Mærke"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "Mærker"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "Kort"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "Feedback om kortet"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "Kortmarkør"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "Mødes her"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "Besked"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "Beskeden blev ikke sendt. Er der forbindelse?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "Beskeden blev ikke sendt. Prøv igen"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "Beskeden har for mange tegn stablet på det samme bogstav"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "Beskeden er for lang: hold den under {max} tegn"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "Besked…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "Model"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "Naviger"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "Navigationsapp"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "Brug for et lift"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "Naboer, der giver naboer et lift. Se biler og folk i nærheden, der har brug for et lift, skriv til hinanden, og kør sammen."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "Ikke tilgængelig"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "På alle dine enheder"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "Åbn rutevejledning i"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "Orange"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "orange"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "Anden"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "Siden blev ikke fundet"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "Siden blev ikke fundet — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "Henter {name} · tryk på 🧭 for at navigere"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "Henter {name} · {seen} · tryk på 🧭 for at navigere"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "Læs og accepter vores {terms} og vores {privacy}."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Privatlivspolitik"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Privatlivspolitik"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "Lilla"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "lilla"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Opretter forbindelse til Hood Ride igen…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "Rød"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "rød"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Opdater fra Google"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "Anmodningen blev annulleret"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "Anmodningen blev afvist"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "Anmodningen er udløbet. Spørg igen, eller prøv en anden chauffør"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "Bed om et lift"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "Anmodet…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "Beder om dit lift…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "Sender anmodning…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "Turen er slut"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "Tur med {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "Passagerer kan ikke se dig. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "Passagerer kigger efter den, når du henter dem. Tilføj den for at gå online."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "Passagerer kan se dette, så de kan finde dig"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "Lift med dine naboer"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Websteder i Safari (eller navnet på din browser, hvis du ikke bruger Safari)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "Gem"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "Gem og gå online"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "Send"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "Indstillinger"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "Indstillinger ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "Indstillinger › Apps › {app} › Tilladelser › Lokation"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "Indstillinger › Anonymitet og sikkerhed › Lokalitetstjenester › {app} › Præcis lokalitet: til"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "Indstillinger › Anonymitet og sikkerhed › Lokalitetstjenester › {app} › Mens du bruger appen, og slå Præcis lokalitet til"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "Vis eller skjul kortets kildeangivelser"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "Log ud"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "Logger ind…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "Sølv"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "sølvfarvet"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "Kildekode på GitHub"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "Tryk for at fjerne"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "Vilkår"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "Den chauffør er her ikke længere"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "Den passager leder ikke længere"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "Det kan ikke fortrydes. Din konto slettes, du fjernes fra kortet, dine samtaler lukkes, og du logges ud på alle enheder. Hvis du logger ind igen senere, starter du med en ny konto."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "Siden findes ikke."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "For sent: anmodningen er trukket tilbage"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "For mange mislykkede loginforsøg fra dit netværk. Prøv igen senere."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "Skriv {word} for at bekræfte"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "Skriv {word} for at bekræfte."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "Opdatering tilgængelig. Tryk for at genindlæse"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "Brug her"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "Hvid"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "hvid"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "Gul"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "gul"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "Du har allerede en åben anmodning"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "Du kan opdatere efter din tur"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "Du kan opdatere dit navn og billede efter din tur"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "Du er fremme · henter {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "Du har kontaktet mange nye personer. Prøv igen senere"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "Du har opdateret mange gange. Prøv igen om et par minutter"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "Du har startet mange nye chats. Prøv igen senere"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "Din bil"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "Dit navn og billede kommer fra {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "Din passager"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "Zoom ind for at se, hvem der er i nærheden"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "Accepteret! Jeg er på vej 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "Okay, jeg kan se dig"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "Okay, fedt"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "Okay, så kommer jeg hen til dig"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "tillad præcis lokation for dette websted i din browsers indstillinger"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "Er der om lidt"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "klik på ikonet til venstre for adresselinjen (øverst i browseren) › Lokation › Tillad"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "farve"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "Fedt, jeg holder øje med dig"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "Modtaget, jeg kører hen til din nål 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "Jeg er her! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "Hej! Jeg står ved møntvaskeriet på 3. gade, kan du hente mig? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "sidst set for over en time siden"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "sidst set for {n} min. siden"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "mærke"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "model"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "i nærheden"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "nu"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "Kører om et øjeblik 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "åbn menuen › Indstillinger › Websteder og downloads › Webstedstilladelser › Placering"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "åbn browserens Indstillinger › Privatliv og sikkerhed › Indstillinger for website › Lokation › tillad Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "åbn {app} › ⋮ › Indstillinger › Indstillinger for website › Lokation › tillad Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "åbn ⋮ › Indstillinger › Webstedstilladelser › Placering › Spørg om tilladelse"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "så din chauffør kan finde dig"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "så den, du kører med, kan finde dig"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "Fedt, vi ses snart!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "tryk på ikonet til venstre for adresselinjen (øverst på skærmen) › Tilladelser › Lokation › Tillad (vælg Præcis, hvis du bliver spurgt)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "for at bede om et lift"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "for at køre"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "for at vise, hvor du er"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "slå Lokation til (stryg nedad › Lokation)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "slå Lokalitetstjenester til (Indstillinger › Anonymitet og sikkerhed)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "slå placering til på denne enhed"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "Ja, jeg kan hente dig"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "Ja tak! Jeg er ved bænkene 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "Hej, hvad så?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "Hej, jeg så din hånd ✋ Skal jeg hente dig?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "Sikker? Jeg står her stadig 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "din browser"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · din chauffør"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{color} {make} {model}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "{count} bil i nærheden"
+msgstr[1] "{count} biler i nærheden"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "{count} bil her"
+msgstr[1] "{count} biler her"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "{count} tegn tilbage"
+msgstr[1] "{count} tegn tilbage"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count} tegn for meget"
+msgstr[1] "{count} tegn for meget"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count} tegn for meget: forkort din besked for at sende den"
+msgstr[1] "{count} tegn for meget: forkort din besked for at sende den"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} person her"
+msgstr[1] "{count} personer her"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} person har brug for et lift her"
+msgstr[1] "{count} personer har brug for et lift her"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "{distance} væk"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} er fremme"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} er på en tur lige nu"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} er på vej"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} er ikke tilgængelig lige nu"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} er ikke tilgængelig lige nu. Prøv en anden chauffør"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} er ikke synlig. Zoom ind, og find bilen igen"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} er gået offline. Prøv en anden chauffør"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "for {n} t. siden"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} mi"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "for {n} min. siden"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} d."
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} t."
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} min."
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site}, og på din telefon: {steps} › Tillad, med Brug præcis lokation slået til"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · Opretter forbindelse igen…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps}. Eller, hvis du valgte Omtrentlig for Hood Ride: tryk på ikonet til venstre for webadressen › Tilladelser › Nulstil tilladelser, prøv igen, og vælg Præcis"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › Brug præcis lokation"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. Hood Ride genindlæses, når du kommer tilbage."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ Ny besked"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ Vent lige et øjeblik"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ Venter på chaufføren…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ Du sender for hurtigt. Vent lige et øjeblik"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ Leder efter et lift…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ Chauffører i nærheden kan se, at du har brug for et lift"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ Brug for et lift"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ En i nærheden har brug for et lift"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ har brug for et lift"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 Chat"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 Chat ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 Tillad placering, når din browser spørger. Hood Ride har brug for den {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 Finder din placering…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Placering er blokeret for Hood Ride. Tillad den {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 Placering er slået fra på denne enhed: {steps} {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 Mødes her"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 Mødested valgt: din chauffør kan se det"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 Flyt nål"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 Nålen er fjernet: din chauffør kommer hen til dig"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 Del din placering"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 Del din placering, så den, du kører med, kan finde dig"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 Tryk på kortet, hvor I skal mødes"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 Venter på din placering. Passagerer kan ikke se dig endnu"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 Din placering er kun omtrentlig. Slå præcis placering til {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 bad om et lift"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 Kør med"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 Du er online"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 Venter på den præcise placering for {name}, eller bed personen om at vælge et 📍 mødested"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} blev sidst set der for over en time siden"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} blev sidst set der for {n} min. siden"

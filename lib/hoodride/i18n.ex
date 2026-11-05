@@ -22,7 +22,9 @@ defmodule Hoodride.I18n do
 
   # every language with a catalog, English first. A new one: its .po, then
   # its tag here (a test keeps the two the same)
-  @known ~w(en es en-XA)
+  # (Apple's App Store list, one version of each language, plus Filipino
+  # and Swahili — owner, 2026-11-04; right-to-left Arabic, Hebrew, Urdu next)
+  @known ~w(en es pt-BR fr it ca de nl sv da nb fi zh-Hans zh-Hant ja ko vi th id ms fil tr ru uk pl cs sk hr sl ro hu el sw hi bn mr te ta gu kn ml or pa en-XA)
 
   # the pseudo-language's catalog comes from the list, not a .po
   @pseudo "en-XA"
@@ -38,8 +40,11 @@ defmodule Hoodride.I18n do
   LANGUAGES setting), English always among them, in the code's order.
   """
   def on do
-    wanted = Application.get_env(:hoodride, :languages, ["en"])
-    Enum.filter(@known, &(&1 == "en" or &1 in wanted))
+    case Application.get_env(:hoodride, :languages, ["en"]) do
+      # (tests: every language the code knows)
+      :all -> @known
+      wanted -> Enum.filter(@known, &(&1 == "en" or &1 in wanted))
+    end
   end
 
   @doc "A language's script, as the page asks for it (none for English)."
@@ -52,7 +57,54 @@ defmodule Hoodride.I18n do
   # (a .po's Plural-Forms numbers them; i18n.js picks by name, with
   # Intl.PluralRules). English and the pseudo-language: one, other
   # Spanish: "many" is exact millions ("1 000 000 de autos" — CLDR 42+)
-  @plural_categories %{"en-XA" => ~w(one other), "es" => ~w(one many other)}
+  # (each language's forms for whole numbers, from Unicode CLDR as the
+  # browser's Intl.PluralRules gives them; "many" in es/fr/it/pt/ca is
+  # exact millions)
+  @plural_categories %{
+    "en-XA" => ~w(one other),
+    "es" => ~w(one many other),
+    "pt-BR" => ~w(one many other),
+    "fr" => ~w(one many other),
+    "it" => ~w(one many other),
+    "ca" => ~w(one many other),
+    "de" => ~w(one other),
+    "nl" => ~w(one other),
+    "sv" => ~w(one other),
+    "da" => ~w(one other),
+    "nb" => ~w(one other),
+    "fi" => ~w(one other),
+    "zh-Hans" => ~w(other),
+    "zh-Hant" => ~w(other),
+    "ja" => ~w(other),
+    "ko" => ~w(other),
+    "vi" => ~w(other),
+    "th" => ~w(other),
+    "id" => ~w(other),
+    "ms" => ~w(other),
+    "fil" => ~w(one other),
+    "tr" => ~w(one other),
+    "ru" => ~w(one few many),
+    "uk" => ~w(one few many),
+    "pl" => ~w(one few many),
+    "cs" => ~w(one few other),
+    "sk" => ~w(one few other),
+    "hr" => ~w(one few other),
+    "sl" => ~w(one two few other),
+    "ro" => ~w(one few other),
+    "hu" => ~w(one other),
+    "el" => ~w(one other),
+    "sw" => ~w(one other),
+    "hi" => ~w(one other),
+    "bn" => ~w(one other),
+    "mr" => ~w(one other),
+    "te" => ~w(one other),
+    "ta" => ~w(one other),
+    "gu" => ~w(one other),
+    "kn" => ~w(one other),
+    "ml" => ~w(one other),
+    "or" => ~w(one other),
+    "pa" => ~w(one other)
+  }
 
   @doc """
   The catalog i18n.js loads — `%{"lang" => lang, "messages" => %{key => text}}`
@@ -161,7 +213,22 @@ defmodule Hoodride.I18n do
   # ----- the server's own words -----
 
   @doc """
-  The words that confirm deleting an account, lowercase: "delete" and its
+  A typed word compared the forgiving way (the app does the same,
+  app.js plainWord): spaces around dropped, accents and dots dropped
+  (decomposed, marks removed — "ȘTERGE" → "sterge", Turkish "SİL" → "sil"),
+  lowercase, Turkish's dotless ı as i.
+  """
+  def typed_word(word) do
+    word
+    |> String.trim()
+    |> :unicode.characters_to_nfd_binary()
+    |> String.replace(~r/\p{M}/u, "")
+    |> String.downcase()
+    |> String.replace("ı", "i")
+  end
+
+  @doc """
+  The words that confirm deleting an account, compared by typed_word/1: "delete" and its
   translation in every language the code knows (`tc("the word typed to
   delete the account", "DELETE")` — what each screen asks for).
   """
@@ -172,7 +239,7 @@ defmodule Hoodride.I18n do
       words ->
         case messages(lang) do
           %{^key => word} when is_binary(word) and word != "" ->
-            Enum.uniq([String.downcase(word) | words])
+            Enum.uniq([typed_word(word) | words])
 
           _ ->
             words

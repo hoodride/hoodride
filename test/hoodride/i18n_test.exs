@@ -32,13 +32,18 @@ defmodule Hoodride.I18nTest do
       assert I18n.on() == ["en"]
     end
 
-    test "hoodride.app: unset, English only — Spanish and the made-up one are on in tests alone" do
+    test "hoodride.app: unset, English only — every language is on in tests alone" do
       # only the LANGUAGES setting switches one on outside tests
       for f <- ~w(config/config.exs config/prod.exs config/dev.exs),
           do: refute(File.read!(f) =~ ":languages", f)
 
       assert File.read!("config/runtime.exs") =~ ~s[if languages = System.get_env("LANGUAGES") do]
-      assert File.read!("config/test.exs") =~ ~s[config :hoodride, :languages, ~w(en es en-XA)]
+      assert File.read!("config/test.exs") =~ "config :hoodride, :languages, :all"
+    end
+
+    test ":all (tests) is every language the code knows" do
+      Application.put_env(:hoodride, :languages, :all)
+      assert I18n.on() == I18n.known()
     end
   end
 
@@ -102,6 +107,22 @@ defmodule Hoodride.I18nTest do
 
     assert I18n.script("en") == nil
     assert "hoodride.i18n.build --check" in Mix.Project.config()[:aliases][:precommit]
+  end
+
+  # the typed delete word, compared the forgiving way (translators,
+  # 2026-11-04: Romanians type STERGE for ȘTERGE; Turkish has two i's)
+  test "a typed word: no capitals, no accents or dots, spaces around ignored" do
+    same = &(I18n.typed_word(&1) == I18n.typed_word(&2))
+    assert same.("ȘTERGE", "sterge")
+    assert same.("ŞTERGE", "Sterge"), "the older cedilla Ş too"
+    assert same.("SİL", "sil") and same.("SIL", "sil") and same.("sıl", "sil")
+    assert same.("USUŃ", " usun ")
+    assert same.("LÖSCHEN", "loschen")
+    refute same.("ELIMINAR", "ELIMINA")
+    refute same.("delete", "deletes")
+    # the app compares the same way (app.js plainWord)
+    assert File.read!("priv/static/app.js") =~
+             ~s[s.trim().normalize("NFD").replace(/\\p{M}/gu, "").toLowerCase().replace(/ı/g, "i")]
   end
 
   test "the server's own words: in the language's catalog, English if none" do

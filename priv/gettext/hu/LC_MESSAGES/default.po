@@ -1,0 +1,1179 @@
+# Hood Ride in Hungarian. A first translation (2026-11-04).
+# Plural forms by name, in this order: one, other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: hu\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(kérés visszavonva)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "Fuvar elfogadása"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "Fuvar elfogadása…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "Elfogadás…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "Add meg, mielőtt vezetsz"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "Add meg az autódat"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "Az első navigáláskor kérdezzük meg"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "Vissza"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "Vissza a bejelentkezési oldalra"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "Mielőtt elkezded"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "Bézs"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "bézs"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "Fekete"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "fekete"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "Kék"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "kék"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "Barna"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "barna"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "A folytatással elfogadod a következőket: {terms} és {privacy}."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Nem érhető el a Hood Ride – újrapróbálkozás…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Nem érhető el a Hood Ride – próbáld újra"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "Mégse"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "Kérés visszavonása"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "Előbb vond vissza a fuvarkérésedet"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "Előbb vond vissza a fuvarkérésedet."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "Saját helyzetem középre"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "Módosítás"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "Bármikor módosíthatod: koppints a bal felső sarokban a profilképedre, majd erre: {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "Módosítás itt: {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "Módosítottad őket?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "Csevegés"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "Véget ért a csevegés vele: {name} – egy ideje nincs itt"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "Csevegések"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "Ellenőrizd: {fields} (mezőnként legfeljebb {max} betű)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "Válassz…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "Bezárás"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "Beállítások bezárása"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "Szín"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "Csatlakozás…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "Kapcsolati hiba – újrapróbálkozás"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "A kapcsolat újraindult – koppints az ONLINE LESZEK gombra, hogy újra vezethess"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "A kapcsolat újraindult – koppints újra a ✋ jelre, ha még kell fuvar"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "A kapcsolat újraindult – a fuvarod váratlanul véget ért, kérlek, szervezd meg újra"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "A kapcsolat újraindult – a fuvarkérésed elveszett, kérlek, kérj újra"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Folytatás a Facebookkal"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Folytatás a Google-lal"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "Másolva ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "Másolás"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "Üzenet másolása"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "Nem sikerült elfogadni"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "Nem sikerült másolni"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "Nem sikerült törölni a fiókodat – kérlek, próbáld újra."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Nem érhető el a Hood Ride – ellenőrizd a kapcsolatot, és próbáld újra."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Nem érhető el a Hood Ride – próbáld újra"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "Nem érhető el a szerver – próbáld újra"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "Nem sikerült automatikusan frissíteni – koppints a bal felső sarokban a profilképedre, majd a Módosítás, végül a Frissítés a Google-ból lehetőségre"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "Most nem sikerült frissíteni – próbáld újra később"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "Most nem sikerült menteni – próbáld újra egy kicsit később."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "Nem sikerült menteni – próbáld újra"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "Nem sikerült elküldeni a kérést"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "Nem sikerült bejelentkezni – próbáld újra"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "Nem sikerült kijelentkezni – próbáld újra"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "TÖRLÉS"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "Elutasítás"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "Fiók törlése"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "Fiókom törlése"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "Törlöd a fiókodat?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "Bemutató"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "Vezetés"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "Sofőr"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "A sofőr ezt nem tudja vállalni – próbálj egy másikat"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "Fuvar befejezése"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "Előbb fejezd be a fuvart"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "Előbb fejezd be a fuvart."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "Előbb fejezd be a mostani fuvarodat"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "OFFLINE LESZEK"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "ONLINE LESZEK"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "Adj egy percet ennek a sofőrnek, mielőtt újra kérnéd"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Tovább a Hood Ride-ra"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "Arany"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "arany"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "A Google válasza eltarthat egy kicsit"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "Szürke"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "szürke"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "Zöld"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "zöld"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride a Discordon"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "A Hood Ride-ot megnyitották egy másik eszközön"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "Elfogadom"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "Itt vagyok"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "Kilépés a bemutatóból"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "Márka"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "Márkák"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "Térkép"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "Visszajelzés a térképről"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "Térképjelölő"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "Találkozzunk itt"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "Üzenet"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "Nem ment el az üzenet – van kapcsolat?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "Nem ment el az üzenet – próbáld újra"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "Az üzenetben túl sok jel van egyetlen betűn"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "Túl hosszú az üzenet – legyen rövidebb {max} karakternél"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "Üzenet…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "Modell"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "Navigálás"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "Navigációs app"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "Fuvar kell"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "Szomszéd viszi a szomszédot. Nézd meg a közeli autókat és a fuvart kereső embereket, írjatok egymásnak, és utazzatok együtt."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "Nem elérhető"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "Minden eszközödön"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "Útvonal megnyitása itt:"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "Narancssárga"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "narancssárga"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "Egyéb"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "Az oldal nem található"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "Az oldal nem található — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "{name} felvétele · koppints a 🧭 ikonra a navigációhoz"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "{name} felvétele · {seen} · koppints a 🧭 ikonra a navigációhoz"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "Olvasd el és fogadd el a következőket: {terms} és {privacy}."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Adatvédelmi irányelvek"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Adatvédelmi irányelvek"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "Lila"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "lila"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Újracsatlakozás a Hood Ride-hoz…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "Piros"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "piros"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Frissítés a Google-ból"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "Kérés visszavonva"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "Kérés elutasítva"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "A kérés lejárt – kérj újra, vagy próbálj másik sofőrt"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "Fuvar kérése"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "Kérés elküldve…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "Fuvarkérés küldése…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "Küldés…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "A fuvar véget ért"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "Fuvar vele: {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "Az utasok nem látnak. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "Az utasok ez alapján keresnek, amikor felveszed őket. Add meg, hogy online lehess."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "Az utasok ezt látják, hogy megtaláljanak"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "Fuvarok a környékedről"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Safari-webhelyek (vagy a böngésződ neve, ha nem a Safarit használod)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "Mentés"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "Mentés, és online leszek"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "Küldés"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "Beállítások"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "Beállítások ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "Beállítások › Alkalmazások › {app} › Engedélyek › Hely"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "Beállítások › Adatvédelem és biztonság › Helymeghatározás › {app} › Pontos helyzet: be"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "Beállítások › Adatvédelem és biztonság › Helymeghatározás › {app} › Az app használata közben, és kapcsold be a Pontos helyzet beállítást"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "Térképforrások megjelenítése vagy elrejtése"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "Kijelentkezés"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "Bejelentkezés…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "Ezüst"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "ezüst"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "Forráskód a GitHubon"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "Koppints az eltávolításhoz"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "Feltételek"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "Ez a sofőr már nincs a közelben"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "Ez az utas már nem keres fuvart"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "Ez nem vonható vissza. A fiókod törlődik, lekerülsz a térképről, a beszélgetéseid lezárulnak, és minden eszközön kijelentkeztetünk. Ha később újra bejelentkezel, új fiókot kezdesz."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "Ez az oldal nem létezik."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "Túl késő – a kérést visszavonták"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "Túl sok sikertelen bejelentkezés a hálózatodról – próbáld újra később."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "A megerősítéshez írd be: {word}"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "A megerősítéshez írd be: {word}."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "Frissítés érhető el – koppints az újratöltéshez"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "Használat itt"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "Fehér"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "fehér"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "Sárga"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "sárga"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "Már van nyitott kérésed"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "A fuvar után frissíthetsz"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "A nevedet és a fotódat a fuvar után frissítheted"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "Megérkeztél · {name} felvétele"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "Sok új emberrel vetted fel a kapcsolatot – próbáld újra később"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "Sokszor frissítettél – próbáld újra pár perc múlva"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "Sok új csevegést indítottál – próbáld újra később"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "Az autód"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "A neved és a fotód innen származik: {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "Az utasod"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "Nagyíts rá, hogy lásd, ki van a közelben"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "Elfogadva! Már indulok 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "Oké, látlak"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "Oké, rendben"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "Oké, akkor megyek hozzád"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "engedélyezd a pontos helyadatokat ennek a webhelynek a böngésződ beállításaiban"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "Pár perc, és ott vagyok"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "kattints a webcímsáv bal oldalán lévő ikonra (a böngésző tetején) › Tartózkodási hely › Engedélyezés"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "szín"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "Szuper, figyelek rád"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "Értem, megyek a jelölődhöz 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "Itt vagyok! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "Szia! A 3. utcai mosodánál vagyok, fel tudnál venni? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "több mint egy órája volt aktív"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "{n} perce volt aktív"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "márka"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "modell"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "a közelben"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "most"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "Mindjárt indulok 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "nyisd meg a menüt › Beállítások › Webhelyek és letöltések › Webhelyengedélyek › Hely"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "nyisd meg a böngésződ Beállítások menüjét › Adatvédelem és biztonság › Webhelybeállítások › Tartózkodási hely › engedélyezd a Hood Ride-nak"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "nyisd meg: {app} › ⋮ › Beállítások › Webhelybeállítások › Tartózkodási hely › engedélyezd a Hood Ride-nak"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "nyisd meg: ⋮ › Beállítások › Webhelyengedélyek › Hely › Engedélykérés"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "hogy a sofőröd megtaláljon"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "hogy az útitársad megtaláljon"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "Szuper, hamarosan találkozunk!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "koppints a webcímsáv bal oldalán lévő ikonra (a képernyő tetején) › Engedélyek › Hely › Engedélyezés (ha kérdezi, válaszd a Pontos lehetőséget)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "hogy fuvart kérhess"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "hogy vezethess"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "hogy megmutasd, hol vagy"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "kapcsold be a helymeghatározást (húzd le az értesítési sávot › Hely)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "kapcsold be a Helymeghatározást (Beállítások › Adatvédelem és biztonság)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "kapcsold be a helymeghatározást ezen az eszközön"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "Igen, fel tudlak venni"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "Igen, kérlek! A padoknál vagyok 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "Szia, mi újság?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "Szia, láttam, hogy jelentkeztél ✋ Felvegyelek?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "Biztos? Még mindig itt várok 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "a böngésződ"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · a sofőröd"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{color} {make} {model}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "{count} autó a környéken"
+msgstr[1] "{count} autó a környéken"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "{count} autó itt"
+msgstr[1] "{count} autó itt"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "{count} karakter maradt"
+msgstr[1] "{count} karakter maradt"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count} karakterrel túl hosszú"
+msgstr[1] "{count} karakterrel túl hosszú"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count} karakterrel túl hosszú – rövidítsd le az üzenetet, hogy elküldhesd"
+msgstr[1] "{count} karakterrel túl hosszú – rövidítsd le az üzenetet, hogy elküldhesd"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} ember itt"
+msgstr[1] "{count} ember itt"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} ember keres itt fuvart"
+msgstr[1] "{count} ember keres itt fuvart"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "{distance} távolságra"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} megérkezett"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} éppen fuvaron van"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} úton van"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} most nem elérhető"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} most nem elérhető – próbálj másik sofőrt"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} nincs a látható részen – nagyíts rá, és keresd meg újra az autóját"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} offline lett – próbálj másik sofőrt"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "{n} órája"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} mi"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "{n} perce"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} n"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} ó"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} p"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site} – és a telefonodon: {steps} › Engedélyezés, bekapcsolt Pontos helyadatok használata beállítással"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · Újracsatlakozás…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps} – vagy ha a Hood Ride-nál a Hozzávetőleges lehetőséget választottad: koppints a webcím bal oldalán lévő ikonra › Engedélyek › Engedélyek visszaállítása, majd próbáld újra, és válaszd a Pontos lehetőséget"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › Pontos helyadatok használata"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. A Hood Ride újratöltődik, amikor visszajössz."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ Új üzenet"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ Lassíts egy kicsit"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ Várakozás a sofőrre…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ Túl gyorsan küldesz – lassíts egy kicsit"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ Fuvar keresése…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ A közeli sofőrök látják, hogy fuvar kell"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ Fuvar kell"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ Valakinek a közelben fuvar kell"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ fuvart keres"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 Csevegés"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 Csevegés ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 Engedélyezd a helyadatokat, amikor a böngésző kéri – a Hood Ride-nak szüksége van rájuk, {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 Helyzeted meghatározása…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 A helyadatok le vannak tiltva a Hood Ride számára – engedélyezd őket, {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 A helymeghatározás ki van kapcsolva ezen az eszközön – {steps}, {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 Találkozzunk itt"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 Találkozási pont beállítva – a sofőröd látja"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 Jelölő áthelyezése"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 Jelölő eltávolítva – a sofőröd hozzád jön"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 Oszd meg a helyzetedet"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 Oszd meg a helyzetedet, hogy az útitársad megtaláljon"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 Koppints a térképen oda, ahol találkoznátok"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 Várakozás a helyzetedre – az utasok még nem látnak"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 A helyzeted csak hozzávetőleges – kapcsold be a Pontos helyzet funkciót, {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 fuvart kért"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 Utazás"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 Online vagy"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 Várakozás {name} pontos helyzetére – vagy kérd meg, hogy jelöljön ki egy 📍 találkozási pontot"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} több mint egy órája volt ott utoljára"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} {n} perce volt ott utoljára"

@@ -38,6 +38,35 @@
     return COLOR_NAMES[color] ? COLOR_NAMES[color]() : color;
   }
 
+  // the color INSIDE a description ("White Nissan Altima"): its own words —
+  // a language may want another form there (Spanish lowercase "blanco",
+  // agreeing with "car" where adjectives agree) than in the picker's list
+  // (context: the color as it reads in "{color} {make} {model}")
+  const DESCRIBED = {
+    White: () => tc("car color, describing a car", "White"),
+    Black: () => tc("car color, describing a car", "Black"),
+    Gray: () => tc("car color, describing a car", "Gray"),
+    Silver: () => tc("car color, describing a car", "Silver"),
+    Blue: () => tc("car color, describing a car", "Blue"),
+    Red: () => tc("car color, describing a car", "Red"),
+    Green: () => tc("car color, describing a car", "Green"),
+    Brown: () => tc("car color, describing a car", "Brown"),
+    Beige: () => tc("car color, describing a car", "Beige"),
+    Yellow: () => tc("car color, describing a car", "Yellow"),
+    Orange: () => tc("car color, describing a car", "Orange"),
+    Gold: () => tc("car color, describing a car", "Gold"),
+    Purple: () => tc("car color, describing a car", "Purple"),
+  };
+
+  // what riders read, in their language: "Gray Honda Civic", "Honda Civic
+  // gris" — the order is the language's (one message with slots); "Other"
+  // is no color to look for. Make and model are names, as typed. Or null.
+  function describe(car) {
+    if (!car || typeof car.make !== "string" || typeof car.model !== "string") return null;
+    if (!DESCRIBED[car.color]) return tc("car description, no color", "{make} {model}", { make: car.make, model: car.model });
+    return tc("car description", "{color} {make} {model}", { color: DESCRIBED[car.color](), make: car.make, model: car.model });
+  }
+
   // suggested while typing (the browser's own list — any make can be typed:
   // make/model databases go stale, and this needs no outside service)
   const MAKES = [
@@ -104,5 +133,5 @@
     return label ? ` · ${label}` : "";
   }
 
-  return { COLORS, colorName, MAKES, MAX, tidy, problems, suggest, inLine };
+  return { COLORS, colorName, describe, MAKES, MAX, tidy, problems, suggest, inLine };
 });

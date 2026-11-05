@@ -1,0 +1,1186 @@
+# Hood Ride in Czech. A first translation (2026-11-04).
+# Plural forms by name, in this order: one, few, other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: cs\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(žádost stažena)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "Přijmout jízdu"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "Přijímání jízdy…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "Přijímání…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "Přidej ho, než začneš jezdit"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "Přidej své auto"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "Zeptáme se při první navigaci"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "Zpět"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "Zpět na přihlašovací stránku"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "Než začneš"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "Béžové"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "béžový"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "Černé"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "černý"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "Modré"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "modrý"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "Hnědé"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "hnědý"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "Pokračováním souhlasíš s dokumenty {terms} a {privacy}."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Nedaří se spojit s Hood Ride – zkoušíme to znovu…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Nedaří se spojit s Hood Ride – zkus to znovu"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "Zrušit"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "Zrušit žádost"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "Nejdřív zruš svou žádost o odvoz"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "Nejdřív zruš svou žádost o odvoz."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "Vycentrovat na mou polohu"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "Změnit"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "Změnit to můžeš kdykoli: klepni vlevo nahoře na svou profilovou fotku a pak na položku {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "Změnit v účtu {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "Už jsou změněné?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "Chat"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "Chat ({name}) skončil – druhá strana je už nějakou dobu pryč"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "Chaty"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "Zkontroluj: {fields} (u každého max. {max} písmen)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "Vyber…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "Zavřít"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "Zavřít nastavení"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "Barva"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "Připojování…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "Problém s připojením – zkoušíme to znovu"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "Spojení se přerušilo – klepni na PŘEJÍT ONLINE a jezdi dál"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "Spojení se přerušilo – pokud pořád potřebuješ odvoz, klepni znovu na ✋"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "Spojení se přerušilo – jízda nečekaně skončila, domluvte ji prosím znovu"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "Spojení se přerušilo – tvoje žádost o odvoz se ztratila, požádej prosím znovu"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Pokračovat přes Facebook"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Pokračovat přes Google"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "Zkopírováno ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "Kopírovat"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "Kopírovat zprávu"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "Nepodařilo se přijmout"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "Nepodařilo se zkopírovat"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "Účet se nepodařilo smazat – zkus to prosím znovu."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Nepodařilo se spojit s Hood Ride – zkontroluj připojení a zkus to znovu."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Nepodařilo se spojit s Hood Ride – zkus to znovu"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "Nepodařilo se spojit se serverem – zkus to znovu"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "Automatická aktualizace se nezdařila – klepni vlevo nahoře na svou profilovou fotku, pak na Změnit a pak na Načíst znovu z účtu Google"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "Teď se to nepodařilo aktualizovat – zkus to později"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "Teď se to nepodařilo uložit – zkus to za chvíli."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "Nepodařilo se to uložit – zkus to znovu"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "Žádost se nepodařilo odeslat"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "Přihlášení se nezdařilo – zkus to znovu"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "Odhlášení se nezdařilo – zkus to znovu"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "SMAZAT"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "Odmítnout"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "Smazat účet"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "Smazat můj účet"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "Smazat účet?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "Demo"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "Řídit"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "Řidič"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "Řidič tuhle jízdu nemůže vzít – zkus jiného"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "Ukončit jízdu"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "Nejdřív ukonči jízdu"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "Nejdřív ukonči jízdu."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "Nejdřív dokonči aktuální jízdu"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "PŘEJÍT OFFLINE"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "PŘEJÍT ONLINE"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "Než znovu požádáš, dej tomuto řidiči chvilku"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Přejít na Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "Zlaté"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "zlatý"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Přihlášení přes Google může chvíli trvat"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "Šedé"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "šedý"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "Zelené"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "zelený"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride na Discordu"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride je teď otevřený na jiném zařízení"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "Souhlasím"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "Jsem tady"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "Ukončit demo"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "Značka"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "Značky"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "Mapa"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "Zpětná vazba k mapě"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "Značka na mapě"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "Sejdeme se tady"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "Zpráva"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "Zpráva se neodeslala – funguje připojení?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "Zpráva se neodeslala – zkus to znovu"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "Zpráva má na jednom písmenu příliš mnoho diakritických znamének"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "Zpráva je moc dlouhá – použij méně než {max} znaků"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "Zpráva…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "Model"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "Navigovat"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "Navigační aplikace"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "Potřebuju odvoz"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "Sousedé vozí sousedy. Podívej se na auta a lidi v okolí, kteří potřebují odvoz, napište si a jeďte spolu."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "Nedostupné"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "Na všech tvých zařízeních"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "Otevřít navigaci v aplikaci"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "Oranžové"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "oranžový"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "Jiné"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "Stránka nenalezena"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "Stránka nenalezena — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "Vyzvedáváš: {name} · klepnutím na 🧭 spustíš navigaci"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "Vyzvedáváš: {name} · {seen} · klepnutím na 🧭 spustíš navigaci"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "Přečti si dokumenty {terms} a {privacy} a vyjádři s nimi souhlas."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Zásady ochrany osobních údajů"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Zásady ochrany osobních údajů"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "Fialové"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "fialový"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Opětovné připojování k Hood Ride…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "Červené"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "červený"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Načíst znovu z účtu Google"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "Žádost zrušena"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "Žádost odmítnuta"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "Žádost vypršela – požádej znovu nebo zkus jiného řidiče"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "Požádat o odvoz"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "Požádáno…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "Odesílání žádosti o odvoz…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "Odesílání…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "Jízda skončila"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "Jízda: {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "Spolujezdci tě nevidí. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "Spolujezdci podle něj poznají, že jedeš pro ně. Bez něj nemůžeš přejít online."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "Spolujezdci ho uvidí, aby tě snadno našli"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "Svezení od sousedů"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Stránky v Safari (nebo název tvého prohlížeče, pokud nepoužíváš Safari)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "Uložit"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "Uložit a přejít online"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "Odeslat"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "Nastavení"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "Nastavení ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "Nastavení › Aplikace › {app} › Oprávnění › Poloha"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "Nastavení › Soukromí a zabezpečení › Polohové služby › {app} › Přesná poloha: zapnuto"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "Nastavení › Soukromí a zabezpečení › Polohové služby › {app} › Při používání aplikace, a zapni Přesnou polohu"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "Zobrazit nebo skrýt zdroje mapy"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "Odhlásit se"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "Přihlašování…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "Stříbrné"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "stříbrný"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "Zdrojový kód na GitHubu"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "Klepnutím odstraníš"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "Podmínky"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "Tento řidič už není poblíž"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "Tento spolujezdec už odvoz nehledá"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "Tuto akci nelze vrátit zpět. Tvůj účet se odstraní, zmizíš z mapy, tvoje konverzace se uzavřou a na všech zařízeních proběhne odhlášení. Pokud se později znovu přihlásíš, vznikne nový účet."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "Tato stránka neexistuje."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "Pozdě – žádost byla stažena"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "Z tvé sítě bylo příliš mnoho neúspěšných pokusů o přihlášení – zkus to později."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "Pro potvrzení napiš {word}"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "Pro potvrzení napiš {word}."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "K dispozici je aktualizace – klepnutím načteš znovu"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "Používat tady"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "Bílé"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "bílý"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "Žluté"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "žlutý"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "Už máš otevřenou žádost"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "Aktualizovat můžeš po jízdě"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "Jméno a fotku můžeš aktualizovat po jízdě"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "Jsi na místě · vyzvedáváš: {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "Kontaktuješ moc nových lidí – zkus to později"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "Aktualizuješ moc často – zkus to za pár minut"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "Zakládáš moc nových chatů – zkus to později"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "Tvoje auto"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "Tvoje jméno a fotka jsou z účtu {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "Tvůj spolujezdec"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "Přibliž mapu a uvidíš, kdo je v okolí"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "Přijato! Už jedu 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "Jo, už tě vidím"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "Jasně, platí"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "Dobře, tak jedu za tebou"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "povol přesnou polohu pro tento web v nastavení prohlížeče"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "Budu tam za pár minut"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "klikni na ikonu vlevo od adresního řádku (nahoře v prohlížeči) › Poloha › Povolit"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "barva"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "Super, budu tě vyhlížet"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "Jasně, jedu k tvému špendlíku 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "Jsem tady! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "Ahoj! Jsem u prádelny ve Třetí ulici, vyzvedneš mě? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "naposledy aktivní před více než hodinou"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "naposledy aktivní před {n} min"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "značka"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "model"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "poblíž"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "teď"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "Za chvilku vyrážím 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "otevři nabídku › Nastavení › Weby a stahování › Oprávnění webů › Poloha"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "otevři Nastavení prohlížeče › Ochrana soukromí a zabezpečení › Nastavení webu › Poloha › povol Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "otevři {app} › ⋮ › Nastavení › Nastavení webu › Poloha › povol Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "otevři ⋮ › Nastavení › Oprávnění serverů › Poloha › Vždy se zeptat"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "aby tě řidič našel"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "aby tě spolucestující našel"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "Super, brzy se uvidíme!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "klepni na ikonu vlevo od adresního řádku (nahoře na obrazovce) › Oprávnění › Poloha › Povolit (pokud se zeptá, zvol Přesná)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "aby šlo požádat o odvoz"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "aby šlo jezdit jako řidič"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "aby bylo vidět, kde jsi"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "zapni Polohu (přejeď prstem dolů › Poloha)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "zapni Polohové služby (Nastavení › Soukromí a zabezpečení)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "zapni na tomto zařízení polohu"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "Jo, můžu tě vyzvednout"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "Ano, prosím! Jsem u laviček 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "Ahoj, jak se máš?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "Ahoj, vidím tvou ruku ✋ Mám tě vyzvednout?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "Určitě? Pořád tu čekám 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "tvůj prohlížeč"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · tvůj řidič"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{color} {make} {model}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "{count} auto poblíž"
+msgstr[1] "{count} auta poblíž"
+msgstr[2] "{count} aut poblíž"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "{count} auto tady"
+msgstr[1] "{count} auta tady"
+msgstr[2] "{count} aut tady"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "Zbývá {count} znak"
+msgstr[1] "Zbývají {count} znaky"
+msgstr[2] "Zbývá {count} znaků"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count} znak navíc"
+msgstr[1] "{count} znaky navíc"
+msgstr[2] "{count} znaků navíc"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count} znak navíc – zkrať zprávu, aby šla odeslat"
+msgstr[1] "{count} znaky navíc – zkrať zprávu, aby šla odeslat"
+msgstr[2] "{count} znaků navíc – zkrať zprávu, aby šla odeslat"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} osoba tady"
+msgstr[1] "{count} osoby tady"
+msgstr[2] "{count} osob tady"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} osoba tady potřebuje odvoz"
+msgstr[1] "{count} osoby tady potřebují odvoz"
+msgstr[2] "{count} osob tady potřebuje odvoz"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "{distance} odtud"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} je na místě"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} má právě jízdu"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} je na cestě"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} teď není k dispozici"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} teď není k dispozici – zkus jiného řidiče"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} není vidět – přibliž mapu a najdi to auto znovu"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} je offline – zkus jiného řidiče"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "před {n} h"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} mi"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "před {n} min"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} d"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} h"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} min"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site} – a v telefonu {steps} › Povolit, se zapnutou volbou Použít přesnou polohu"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · Opětovné připojování…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps} – nebo, pokud je pro Hood Ride nastavená Přibližná poloha: klepni na ikonu vlevo od webové adresy › Oprávnění › Resetovat oprávnění, pak to zkus znovu a zvol Přesná"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › Použít přesnou polohu"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. Po návratu se Hood Ride znovu načte."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ Nová zpráva"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ Chvilku počkej"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ Čeká se na řidiče…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ Posíláš moc rychle – chvilku počkej"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ Hledá se odvoz…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ Řidiči v okolí vidí, že potřebuješ odvoz"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ Potřebuju odvoz"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ Někdo poblíž potřebuje odvoz"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ potřebuje odvoz"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 Chat"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 Chat ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 Až se prohlížeč zeptá, povol přístup k poloze – Hood Ride ji potřebuje, {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 Zjišťování tvé polohy…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Poloha je pro Hood Ride zablokovaná – povol ji, {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 Poloha je na tomto zařízení vypnutá – {steps}, {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 Sejdeme se tady"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 Místo setkání nastaveno – tvůj řidič ho vidí"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 Přesunout špendlík"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 Špendlík odstraněn – řidič přijede přímo za tebou"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 Sdílej svou polohu"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 Sdílej svou polohu, aby tě spolucestující našel"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 Klepni na mapu tam, kde se chceš sejít"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 Čeká se na tvou polohu – spolujezdci tě zatím nevidí"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 Tvoje poloha je jen přibližná – zapni přesnou polohu, {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 žádá o odvoz"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 Svézt se"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 Jsi online"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 Čeká se, až {name} pošle přesnou polohu – nebo požádej o nastavení 📍 místa setkání"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} – poslední poloha tady je starší než hodina"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} – poslední poloha tady je {n} min stará"

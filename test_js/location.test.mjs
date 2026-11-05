@@ -191,7 +191,8 @@ test("Android, blocked: the browser's own site path, and the phone's switch for 
   assert.match(samsung, /Settings › Apps › Samsung Internet › Permissions › Location/);
 
   const firefox = denied(UA.firefoxAndroid);
-  assert.match(firefox, /⋮ › Settings › Site permissions › Location/);
+  // (Firefox for Android: "Site settings" now — its own shipped strings, 2026-11-04)
+  assert.match(firefox, /⋮ › Settings › Site settings › Location/);
   assert.match(firefox, /Settings › Apps › Firefox › Permissions › Location/);
 
   assert.match(denied(UA.edgeAndroid), /Settings › Apps › Edge ›/);

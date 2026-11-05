@@ -1,0 +1,1172 @@
+# Hood Ride in Thai. A first translation (2026-11-04).
+# Plural forms by name, in this order: other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: th\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(ถอนคำขอแล้ว)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "รับงาน"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "กำลังรับงาน…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "กำลังรับ…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "เพิ่มข้อมูลรถก่อนขับ"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "เพิ่มรถของคุณ"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "ระบบจะถามในครั้งแรกที่คุณนำทาง"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "กลับ"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "กลับไปที่หน้าลงชื่อเข้าใช้"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "ก่อนเริ่มต้น"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "เบจ"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "เบจ"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "ดำ"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "ดำ"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "น้ำเงิน"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "น้ำเงิน"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "น้ำตาล"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "น้ำตาล"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "เมื่อดำเนินการต่อ แสดงว่าคุณยอมรับ{terms}และ{privacy}ของเรา"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "เชื่อมต่อ Hood Ride ไม่ได้ กำลังลองอีกครั้ง…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "เชื่อมต่อ Hood Ride ไม่ได้ โปรดลองอีกครั้ง"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "ยกเลิก"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "ยกเลิกคำขอ"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "ยกเลิกคำขอเรียกรถก่อน"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "โปรดยกเลิกคำขอเรียกรถก่อน"
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "ไปที่ตำแหน่งของฉัน"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "เปลี่ยน"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "เปลี่ยนได้ทุกเมื่อ: แตะรูปโปรไฟล์ที่มุมซ้ายบน แล้วเลือก{setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "เปลี่ยนใน {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "เปลี่ยนแล้วใช่ไหม"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "แชท"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "แชทกับ {name} สิ้นสุดแล้ว เนื่องจากอีกฝ่ายไม่ได้ใช้งานมาสักพัก"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "แชท"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "ตรวจสอบ{fields} (ไม่เกิน {max} ตัวอักษรต่อช่อง)"
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "เลือก…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "ปิด"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "ปิดการตั้งค่า"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "สี"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "กำลังเชื่อมต่อ…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "การเชื่อมต่อมีปัญหา กำลังลองอีกครั้ง"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "การเชื่อมต่อถูกรีเซ็ต แตะ ออนไลน์ เพื่อขับต่อ"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "การเชื่อมต่อถูกรีเซ็ต แตะ ✋ อีกครั้งหากยังต้องการรถ"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "การเชื่อมต่อถูกรีเซ็ต การเดินทางของคุณสิ้นสุดลงโดยไม่คาดคิด โปรดนัดหมายใหม่อีกครั้ง"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "การเชื่อมต่อถูกรีเซ็ต คำขอเรียกรถของคุณหายไป โปรดขออีกครั้ง"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "ดำเนินการต่อด้วย Facebook"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "ดำเนินการต่อด้วย Google"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "คัดลอกแล้ว ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "คัดลอก"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "คัดลอกข้อความ"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "รับงานไม่ได้"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "คัดลอกไม่ได้"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "ลบบัญชีของคุณไม่ได้ โปรดลองอีกครั้ง"
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "เชื่อมต่อ Hood Ride ไม่ได้ โปรดตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง"
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "เชื่อมต่อ Hood Ride ไม่ได้ โปรดลองอีกครั้ง"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ โปรดลองอีกครั้ง"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "รีเฟรชอัตโนมัติไม่ได้ แตะรูปโปรไฟล์ที่มุมซ้ายบน แล้วเลือก เปลี่ยน จากนั้นเลือก รีเฟรชจาก Google"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "รีเฟรชไม่ได้ในขณะนี้ โปรดลองอีกครั้งในภายหลัง"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "บันทึกไม่ได้ในขณะนี้ โปรดลองอีกครั้งในอีกสักครู่"
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "บันทึกไม่ได้ โปรดลองอีกครั้ง"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "ส่งคำขอไม่ได้"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "ลงชื่อเข้าใช้ไม่ได้ โปรดลองอีกครั้ง"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "ออกจากระบบไม่ได้ โปรดลองอีกครั้ง"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "ลบ"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "ปฏิเสธ"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "ลบบัญชี"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "ลบบัญชีของฉัน"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "ลบบัญชีของคุณใช่ไหม"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "เดโม"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "ขับรถ"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "คนขับ"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "คนขับรับเที่ยวนี้ไม่ได้ ลองคนอื่นดู"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "จบการเดินทาง"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "จบการเดินทางของคุณก่อน"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "โปรดจบการเดินทางของคุณก่อน"
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "จบการเดินทางปัจจุบันก่อน"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "ออฟไลน์"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "ออนไลน์"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "รอคนขับคนนี้สักนาทีก่อนขออีกครั้ง"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "ไปที่ Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "ทอง"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "ทอง"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Google อาจใช้เวลาสักครู่"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "เทา"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "เทา"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "เขียว"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "เขียว"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride บน Discord"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride ถูกเปิดในอุปกรณ์อื่น"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "ฉันยอมรับ"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "ฉันมาถึงแล้ว"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "ออกจากเดโม"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "ยี่ห้อ"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "ยี่ห้อรถ"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "แผนที่"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "ความคิดเห็นเกี่ยวกับแผนที่"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "หมุดบนแผนที่"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "เจอกันที่นี่"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "ข้อความ"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "ส่งข้อความไม่ได้ เน็ตหลุดหรือเปล่า"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "ส่งข้อความไม่ได้ โปรดลองอีกครั้ง"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "ข้อความมีเครื่องหมายซ้อนบนตัวอักษรเดียวมากเกินไป"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "ข้อความยาวเกินไป โปรดพิมพ์ไม่เกิน {max} ตัวอักษร"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "ข้อความ…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "รุ่น"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "นำทาง"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "แอปนำทาง"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "ต้องการรถ"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "เพื่อนบ้านไปส่งเพื่อนบ้าน ดูรถและคนที่ต้องการรถในบริเวณใกล้เคียง ส่งข้อความหากัน แล้วเดินทางไปด้วยกัน"
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "ไม่พร้อมใช้งาน"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "ในอุปกรณ์ทั้งหมดของคุณ"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "เปิดเส้นทางใน"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "ส้ม"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "ส้ม"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "อื่นๆ"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "ไม่พบหน้านี้"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "ไม่พบหน้านี้ — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "กำลังไปรับ {name} · แตะ 🧭 เพื่อนำทาง"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "กำลังไปรับ {name} · {seen} · แตะ 🧭 เพื่อนำทาง"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "โปรดอ่านและยอมรับ{terms}และ{privacy}ของเรา"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "นโยบายความเป็นส่วนตัว"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "นโยบาย⁠ความ⁠เป็น⁠ส่วน⁠ตัว"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "ม่วง"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "ม่วง"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "กำลังเชื่อมต่อ Hood Ride อีกครั้ง…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "แดง"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "แดง"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "รีเฟรชจาก Google"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "ยกเลิกคำขอแล้ว"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "คำขอถูกปฏิเสธ"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "คำขอหมดเวลาแล้ว ขออีกครั้งหรือลองคนขับคนอื่น"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "ขอติดรถ"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "ส่งคำขอแล้ว…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "กำลังขอติดรถ…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "กำลังส่งคำขอ…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "การเดินทางสิ้นสุดแล้ว"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "เดินทางกับ {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "ผู้โดยสารมองไม่เห็นคุณ {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "ผู้โดยสารจะมองหารถคันนี้ตอนคุณไปรับ เพิ่มข้อมูลรถเพื่อออนไลน์"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "ผู้โดยสารจะเห็นข้อมูลนี้เพื่อให้หาคุณเจอ"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "เดินทางกับเพื่อนบ้านของคุณ"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "เว็บไซต์ Safari (หรือชื่อเบราว์เซอร์ของคุณ หากไม่ได้ใช้ Safari)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "บันทึก"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "บันทึกและออนไลน์"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "ส่ง"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "การตั้งค่า"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "การตั้งค่า ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "การตั้งค่า › แอป › {app} › สิทธิ์ › ตำแหน่ง"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "การตั้งค่า › ความเป็นส่วนตัวและความปลอดภัย › บริการหาตำแหน่งที่ตั้ง › {app} › ตำแหน่งที่ตั้งจริง: เปิด"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "การตั้งค่า › ความเป็นส่วนตัวและความปลอดภัย › บริการหาตำแหน่งที่ตั้ง › {app} › ในระหว่างใช้แอป แล้วเปิด ตำแหน่งที่ตั้งจริง"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "แสดงหรือซ่อนเครดิตของแผนที่"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "ออกจากระบบ"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "กำลังลงชื่อเข้าใช้…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "เงิน"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "เงิน"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "ซอร์สโค้ดบน GitHub"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "แตะเพื่อนำออก"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "ข้อกำหนด"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "คนขับคนนั้นไม่อยู่แถวนี้แล้ว"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "ผู้โดยสารคนนั้นไม่ได้หารถแล้ว"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "การดำเนินการนี้ไม่สามารถยกเลิกได้ ระบบจะลบบัญชีของคุณ นำคุณออกจากแผนที่ ปิดการสนทนาทั้งหมด และออกจากระบบในทุกอุปกรณ์ หากลงชื่อเข้าใช้อีกครั้งในภายหลัง จะเป็นการเริ่มบัญชีใหม่"
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "ไม่มีหน้านี้"
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "ช้าไปแล้ว คำขอถูกถอนแล้ว"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "มีการลงชื่อเข้าใช้ที่ไม่สำเร็จจากเครือข่ายของคุณมากเกินไป โปรดลองอีกครั้งในภายหลัง"
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "พิมพ์ {word} เพื่อยืนยัน"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "พิมพ์ {word} เพื่อยืนยัน"
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "มีอัปเดตใหม่ แตะเพื่อโหลดซ้ำ"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "ใช้ตรงนี้"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "ขาว"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "ขาว"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "เหลือง"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "เหลือง"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "คุณมีคำขอที่ยังเปิดอยู่แล้ว"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "คุณรีเฟรชได้หลังจบการเดินทาง"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "คุณรีเฟรชชื่อและรูปภาพได้หลังจบการเดินทาง"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "คุณมาถึงแล้ว · กำลังรับ {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "คุณติดต่อคนใหม่ไปหลายคนแล้ว โปรดลองอีกครั้งในภายหลัง"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "คุณรีเฟรชหลายครั้งแล้ว โปรดลองอีกครั้งในอีกไม่กี่นาที"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "คุณเริ่มแชทใหม่ไปหลายรายการแล้ว โปรดลองอีกครั้งในภายหลัง"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "รถของคุณ"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "ชื่อและรูปภาพของคุณมาจาก {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "ผู้โดยสารของคุณ"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "ซูมเข้าเพื่อดูว่ามีใครอยู่แถวนี้"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "รับแล้ว! กำลังไป 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "โอเค เห็นแล้ว"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "โอเค ได้เลย"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "โอเค งั้นเดี๋ยวไปหานะ"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "อนุญาตตำแหน่งที่แน่นอนสำหรับเว็บไซต์นี้ในการตั้งค่าของเบราว์เซอร์"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "อีกแป๊บเดียวถึง"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "คลิกไอคอนทางซ้ายของแถบที่อยู่เว็บ (ด้านบนของเบราว์เซอร์) › ตำแหน่ง › อนุญาต"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "สี"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "ได้เลย เดี๋ยวคอยดูนะ"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "รับทราบ กำลังไปที่หมุดของคุณ 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "ถึงแล้ว! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "สวัสดี! อยู่ที่ร้านซักผ้าถนนสาม มารับหน่อยได้ไหม 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "เห็นล่าสุดเมื่อกว่าหนึ่งชั่วโมงที่แล้ว"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "เห็นล่าสุดเมื่อ {n} นาทีที่แล้ว"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "ยี่ห้อ"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "รุ่น"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "ใกล้ๆ"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "เมื่อสักครู่"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "แป๊บนึงเดี๋ยวออกไป 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "เปิดเมนู › การตั้งค่า › ไซต์และการดาวน์โหลด › สิทธิ์ของไซต์ › ตำแหน่ง"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "เปิดการตั้งค่าของเบราว์เซอร์ › ความเป็นส่วนตัวและความปลอดภัย › การตั้งค่าเว็บไซต์ › ตำแหน่ง › อนุญาต Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "เปิด {app} › ⋮ › การตั้งค่า › การตั้งค่าเว็บไซต์ › ตำแหน่ง › อนุญาต Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "เปิด ⋮ › การตั้งค่า › สิทธิอนุญาตของไซต์ › ตำแหน่ง › ถามเพื่ออนุญาต"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "เพื่อให้คนขับหาคุณเจอ"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "เพื่อให้คนที่เดินทางด้วยกันหาคุณเจอ"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "เยี่ยม แล้วเจอกัน!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "แตะไอคอนทางซ้ายของแถบที่อยู่เว็บ (ด้านบนของหน้าจอ) › สิทธิ์ › ตำแหน่ง › อนุญาต (เลือก แน่นอน หากระบบถาม)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "เพื่อขอติดรถ"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "เพื่อขับรถ"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "เพื่อแสดงตำแหน่งของคุณ"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "เปิดตำแหน่ง (ปัดลง › ตำแหน่ง)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "เปิดบริการหาตำแหน่งที่ตั้ง (การตั้งค่า › ความเป็นส่วนตัวและความปลอดภัย)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "เปิดตำแหน่งสำหรับอุปกรณ์นี้"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "ได้ ไปรับได้นะ"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "ได้เลย ขอบคุณมาก! อยู่ตรงม้านั่ง 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "ว่าไง"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "หวัดดี เห็นยกมือ ✋ ให้ไปรับไหม"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "แน่ใจเหรอ ยังติดอยู่ตรงนี้เลย 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "เบราว์เซอร์ของคุณ"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · คนขับของคุณ"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{make} {model} สี{color}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "รถ {count} คันแถวนี้"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "รถ {count} คันที่นี่"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "เหลืออีก {count} ตัวอักษร"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "เกิน {count} ตัวอักษร"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "เกิน {count} ตัวอักษร โปรดทำให้ข้อความสั้นลงเพื่อส่ง"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} คนที่นี่"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} คนต้องการรถที่นี่"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "ห่างออกไป {distance}"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} มาถึงแล้ว"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} กำลังเดินทางอยู่"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} กำลังมา"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} ไม่ว่างในขณะนี้"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} ไม่ว่างในขณะนี้ ลองคนขับคนอื่นดู"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} ไม่อยู่ในมุมมอง ซูมเข้าแล้วหารถของเขาอีกครั้ง"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} ออฟไลน์แล้ว ลองคนขับคนอื่นดู"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "{n} ชม. ที่แล้ว"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} กม."
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} ไมล์"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "{n} นาทีที่แล้ว"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} วัน"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} ชม."
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} นาที"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site} และในโทรศัพท์ของคุณ: {steps} › อนุญาต โดยเปิด ใช้ตำแหน่งที่แน่นอน"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · กำลังเชื่อมต่ออีกครั้ง…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps} หรือหากคุณเลือก โดยประมาณ ให้ Hood Ride: แตะไอคอนทางซ้ายของที่อยู่เว็บ › สิทธิ์ › รีเซ็ตสิทธิ์ แล้วลองอีกครั้งและเลือก แน่นอน"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › ใช้ตำแหน่งที่แน่นอน"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps} Hood Ride จะโหลดซ้ำเมื่อคุณกลับมา"
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ ข้อความใหม่"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ ช้าลงหน่อย"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ กำลังรอคนขับ…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ คุณส่งเร็วเกินไป ช้าลงหน่อย"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ กำลังหารถ…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ คนขับที่อยู่ใกล้เห็นว่าคุณต้องการรถ"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ ต้องการรถ"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ มีคนใกล้ๆ ต้องการรถ"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ ต้องการรถ"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 แชท"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 แชท ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 อนุญาตตำแหน่งเมื่อเบราว์เซอร์ถาม Hood Ride ต้องใช้ตำแหน่ง{why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 กำลังหาตำแหน่งของคุณ…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 ตำแหน่งถูกบล็อกสำหรับ Hood Ride โปรดอนุญาต{why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 ตำแหน่งปิดอยู่ในอุปกรณ์นี้ {steps} {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 เจอกันที่นี่"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 ตั้งจุดนัดพบแล้ว คนขับของคุณเห็นแล้ว"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 ย้ายหมุด"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 นำหมุดออกแล้ว คนขับจะมาหาคุณเอง"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 แชร์ตำแหน่งของคุณ"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 แชร์ตำแหน่งของคุณเพื่อให้คนที่เดินทางด้วยกันหาคุณเจอ"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 แตะแผนที่ตรงจุดที่คุณอยากนัดเจอ"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 กำลังรอตำแหน่งของคุณ ผู้โดยสารยังมองไม่เห็นคุณ"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 ตำแหน่งของคุณเป็นแบบโดยประมาณเท่านั้น โปรดเปิด ตำแหน่งที่ตั้งจริง {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 ขอติดรถ"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 นั่งรถ"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 คุณออนไลน์อยู่"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 กำลังรอตำแหน่งที่แน่นอนของ {name} หรือขอให้เขาตั้ง 📍 จุดนัดพบ"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 เห็น {name} ที่นั่นล่าสุดเมื่อกว่าหนึ่งชั่วโมงที่แล้ว"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 เห็น {name} ที่นั่นล่าสุดเมื่อ {n} นาทีที่แล้ว"

@@ -1,0 +1,1179 @@
+# Hood Ride in Tamil. A first translation (2026-11-04).
+# Plural forms by name, in this order: one, other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: ta\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(கோரிக்கை திரும்பப் பெறப்பட்டது)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "பயணத்தை ஏற்கவும்"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "பயணத்தை ஏற்கிறது…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "ஏற்கிறது…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "ஓட்டுவதற்கு முன் அதைச் சேர்க்கவும்"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "உங்கள் காரைச் சேர்க்கவும்"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "முதல்முறை வழிகாட்டலைத் தொடங்கும்போது கேட்கப்படும்"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "பின்செல்"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "உள்நுழைவுப் பக்கத்திற்குத் திரும்பு"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "தொடங்கும் முன்"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "பீஜ்"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "பீஜ் நிற"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "கருப்பு"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "கருப்பு நிற"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "நீலம்"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "நீல நிற"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "பழுப்பு"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "பழுப்பு நிற"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "தொடர்வதன் மூலம், எங்கள் {terms}, {privacy} ஆகியவற்றை ஏற்கிறீர்கள்."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Hood Ride உடன் இணைக்க முடியவில்லை. மீண்டும் முயல்கிறது…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Hood Ride உடன் இணைக்க முடியவில்லை. மீண்டும் முயலவும்"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "ரத்துசெய்"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "கோரிக்கையை ரத்துசெய்"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "முதலில் உங்கள் பயணக் கோரிக்கையை ரத்துசெய்யவும்"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "முதலில் உங்கள் பயணக் கோரிக்கையை ரத்துசெய்யவும்."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "எனது இருப்பிடத்தை மையப்படுத்து"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "மாற்று"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "எப்போது வேண்டுமானாலும் மாற்றலாம்: மேலே இடதுபுறம் உள்ள உங்கள் சுயவிவரப் படத்தைத் தட்டி, பிறகு {setting} என்பதைத் தட்டவும்"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "{provider} இல் மாற்று ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "அவற்றை மாற்றினீர்களா?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "அரட்டை"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "{name} உடனான அரட்டை முடிந்தது: அவர் சிறிது நேரமாக இணைப்பில் இல்லை"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "அரட்டைகள்"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "இவற்றைச் சரிபார்க்கவும்: {fields} (ஒவ்வொன்றும் அதிகபட்சம் {max} எழுத்துகள்)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "தேர்வுசெய்யவும்…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "மூடு"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "அமைப்புகளை மூடு"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "நிறம்"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "இணைக்கிறது…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "இணைப்பில் சிக்கல். மீண்டும் முயல்கிறது"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "இணைப்பு மீட்டமைக்கப்பட்டது. மீண்டும் ஓட்ட, ஆன்லைனுக்குச் செல் என்பதைத் தட்டவும்"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "இணைப்பு மீட்டமைக்கப்பட்டது. இன்னும் பயணம் தேவையெனில் ✋ ஐ மீண்டும் தட்டவும்"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "இணைப்பு மீட்டமைக்கப்பட்டது. உங்கள் பயணம் எதிர்பாராமல் முடிந்தது, மீண்டும் அமைக்கவும்"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "இணைப்பு மீட்டமைக்கப்பட்டது. உங்கள் பயணக் கோரிக்கை தொலைந்தது, மீண்டும் கோரவும்"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Facebook மூலம் தொடர்க"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Google மூலம் தொடர்க"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "நகலெடுக்கப்பட்டது ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "நகலெடு"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "மெசேஜை நகலெடு"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "ஏற்க முடியவில்லை"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "நகலெடுக்க முடியவில்லை"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "உங்கள் கணக்கை நீக்க முடியவில்லை. மீண்டும் முயலவும்."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Hood Ride உடன் இணைக்க முடியவில்லை. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Hood Ride உடன் இணைக்க முடியவில்லை. மீண்டும் முயலவும்"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "சேவையகத்துடன் இணைக்க முடியவில்லை. மீண்டும் முயலவும்"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "தானாகப் புதுப்பிக்க முடியவில்லை. மேலே இடதுபுறம் உள்ள உங்கள் சுயவிவரப் படத்தைத் தட்டி, பிறகு 'மாற்று', பிறகு 'Google இலிருந்து புதுப்பி' என்பதைத் தட்டவும்"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "இப்போது புதுப்பிக்க முடியவில்லை. பிறகு மீண்டும் முயலவும்"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "இப்போது சேமிக்க முடியவில்லை. சிறிது நேரத்தில் மீண்டும் முயலவும்."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "அதைச் சேமிக்க முடியவில்லை. மீண்டும் முயலவும்"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "கோரிக்கையை அனுப்ப முடியவில்லை"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "உள்நுழைய முடியவில்லை. மீண்டும் முயலவும்"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "வெளியேற முடியவில்லை. மீண்டும் முயலவும்"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "நீக்கு"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "நிராகரி"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "கணக்கை நீக்கு"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "எனது கணக்கை நீக்கு"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "உங்கள் கணக்கை நீக்கவா?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "டெமோ"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "ஓட்டு"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "டிரைவர்"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "டிரைவரால் இந்தப் பயணத்தை ஏற்க முடியாது. வேறொருவரை முயலவும்"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "பயணத்தை முடி"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "முதலில் உங்கள் பயணத்தை முடிக்கவும்"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "முதலில் உங்கள் பயணத்தை முடிக்கவும்."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "முதலில் உங்கள் தற்போதைய பயணத்தை முடிக்கவும்"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "ஆஃப்லைனுக்குச் செல்"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "ஆன்லைனுக்குச் செல்"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "மீண்டும் கேட்கும் முன் இந்த டிரைவருக்கு ஒரு நிமிடம் கொடுங்கள்"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Hood Ride க்குச் செல்"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "தங்கம்"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "தங்க நிற"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Google சிறிது நேரம் எடுக்கலாம்"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "சாம்பல்"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "சாம்பல் நிற"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "பச்சை"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "பச்சை நிற"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Discord இல் Hood Ride"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride வேறொரு சாதனத்தில் திறக்கப்பட்டது"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "ஏற்கிறேன்"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "வந்துவிட்டேன்"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "டெமோவிலிருந்து வெளியேறு"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "நிறுவனம்"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "நிறுவனங்கள்"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "வரைபடம்"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "வரைபடம் பற்றிய கருத்து"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "வரைபடக் குறிப்பான்"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "இங்கே சந்திப்போம்"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "மெசேஜ்"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "மெசேஜ் அனுப்பப்படவில்லை. இணைப்பு உள்ளதா?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "மெசேஜ் அனுப்பப்படவில்லை. மீண்டும் முயலவும்"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "மெசேஜில் ஒரே எழுத்தின் மீது அதிகமான குறிகள் உள்ளன"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "மெசேஜ் மிக நீளமாக உள்ளது. {max} எழுத்துகளுக்குள் வைக்கவும்"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "மெசேஜ்…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "மாடல்"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "வழிகாட்டு"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "வழிகாட்டல் ஆப்ஸ்"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "பயணம் வேண்டும்"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "அக்கம்பக்கத்தினருக்கு அக்கம்பக்கத்தினரே பயணம் தருகிறார்கள். அருகிலுள்ள கார்களையும் பயணம் தேவைப்படுபவர்களையும் பார்த்து, ஒருவருக்கொருவர் மெசேஜ் அனுப்பி, சேர்ந்து பயணியுங்கள்."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "கிடைக்கவில்லை"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "உங்கள் எல்லாச் சாதனங்களிலும்"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "வழிகளை இதில் திற"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "ஆரஞ்சு"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "ஆரஞ்சு நிற"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "பிற"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "பக்கம் கிடைக்கவில்லை"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "பக்கம் கிடைக்கவில்லை — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "{name} ஐ அழைத்துச் செல்கிறீர்கள் · வழிகாட்டலுக்கு 🧭 ஐத் தட்டவும்"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "{name} ஐ அழைத்துச் செல்கிறீர்கள் · {seen} · வழிகாட்டலுக்கு 🧭 ஐத் தட்டவும்"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "எங்கள் {terms}, {privacy} ஆகியவற்றைப் படித்து ஏற்கவும்."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "தனியுரிமைக் கொள்கை"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "தனியுரிமைக் கொள்கை"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "ஊதா"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "ஊதா நிற"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Hood Ride உடன் மீண்டும் இணைக்கிறது…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "சிவப்பு"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "சிவப்பு நிற"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Google இலிருந்து புதுப்பி"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "கோரிக்கை ரத்துசெய்யப்பட்டது"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "கோரிக்கை நிராகரிக்கப்பட்டது"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "கோரிக்கை காலாவதியானது. மீண்டும் கேட்கவும் அல்லது வேறொரு டிரைவரை முயலவும்"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "பயணம் கோரு"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "கோரப்பட்டது…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "உங்கள் பயணத்தைக் கோருகிறது…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "கோருகிறது…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "பயணம் முடிந்தது"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "{name} உடன் பயணம்"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "பயணிகளால் உங்களைப் பார்க்க முடியாது. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "நீங்கள் அழைத்துச் செல்ல வரும்போது பயணிகள் உங்கள் காரைத் தேடுவார்கள். ஆன்லைனுக்குச் செல்ல அதைச் சேர்க்கவும்."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "பயணிகள் உங்களைக் கண்டறிய இதைப் பார்ப்பார்கள்"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "உங்கள் அக்கம்பக்கத்திலிருந்து பயணங்கள்"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Safari இணையதளங்கள் (அல்லது Safari ஐப் பயன்படுத்தவில்லை என்றால் உங்கள் உலாவியின் பெயர்)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "சேமி"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "சேமித்து ஆன்லைனுக்குச் செல்"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "அனுப்பு"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "அமைப்புகள்"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "அமைப்புகள் ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "அமைப்புகள் › ஆப்ஸ் › {app} › அனுமதிகள் › இருப்பிடம்"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "அமைப்புகள் › தனியுரிமை & பாதுகாப்பு › இருப்பிடச் சேவைகள் › {app} › துல்லியமான இருப்பிடம்: ஆன்"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "அமைப்புகள் › தனியுரிமை & பாதுகாப்பு › இருப்பிடச் சேவைகள் › {app} › செயலியைப் பயன்படுத்தும்போது, பிறகு துல்லியமான இருப்பிடத்தை ஆன் செய்யவும்"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "வரைபடத்தின் கிரெடிட்களைக் காட்டு அல்லது மறை"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "வெளியேறு"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "உள்நுழைகிறது…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "வெள்ளி"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "வெள்ளி நிற"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "GitHub இல் மூலக் குறியீடு"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "அகற்ற தட்டவும்"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "விதிமுறைகள்"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "அந்த டிரைவர் இப்போது அருகில் இல்லை"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "அந்தப் பயணி இப்போது பயணம் தேடவில்லை"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "இதைச் செயல்தவிர்க்க முடியாது. உங்கள் கணக்கு அகற்றப்படும், வரைபடத்திலிருந்து நீங்கள் நீக்கப்படுவீர்கள், உங்கள் உரையாடல்கள் மூடப்படும், எல்லாச் சாதனங்களிலிருந்தும் வெளியேற்றப்படுவீர்கள். பிறகு மீண்டும் உள்நுழைந்தால் புதிய கணக்கு தொடங்கும்."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "இந்தப் பக்கம் இல்லை."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "தாமதமாகிவிட்டது: கோரிக்கை திரும்பப் பெறப்பட்டது"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "உங்கள் நெட்வொர்க்கிலிருந்து பலமுறை உள்நுழைவு தோல்வியடைந்தது. பிறகு மீண்டும் முயலவும்."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "உறுதிப்படுத்த {word} என டைப் செய்யவும்"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "உறுதிப்படுத்த {word} என டைப் செய்யவும்."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "புதுப்பிப்பு உள்ளது. மீண்டும் ஏற்ற தட்டவும்"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "இங்கே பயன்படுத்து"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "வெள்ளை"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "வெள்ளை நிற"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "மஞ்சள்"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "மஞ்சள் நிற"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "உங்களிடம் ஏற்கெனவே ஒரு கோரிக்கை நிலுவையில் உள்ளது"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "பயணம் முடிந்ததும் புதுப்பிக்கலாம்"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "பயணம் முடிந்ததும் உங்கள் பெயரையும் படத்தையும் புதுப்பிக்கலாம்"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "வந்துவிட்டீர்கள் · {name} ஐ அழைத்துச் செல்கிறீர்கள்"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "நிறையப் புதியவர்களைத் தொடர்புகொண்டுள்ளீர்கள். பிறகு மீண்டும் முயலவும்"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "பலமுறை புதுப்பித்துள்ளீர்கள். சில நிமிடங்களில் மீண்டும் முயலவும்"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "நிறையப் புதிய அரட்டைகளைத் தொடங்கியுள்ளீர்கள். பிறகு மீண்டும் முயலவும்"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "உங்கள் கார்"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "உங்கள் பெயரும் படமும் {provider} இலிருந்து வருகின்றன"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "உங்கள் பயணி"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "அருகில் யார் இருக்கிறார்கள் என்று பார்க்கப் பெரிதாக்கவும்"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "ஏற்றுக்கொண்டேன்! வந்துகொண்டிருக்கிறேன் 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "சரி, நீங்க தெரியறீங்க"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "சரி, டன்"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "சரி, அப்போ நானே உங்ககிட்ட வர்றேன்"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "உங்கள் உலாவியின் அமைப்புகளில் இந்தத் தளத்திற்குத் துல்லியமான இருப்பிடத்தை அனுமதிக்கவும்"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "சில நிமிஷத்துல வந்துடறேன்"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "இணைய முகவரிப் பட்டியின் (உலாவியின் மேற்பகுதி) இடதுபுறம் உள்ள ஐகானைக் கிளிக் செய்யவும் › இருப்பிடம் › அனுமதி"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "நிறம்"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "சரி, உங்களுக்காகப் பார்த்துட்டு இருக்கேன்"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "புரிஞ்சது, உங்க பின்னுக்கு வர்றேன் 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "வந்துட்டேன்! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "ஹாய்! நான் 3வது தெருவுல இருக்குற லாண்ட்ரி கிட்ட இருக்கேன், என்னைக் கூட்டிட்டுப் போக முடியுமா? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "கடைசியாக ஒரு மணிநேரத்திற்கும் முன்பு பார்த்தது"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "கடைசியாக {n} நிமி. முன்பு பார்த்தது"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "நிறுவனம்"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "மாடல்"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "அருகில்"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "இப்போது"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "ஒரு நிமிஷத்துல கிளம்பறேன் 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "மெனுவைத் திறக்கவும் › அமைப்புகள் › தளங்களும் பதிவிறக்கங்களும் › தள அனுமதிகள் › இருப்பிடம்"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "உங்கள் உலாவியின் அமைப்புகளைத் திறக்கவும் › தனியுரிமை மற்றும் பாதுகாப்பு › இணையதள அமைப்புகள் › இருப்பிடம் › Hood Ride ஐ அனுமதிக்கவும்"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "{app} ஐத் திறக்கவும் › ⋮ › அமைப்புகள் › இணையதள அமைப்புகள் › இருப்பிடம் › Hood Ride ஐ அனுமதிக்கவும்"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "⋮ ஐத் திறக்கவும் › அமைப்புகள் › தள அனுமதிகள் › இருப்பிடம் › அனுமதிக்கக் கேள்"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "உங்கள் டிரைவர் உங்களைக் கண்டறிய"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "உங்களுடன் பயணிப்பவர் உங்களைக் கண்டறிய"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "சூப்பர், சீக்கிரம் பார்க்கலாம்!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "இணைய முகவரிப் பட்டியின் (திரையின் மேற்பகுதி) இடதுபுறம் உள்ள ஐகானைத் தட்டவும் › அனுமதிகள் › இருப்பிடம் › அனுமதி (கேட்டால் துல்லியம் என்பதைத் தேர்வுசெய்யவும்)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "பயணம் கேட்க"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "ஓட்டுவதற்கு"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "நீங்கள் எங்கே இருக்கிறீர்கள் என்பதைக் காட்ட"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "இருப்பிடத்தை ஆன் செய்யவும் (கீழே ஸ்வைப் செய்யவும் › இருப்பிடம்)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "இருப்பிடச் சேவைகளை ஆன் செய்யவும் (அமைப்புகள் › தனியுரிமை & பாதுகாப்பு)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "இந்தச் சாதனத்திற்கு இருப்பிடத்தை ஆன் செய்யவும்"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "ஆமா, நான் வந்து கூட்டிட்டுப் போறேன்"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "ஆமா, ப்ளீஸ்! நான் பெஞ்சுகள் பக்கத்துல இருக்கேன் 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "ஹாய், என்ன விஷயம்?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "ஹாய், உங்க கையைப் பார்த்தேன் ✋ கூட்டிட்டுப் போகணுமா?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "நிஜமாவா? நான் இன்னும் இங்கேயே காத்திருக்கேன் 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "உங்கள் உலாவி"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · உங்கள் டிரைவர்"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{color} {make} {model}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "இங்கே அருகில் {count} கார்"
+msgstr[1] "இங்கே அருகில் {count} கார்கள்"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "இங்கே {count} கார்"
+msgstr[1] "இங்கே {count} கார்கள்"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "{count} எழுத்து மீதமுள்ளது"
+msgstr[1] "{count} எழுத்துகள் மீதமுள்ளன"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count} எழுத்து அதிகம்"
+msgstr[1] "{count} எழுத்துகள் அதிகம்"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count} எழுத்து அதிகம்: அனுப்ப, மெசேஜைச் சுருக்கவும்"
+msgstr[1] "{count} எழுத்துகள் அதிகம்: அனுப்ப, மெசேஜைச் சுருக்கவும்"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "இங்கே {count} நபர்"
+msgstr[1] "இங்கே {count} நபர்கள்"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "இங்கே {count} நபருக்குப் பயணம் தேவை"
+msgstr[1] "இங்கே {count} நபர்களுக்குப் பயணம் தேவை"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "{distance} தொலைவில்"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} வந்துவிட்டார்"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} இப்போது பயணத்தில் உள்ளார்"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} வந்துகொண்டிருக்கிறார்"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} இப்போது கிடைக்கவில்லை"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} இப்போது கிடைக்கவில்லை. வேறொரு டிரைவரை முயலவும்"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} பார்வையில் இல்லை. பெரிதாக்கி அவரது காரை மீண்டும் கண்டறியவும்"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} ஆஃப்லைனுக்குச் சென்றுவிட்டார். வேறொரு டிரைவரை முயலவும்"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "{n} மணி. முன்பு"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} கி.மீ."
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} மைல்"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "{n} நிமி. முன்பு"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} நா"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} ம"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} நிமி"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site}. அத்துடன் உங்கள் மொபைலில்: {steps} › அனுமதி, துல்லியமான இருப்பிடத்தைப் பயன்படுத்து என்பதை ஆன் செய்து வைக்கவும்"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · மீண்டும் இணைக்கிறது…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps}. அல்லது, Hood Ride க்குத் தோராயம் என்பதைத் தேர்வுசெய்திருந்தால்: இணைய முகவரியின் இடதுபுறம் உள்ள ஐகானைத் தட்டவும் › அனுமதிகள் › அனுமதிகளை மீட்டமை, பிறகு மீண்டும் முயன்று துல்லியம் என்பதைத் தேர்வுசெய்யவும்"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › துல்லியமான இருப்பிடத்தைப் பயன்படுத்து"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. நீங்கள் திரும்பி வரும்போது Hood Ride மீண்டும் ஏற்றப்படும்."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ புதிய மெசேஜ்"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ சற்றுப் பொறுங்கள்"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ டிரைவருக்காகக் காத்திருக்கிறது…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ மிக வேகமாக அனுப்புகிறீர்கள். சற்றுப் பொறுங்கள்"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ பயணத்தைத் தேடுகிறது…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ உங்களுக்குப் பயணம் தேவை என்பது அருகிலுள்ள டிரைவர்களுக்குத் தெரியும்"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ பயணம் வேண்டும்"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ அருகில் ஒருவருக்குப் பயணம் தேவை"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ பயணம் தேவை"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 அரட்டை"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 அரட்டை ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 உங்கள் உலாவி கேட்கும்போது இருப்பிடத்தை அனுமதிக்கவும். {why} Hood Ride க்கு இது தேவை"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 உங்கள் இருப்பிடத்தைக் கண்டறிகிறது…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Hood Ride க்கு இருப்பிடம் தடுக்கப்பட்டுள்ளது. {why} அதை அனுமதிக்கவும்: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 இந்தச் சாதனத்தில் இருப்பிடம் ஆஃப் செய்யப்பட்டுள்ளது. {why}, {steps}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 இங்கே சந்திப்போம்"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 சந்திப்பு இடம் அமைக்கப்பட்டது: உங்கள் டிரைவர் அதைப் பார்ப்பார்"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 பின்னை நகர்த்து"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 பின் அகற்றப்பட்டது: உங்கள் டிரைவர் உங்களிடமே வருவார்"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 உங்கள் இருப்பிடத்தைப் பகிரவும்"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 உங்களுடன் பயணிப்பவர் உங்களைக் கண்டறிய உங்கள் இருப்பிடத்தைப் பகிரவும்"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 சந்திக்க விரும்பும் இடத்தில் வரைபடத்தைத் தட்டவும்"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 உங்கள் இருப்பிடத்திற்காகக் காத்திருக்கிறது. பயணிகளால் இன்னும் உங்களைப் பார்க்க முடியாது"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 உங்கள் இருப்பிடம் தோராயமானது மட்டுமே. {why} துல்லியமான இருப்பிடத்தை ஆன் செய்யவும்: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 பயணம் கோரியுள்ளார்"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 பயணி"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 நீங்கள் ஆன்லைனில் உள்ளீர்கள்"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 {name} இன் துல்லியமான இருப்பிடத்திற்காகக் காத்திருக்கிறது, அல்லது 📍 சந்திப்பு இடத்தை அமைக்கச் சொல்லுங்கள்"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} கடைசியாக ஒரு மணிநேரத்திற்கும் முன்பு அங்கே காணப்பட்டார்"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} கடைசியாக {n} நிமி. முன்பு அங்கே காணப்பட்டார்"

@@ -25,6 +25,10 @@ defmodule HoodrideWeb.MinifyTest do
     assert status == 0
     assert "app.js" in Minify.files()
     for f <- ~w(maplibre-gl.js phoenix.min.js h3-js.umd.js sw.js), do: refute(f in Minify.files())
+    # the languages' catalogs: generated, compact — never minified (it would
+    # turn their letters into \u escapes)
+    for f <- ~w(i18n-es.js i18n-ja.js i18n-en-XA.js), do: refute(f in Minify.files())
+    assert "i18n.js" in Minify.files()
     for f <- Minify.files(), do: assert(File.exists?(Path.join(out, f)), f)
   end
 

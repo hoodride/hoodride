@@ -284,4 +284,24 @@ await journey("visitor: the signed-out screen, signing in, the demo", async (bro
   await dee.click("btn-logout");
   await dee.waitFor(`location.pathname === "/" && location.search === "" && typeof DEMO !== "undefined" && !DEMO && document.getElementById("screen-login").classList.contains("active") && !document.getElementById("auth-buttons").classList.contains("hidden")`, "the sign-in page, Continue with Google", 15000);
   check((await dee.eval(`sessionStorage.getItem("demo_api_call")`)) === null, "no request sent while leaving", await dee.eval(`sessionStorage.getItem("demo_api_call")`));
+
+  // the chat on a wide screen (owner, 2026-11-04): at most 640 px, centered
+  // — lines of ~60 characters, not ~150 across a desktop; a phone keeps
+  // it full width (Material 3's bottom sheets cap at 640dp)
+  step("Wes opens the demo's chat on a desktop, then on a phone: 640 px centered, then full width");
+  const wes = await browser.visitor("BT-Wes");
+  const chatBox = `(() => { const r = document.getElementById("chat").getBoundingClientRect(); return { width: Math.round(r.width), left: Math.round(r.left), right: Math.round(innerWidth - r.right) }; })()`;
+  for (const [w, h, scale, want] of [
+    [1440, 900, 1, { width: 640, left: 400, right: 400 }],
+    [390, 780, 2, { width: 390, left: 0, right: 0 }],
+  ]) {
+    await wes.phone(w, h, scale);
+    await wes.goto(`${BASE}/?demo=1`);
+    await wes.waitFor(`typeof DEMO !== "undefined" && DEMO && !!map && drivers.length > 0`, `${w} px: the demo`, 15000);
+    await wes.eval(`openMarkerCard(drivers[0], "driver"), true`);
+    await wes.click("btn-msg");
+    await wes.waitFor(`!document.getElementById("chat").classList.contains("hidden")`, `${w} px: the chat`);
+    check(JSON.stringify(await wes.eval(chatBox)) === JSON.stringify(want), `${w} px wide: the chat ${want.width} px, ${want.left} px either side`, await wes.eval(chatBox));
+  }
+  await wes.close();
 });

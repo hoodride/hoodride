@@ -1,0 +1,1186 @@
+# Hood Ride in Catalan. A first translation (2026-11-04).
+# Plural forms by name, in this order: one, many, other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: ca\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=3; plural=(n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2);\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(sol·licitud retirada)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "Accepta el viatge"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "S'està acceptant el viatge…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "S'està acceptant…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "Afegeix-lo abans de conduir"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "Afegeix el teu cotxe"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "Se't pregunta la primera vegada que navegues"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "Enrere"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "Torna a la pàgina d'inici de sessió"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "Abans de començar"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "Beix"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "beix"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "Negre"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "negre"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "Blau"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "blau"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "Marró"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "marró"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "Si continues, acceptes les nostres {terms} i la nostra {privacy}."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "No es pot connectar amb Hood Ride. S'està tornant a provar…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "No es pot connectar amb Hood Ride. Torna-ho a provar"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "Cancel·la"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "Cancel·la la sol·licitud"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "Primer cancel·la la teva sol·licitud de viatge"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "Primer cancel·la la teva sol·licitud de viatge."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "Centra en la meva ubicació"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "Canvia"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "Pots canviar-la quan vulguis: toca la teva foto de perfil a dalt a l'esquerra i després {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "Canvia-ho a {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "Els has canviat?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "Xat"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "El xat amb {name} s'ha acabat: fa estona que no es connecta"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "Xats"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "Revisa: {fields} (fins a {max} lletres cadascun)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "Tria…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "Tanca"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "Tanca la configuració"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "Color"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "S'està connectant…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "Problema de connexió. S'està tornant a provar"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "S'ha restablert la connexió. Toca CONNECTA'T per tornar a conduir"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "S'ha restablert la connexió. Torna a tocar ✋ si encara necessites un viatge"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "S'ha restablert la connexió. El teu viatge ha acabat de manera inesperada; torna a organitzar-lo"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "S'ha restablert la connexió. S'ha perdut la teva sol·licitud de viatge; torna a demanar-lo"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Continua amb Facebook"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Continua amb Google"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "S'ha copiat ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "Copia"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "Copia el missatge"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "No s'ha pogut acceptar"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "No s'ha pogut copiar"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "No s'ha pogut suprimir el teu compte. Torna-ho a provar."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "No s'ha pogut connectar amb Hood Ride. Comprova la connexió i torna-ho a provar."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "No s'ha pogut connectar amb Hood Ride. Torna-ho a provar"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "No s'ha pogut connectar amb el servidor. Torna-ho a provar"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "No s'ha pogut actualitzar automàticament. Toca la teva foto de perfil a dalt a l'esquerra, després Canvia i després Actualitza des de Google"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "No s'ha pogut actualitzar ara. Torna-ho a provar més tard"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "No s'ha pogut desar ara. Torna-ho a provar d'aquí a un moment."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "No s'ha pogut desar. Torna-ho a provar"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "No s'ha pogut enviar la sol·licitud"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "No s'ha pogut iniciar la sessió. Torna-ho a provar"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "No s'ha pogut tancar la sessió. Torna-ho a provar"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "SUPRIMEIX"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "Rebutja"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "Suprimeix el compte"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "Suprimeix el meu compte"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "Vols suprimir el teu compte?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "Demo"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "Condueix"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "Conductor"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "El conductor no pot fer aquest viatge. Prova'n un altre"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "Acaba el viatge"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "Primer acaba el teu viatge"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "Primer acaba el teu viatge."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "Primer acaba el viatge actual"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "DESCONNECTA'T"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "CONNECTA'T"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "Dona un minut a aquest conductor abans de tornar-li a demanar"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Ves a Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "Daurat"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "daurat"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Google pot trigar una mica"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "Gris"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "gris"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "Verd"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "verd"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride a Discord"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride s'ha obert en un altre dispositiu"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "Hi estic d'acord"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "Ja hi soc"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "Surt de la demo"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "Marca"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "Marques"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "Mapa"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "Comentaris sobre el mapa"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "Marcador del mapa"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "Ens trobem aquí"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "Missatge"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "No s'ha enviat el missatge. Hi ha connexió?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "No s'ha enviat el missatge. Torna-ho a provar"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "El missatge té massa signes sobre una mateixa lletra"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "Missatge massa llarg: fes servir menys de {max} caràcters"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "Missatge…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "Model"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "Navega"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "App de navegació"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "Necessito un viatge"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "Veïns que porten veïns. Mira els cotxes i les persones properes que necessiten un viatge, envieu-vos missatges i viatgeu junts."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "No disponible"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "En tots els teus dispositius"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "Obre les indicacions a"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "Taronja"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "taronja"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "Un altre"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "No s'ha trobat la pàgina"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "No s'ha trobat la pàgina — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "Vas a recollir {name} · toca 🧭 per navegar"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "Vas a recollir {name} · {seen} · toca 🧭 per navegar"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "Llegeix i accepta les nostres {terms} i la nostra {privacy}."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Política de privadesa"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Política de privadesa"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "Lila"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "lila"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "S'està tornant a connectar amb Hood Ride…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "Vermell"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "vermell"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Actualitza des de Google"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "Sol·licitud cancel·lada"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "Sol·licitud rebutjada"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "La sol·licitud ha caducat. Torna-ho a demanar o prova amb un altre conductor"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "Demana el viatge"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "Sol·licitat…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "S'està demanant el teu viatge…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "S'està demanant…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "Viatge acabat"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "Viatge amb {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "Els passatgers no et veuen. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "Els passatgers el busquen quan els vas a recollir. Afegeix-lo per connectar-te."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "Els passatgers ho veuen per poder trobar-te"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "Viatges amb els teus veïns"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Llocs web del Safari (o el nom del teu navegador, si no fas servir el Safari)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "Desa"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "Desa i connecta't"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "Envia"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "Configuració"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "Configuració ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "Configuració › Aplicacions › {app} › Permisos › Ubicació"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "Configuració › Privacitat i seguretat › Localització › {app} › Ubicació exacta: activada"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "Configuració › Privacitat i seguretat › Localització › {app} › Mentre s'utilitza l'app, i activa Ubicació exacta"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "Mostra o amaga els crèdits del mapa"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "Tanca la sessió"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "S'està iniciant la sessió…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "Platejat"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "platejat"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "Codi font a GitHub"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "Toca per treure'l"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "Condicions"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "Aquest conductor ja no és a prop"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "Aquest passatger ja no busca viatge"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "Aquesta acció no es pot desfer. Se suprimeix el teu compte, desapareixes del mapa, es tanquen les teves converses i es tanca la sessió a tots els dispositius. Si tornes a iniciar la sessió més endavant, començaràs amb un compte nou."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "Aquesta pàgina no existeix."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "Massa tard: la sol·licitud s'ha retirat"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "Massa intents d'inici de sessió fallits des de la teva xarxa. Torna-ho a provar més tard."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "Escriu {word} per confirmar"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "Escriu {word} per confirmar."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "Hi ha una actualització. Toca per tornar a carregar"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "Fes servir aquí"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "Blanc"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "blanc"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "Groc"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "groc"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "Ja tens una sol·licitud oberta"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "Podràs actualitzar-ho després del viatge"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "Podràs actualitzar el nom i la foto després del viatge"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "Has arribat · vas a recollir {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "Has contactat amb moltes persones noves. Torna-ho a provar més tard"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "Has actualitzat moltes vegades. Torna-ho a provar d'aquí a uns minuts"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "Has començat molts xats nous. Torna-ho a provar més tard"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "El teu cotxe"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "El teu nom i la teva foto provenen de {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "El teu passatger"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "Amplia el mapa per veure qui hi ha a prop"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "Acceptat! Ja vinc 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "Perfecte, ja et veig"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "D'acord, fet"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "D'acord, doncs vinc cap a tu"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "permet la ubicació precisa per a aquest lloc a la configuració del navegador"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "Arribo d'aquí a uns minuts"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "fes clic a la icona de l'esquerra de la barra d'adreces (a dalt del navegador) › Ubicació › Permet"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "color"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "Genial, estaré atent"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "Entesos, vaig cap al teu marcador 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "Ja soc aquí! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "Ei! Soc a la bugaderia del carrer 3, em pots recollir? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "vist fa més d'una hora"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "vist fa {n} min"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "marca"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "model"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "a prop"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "ara"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "Surto en un moment 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "obre el menú › Configuració › Llocs i baixades › Permisos dels llocs › Ubicació"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "obre la Configuració del navegador › Privadesa i seguretat › Configuració del lloc web › Ubicació › permet Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "obre {app} › ⋮ › Configuració › Configuració del lloc web › Ubicació › permet Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "obre ⋮ › Paràmetres › Paràmetres del lloc › Ubicació › Demana-m’ho"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "perquè el teu conductor et trobi"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "perquè el teu company de viatge et trobi"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "Perfecte, fins ara!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "toca la icona de l'esquerra de la barra d'adreces (a dalt de la pantalla) › Permisos › Ubicació › Permet (tria Precisa si t'ho pregunta)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "per demanar un viatge"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "per conduir"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "per mostrar on ets"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "activa la Ubicació (llisca cap avall › Ubicació)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "activa la Localització (Configuració › Privacitat i seguretat)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "activa la ubicació en aquest dispositiu"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "Sí, et puc recollir"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "Sí, si us plau! Soc al costat dels bancs 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "Ei, què tal?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "Ei, he vist la teva mà ✋ Et vinc a buscar?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "Segur? Encara soc aquí esperant 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "el teu navegador"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · el teu conductor"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{make} {model} {color}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "{count} cotxe per aquí"
+msgstr[1] "{count} de cotxes per aquí"
+msgstr[2] "{count} cotxes per aquí"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "{count} cotxe aquí"
+msgstr[1] "{count} de cotxes aquí"
+msgstr[2] "{count} cotxes aquí"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "Queda {count} caràcter"
+msgstr[1] "Queden {count} de caràcters"
+msgstr[2] "Queden {count} caràcters"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count} caràcter de més"
+msgstr[1] "{count} de caràcters de més"
+msgstr[2] "{count} caràcters de més"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count} caràcter de més: escurça el missatge per enviar-lo"
+msgstr[1] "{count} de caràcters de més: escurça el missatge per enviar-lo"
+msgstr[2] "{count} caràcters de més: escurça el missatge per enviar-lo"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} persona aquí"
+msgstr[1] "{count} de persones aquí"
+msgstr[2] "{count} persones aquí"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} persona necessita un viatge aquí"
+msgstr[1] "{count} de persones necessiten un viatge aquí"
+msgstr[2] "{count} persones necessiten un viatge aquí"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "a {distance}"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} ha arribat"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} ara és en un viatge"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} és de camí"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} no està disponible ara"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} no està disponible ara. Prova amb un altre conductor"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} no és visible. Amplia el mapa i torna a trobar el seu cotxe"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} s'ha desconnectat. Prova amb un altre conductor"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "fa {n} h"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} mi"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "fa {n} min"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} d"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} h"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} min"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site}; i al telèfon: {steps} › Permet, amb Utilitza la ubicació precisa activat"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · S'està tornant a connectar…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps}; o, si has triat Aproximada per a Hood Ride: toca la icona de l'esquerra de l'adreça web › Permisos › Restableix els permisos, torna-ho a provar i tria Precisa"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › Utilitza la ubicació precisa"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. Hood Ride es tornarà a carregar quan tornis."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ Missatge nou"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ Espera un moment"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ S'està esperant el conductor…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ Envies massa ràpid. Espera un moment"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ Buscant viatge…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ Els conductors propers veuen que necessites un viatge"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ Necessito un viatge"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ Algú a prop necessita un viatge"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ necessita un viatge"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 Xat"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 Xat ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 Permet la ubicació quan el navegador t'ho demani. Hood Ride la necessita {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 S'està cercant la teva ubicació…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 La ubicació està bloquejada per a Hood Ride. Permet-la {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 La ubicació està desactivada en aquest dispositiu: {steps} {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 Ens trobem aquí"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 Punt de trobada marcat: el teu conductor el veu"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 Mou el marcador"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 Marcador eliminat: el teu conductor vindrà on ets"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 Comparteix la teva ubicació"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 Comparteix la teva ubicació perquè el teu company de viatge et trobi"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 Toca el mapa al punt on us voleu trobar"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 S'està esperant la teva ubicació. Els passatgers encara no et veuen"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 La teva ubicació només és aproximada. Activa la ubicació exacta {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 ha demanat un viatge"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 Viatja"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 Ja estàs en línia"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 S'està esperant la ubicació exacta de {name}, o demana-li que marqui un 📍 punt de trobada"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} hi va ser per última vegada fa més d'una hora"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} hi va ser per última vegada fa {n} min"

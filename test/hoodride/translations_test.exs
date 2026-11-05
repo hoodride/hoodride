@@ -33,7 +33,8 @@ defmodule Hoodride.TranslationsTest do
   # {english, translation} per form: a plural's every form against its
   # plural English (Spanish's one-form against the singular)
   defp pairs(lang) do
-    po = Expo.PO.parse_file!("priv/gettext/#{lang}/LC_MESSAGES/default.po")
+    po =
+      Expo.PO.parse_file!("priv/gettext/#{String.replace(lang, "-", "_")}/LC_MESSAGES/default.po")
 
     Enum.flat_map(po.messages, fn
       %Message.Singular{} = m ->
@@ -55,7 +56,11 @@ defmodule Hoodride.TranslationsTest do
 
   test "complete: every message, every plural form" do
     for lang <- languages() do
-      po = Expo.PO.parse_file!("priv/gettext/#{lang}/LC_MESSAGES/default.po")
+      po =
+        Expo.PO.parse_file!(
+          "priv/gettext/#{String.replace(lang, "-", "_")}/LC_MESSAGES/default.po"
+        )
+
       pot = Expo.PO.parse_file!("priv/gettext/default.pot")
       assert length(po.messages) == length(pot.messages), lang
 

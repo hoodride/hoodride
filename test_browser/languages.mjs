@@ -10,6 +10,7 @@
 // Through the real loader (1f): Lia picks the language as the language
 // switch will (its cookie), the server serves the page in it — <html lang>,
 // the catalog right after i18n.js, before the app.
+import { readdirSync } from "node:fs";
 import { journey, step, check, BASE } from "./cdp.mjs";
 
 // her pick, as the language switch keeps it (HoodrideWeb.Lang)
@@ -41,10 +42,92 @@ const ENGLISH = `((allow) => {
 })`;
 
 // cut off or spilling out: a shown button or banner whose words are wider
-// than its box
+// than its box — or a box grown past the screen's edge by a long word (it
+// never overflows itself then: the first version missed exactly that)
+// nothing on screen still moving (the menu slides in for 0.2 s: measured
+// mid-slide it "stuck out"); endless ones (a pulsing pin) don't count
+const SETTLED = `document.getAnimations().every((a) => a.playState !== "running" || a.effect.getComputedTiming().iterations === Infinity)`;
+
 const SPILLS = `(() => [...document.querySelectorAll("button, .btn, .banner, .drawer-row, label")]
-  .filter((el) => el.getClientRects().length > 0 && !el.closest(".hidden") && el.scrollWidth > el.clientWidth + 1)
-  .map((el) => ({ in: el.id || el.className, text: el.textContent.trim().slice(0, 60), over: el.scrollWidth - el.clientWidth })))()`;
+  .filter((el) => el.getClientRects().length > 0 && !el.closest(".hidden, .drawer[inert]"))
+  .map((el) => { const r = el.getBoundingClientRect(); return { el, over: Math.max(el.scrollWidth - el.clientWidth, Math.round(r.right - Math.min(innerWidth, screen.width)), Math.round(-r.left)) }; })
+  .filter((x) => x.over > 1)
+  .map(({ el, over }) => ({ in: el.id || el.className, text: el.textContent.trim().slice(0, 60), over })))()`;
+
+// EVERY language through the real screens on one demo page — the
+// language switched in place (its catalog script), each screen set up
+// directly, then measured as it stands: every label beside its real
+// neighbours ("Decline" next to "Accept ride" in the chat header — a label
+// measured alone in a phone-wide box fit even when absurdly long; the
+// first version of this check missed exactly that). → [{ lang, screen, … }]
+const FITS_ALL = (langs) => `(async () => {
+  const settle = async () => {
+    for (let i = 0; i < 40; i++) {
+      await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 30)));
+      if (document.getAnimations().every((a) => a.playState !== "running" || a.effect.getComputedTiming().iterations === Infinity)) return;
+    }
+  };
+  const spills = () => [...document.querySelectorAll("button, .btn, .banner, .drawer-row, label")]
+    .filter((el) => el.getClientRects().length > 0 && !el.closest(".hidden, .drawer[inert]"))
+    .map((el) => { const r = el.getBoundingClientRect(); return { el, over: Math.max(el.scrollWidth - el.clientWidth, Math.round(r.right - Math.min(innerWidth, screen.width)), Math.round(-r.left)) }; })
+    .filter((x) => x.over > 1)
+    .map(({ el, over }) => ({ in: el.id || el.className, text: el.textContent.trim().slice(0, 50), over }))
+    // and the chat's name stays readable: who you're talking to (a long
+    // pair of buttons once squeezed it to nothing)
+    .concat((() => { const n = document.querySelector("#chat:not(.hidden) .chat-title"); const w = n ? Math.round(n.getBoundingClientRect().width) : null; return n && w < 70 ? [{ in: "chat-title (the name)", text: n.textContent.trim().slice(0, 30), over: 70 - w }] : []; })());
+  const out = [];
+  const look = async (lang, screen) => { await settle(); for (const s of spills()) out.push({ lang, screen, ...s }); };
+  const mode = (m) => { if (state.mode !== m) document.getElementById("btn-mode").click(); };
+  for (const lang of ${JSON.stringify(langs)}) {
+    await new Promise((ok, fail) => {
+      const s = document.createElement("script");
+      s.src = "/i18n-" + lang + ".js";
+      s.onload = ok;
+      s.onerror = () => fail(new Error("no catalog for " + lang));
+      document.head.appendChild(s);
+    });
+    if (HoodI18n.lang() !== lang) { out.push({ lang, screen: "catalog", in: HoodI18n.lang(), over: -1 }); continue; }
+    // the rider's map, a car's card, the chat with it
+    mode("rider");
+    refreshControls();
+    await look(lang, "the map");
+    openMarkerCard(drivers[0], "driver");
+    await look(lang, "a car's card");
+    closePeerCard();
+    openChat(drivers[0]);
+    refreshControls();
+    await look(lang, "the chat");
+    closeChat();
+    // the driver: online, a rider asking — Decline and Accept ride side by side
+    mode("driver");
+    if (!state.online) document.getElementById("btn-online").click();
+    await settle();
+    if (mockHand) {
+      mockHand.pending = true;
+      openChat(mockHand);
+      refreshControls();
+      await look(lang, "the driver's chat, a rider asking");
+      mockHand.pending = false;
+      closeChat();
+    } else out.push({ lang, screen: "the driver's chat", in: "no pretend rider", over: -1 });
+    refreshControls();
+    await look(lang, "driving");
+    if (state.online) document.getElementById("btn-online").click();
+    mode("rider");
+    // the menu, the car form, deleting the account
+    openSettings();
+    await look(lang, "the menu");
+    showDeleteConfirm();
+    await look(lang, "delete your account?");
+    hideDeleteConfirm();
+    closeSettings();
+    openCarSheet();
+    await look(lang, "the car form");
+    closeCarSheet();
+    await settle();
+  }
+  return out;
+})()`;
 
 // the screens both languages are walked through: the demo's map, a car's
 // card, a chat, a ride, driving, the menu, the car form, the map-app box —
@@ -106,6 +189,7 @@ await journey("languages: no English left in a made-up language, nothing cut off
   ];
   const allow = `[${NAMES.map(String).join(", ")}]`;
   const leftEnglish = async (p, where) => {
+    await p.waitFor(SETTLED, `${where}: settled`);
     const found = await p.eval(`${ENGLISH}(${allow})`);
     check(found.length === 0, `${where}: no English left`, found);
     // (a third longer fits everywhere — checked 2026-11-04; words 4× longer
@@ -116,6 +200,7 @@ await journey("languages: no English left in a made-up language, nothing cut off
 
   step("Lia opens Hood Ride signed out, in the made-up language");
   const lia = await browser.visitor("BT-Lia");
+  await lia.phone(390, 780, 2);
   await lia.goto(`${BASE}/`);
   await lia.eval(PICK);
   await lia.goto(`${BASE}/`);
@@ -137,21 +222,56 @@ await journey("languages: no English left in a made-up language, nothing cut off
 
   // real Spanish (stage 2): its own words, as long as they really are —
   // everything fits, nothing spills out or is cut off
-  step("Sol picks Spanish: the same screens, every word fits");
+  step("Sol picks Spanish: the agreement line in Spanish, its links in place");
   const sol = await browser.visitor("BT-Sol");
+  await sol.phone(390, 780, 2);
   await sol.goto(`${BASE}/`);
   await sol.eval(`(document.cookie = "hoodride_lang=es; path=/; SameSite=Lax", true)`);
   await sol.goto(`${BASE}/`);
   await sol.waitFor(`!!document.getElementById("auth-buttons") && !document.getElementById("auth-buttons").classList.contains("hidden")`, "the sign-in buttons");
-  check(await sol.eval(`HoodI18n.lang() === "es" && document.documentElement.lang === "es"`), "the page served in Spanish");
   const fine = await sol.eval(`document.querySelector(".fineprint").textContent`);
   check(fine === "Al continuar, aceptas nuestros Términos y nuestra Política de privacidad.", "the agreement line in Spanish, its links in place", fine);
-  const fits = async (p, where) => {
-    const spills = await p.eval(SPILLS);
-    check(spills.length === 0, `${where} in Spanish: every word fits`, spills);
-  };
-  await fits(sol, "the sign-in screen");
-  await walk(sol, fits, "Blanco");
-  check((await sol.eval(`document.getElementById("btn-online").textContent`)).includes("DESCONECTARSE"), "Spanish on the buttons", await sol.eval(`document.getElementById("btn-online").textContent`));
-  check(sol.errors.length === 0, "no page errors", sol.errors);
+  await sol.close();
+
+  // EVERY language, every label each button can show, in a copy of that
+  // button: nothing spills (quick; the walk below covers whole screens for
+  // the longest and widest)
+  step("every language: every screen's labels fit, beside each other");
+  const langs = readdirSync(new URL("../priv/static/", import.meta.url))
+    .map((f) => (f.match(/^i18n-(.+)\.js$/) || [])[1])
+    .filter((l) => l && l !== "en-XA");
+  check(langs.length >= 42, "all the languages", langs.length);
+  const pf = await browser.visitor("BT-Fit");
+  await pf.phone(390, 780, 2);
+  await pf.goto(`${BASE}/?demo=1`);
+  await pf.waitFor(`typeof DEMO !== "undefined" && DEMO && !!map`, "the demo");
+  const spilled = await pf.eval(FITS_ALL(langs));
+  check(spilled.length === 0, "every label fits, in every language", spilled);
+  check(pf.errors.length === 0, "no page errors", pf.errors);
+  await pf.close();
+
+  // real languages, their own words as long (and as wide) as they really
+  // are: everything fits. The longest short labels, measured against
+  // English (French, Russian, Greek, German — "Terms" → "Nutzungsbedingungen"),
+  // and wide scripts (Tamil, Japanese); if these fit, shorter ones do
+  for (const lang of ["es", "fr", "ru", "el", "de", "ta", "ja"]) {
+    step(`${lang}: the same screens, every word fits`);
+    const p = await browser.visitor(`BT-${lang}`);
+    await p.phone(390, 780, 2);
+    await p.goto(`${BASE}/`);
+    await p.eval(`(document.cookie = "hoodride_lang=${lang}; path=/; SameSite=Lax", true)`);
+    await p.goto(`${BASE}/`);
+    await p.waitFor(`!!document.getElementById("auth-buttons") && !document.getElementById("auth-buttons").classList.contains("hidden")`, `${lang}: the sign-in buttons`);
+    check(await p.eval(`HoodI18n.lang() === ${JSON.stringify(lang)} && document.documentElement.lang === ${JSON.stringify(lang)}`), `${lang}: the page served in it`);
+    const fits = async (q, where) => {
+      await q.waitFor(SETTLED, `${where}: settled`);
+      const spills = await q.eval(SPILLS);
+      check(spills.length === 0, `${where} in ${lang}: every word fits`, spills);
+    };
+    await fits(p, "the sign-in screen");
+    const white = await p.eval(`HoodCar.colorName("White")`);
+    await walk(p, fits, white);
+    check(p.errors.length === 0, `${lang}: no page errors`, p.errors);
+    await p.close();
+  }
 });

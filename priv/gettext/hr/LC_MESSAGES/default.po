@@ -1,0 +1,1186 @@
+# Hood Ride in Croatian. A first translation (2026-11-04).
+# Plural forms by name, in this order: one, few, other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: hr\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(zahtjev povučen)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "Prihvati vožnju"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "Prihvaćanje vožnje…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "Prihvaćanje…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "Dodaj ga prije nego što počneš voziti"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "Dodaj svoj auto"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "Pitat ćemo te pri prvoj navigaciji"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "Natrag"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "Natrag na stranicu za prijavu"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "Prije nego što počneš"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "Bež"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "bež"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "Crni"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "crni"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "Plavi"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "plavi"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "Smeđi"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "smeđi"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "Nastavkom prihvaćaš dokumente {terms} i {privacy}."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Nije moguće povezati se s Hood Ride – pokušavamo ponovno…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Nije moguće povezati se s Hood Ride – pokušaj ponovno"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "Odustani"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "Otkaži zahtjev"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "Najprije otkaži svoj zahtjev za prijevoz"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "Najprije otkaži svoj zahtjev za prijevoz."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "Centriraj na moju lokaciju"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "Promijeni"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "Promijeni kad god želiš: dodirni svoju profilnu sliku gore lijevo, a zatim {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "Promijeni na računu {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "Jesu li promijenjeni?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "Chat"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "Chat ({name}) je završen – druga strana već neko vrijeme nije tu"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "Chatovi"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "Provjeri: {fields} (najviše {max} slova u svakom)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "Odaberi…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "Zatvori"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "Zatvori postavke"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "Boja"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "Povezivanje…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "Problem s vezom – pokušavamo ponovno"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "Veza je prekinuta – dodirni UKLJUČI SE da nastaviš voziti"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "Veza je prekinuta – dodirni ✋ ponovno ako ti još treba prijevoz"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "Veza je prekinuta – vožnja je neočekivano završila, dogovorite je ponovno"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "Veza je prekinuta – tvoj zahtjev za prijevoz je izgubljen, zatraži ponovno"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Nastavi putem Facebooka"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Nastavi putem Googlea"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "Kopirano ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "Kopiraj"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "Kopiraj poruku"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "Prihvaćanje nije uspjelo"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "Kopiranje nije uspjelo"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "Brisanje računa nije uspjelo – pokušaj ponovno."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Povezivanje s Hood Ride nije uspjelo – provjeri vezu i pokušaj ponovno."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Povezivanje s Hood Ride nije uspjelo – pokušaj ponovno"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "Povezivanje s poslužiteljem nije uspjelo – pokušaj ponovno"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "Automatsko osvježavanje nije uspjelo – dodirni svoju profilnu sliku gore lijevo, zatim Promijeni, a zatim Osvježi s Googlea"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "Osvježavanje trenutačno nije uspjelo – pokušaj kasnije"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "Spremanje trenutačno nije uspjelo – pokušaj za koji trenutak."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "Spremanje nije uspjelo – pokušaj ponovno"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "Slanje zahtjeva nije uspjelo"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "Prijava nije uspjela – pokušaj ponovno"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "Odjava nije uspjela – pokušaj ponovno"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "IZBRIŠI"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "Odbij"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "Izbriši račun"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "Izbriši moj račun"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "Izbrisati račun?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "Demo"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "Vozi"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "Vozač"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "Vozač ne može preuzeti ovu vožnju – pokušaj s drugim"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "Završi vožnju"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "Najprije završi vožnju"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "Najprije završi vožnju."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "Najprije završi trenutačnu vožnju"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "ISKLJUČI SE"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "UKLJUČI SE"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "Daj ovom vozaču minutu prije nego što ponovno zatražiš"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Idi na Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "Zlatni"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "zlatni"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Prijava putem Googlea može malo potrajati"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "Sivi"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "sivi"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "Zeleni"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "zeleni"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride na Discordu"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride je otvoren na drugom uređaju"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "Prihvaćam"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "Tu sam"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "Izađi iz demo načina"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "Marka"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "Marke"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "Karta"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "Povratne informacije o karti"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "Oznaka na karti"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "Nađimo se ovdje"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "Poruka"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "Poruka nije poslana – ima li veze?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "Poruka nije poslana – pokušaj ponovno"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "Poruka ima previše znakova naslaganih na jedno slovo"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "Poruka je preduga – neka ima manje od {max} znakova"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "Poruka…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "Model"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "Navigiraj"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "Aplikacija za navigaciju"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "Treba mi prijevoz"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "Susjedi voze susjede. Pogledaj aute i ljude u blizini kojima treba prijevoz, dopisujte se i vozite se zajedno."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "Nije dostupno"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "Na svim tvojim uređajima"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "Otvori upute u aplikaciji"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "Narančasti"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "narančasti"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "Ostalo"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "Stranica nije pronađena"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "Stranica nije pronađena — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "Preuzimaš: {name} · dodirni 🧭 za navigaciju"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "Preuzimaš: {name} · {seen} · dodirni 🧭 za navigaciju"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "Pročitaj i prihvati dokumente {terms} i {privacy}."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Pravila o privatnosti"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Pravila o privatnosti"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "Ljubičasti"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "ljubičasti"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Ponovno povezivanje s Hood Ride…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "Crveni"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "crveni"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Osvježi s Googlea"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "Zahtjev otkazan"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "Zahtjev odbijen"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "Zahtjev je istekao – zatraži ponovno ili pokušaj s drugim vozačem"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "Zatraži vožnju"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "Zatraženo…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "Šaljemo tvoj zahtjev za vožnju…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "Slanje…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "Vožnja je završena"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "Vožnja: {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "Putnici te ne vide. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "Putnici ga traže kad dolaziš po njih. Dodaj ga prije nego što se uključiš."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "Putnici to vide kako bi te pronašli"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "Vožnje sa susjedima"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Safari web-stranice (ili naziv tvog preglednika ako ne koristiš Safari)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "Spremi"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "Spremi i uključi se"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "Pošalji"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "Postavke"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "Postavke ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "Postavke › Aplikacije › {app} › Dopuštenja › Lokacija"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "Postavke › Privatnost i sigurnost › Lokacijske usluge › {app} › Precizna lokacija: uključeno"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "Postavke › Privatnost i sigurnost › Lokacijske usluge › {app} › Tijekom uporabe aplikacije, i uključi Preciznu lokaciju"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "Prikaži ili sakrij izvore karte"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "Odjavi se"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "Prijava…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "Srebrni"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "srebrni"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "Izvorni kod na GitHubu"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "Dodirni za uklanjanje"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "Uvjeti"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "Taj vozač više nije u blizini"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "Taj putnik više ne traži prijevoz"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "Ovo se ne može poništiti. Račun ti se briše, nestaješ s karte, razgovori se zatvaraju i odjavljuješ se na svim uređajima. Ako se kasnije ponovno prijaviš, otvara se novi račun."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "Ova stranica ne postoji."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "Prekasno – zahtjev je povučen"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "Previše neuspjelih prijava s tvoje mreže – pokušaj kasnije."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "Upiši {word} za potvrdu"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "Upiši {word} za potvrdu."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "Dostupno je ažuriranje – dodirni za ponovno učitavanje"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "Koristi ovdje"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "Bijeli"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "bijeli"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "Žuti"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "žuti"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "Već imaš otvoren zahtjev"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "Osvježiti možeš nakon vožnje"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "Ime i fotografiju možeš osvježiti nakon vožnje"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "Na mjestu si · preuzimaš: {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "Kontaktiraš previše novih ljudi – pokušaj kasnije"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "Osvježavaš prečesto – pokušaj za nekoliko minuta"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "Pokrećeš previše novih chatova – pokušaj kasnije"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "Tvoj auto"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "Ime i fotografija preuzeti su s računa {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "Tvoj putnik"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "Povećaj kartu da vidiš tko je u blizini"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "Prihvaćeno! Krećem 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "Može, vidim te"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "Može, dogovoreno"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "Dobro, onda dolazim do tebe"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "dopusti preciznu lokaciju za ovu web-lokaciju u postavkama preglednika"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "Stižem za koju minutu"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "klikni ikonu lijevo od adresne trake (na vrhu preglednika) › Lokacija › Dopusti"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "boja"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "Super, gledat ću kad dolaziš"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "Jasno, idem do tvoje pribadače 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "Tu sam! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "Hej! Kod praonice rublja sam u Trećoj ulici, možeš li me pokupiti? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "zadnja aktivnost prije više od sat vremena"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "zadnja aktivnost prije {n} min"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "marka"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "model"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "u blizini"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "sada"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "Krećem za tren 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "otvori izbornik › Postavke › Web-mjesta i preuzimanja › Dozvole web-mjesta › Lokacija"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "otvori Postavke preglednika › Privatnost i sigurnost › Postavke web-lokacije › Lokacija › dopusti Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "otvori {app} › ⋮ › Postavke › Postavke web-lokacije › Lokacija › dopusti Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "otvori ⋮ › Postavke › Dopuštenja web-mjesta › Lokacija › Pitaj za dopuštenje"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "da te vozač pronađe"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "da te suputnik pronađe"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "Super, vidimo se uskoro!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "dodirni ikonu lijevo od adresne trake (na vrhu zaslona) › Dopuštenja › Lokacija › Dopusti (odaberi Točna ako te pita)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "da možeš zatražiti prijevoz"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "da možeš voziti"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "da se vidi gdje si"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "uključi Lokaciju (povuci prema dolje › Lokacija)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "uključi Lokacijske usluge (Postavke › Privatnost i sigurnost)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "uključi lokaciju na ovom uređaju"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "Da, mogu te pokupiti"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "Da, molim te! Kod klupa sam 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "Hej, što ima?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "Hej, vidim tvoju ruku ✋ Treba li te pokupiti?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "Sigurno? Još uvijek čekam ovdje 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "tvoj preglednik"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · tvoj vozač"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{color} {make} {model}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "{count} auto u blizini"
+msgstr[1] "{count} auta u blizini"
+msgstr[2] "{count} auta u blizini"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "{count} auto ovdje"
+msgstr[1] "{count} auta ovdje"
+msgstr[2] "{count} auta ovdje"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "Preostaje još {count} znak"
+msgstr[1] "Preostaju još {count} znaka"
+msgstr[2] "Preostaje još {count} znakova"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count} znak previše"
+msgstr[1] "{count} znaka previše"
+msgstr[2] "{count} znakova previše"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count} znak previše – skrati poruku da je možeš poslati"
+msgstr[1] "{count} znaka previše – skrati poruku da je možeš poslati"
+msgstr[2] "{count} znakova previše – skrati poruku da je možeš poslati"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} osoba ovdje"
+msgstr[1] "{count} osobe ovdje"
+msgstr[2] "{count} osoba ovdje"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} osoba ovdje treba prijevoz"
+msgstr[1] "{count} osobe ovdje trebaju prijevoz"
+msgstr[2] "{count} osoba ovdje treba prijevoz"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "udaljeno {distance}"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} je na mjestu"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} je upravo u vožnji"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} je na putu"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} trenutačno nije na raspolaganju"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} trenutačno nije na raspolaganju – pokušaj s drugim vozačem"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} nije u prikazu – povećaj kartu i ponovno pronađi taj auto"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} više nije na mreži – pokušaj s drugim vozačem"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "prije {n} h"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} mi"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "prije {n} min"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} d"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} h"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} min"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site} – a na telefonu {steps} › Dopusti, uz uključeno Koristi točnu lokaciju"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · Ponovno povezivanje…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps} – ili, ako je za Hood Ride odabrana Približna lokacija: dodirni ikonu lijevo od web-adrese › Dopuštenja › Poništi dopuštenja, zatim pokušaj ponovno i odaberi Točna"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › Koristi točnu lokaciju"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. Hood Ride će se ponovno učitati kad se vratiš."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ Nova poruka"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ Malo uspori"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ Čeka se vozač…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ Šalješ prebrzo – malo uspori"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ Traži se prijevoz…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ Vozači u blizini vide da ti treba prijevoz"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ Treba mi prijevoz"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ Netko u blizini treba prijevoz"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ treba prijevoz"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 Chat"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 Chat ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 Dopusti lokaciju kad te preglednik pita – Hood Ride je treba {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 Traženje tvoje lokacije…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Lokacija je blokirana za Hood Ride – dopusti je {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 Lokacija je isključena na ovom uređaju – {steps} {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 Nađimo se ovdje"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 Mjesto susreta postavljeno – tvoj vozač ga vidi"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 Premjesti pribadaču"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 Pribadača uklonjena – vozač će doći do tebe"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 Podijeli svoju lokaciju"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 Podijeli svoju lokaciju da te suputnik pronađe"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 Dodirni kartu gdje se želiš naći"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 Čeka se tvoja lokacija – putnici te još ne vide"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 Lokacija ti je samo približna – uključi preciznu lokaciju {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 traži vožnju"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 Vozi se"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 Na mreži si"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 Čeka se da {name} pošalje točnu lokaciju – ili zamoli da postavi 📍 mjesto susreta"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} – zadnja lokacija ovdje starija je od sat vremena"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} – zadnja lokacija ovdje stara je {n} min"

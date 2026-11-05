@@ -604,6 +604,11 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   bottom: 0;
   left: 0;
   right: 0;
+  /* at most 640 px, centered — a phone stays full width; on a desktop the
+     lines were ~150 characters (Material 3's bottom sheets cap at 640dp;
+     readable lines are 45–75 characters: ~60 here; owner, 2026-11-04) */
+  max-width: 640px;
+  margin: 0 auto;
   z-index: 12;
   height: min(48dvh, 420px);
   background: var(--card);
@@ -614,6 +619,12 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 }
 .chat-header {
   display: flex;
+  /* the buttons (Decline, Accept ride…) beside the name while there's
+     room, on their own row under it when there isn't — the name never
+     squeezed away (in 32 languages Decline + Accept ride left it 0–60 px;
+     owner, 2026-11-04). Flex wrapping alone, no screen-size rules: the
+     name's 120 px decides (MDN; Every Layout's "Sidebar") */
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   padding: 14px 44px 12px 18px;
@@ -621,8 +632,14 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   position: relative;
 }
 /* the name, with "about 0.4 mi away · 20 min ago" on a small line under it
-   (like a messenger's "last seen"); both shorten with … on a narrow phone */
-.chat-title { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+   (like a messenger's "last seen"); both shorten with … on a narrow phone.
+   It takes the row's room (999); at least 120 px, or the buttons wrap */
+.chat-title { flex: 999 1 120px; min-width: 0; display: flex; flex-direction: column; }
+/* the ride's buttons move as one: beside the name, or both on the row
+   under it, sharing it (none showing: no room taken) */
+.chat-actions { flex: 1 1 auto; display: flex; gap: 10px; }
+.chat-actions > .btn { flex: 1 1 auto; }
+.chat-actions:not(:has(> .btn:not(.hidden))) { display: none; }
 .chat-title > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #chat-name { font-weight: 700; font-size: 16px; }
 .chat-dist { font-size: 12px; opacity: 0.7; }

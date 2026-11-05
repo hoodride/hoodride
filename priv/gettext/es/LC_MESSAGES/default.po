@@ -1,6 +1,5 @@
-# Hood Ride in Spanish (Latin American, addressed as tú — Microsoft's es-US and es-MX style guides).
-# A first translation (2026-11-04), to be reviewed by a native speaker before it's switched on.
-# Phone and browser menu names ("Ajustes › Privacidad y seguridad › …") to be checked on real phones.
+# Hood Ride in Spanish (Latin American, addressed as tú — Microsoft's es-US and es-MX style guides). A first translation (2026-11-04).
+# Plural forms by name, in this order: one, many, other (Unicode CLDR — the app picks by name).
 msgid ""
 msgstr "Language: es\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -52,9 +51,19 @@ msgid "Beige"
 msgstr "Beige"
 
 #: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "beige"
+
+#: priv/static/car.js
 msgctxt "car color"
 msgid "Black"
 msgstr "Negro"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "negro"
 
 #: priv/static/car.js
 msgctxt "car color"
@@ -62,9 +71,19 @@ msgid "Blue"
 msgstr "Azul"
 
 #: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "azul"
+
+#: priv/static/car.js
 msgctxt "car color"
 msgid "Brown"
 msgstr "Café"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "café"
 
 #: priv/static/index.html
 msgid "By continuing, you agree to our {terms} and {privacy}."
@@ -316,6 +335,11 @@ msgctxt "car color"
 msgid "Gold"
 msgstr "Dorado"
 
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "dorado"
+
 #: priv/static/index.html
 msgid "Google can take a little while"
 msgstr "Google puede tardar un poco"
@@ -326,9 +350,19 @@ msgid "Gray"
 msgstr "Gris"
 
 #: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "gris"
+
+#: priv/static/car.js
 msgctxt "car color"
 msgid "Green"
 msgstr "Verde"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "verde"
 
 #: priv/static/index.html
 msgid "Hood Ride on Discord"
@@ -436,6 +470,11 @@ msgid "Orange"
 msgstr "Naranja"
 
 #: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "naranja"
+
+#: priv/static/car.js
 msgctxt "car color"
 msgid "Other"
 msgstr "Otro"
@@ -473,6 +512,11 @@ msgctxt "car color"
 msgid "Purple"
 msgstr "Morado"
 
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "morado"
+
 #: priv/static/app.js
 msgid "Reconnecting to Hood Ride…"
 msgstr "Reconectando con Hood Ride…"
@@ -481,6 +525,11 @@ msgstr "Reconectando con Hood Ride…"
 msgctxt "car color"
 msgid "Red"
 msgstr "Rojo"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "rojo"
 
 #: priv/static/index.html
 msgid "Refresh from Google"
@@ -568,11 +617,11 @@ msgstr "Configuración › Apps › {app} › Permisos › Ubicación"
 
 #: priv/static/sendfilter.js
 msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
-msgstr "Ajustes › Privacidad y seguridad › Localización › {app} › Ubicación exacta: activada"
+msgstr "Configuración › Privacidad y seguridad › Localización › {app} › Ubicación precisa: activada"
 
 #: priv/static/sendfilter.js
 msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
-msgstr "Ajustes › Privacidad y seguridad › Localización › {app} › Al usar la app, y activa Ubicación exacta"
+msgstr "Configuración › Privacidad y seguridad › Localización › {app} › Al usar la app, y activa Ubicación precisa"
 
 #: priv/static/app.js
 msgid "Show or hide the map's credits"
@@ -590,6 +639,11 @@ msgstr "Iniciando sesión…"
 msgctxt "car color"
 msgid "Silver"
 msgstr "Plateado"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "plateado"
 
 #: priv/static/index.html
 msgid "Source code on GitHub"
@@ -649,9 +703,19 @@ msgid "White"
 msgstr "Blanco"
 
 #: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "blanco"
+
+#: priv/static/car.js
 msgctxt "car color"
 msgid "Yellow"
 msgstr "Amarillo"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "amarillo"
 
 #: priv/static/app.js
 msgid "You already have an open request"
@@ -738,6 +802,10 @@ msgid "got it, heading to your pin 📍"
 msgstr "Entendido, voy a tu marcador 📍"
 
 #: priv/static/app.js
+msgid "here! {car}"
+msgstr "¡Ya llegué! {car}"
+
+#: priv/static/app.js
 msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
 msgstr "¡Hola! Estoy en la lavandería de la calle 3, ¿me puedes recoger? 🙏"
 
@@ -782,8 +850,8 @@ msgid "open {app} › ⋮ › Settings › Site settings › Location › allow 
 msgstr "abre {app} › ⋮ › Configuración › Configuración de sitios › Ubicación › permite Hood Ride"
 
 #: priv/static/sendfilter.js
-msgid "open ⋮ › Settings › Site permissions › Location › Ask to allow"
-msgstr "abre ⋮ › Configuración › Permisos del sitio › Ubicación › Preguntar para permitir"
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "abre ⋮ › Ajustes › Configuración del sitio › Ubicación › Pedir permiso"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"
@@ -824,7 +892,7 @@ msgstr "activa la Ubicación (desliza hacia abajo › Ubicación)"
 
 #: priv/static/sendfilter.js
 msgid "turn on Location Services (Settings › Privacy & Security)"
-msgstr "activa la Localización (Ajustes › Privacidad y seguridad)"
+msgstr "activa la Localización (Configuración › Privacidad y seguridad)"
 
 #: priv/static/sendfilter.js
 msgid "turn on location for this device"
@@ -857,6 +925,11 @@ msgstr "tu navegador"
 #: priv/static/app.js
 msgid "{car} · your driver"
 msgstr "{car} · tu conductor"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{make} {model} {color}"
 
 #: priv/static/app.js
 msgid "{count} car around here"
@@ -911,6 +984,11 @@ msgstr[2] "{count} personas necesitan un viaje aquí"
 msgid "{distance} away"
 msgstr "a {distance}"
 
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
 #: priv/static/app.js
 msgid "{name} has arrived"
 msgstr "{name} llegó"
@@ -944,6 +1022,14 @@ msgid "{n} h ago"
 msgstr "hace {n} h"
 
 #: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} mi"
+
+#: priv/static/distance.js
 msgid "{n} min ago"
 msgstr "hace {n} min"
 
@@ -961,7 +1047,7 @@ msgstr "{n} min"
 
 #: priv/static/sendfilter.js
 msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
-msgstr "{site}; y en tu teléfono, {steps} › Permitir, con Usar ubicación precisa activado"
+msgstr "{site}; y en tu teléfono, {steps} › Permitir, con Usar la ubicación precisa activado"
 
 #: priv/static/app.js
 msgid "{status} · Reconnecting…"
@@ -973,7 +1059,7 @@ msgstr "{steps}; o, si elegiste Aproximada para Hood Ride: toca el ícono a la i
 
 #: priv/static/sendfilter.js
 msgid "{steps} › Use precise location"
-msgstr "{steps} › Usar ubicación precisa"
+msgstr "{steps} › Usar la ubicación precisa"
 
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
@@ -1073,7 +1159,7 @@ msgstr "📍 Esperando tu ubicación. Los pasajeros todavía no te ven"
 
 #: priv/static/sendfilter.js
 msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 Tu ubicación es solo aproximada. Activa la ubicación precisa {why}: {steps}"
+msgstr "📍 Tu ubicación es solo aproximada. Activa Ubicación precisa {why}: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

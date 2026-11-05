@@ -1,0 +1,1179 @@
+# Hood Ride in Swahili. A first translation (2026-11-04).
+# Plural forms by name, in this order: one, other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: sw\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(ombi limeondolewa)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "Kubali safari"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "Inakubali safari…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "Inakubali…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "Liongeze kabla ya kuendesha"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "Ongeza gari lako"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "Utaulizwa mara ya kwanza unapofungua maelekezo"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "Rudi"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "Rudi kwenye ukurasa wa kuingia"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "Kabla hujaanza"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "Beji"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "ya beji"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "Nyeusi"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "nyeusi"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "Bluu"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "ya bluu"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "Kahawia"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "ya kahawia"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "Kwa kuendelea, unakubali {terms} na {privacy}."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Imeshindwa kufikia Hood Ride — inajaribu tena…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Imeshindwa kufikia Hood Ride — jaribu tena"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "Ghairi"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "Ghairi ombi"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "Ghairi kwanza ombi lako la usafiri"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "Ghairi kwanza ombi lako la usafiri."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "Weka mahali nilipo katikati"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "Badilisha"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "Libadilishe wakati wowote: gusa picha yako ya wasifu iliyo juu kushoto, kisha {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "Badilisha kwenye {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "Umeyabadilisha?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "Gumzo"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "Gumzo na {name} limeisha — amekuwa mbali kwa muda"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "Mazungumzo"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "Angalia {fields} (herufi zisizozidi {max} kila moja)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "Chagua…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "Funga"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "Funga mipangilio"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "Rangi"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "Inaunganisha…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "Tatizo la muunganisho — inajaribu tena"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "Muunganisho umewekwa upya — gusa ANZA KAZI ili uendeshe tena"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "Muunganisho umewekwa upya — gusa ✋ tena kama bado unahitaji usafiri"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "Muunganisho umewekwa upya — safari yako imeisha ghafla, tafadhali ipange upya"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "Muunganisho umewekwa upya — ombi lako la usafiri limepotea, tafadhali omba tena"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Endelea na Facebook"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Endelea na Google"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "Imenakiliwa ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "Nakili"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "Nakili ujumbe"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "Imeshindwa kukubali"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "Imeshindwa kunakili"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "Imeshindwa kufuta akaunti yako — tafadhali jaribu tena."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Imeshindwa kufikia Hood Ride — angalia muunganisho wako kisha ujaribu tena."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Imeshindwa kufikia Hood Ride — jaribu tena"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "Imeshindwa kufikia seva — jaribu tena"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "Imeshindwa kusasisha kiotomatiki — gusa picha yako ya wasifu iliyo juu kushoto, kisha Badilisha, kisha Sasisha kutoka Google"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "Imeshindwa kusasisha sasa hivi — jaribu tena baadaye"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "Imeshindwa kuhifadhi sasa hivi — jaribu tena baada ya muda mfupi."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "Imeshindwa kuhifadhi — jaribu tena"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "Imeshindwa kutuma ombi"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "Imeshindwa kuingia — jaribu tena"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "Imeshindwa kutoka — jaribu tena"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "FUTA"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "Kataa"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "Futa akaunti"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "Futa akaunti yangu"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "Ungependa kufuta akaunti yako?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "Onyesho"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "Endesha"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "Dereva"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "Dereva hawezi kuchukua safari hii — jaribu mwingine"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "Maliza safari"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "Maliza safari yako kwanza"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "Maliza safari yako kwanza."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "Maliza kwanza safari uliyo nayo sasa"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "MALIZA KAZI"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "ANZA KAZI"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "Mpe dereva huyu dakika moja kabla ya kuomba tena"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Nenda kwenye Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "Dhahabu"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "ya dhahabu"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Google inaweza kuchukua muda kidogo"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "Kijivu"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "ya kijivu"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "Kijani"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "ya kijani"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride kwenye Discord"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride imefunguliwa kwenye kifaa kingine"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "Nakubali"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "Nimefika"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "Ondoka kwenye onyesho"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "Chapa"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "Chapa za magari"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "Ramani"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "Maoni kuhusu ramani"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "Alama ya ramani"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "Tukutane hapa"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "Ujumbe"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "Ujumbe haukutumwa — kuna muunganisho?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "Ujumbe haukutumwa — jaribu tena"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "Ujumbe una alama nyingi mno juu ya herufi moja"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "Ujumbe ni mrefu mno — usizidi herufi {max}"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "Ujumbe…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "Modeli"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "Elekeza njia"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "Programu ya maelekezo"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "Nahitaji usafiri"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "Majirani wakiwapa majirani usafiri. Ona magari na watu wanaohitaji usafiri karibu nawe, tumianeni ujumbe, na msafiri pamoja."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "Haipatikani"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "Kwenye vifaa vyako vyote"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "Fungua maelekezo kwenye"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "Rangi ya chungwa"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "ya rangi ya chungwa"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "Nyingine"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "Ukurasa haupatikani"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "Ukurasa haupatikani — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "Unamchukua {name} · gusa 🧭 ili upate maelekezo"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "Unamchukua {name} · {seen} · gusa 🧭 ili upate maelekezo"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "Tafadhali soma na ukubali {terms} na {privacy}."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Sera ya Faragha"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Sera ya Faragha"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "Zambarau"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "ya zambarau"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Inaunganisha tena na Hood Ride…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "Nyekundu"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "nyekundu"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Sasisha kutoka Google"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "Ombi limeghairiwa"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "Ombi limekataliwa"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "Muda wa ombi umeisha — omba tena au jaribu dereva mwingine"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "Omba safari"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "Imeombwa…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "Inaomba safari yako…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "Inaomba…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "Safari imeisha"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "Safari na {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "Abiria hawakuoni. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "Abiria hulitafuta unapowachukua. Liongeze ili uanze kazi."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "Abiria wanaona hii ili waweze kukupata"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "Safari kutoka mtaani kwako"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Safari Websites (au jina la kivinjari chako, kama hutumii Safari)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "Hifadhi"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "Hifadhi na uanze kazi"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "Tuma"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "Mipangilio"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "Mipangilio ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "Mipangilio › Programu › {app} › Ruhusa › Mahali"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "Settings › Privacy & Security › Location Services › {app} › Precise Location: iwashwe"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "Settings › Privacy & Security › Location Services › {app} › While Using the App, kisha uwashe Precise Location"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "Onyesha au ficha wachangiaji wa ramani"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "Ondoka"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "Inaingia…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "Fedha"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "ya fedha"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "Msimbo chanzo kwenye GitHub"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "Gusa ili uondoe"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "Masharti"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "Dereva huyo hayupo karibu tena"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "Abiria huyo hatafuti usafiri tena"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "Hatua hii haiwezi kutenduliwa. Akaunti yako itafutwa, utaondolewa kwenye ramani, mazungumzo yako yatafungwa na utatolewa kwenye vifaa vyote. Ukiingia tena baadaye, utaanza akaunti mpya."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "Ukurasa huu haupo."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "Umechelewa — ombi limeondolewa"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "Majaribio mengi mno ya kuingia yameshindwa kutoka kwenye mtandao wako — jaribu tena baadaye."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "Andika {word} ili uthibitishe"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "Andika {word} ili uthibitishe."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "Sasisho linapatikana — gusa ili upakie upya"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "Tumia hapa"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "Nyeupe"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "nyeupe"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "Njano"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "ya njano"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "Tayari una ombi lililo wazi"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "Unaweza kusasisha baada ya safari yako"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "Unaweza kusasisha jina na picha yako baada ya safari yako"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "Umefika · unamchukua {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "Umewasiliana na watu wengi wapya — jaribu tena baadaye"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "Umesasisha mara nyingi — jaribu tena baada ya dakika chache"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "Umeanzisha gumzo nyingi mpya — jaribu tena baadaye"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "Gari lako"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "Jina na picha yako vinatoka {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "Abiria wako"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "Vuta karibu uone nani yuko karibu"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "Nimekubali! Niko njiani 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "Sawa, nakuona"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "Sawa kabisa"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "Sawa, nakuja kwako basi"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "ruhusu mahali sahihi kwa tovuti hii kwenye mipangilio ya kivinjari chako"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "Nitafika baada ya muda mfupi"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "bofya aikoni iliyo kushoto mwa sehemu ya anwani ya wavuti (juu ya kivinjari) › Mahali › Ruhusu"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "rangi"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "Poa, nitakusubiri"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "Sawa, naelekea kwenye alama yako 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "Nimefika! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "Habari! Niko kwenye dobi la barabara ya 3, unaweza kunichukua? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "alionekana mara ya mwisho zaidi ya saa moja iliyopita"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "alionekana mara ya mwisho dakika {n} zilizopita"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "chapa"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "modeli"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "karibu"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "sasa"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "Natoka sasa hivi 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "fungua menyu › Mipangilio › Tovuti na vipakuliwa › Ruhusa za tovuti › Mahali"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "fungua Mipangilio ya kivinjari chako › Faragha na usalama › Mipangilio ya tovuti › Mahali › ruhusu Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "fungua {app} › ⋮ › Mipangilio › Mipangilio ya tovuti › Mahali › ruhusu Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "fungua ⋮ › Mipangilio › Ruhusa za tovuti › Mahali › Uliza ili kuruhusu"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "ili dereva wako akupate"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "ili mwenzako wa safari akupate"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "Safi, tuonane hivi karibuni!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "gusa aikoni iliyo kushoto mwa sehemu ya anwani ya wavuti (juu ya skrini) › Ruhusa › Mahali › Ruhusu (chagua Sahihi ukiulizwa)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "ili uombe usafiri"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "ili uendeshe"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "ili uonyeshe ulipo"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "washa Mahali (telezesha kidole chini › Mahali)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "washa Location Services (Settings › Privacy & Security)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "washa mahali kwenye kifaa hiki"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "Ndiyo, naweza kukuchukua"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "Ndiyo tafadhali! Niko karibu na mabenchi 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "Mambo vipi?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "Habari, nimeona mkono wako ✋ unahitaji kuchukuliwa?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "Una uhakika? Bado nimekwama hapa nje 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "kivinjari chako"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · dereva wako"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{make} {model} {color}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "Gari {count} karibu hapa"
+msgstr[1] "Magari {count} karibu hapa"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "Gari {count} hapa"
+msgstr[1] "Magari {count} hapa"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "Imebaki herufi {count}"
+msgstr[1] "Zimebaki herufi {count}"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "Herufi {count} zaidi ya kikomo"
+msgstr[1] "Herufi {count} zaidi ya kikomo"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "Herufi {count} zaidi ya kikomo — fupisha ujumbe wako ili uutume"
+msgstr[1] "Herufi {count} zaidi ya kikomo — fupisha ujumbe wako ili uutume"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "Mtu {count} hapa"
+msgstr[1] "Watu {count} hapa"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "Mtu {count} anahitaji usafiri hapa"
+msgstr[1] "Watu {count} wanahitaji usafiri hapa"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "umbali wa {distance}"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} amefika"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} yuko safarini sasa hivi"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} yuko njiani"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} hapatikani sasa hivi"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} hapatikani sasa hivi — jaribu dereva mwingine"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} haonekani — vuta karibu na utafute gari lake tena"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} hayupo mtandaoni tena — jaribu dereva mwingine"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "saa {n} zilizopita"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "km {n}"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "maili {n}"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "dakika {n} zilizopita"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "siku {n}"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "saa {n}"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "dk {n}"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site} — na kwenye simu yako: {steps} › Ruhusu, huku Tumia data sahihi ya mahali ikiwa imewashwa"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · Inaunganisha tena…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps} — au, kama ulichagua Kadirio kwa Hood Ride: gusa aikoni iliyo kushoto mwa anwani ya wavuti › Ruhusa › Weka upya ruhusa, kisha ujaribu tena na uchague Sahihi"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › Tumia data sahihi ya mahali"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. Hood Ride itapakia upya utakaporudi."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ Ujumbe mpya"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ Punguza kasi kidogo"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ Inamsubiri dereva…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ Unatuma haraka mno — punguza kasi kidogo"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ Inatafuta usafiri…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ Madereva walio karibu wanaona kwamba unahitaji usafiri"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ Nahitaji usafiri"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ Mtu aliye karibu anahitaji usafiri"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ anahitaji usafiri"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 Gumzo"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 Gumzo ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 Ruhusu mahali kivinjari chako kitakapouliza — Hood Ride inahitaji mahali {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 Inatafuta mahali ulipo…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Mahali pamezuiwa kwa Hood Ride — ruhusu {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 Mahali pamezimwa kwenye kifaa hiki — {steps} {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 Tukutane hapa"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 Mahali pa kukutana pamewekwa — dereva wako anapaona"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 Hamisha alama"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 Alama imeondolewa — dereva wako atakuja ulipo"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 Shiriki mahali ulipo"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 Shiriki mahali ulipo ili mwenzako wa safari akupate"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 Gusa ramani mahali unapotaka mkutane"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 Inasubiri mahali ulipo — abiria bado hawakuoni"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 Mahali ulipo ni pa kukadiria tu — washa mahali sahihi {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 ameomba usafiri"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 Safiri"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 Uko kazini"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 Inasubiri mahali hasa alipo {name} — au mwombe aweke 📍 mahali pa kukutana"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} alionekana hapo mara ya mwisho zaidi ya saa moja iliyopita"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} alionekana hapo mara ya mwisho dakika {n} zilizopita"

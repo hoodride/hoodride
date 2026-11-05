@@ -1,0 +1,1186 @@
+# Hood Ride in Romanian. A first translation (2026-11-04).
+# Plural forms by name, in this order: one, few, other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: ro\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(cerere retrasă)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "Acceptă cursa"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "Se acceptă cursa…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "Se acceptă…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "Adaug-o înainte să conduci"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "Adaugă-ți mașina"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "Te întrebăm prima dată când navighezi"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "Înapoi"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "Înapoi la pagina de conectare"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "Înainte să începi"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "Bej"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "bej"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "Neagră"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "negru"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "Albastră"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "albastru"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "Maro"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "maro"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "Dacă continui, accepți {terms} și {privacy}."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Nu ne putem conecta la Hood Ride – reîncercăm…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Nu ne putem conecta la Hood Ride – încearcă din nou"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "Anulează"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "Anulează cererea"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "Mai întâi anulează-ți cererea de cursă"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "Mai întâi anulează-ți cererea de cursă."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "Centrează pe locația mea"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "Schimbă"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "O poți schimba oricând: atinge fotografia de profil din stânga sus, apoi {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "Schimbă pe {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "Le-ai schimbat?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "Chat"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "Chatul cu {name} s-a încheiat – lipsește de ceva vreme"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "Chaturi"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "Verifică: {fields} (maximum {max} litere fiecare)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "Alege…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "Închide"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "Închide setările"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "Culoare"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "Se conectează…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "Problemă de conexiune – reîncercăm"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "Conexiunea s-a resetat – atinge INTRĂ ONLINE ca să conduci din nou"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "Conexiunea s-a resetat – atinge din nou ✋ dacă încă ai nevoie de o cursă"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "Conexiunea s-a resetat – cursa s-a încheiat neașteptat, stabiliți-o din nou"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "Conexiunea s-a resetat – cererea ta de cursă s-a pierdut, cere din nou"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Continuă cu Facebook"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Continuă cu Google"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "Copiat ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "Copiază"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "Copiază mesajul"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "Nu s-a putut accepta"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "Nu s-a putut copia"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "Contul nu a putut fi șters – încearcă din nou."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Nu ne-am putut conecta la Hood Ride – verifică-ți conexiunea și încearcă din nou."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Nu ne-am putut conecta la Hood Ride – încearcă din nou"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "Nu ne-am putut conecta la server – încearcă din nou"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "Nu s-a putut reîmprospăta automat – atinge fotografia de profil din stânga sus, apoi Schimbă, apoi Reîmprospătează de la Google"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "Nu s-a putut reîmprospăta acum – încearcă mai târziu"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "Nu s-a putut salva acum – încearcă din nou peste câteva clipe."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "Nu s-a putut salva – încearcă din nou"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "Cererea nu a putut fi trimisă"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "Nu te-ai putut conecta – încearcă din nou"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "Nu te-ai putut deconecta – încearcă din nou"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "ȘTERGE"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "Refuză"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "Șterge contul"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "Șterge-mi contul"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "Ștergi contul?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "Demo"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "Conduc"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "Șofer"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "Șoferul nu poate prelua cursa asta – încearcă altul"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "Încheie cursa"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "Mai întâi încheie cursa"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "Mai întâi încheie cursa."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "Mai întâi termină cursa actuală"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "IEȘI OFFLINE"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "INTRĂ ONLINE"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "Lasă-i acestui șofer un minut înainte să ceri din nou"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Mergi la Hood Ride"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "Aurie"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "auriu"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Google poate dura puțin"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "Gri"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "gri"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "Verde"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "verde"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride pe Discord"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride a fost deschis pe alt dispozitiv"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "Sunt de acord"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "Am ajuns"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "Ieși din demo"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "Marcă"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "Mărci"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "Hartă"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "Feedback despre hartă"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "Marcaj pe hartă"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "Ne întâlnim aici"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "Mesaj"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "Mesajul nu s-a trimis – ai conexiune?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "Mesajul nu s-a trimis – încearcă din nou"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "Mesajul are prea multe semne suprapuse pe o singură literă"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "Mesaj prea lung – folosește mai puțin de {max} caractere"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "Mesaj…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "Model"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "Navighează"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "Aplicație de navigare"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "Am nevoie de o cursă"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "Vecini care își duc vecinii. Vezi mașinile și oamenii din apropiere care au nevoie de o cursă, scrieți-vă și mergeți împreună."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "Indisponibil"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "Pe toate dispozitivele tale"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "Deschide indicațiile în"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "Portocalie"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "portocaliu"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "Alta"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "Pagina nu a fost găsită"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "Pagina nu a fost găsită — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "Preiei: {name} · atinge 🧭 pentru navigare"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "Preiei: {name} · {seen} · atinge 🧭 pentru navigare"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "Citește și acceptă {terms} și {privacy}."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Politica de confidențialitate"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Politica de confidențialitate"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "Mov"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "mov"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Ne reconectăm la Hood Ride…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "Roșie"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "roșu"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Reîmprospătează de la Google"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "Cerere anulată"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "Cerere refuzată"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "Cererea a expirat – cere din nou sau încearcă alt șofer"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "Cere cursa"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "Cerută…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "Se trimite cererea de cursă…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "Se trimite…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "Cursă încheiată"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "Cursă cu {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "Pasagerii nu te văd. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "Pasagerii o caută când vii după ei. Adaug-o ca să intri online."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "Pasagerii văd asta ca să te găsească"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "Curse cu vecinii tăi"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Site-uri Safari (sau numele browserului tău, dacă nu folosești Safari)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "Salvează"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "Salvează și intră online"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "Trimite"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "Setări"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "Setări ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "Setări › Aplicații › {app} › Permisiuni › Locație"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "Configurări › Intimitate și securitate › Servicii de localizare › {app} › Localizare precisă: activată"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "Configurări › Intimitate și securitate › Servicii de localizare › {app} › La utilizarea aplicației, și activează Localizare precisă"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "Afișează sau ascunde sursele hărții"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "Deconectează-te"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "Te conectăm…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "Argintie"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "argintiu"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "Codul sursă pe GitHub"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "Atinge ca să elimini"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "Termenii"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "Șoferul acela nu mai e prin zonă"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "Pasagerul acela nu mai caută o cursă"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "Acțiunea nu poate fi anulată. Contul tău este șters, dispari de pe hartă, conversațiile se închid și sesiunea se încheie pe toate dispozitivele. Dacă te conectezi din nou mai târziu, începi cu un cont nou."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "Pagina aceasta nu există."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "Prea târziu – cererea a fost retrasă"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "Prea multe încercări de conectare eșuate din rețeaua ta – încearcă mai târziu."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "Scrie {word} pentru a confirma"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "Scrie {word} pentru a confirma."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "Actualizare disponibilă – atinge pentru reîncărcare"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "Folosește aici"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "Albă"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "alb"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "Galbenă"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "galben"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "Ai deja o cerere deschisă"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "Poți reîmprospăta după cursă"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "Poți reîmprospăta numele și fotografia după cursă"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "Ai ajuns · preiei: {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "Ai contactat multe persoane noi – încearcă mai târziu"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "Ai reîmprospătat de prea multe ori – încearcă din nou în câteva minute"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "Ai început multe chaturi noi – încearcă mai târziu"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "Mașina ta"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "Numele și fotografia vin din contul {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "Pasagerul tău"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "Mărește harta ca să vezi cine e prin zonă"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "Acceptat! Sunt pe drum 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "Ok, te văd"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "Ok, s-a făcut"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "Bine, atunci vin eu la tine"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "permite locația exactă pentru acest site din setările browserului"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "Ajung în câteva minute"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "dă clic pe pictograma din stânga barei de adrese (sus în browser) › Locație › Permite"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "culoare"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "Super, stau cu ochii după tine"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "Am înțeles, merg la marcajul tău 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "Am ajuns! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "Hei! Sunt la spălătoria de pe Strada a Treia, mă poți lua? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "ultima activitate acum peste o oră"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "ultima activitate acum {n} min"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "marcă"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "model"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "în apropiere"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "acum"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "Plec într-o clipă 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "deschide meniul › Setări › Site-uri și descărcări › Permisiuni site › Locație"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "deschide Setările browserului › Confidențialitate și securitate › Setări pentru site-uri › Locație › permite Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "deschide {app} › ⋮ › Setări › Setări pentru site-uri › Locație › permite Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "deschide ⋮ › Setări › Permisiuni pentru site-uri › Locație › Întreabă pentru a permite"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "ca șoferul să te găsească"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "ca partenerul de drum să te găsească"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "Super, ne vedem curând!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "atinge pictograma din stânga barei de adrese (sus pe ecran) › Permisiuni › Locație › Permite (alege Exactă dacă ți se cere)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "ca să poți cere o cursă"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "ca să poți conduce"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "ca să se vadă unde ești"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "activează Locația (glisează în jos › Locație)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "activează Serviciile de localizare (Configurări › Intimitate și securitate)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "activează locația pe acest dispozitiv"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "Da, te pot lua"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "Da, te rog! Sunt lângă bănci 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "Salut, ce faci?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "Salut, ți-am văzut mâna ✋ Vrei să te iau?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "Sigur? Încă aștept aici 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "browserul tău"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · șoferul tău"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{make} {model} {color}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "{count} mașină prin zonă"
+msgstr[1] "{count} mașini prin zonă"
+msgstr[2] "{count} de mașini prin zonă"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "{count} mașină aici"
+msgstr[1] "{count} mașini aici"
+msgstr[2] "{count} de mașini aici"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "A mai rămas {count} caracter"
+msgstr[1] "Au mai rămas {count} caractere"
+msgstr[2] "Au mai rămas {count} de caractere"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count} caracter în plus"
+msgstr[1] "{count} caractere în plus"
+msgstr[2] "{count} de caractere în plus"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count} caracter în plus – scurtează mesajul ca să-l poți trimite"
+msgstr[1] "{count} caractere în plus – scurtează mesajul ca să-l poți trimite"
+msgstr[2] "{count} de caractere în plus – scurtează mesajul ca să-l poți trimite"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} persoană aici"
+msgstr[1] "{count} persoane aici"
+msgstr[2] "{count} de persoane aici"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} persoană are nevoie de o cursă aici"
+msgstr[1] "{count} persoane au nevoie de o cursă aici"
+msgstr[2] "{count} de persoane au nevoie de o cursă aici"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "la {distance}"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} a ajuns"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} e într-o cursă acum"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} e pe drum"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} nu poate acum"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} nu poate acum – încearcă alt șofer"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} nu se vede pe hartă – mărește harta și găsește din nou mașina"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} a ieșit offline – încearcă alt șofer"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "acum {n} h"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} mi"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "acum {n} min"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} z"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} h"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} min"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site} – și în telefon, {steps} › Permite, cu Folosește locația exactă activat"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · Ne reconectăm…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps} – sau, dacă ai ales Aproximativă pentru Hood Ride: atinge pictograma din stânga adresei web › Permisiuni › Resetează permisiunile, apoi încearcă din nou și alege Exactă"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › Folosește locația exactă"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. Hood Ride se reîncarcă atunci când revii."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ Mesaj nou"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ Mai încet puțin"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ Așteptăm șoferul…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ Trimiți prea repede – mai încet puțin"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ Căutăm o cursă…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ Șoferii din apropiere văd că ai nevoie de o cursă"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ Am nevoie de o cursă"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ Cineva din apropiere are nevoie de o cursă"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ are nevoie de o cursă"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 Chat"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 Chat ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 Permite accesul la locație când te întreabă browserul – Hood Ride are nevoie de ea {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 Îți căutăm locația…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Locația este blocată pentru Hood Ride – permite-o {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 Locația este dezactivată pe acest dispozitiv – {steps} {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 Ne întâlnim aici"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 Locul de întâlnire e stabilit – șoferul tău îl vede"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 Mută marcajul"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 Marcaj eliminat – șoferul vine până la tine"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 Partajează-ți locația"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 Partajează-ți locația ca partenerul de drum să te găsească"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 Atinge harta unde vrei să vă întâlniți"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 Îți așteptăm locația – pasagerii încă nu te văd"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 Locația ta e doar aproximativă – activează Localizarea precisă {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 a cerut o cursă"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 Călătoresc"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 Ești online"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 Așteptăm ca {name} să trimită locația exactă – sau cere să stabilească un 📍 loc de întâlnire"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} – ultima poziție aici, acum peste o oră"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} – ultima poziție aici, acum {n} min"

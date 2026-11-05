@@ -220,7 +220,7 @@
         app === "Samsung Internet"
           ? t("open the menu › Settings › Sites and downloads › Site permissions › Location")
           : app === "Firefox"
-            ? t("open ⋮ › Settings › Site permissions › Location › Ask to allow")
+            ? t("open ⋮ › Settings › Site settings › Location › Ask to allow")
             : standalone
               ? t("open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride", { app: app || t("your browser") })
               : t("tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)");

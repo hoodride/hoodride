@@ -1,0 +1,1179 @@
+# Hood Ride in Finnish. A first translation (2026-11-04).
+# Plural forms by name, in this order: one, other (Unicode CLDR — the app picks by name).
+msgid ""
+msgstr "Language: fi\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr "(pyyntö peruttu)"
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr "Hyväksy kyyti"
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr "Hyväksytään kyytiä…"
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr "Hyväksytään…"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr "Lisää se ennen kuin ajat"
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr "Lisää autosi"
+
+#: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr "Kysytään, kun navigoit ensimmäisen kerran"
+
+#: priv/static/index.html
+msgid "Back"
+msgstr "Takaisin"
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr "Takaisin kirjautumissivulle"
+
+#: priv/static/index.html
+msgid "Before you start"
+msgstr "Ennen kuin aloitat"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr "Beige"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Beige"
+msgstr "beige"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr "Musta"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Black"
+msgstr "musta"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr "Sininen"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Blue"
+msgstr "sininen"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr "Ruskea"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Brown"
+msgstr "ruskea"
+
+#: priv/static/index.html
+msgid "By continuing, you agree to our {terms} and {privacy}."
+msgstr "Jatkamalla hyväksyt seuraavat: {terms} ja {privacy}."
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
+msgstr "Hood Rideen ei saada yhteyttä. Yritetään uudelleen…"
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr "Hood Rideen ei saada yhteyttä. Yritä uudelleen"
+
+#: priv/static/index.html
+msgid "Cancel"
+msgstr "Peruuta"
+
+#: priv/static/app.js
+msgid "Cancel request"
+msgstr "Peru pyyntö"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr "Peru ensin kyytipyyntösi"
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr "Peru ensin kyytipyyntösi."
+
+#: priv/static/index.html
+msgid "Center on my location"
+msgstr "Keskitä sijaintiini"
+
+#: priv/static/index.html
+msgid "Change"
+msgstr "Vaihda"
+
+#: priv/static/index.html
+msgid "Change it anytime: tap your profile picture at the top left, then {setting}"
+msgstr "Voit vaihtaa sen milloin vain: napauta profiilikuvaasi vasemmalla ylhäällä ja sitten kohtaa {setting}"
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr "Vaihda palvelussa {provider} ↗"
+
+#: priv/static/index.html
+msgid "Changed them?"
+msgstr "Vaihdoitko ne?"
+
+#: priv/static/index.html
+msgid "Chat"
+msgstr "Chat"
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr "Chat käyttäjän {name} kanssa päättyi: hän on ollut poissa jonkin aikaa"
+
+#: priv/static/app.js
+msgid "Chats"
+msgstr "Chatit"
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr "Tarkista: {fields} (enintään {max} kirjainta kussakin)."
+
+#: priv/static/index.html
+msgid "Choose…"
+msgstr "Valitse…"
+
+#: priv/static/index.html
+msgid "Close"
+msgstr "Sulje"
+
+#: priv/static/index.html
+msgid "Close settings"
+msgstr "Sulje asetukset"
+
+#: priv/static/index.html
+msgid "Color"
+msgstr "Väri"
+
+#: priv/static/index.html
+msgid "Connecting…"
+msgstr "Yhdistetään…"
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
+msgstr "Yhteysongelma. Yritetään uudelleen"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr "Yhteys katkesi. Napauta LINJOILLE, niin voit ajaa taas"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr "Yhteys katkesi. Napauta ✋ uudelleen, jos tarvitset yhä kyydin"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr "Yhteys katkesi. Kyytisi päättyi odottamatta, joten sovi se uudelleen"
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr "Yhteys katkesi. Kyytipyyntösi katosi, joten pyydä uudelleen"
+
+#: priv/static/index.html
+msgid "Continue with Facebook"
+msgstr "Jatka Facebookilla"
+
+#: priv/static/index.html
+msgid "Continue with Google"
+msgstr "Jatka Googlella"
+
+#: priv/static/app.js
+msgid "Copied ✓"
+msgstr "Kopioitu ✓"
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr "Kopioi"
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr "Kopioi viesti"
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr "Hyväksyminen epäonnistui"
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr "Kopiointi epäonnistui"
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr "Tilin poistaminen epäonnistui. Yritä uudelleen."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr "Hood Rideen ei saatu yhteyttä. Tarkista yhteytesi ja yritä uudelleen."
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr "Hood Rideen ei saatu yhteyttä. Yritä uudelleen"
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
+msgstr "Palvelimeen ei saatu yhteyttä. Yritä uudelleen"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
+msgstr "Automaattinen päivitys epäonnistui. Napauta profiilikuvaasi vasemmalla ylhäällä, sitten Vaihda ja sitten Päivitä Googlesta"
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr "Päivittäminen ei onnistu juuri nyt. Yritä myöhemmin uudelleen"
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr "Tallentaminen ei onnistu juuri nyt. Yritä hetken päästä uudelleen."
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr "Tallentaminen epäonnistui. Yritä uudelleen"
+
+#: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr "Pyynnön lähettäminen epäonnistui"
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr "Kirjautuminen epäonnistui. Yritä uudelleen"
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr "Uloskirjautuminen epäonnistui. Yritä uudelleen"
+
+#: priv/static/app.js, priv/static/index.html
+msgctxt "the word typed to delete the account"
+msgid "DELETE"
+msgstr "POISTA"
+
+#: priv/static/index.html
+msgid "Decline"
+msgstr "Hylkää"
+
+#: priv/static/index.html
+msgid "Delete account"
+msgstr "Poista tili"
+
+#: priv/static/index.html
+msgid "Delete my account"
+msgstr "Poista tilini"
+
+#: priv/static/index.html
+msgid "Delete your account?"
+msgstr "Poistetaanko tilisi?"
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr "Demo"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Drive"
+msgstr "Aja"
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr "Kuljettaja"
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr "Kuljettaja ei voi ottaa tätä kyytiä. Kokeile toista"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End ride"
+msgstr "Lopeta kyyti"
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr "Lopeta ensin kyytisi"
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr "Lopeta ensin kyytisi."
+
+#: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr "Lopeta ensin nykyinen kyytisi"
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr "POIS LINJOILTA"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "GO ONLINE"
+msgstr "LINJOILLE"
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr "Anna kuljettajalle hetki aikaa ennen kuin pyydät uudelleen"
+
+#: priv/static/notfound.html
+msgid "Go to Hood Ride"
+msgstr "Siirry Hood Rideen"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr "Kulta"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gold"
+msgstr "kullanvärinen"
+
+#: priv/static/index.html
+msgid "Google can take a little while"
+msgstr "Googlella voi kestää hetki"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr "Harmaa"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Gray"
+msgstr "harmaa"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr "Vihreä"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Green"
+msgstr "vihreä"
+
+#: priv/static/index.html
+msgid "Hood Ride on Discord"
+msgstr "Hood Ride Discordissa"
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr "Hood Ride avattiin toisella laitteella"
+
+#: priv/static/index.html
+msgid "I agree"
+msgstr "Hyväksyn"
+
+#: priv/static/index.html
+msgid "I'm here"
+msgstr "Olen täällä"
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr "Poistu demosta"
+
+#: priv/static/index.html
+msgid "Make"
+msgstr "Merkki"
+
+#: priv/static/index.html
+msgid "Makes"
+msgstr "Merkit"
+
+#: priv/static/app.js
+msgid "Map"
+msgstr "Kartta"
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr "Palaute kartasta"
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr "Karttamerkki"
+
+#: priv/static/index.html
+msgid "Meet here"
+msgstr "Tavataan tässä"
+
+#: priv/static/index.html
+msgid "Message"
+msgstr "Viesti"
+
+#: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr "Viestiä ei lähetetty. Onko yhteys kunnossa?"
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr "Viestiä ei lähetetty. Yritä uudelleen"
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr "Viestissä on liikaa merkkejä pinottuna samaan kirjaimeen"
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr "Viesti on liian pitkä: käytä alle {max} merkkiä"
+
+#: priv/static/index.html
+msgid "Message…"
+msgstr "Viesti…"
+
+#: priv/static/index.html
+msgid "Model"
+msgstr "Malli"
+
+#: priv/static/index.html
+msgid "Navigate"
+msgstr "Navigoi"
+
+#: priv/static/index.html
+msgid "Navigation app"
+msgstr "Navigointisovellus"
+
+#: priv/static/index.html
+msgid "Need a ride"
+msgstr "Tarvitsen kyydin"
+
+#: priv/static/index.html
+msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
+msgstr "Naapurit antavat kyytejä naapureille. Näe lähellä olevat autot ja kyytiä tarvitsevat ihmiset, lähetä viestejä ja matkustakaa yhdessä."
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr "Ei saatavilla"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "On all your devices"
+msgstr "Kaikilla laitteillasi"
+
+#: priv/static/index.html
+msgid "Open directions in"
+msgstr "Avaa reittiohjeet sovelluksessa"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr "Oranssi"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Orange"
+msgstr "oranssi"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
+msgstr "Muu"
+
+#: priv/static/notfound.html
+msgid "Page not found"
+msgstr "Sivua ei löytynyt"
+
+#: priv/static/notfound.html
+msgid "Page not found — Hood Ride"
+msgstr "Sivua ei löytynyt — Hood Ride"
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr "Noudetaan: {name} · navigoi napauttamalla 🧭"
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr "Noudetaan: {name} · {seen} · navigoi napauttamalla 🧭"
+
+#: priv/static/index.html
+msgid "Please read and agree to our {terms} and {privacy}."
+msgstr "Lue ja hyväksy seuraavat: {terms} ja {privacy}."
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Tietosuojakäytäntö"
+
+#: priv/static/index.html
+msgid "Privacy Policy"
+msgstr "Tietosuojakäytäntö"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr "Violetti"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Purple"
+msgstr "violetti"
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr "Yhdistetään uudelleen Hood Rideen…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr "Punainen"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Red"
+msgstr "punainen"
+
+#: priv/static/index.html
+msgid "Refresh from Google"
+msgstr "Päivitä Googlesta"
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr "Pyyntö peruttu"
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr "Pyyntö hylätty"
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr "Pyyntö vanheni. Pyydä uudelleen tai kokeile toista kuljettajaa"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Request ride"
+msgstr "Pyydä kyytiä"
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr "Pyydetty…"
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr "Pyydetään kyytiä…"
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr "Pyydetään…"
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr "Kyyti päättyi"
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr "Kyyti: {name}"
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
+msgstr "Matkustajat eivät näe sinua. {why}"
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr "Matkustajat etsivät sitä, kun noudat heidät. Lisää se, niin pääset linjoille."
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Riders see this so they can find you"
+msgstr "Matkustajat näkevät tämän, jotta he löytävät sinut"
+
+#: priv/static/index.html
+msgid "Rides from your neighborhood"
+msgstr "Kyytejä naapureilta"
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
+msgstr "Safari-verkkosivustot (tai selaimesi nimi, jos et käytä Safaria)"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Save"
+msgstr "Tallenna"
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr "Tallenna ja siirry linjoille"
+
+#: priv/static/index.html
+msgid "Send"
+msgstr "Lähetä"
+
+#: priv/static/index.html
+msgid "Settings"
+msgstr "Asetukset"
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr "Asetukset ({name})"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr "Asetukset › Sovellukset › {app} › Luvat › Sijainti"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr "Asetukset › Tietosuoja ja suojaus › Sijaintipalvelut › {app} › Tarkka sijainti: päällä"
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr "Asetukset › Tietosuoja ja suojaus › Sijaintipalvelut › {app} › Käytettäessä appia, ja laita Tarkka sijainti päälle"
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
+msgstr "Näytä tai piilota kartan tekijätiedot"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Sign out"
+msgstr "Kirjaudu ulos"
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr "Kirjaudutaan sisään…"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr "Hopea"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Silver"
+msgstr "hopeanvärinen"
+
+#: priv/static/index.html
+msgid "Source code on GitHub"
+msgstr "Lähdekoodi GitHubissa"
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr "Poista napauttamalla"
+
+#: priv/static/index.html
+msgid "Terms"
+msgstr "Käyttöehdot"
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr "Kuljettaja ei ole enää lähellä"
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr "Matkustaja ei enää etsi kyytiä"
+
+#: priv/static/index.html
+msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
+msgstr "Tätä ei voi kumota. Tilisi poistetaan, sinut poistetaan kartalta, keskustelusi suljetaan ja sinut kirjataan ulos kaikilla laitteilla. Jos kirjaudut myöhemmin uudelleen, aloitat uudella tilillä."
+
+#: priv/static/notfound.html
+msgid "This page doesn't exist."
+msgstr "Tätä sivua ei ole olemassa."
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr "Liian myöhään: pyyntö peruttiin"
+
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Too many failed sign-ins from your network — try again later."
+msgstr "Liian monta epäonnistunutta kirjautumista verkostasi. Yritä myöhemmin uudelleen."
+
+#: priv/static/index.html
+msgid "Type {word} to confirm"
+msgstr "Vahvista kirjoittamalla {word}"
+
+#: priv/static/app.js
+msgid "Type {word} to confirm."
+msgstr "Vahvista kirjoittamalla {word}."
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr "Päivitys saatavilla. Lataa uudelleen napauttamalla"
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr "Käytä tässä"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr "Valkoinen"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "White"
+msgstr "valkoinen"
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr "Keltainen"
+
+#: priv/static/car.js
+msgctxt "car color, describing a car"
+msgid "Yellow"
+msgstr "keltainen"
+
+#: priv/static/app.js
+msgid "You already have an open request"
+msgstr "Sinulla on jo avoin pyyntö"
+
+#: priv/static/index.html
+msgid "You can refresh after your ride"
+msgstr "Voit päivittää kyydin jälkeen"
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr "Voit päivittää nimesi ja kuvasi kyydin jälkeen"
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr "Olet perillä · noudetaan: {name}"
+
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr "Olet ottanut yhteyttä moniin uusiin ihmisiin. Yritä myöhemmin uudelleen"
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr "Olet päivittänyt monta kertaa. Yritä uudelleen muutaman minuutin päästä"
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
+msgstr "Olet aloittanut monta uutta chatia. Yritä myöhemmin uudelleen"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "Your car"
+msgstr "Autosi"
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr "Nimesi ja kuvasi tulevat palvelusta {provider}"
+
+#: priv/static/app.js
+msgid "Your rider"
+msgstr "Matkustajasi"
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr "Lähennä nähdäksesi, keitä lähellä on"
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr "Hyväksytty! Tulossa 🚗"
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr "Okei, näen sut"
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr "Okei, sovittu"
+
+#: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr "Okei, tulen sitten sun luo"
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr "salli tarkka sijainti tälle sivustolle selaimesi asetuksissa"
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr "Oon siellä parin minuutin päästä"
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
+msgstr "klikkaa osoitepalkin vasemmalla puolella olevaa kuvaketta (selaimen yläosassa) › Sijainti › Salli"
+
+#: priv/static/app.js
+msgid "color"
+msgstr "väri"
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr "Hyvä, pidän silmät auki"
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr "Selvä, tulen merkkisi luo 📍"
+
+#: priv/static/app.js
+msgid "here! {car}"
+msgstr "Olen täällä! {car}"
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
+msgstr "Moi! Oon Kolmannen kadun pesulan luona, voitko hakea mut? 🙏"
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr "nähty yli tunti sitten"
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr "nähty {n} min sitten"
+
+#: priv/static/app.js
+msgid "make"
+msgstr "merkki"
+
+#: priv/static/app.js
+msgid "model"
+msgstr "malli"
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr "lähellä"
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr "nyt"
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr "Lähden ihan kohta 🚗"
+
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr "avaa valikko › Asetukset › Sivustot ja lataukset › Sivuston käyttöoikeudet › Sijainti"
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr "avaa selaimesi Asetukset › Yksityisyys ja turvallisuus › Sivustoasetukset › Sijainti › salli Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr "avaa {app} › ⋮ › Asetukset › Sivustoasetukset › Sijainti › salli Hood Ride"
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
+msgstr "avaa ⋮ › Asetukset › Sivustojen oikeudet › Sijainti › Kysy lupaa"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr "jotta kuljettajasi löytää sinut"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr "jotta kyytikumppanisi löytää sinut"
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr "Kiva, nähdään pian!"
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr "napauta osoitepalkin vasemmalla puolella olevaa kuvaketta (näytön yläosassa) › Luvat › Sijainti › Salli (valitse Tarkka, jos sitä kysytään)"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr "kyydin pyytämistä varten"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr "ajamista varten"
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr "sijaintisi näyttämistä varten"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr "laita Sijainti päälle (pyyhkäise alas › Sijainti)"
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr "laita Sijaintipalvelut päälle (Asetukset › Tietosuoja ja suojaus)"
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr "laita sijainti päälle tässä laitteessa"
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr "Joo, voin hakea sut"
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr "Joo kiitos! Oon penkkien luona 🙏"
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr "Moi, mitä kuuluu?"
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr "Moi, näin sun käden ✋ Tarviitko kyydin?"
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr "Ootko varma? Oon yhä täällä odottamassa 🙏"
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr "selaimesi"
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr "{car} · kuljettajasi"
+
+#: priv/static/car.js
+msgctxt "car description"
+msgid "{color} {make} {model}"
+msgstr "{color} {make} {model}"
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] "{count} auto tässä lähellä"
+msgstr[1] "{count} autoa tässä lähellä"
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] "{count} auto tässä"
+msgstr[1] "{count} autoa tässä"
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] "{count} merkki jäljellä"
+msgstr[1] "{count} merkkiä jäljellä"
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] "{count} merkki liikaa"
+msgstr[1] "{count} merkkiä liikaa"
+
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] "{count} merkki liikaa: lyhennä viestiä, jotta voit lähettää sen"
+msgstr[1] "{count} merkkiä liikaa: lyhennä viestiä, jotta voit lähettää sen"
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] "{count} henkilö tässä"
+msgstr[1] "{count} henkilöä tässä"
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] "{count} henkilö tarvitsee kyydin tässä"
+msgstr[1] "{count} henkilöä tarvitsee kyydin tässä"
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr "{distance} päässä"
+
+#: priv/static/car.js
+msgctxt "car description, no color"
+msgid "{make} {model}"
+msgstr "{make} {model}"
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr "{name} on perillä"
+
+#: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr "{name} on juuri nyt kyydissä"
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr "{name} on tulossa"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr "{name} ei ole juuri nyt tavoitettavissa"
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr "{name} ei ole juuri nyt tavoitettavissa. Kokeile toista kuljettajaa"
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr "{name} ei ole näkyvissä. Lähennä karttaa ja etsi auto uudelleen"
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
+msgstr "{name} poistui linjoilta. Kokeile toista kuljettajaa"
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr "{n} t sitten"
+
+#: priv/static/distance.js
+msgid "{n} km"
+msgstr "{n} km"
+
+#: priv/static/distance.js
+msgid "{n} mi"
+msgstr "{n} mi"
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr "{n} min sitten"
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr "{n} pv"
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr "{n} t"
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr "{n} min"
+
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr "{site}, ja puhelimessasi: {steps} › Salli, ja Käytä tarkkaa sijaintia päällä"
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr "{status} · Yhdistetään uudelleen…"
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr "{steps}. Tai jos valitsit Hood Ridelle Likimääräinen: napauta verkko-osoitteen vasemmalla puolella olevaa kuvaketta › Luvat › Nollaa luvat, yritä sitten uudelleen ja valitse Tarkka"
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr "{steps} › Käytä tarkkaa sijaintia"
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr "{steps}. Hood Ride latautuu uudelleen, kun palaat."
+
+#: priv/static/index.html
+msgid "↓ New message"
+msgstr "↓ Uusi viesti"
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
+msgstr "⏳ Hetkinen, hidasta vähän"
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr "⏳ Odotetaan kuljettajaa…"
+
+#: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr "⏳ Lähetät liian nopeasti. Hidasta vähän"
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr "✋ Etsitään kyytiä…"
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr "✋ Lähellä olevat kuljettajat näkevät, että tarvitset kyydin"
+
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr "✋ Tarvitsen kyydin"
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr "✋ Joku lähellä tarvitsee kyydin"
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr "✋ tarvitsee kyydin"
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr "💬 Chat"
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr "💬 Chat ({count})"
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr "📍 Salli sijainti, kun selain kysyy. Hood Ride tarvitsee sitä {why}"
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
+msgid "📍 Finding your location…"
+msgstr "📍 Haetaan sijaintiasi…"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr "📍 Sijainti on estetty Hood Ridelta. Salli se {why}: {steps}"
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr "📍 Sijainti on pois päältä tässä laitteessa: {steps} {why}"
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr "📍 Tavataan tässä"
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr "📍 Tapaamispaikka asetettu: kuljettajasi näkee sen"
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr "📍 Siirrä merkkiä"
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
+msgstr "📍 Merkki poistettu: kuljettajasi tulee luoksesi"
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr "📍 Jaa sijaintisi"
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr "📍 Jaa sijaintisi, jotta kyytikumppanisi löytää sinut"
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr "📍 Napauta kartalta tapaamispaikka"
+
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr "📍 Odotetaan sijaintiasi. Matkustajat eivät vielä näe sinua"
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr "📍 Sijaintisi on vain likimääräinen. Laita tarkka sijainti päälle {why}: {steps}"
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr "📩 pyysi kyytiä"
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr "🚶 Matkusta"
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr "🟢 Olet linjoilla"
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr "🧭 Odotetaan käyttäjän {name} tarkkaa sijaintia, tai pyydä häntä asettamaan 📍 tapaamispaikka"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr "🧭 {name} nähtiin siellä viimeksi yli tunti sitten"
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
+msgstr "🧭 {name} nähtiin siellä viimeksi {n} min sitten"
