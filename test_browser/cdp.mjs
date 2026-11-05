@@ -370,6 +370,11 @@ function page(cdp, sessionId, name) {
     async cookies() {
       return (await send("Network.getCookies", {})).cookies;
     },
+    // a script run first on every page this person opens from now on
+    // (before the page's own): e.g. a watcher of what each frame shows
+    async onEveryPage(source) {
+      await send("Page.addScriptToEvaluateOnNewDocument", { source });
+    },
     // type into the focused field as a keyboard would (real input events)
     async type(text) {
       await send("Input.insertText", { text });

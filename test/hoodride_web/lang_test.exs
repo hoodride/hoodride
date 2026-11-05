@@ -454,12 +454,20 @@ defmodule HoodrideWeb.LangTest do
 
       for face <- faces do
         assert face =~ ~s(font-family: "Noto Sans Ethiopic")
-        assert face =~ ~r/src: url\("#{prefix}fonts\/NotoSansEthiopic-(Regular|Bold)\.ttf"\)/
+        # an installed copy (Android, Linux) before the download (MDN:
+        # "local files should appear before remote files")
+        assert face =~
+                 ~r/src: local\("Noto Sans Ethiopic (Regular|Bold)"\), local\("NotoSansEthiopic-\1"\),\s+url\("#{prefix}fonts\/NotoSansEthiopic-\1\.ttf"\)/
+
         # only Ethiopic: nobody else ever downloads it
         assert face =~ "unicode-range: U+1200-139F, U+2D80-2DDF, U+AB01-AB2E, U+1E7E0-1E7FE;"
       end
 
-      assert text =~ ~r/font(-family)?:[^;]*"Noto Sans Ethiopic", sans-serif;/,
+      # the device's own Ethiopic fonts first (Windows' Ebrima and Nyala,
+      # Apple's Kefa): no download when it has one — after the Latin fonts
+      # (Ebrima has Latin letters too; English must not change font)
+      assert text =~
+               ~r/font(-family)?:[^;]*"Segoe UI", Roboto, Ebrima, Nyala, Kefa, "Noto Sans Ethiopic", sans-serif;/,
              "#{css}: in the font list"
     end
 

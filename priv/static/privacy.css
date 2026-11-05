@@ -4,24 +4,31 @@
    2026-11-05: not every phone has one — iPhones unconfirmed): Google's Noto Sans Ethiopic,
    unchanged (fonts/, SIL OFL — THIRD-PARTY.md). unicode-range: a browser
    fetches it only for Ethiopic letters its own fonts lack — never for
-   anyone else */
+   anyone else. And not when the device has an Ethiopic font of its own:
+   the font list names the built-in ones first — Windows' Ebrima (and
+   Nyala), Apple's Kefa — after the Latin fonts (Ebrima has Latin letters
+   too: only the Ethiopic ones reach it); and src tries an installed Noto
+   Sans Ethiopic (Android, Linux) before the download — "local files should
+   appear before remote files" (MDN, @font-face src) */
 @font-face {
   font-family: "Noto Sans Ethiopic";
-  src: url("/fonts/NotoSansEthiopic-Regular.ttf") format("truetype");
+  src: local("Noto Sans Ethiopic Regular"), local("NotoSansEthiopic-Regular"),
+    url("/fonts/NotoSansEthiopic-Regular.ttf") format("truetype");
   font-weight: 400;
   font-display: swap;
   unicode-range: U+1200-139F, U+2D80-2DDF, U+AB01-AB2E, U+1E7E0-1E7FE;
 }
 @font-face {
   font-family: "Noto Sans Ethiopic";
-  src: url("/fonts/NotoSansEthiopic-Bold.ttf") format("truetype");
+  src: local("Noto Sans Ethiopic Bold"), local("NotoSansEthiopic-Bold"),
+    url("/fonts/NotoSansEthiopic-Bold.ttf") format("truetype");
   font-weight: 700;
   font-display: swap;
   unicode-range: U+1200-139F, U+2D80-2DDF, U+AB01-AB2E, U+1E7E0-1E7FE;
 }
 :root { color-scheme: dark light; --bg: #121212; --text: #ececec; --muted: #a0a0a0; --accent: #ffc107; --line: #2c2c2e; }
 @media (prefers-color-scheme: light) { :root { --bg: #fff; --text: #1a1a1a; --muted: #555; --accent: #8a6100; --line: #ddd; } }
-body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Ethiopic", sans-serif; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, Ebrima, Nyala, Kefa, "Noto Sans Ethiopic", sans-serif; }
 main { max-width: 720px; margin: 0 auto; padding: 24px 16px 64px; }
 h1 { font-size: 28px; margin: 8px 0 4px; }
 h2 { font-size: 20px; margin: 32px 0 8px; padding-top: 16px; border-top: 1px solid var(--line); }

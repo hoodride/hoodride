@@ -43,12 +43,33 @@ defmodule HoodrideWeb.PageController do
       |> with_alternates("", lang, I18n.addressed())
       |> localize_links(lang)
       |> in_language(lang)
+      |> resuming(signed_in?(conn))
 
     conn
+    # (the page now depends on the sign-in cookie too: Vary says so)
+    |> Lang.vary()
     |> Lang.renew()
     |> put_resp_content_type("text/html")
     |> send_resp(200, html)
   end
+
+  # Signed in (a session cookie that still holds a sign-in — no database
+  # read): the page starts NEUTRAL, the car on dark, not on the sign-in
+  # screen that /api/state would replace a moment later (owner, 2026-11-05:
+  # changing language flashed the sign-in screen). The app (app.js) then
+  # shows the map, the Terms, or — the sign-in really over — the sign-in
+  # screen. "Don't guess on the server: render a pending state" (the
+  # standard fix for a flash of signed-out content; Remix: the session read
+  # before the page is sent). A hint only: the app decides.
+  defp signed_in?(conn) do
+    conn |> fetch_session() |> get_session() |> HoodrideWeb.Auth.session_user() != nil
+  end
+
+  @doc "The page starting neutral (`resuming`) for someone signed in."
+  def resuming(html, false), do: html
+
+  def resuming(html, true),
+    do: String.replace(html, "<html lang=", ~s(<html class="resuming" lang=), global: false)
 
   # a language address, checked: one switched on → `serve`; the same in other
   # capitals (/JA, /pt-br) → its own spelling; /en… → the English address;

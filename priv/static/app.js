@@ -249,6 +249,8 @@ const RIDER_REPLIES = () => [
 const $ = (id) => document.getElementById(id);
 
 function show(screenId) {
+  // a screen chosen: the neutral start is over (PageController.resuming)
+  document.documentElement.classList.remove("resuming");
   document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
   $(screenId).classList.add("active");
   // the page doesn't zoom on the map screen (styles.css html.on-map); the
@@ -4048,6 +4050,9 @@ const booting = HoodBoot.create({
     // signed out (here or from another device): no remembered map area left
     HoodViewStore.forgetAll(storageOrNull());
     HoodReadStore.forgetAll(storageOrNull());
+    // the sign-in really over (expired, signed out elsewhere): the page
+    // started neutral for a signed-in visitor — now the sign-in screen, whole
+    document.documentElement.classList.remove("resuming");
     $("boot-status").classList.add("hidden");
     $("auth-buttons").classList.remove("hidden");
     auth.signOut(); // signed out: clear any leftover of the old fake sign-in

@@ -326,6 +326,68 @@ await journey("languages: no English left in a made-up language, nothing cut off
   check(ali.errors.length === 0, "ar: no page errors", ali.errors);
   await ali.close();
 
+  // the Ethiopic font (owner, 2026-11-05): downloaded only by a device
+  // without an Ethiopic font of its own — Windows always has Ebrima, so
+  // there, never; the letters still shown (in Ebrima)
+  step("Abe, in Amharic on Windows: his own Ethiopic font, no download");
+  const abe = await browser.visitor("BT-Abe");
+  await abe.phone(390, 780, 2);
+  await abe.goto(`${BASE}/am/privacy`);
+  const am = await abe.eval(`document.fonts.ready.then(() => ({
+    windows: navigator.userAgent.includes("Windows"),
+    downloaded: performance.getEntriesByType("resource").filter((e) => e.name.includes("NotoSansEthiopic")).map((e) => e.name),
+    // an Ethiopic letter drawn with real width, not an empty box
+    width: (() => { const s = document.createElement("span"); s.textContent = "ሀሁሂ"; document.body.append(s); const w = s.getBoundingClientRect().width; s.remove(); return w; })(),
+  }))`);
+  check(am.width > 20, "am: the Ethiopic letters shown", am);
+  if (am.windows) check(am.downloaded.length === 0, "am: Windows' own Ebrima used — the font not downloaded", am);
+  check(abe.errors.length === 0, "am: no page errors", abe.errors);
+  await abe.close();
+
+  // signed in, a language change reloads the page — it used to show the
+  // sign-in screen for a moment (owner, 2026-11-05: "is it like logging me
+  // back in?"). Now it starts on the car alone (PageController.resuming):
+  // every frame before it's painted, the sign-in screen's words never seen;
+  // "Connecting…" not in the first second; then the map, in Spanish
+  step("Uma, signed in, switches to Español: the sign-in screen never flashes");
+  const uma = await browser.person("BT-Uma");
+  await uma.phone(390, 780, 2);
+  // (in its own scope: a global "tick" here broke the app's own — app.js
+  // never ran)
+  await uma.onEveryPage(`(() => {
+    window.__seen = { login: [], early: [] };
+    const t0 = performance.now();
+    const tick = () => {
+      const screen = document.getElementById("screen-login");
+      const on = (sel) => { const el = document.querySelector(sel); return el && screen.classList.contains("active") && getComputedStyle(el).visibility === "visible" && el.getBoundingClientRect().height > 0; };
+      if (screen) {
+        const ms = Math.round(performance.now() - t0);
+        for (const sel of ["#screen-login .tagline", "#screen-login .about", "#screen-login .fineprint", "#btn-lang-login"]) if (on(sel)) window.__seen.login.push([sel, ms]);
+        if (on("#boot-status") && ms < 900) window.__seen.early.push(ms);
+        window.__seen.started = window.__seen.started ?? document.documentElement.className;
+      }
+      if (!document.getElementById("screen-map")?.classList.contains("active")) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  })();`);
+  await uma.waitFor(`document.getElementById("screen-map").classList.contains("active")`, "the map");
+  await uma.eval(`document.getElementById("btn-lang").click(), true`);
+  await uma.waitFor(`!document.getElementById("lang-sheet").classList.contains("hidden")`, "the list");
+  await uma.eval(`[...document.querySelectorAll("#lang-list button")].find((b) => b.lang === "es").click(), true`);
+  await uma.waitFor(`document.documentElement.lang === "es" && document.getElementById("screen-map").classList.contains("active")`, "the map, in Spanish", 20000);
+  const seen = await uma.eval(`window.__seen`);
+  check(seen.started === "resuming", "the page started neutral (the server knew)", seen);
+  check(seen.login.length === 0, "not one frame of the sign-in screen", seen.login.slice(0, 6));
+  check(seen.early.length === 0, "no Connecting… flashing in the first second", seen.early.slice(0, 6));
+  check(!(await uma.eval(`document.documentElement.classList.contains("resuming")`)), "the neutral start over");
+  check(uma.errors.length === 0, "no page errors", uma.errors);
+  // signed out (here or elsewhere) with that page: the whole sign-in screen
+  await uma.eval(`fetch("/api/logout", { method: "POST" }).then(() => true)`);
+  await uma.goto(`${BASE}/es`);
+  await uma.waitFor(`!document.getElementById("auth-buttons").classList.contains("hidden")`, "the sign-in buttons");
+  check(await uma.eval(`!document.documentElement.classList.contains("resuming") && getComputedStyle(document.querySelector("#screen-login .tagline")).visibility === "visible"`), "signed out: the sign-in screen, whole");
+  await uma.close();
+
   // offline (owner, 2026-11-05): "/" sends a Japanese phone to /ja — a
   // saved redirect can't be shown offline, so the worker keeps the home he
   // opened as "/" (sw.js): with no signal, "/" opens in Japanese
