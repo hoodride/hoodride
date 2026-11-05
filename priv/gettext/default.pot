@@ -345,6 +345,18 @@ msgstr ""
 msgid "Makes"
 msgstr ""
 
+#: priv/static/app.js
+msgid "Map"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Map feedback"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Map marker"
+msgstr ""
+
 #: priv/static/index.html
 msgid "Meet here"
 msgstr ""
@@ -539,6 +551,10 @@ msgstr ""
 
 #: priv/static/sendfilter.js
 msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Show or hide the map's credits"
 msgstr ""
 
 #: priv/static/app.js, priv/static/index.html

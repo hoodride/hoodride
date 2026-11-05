@@ -194,8 +194,10 @@ defmodule Hoodride.DocsTest do
 
   # a NUL character in a text file makes git treat it as binary (no diffs,
   # no review); shell quoting once wrote one into a test file instead of
-  # the text "\u0000" (2026-11-04)
-  test "no text file holds a NUL character" do
+  # the text "\u0000" (2026-11-04). Any other control character is as
+  # unseen: a Python string turned the regex `\b` (a word's edge) into a
+  # backspace — twice, once in a test that then checked nothing (2026-11-04)
+  test "no text file holds a NUL or other hidden control character" do
     {out, 0} = System.cmd("git", ~w(ls-files --cached --others --exclude-standard))
     text = ~w(.ex .exs .eex .js .mjs .css .html .md .json .txt .sh .toml .yml .service .conf .svg)
 
@@ -205,7 +207,12 @@ defmodule Hoodride.DocsTest do
       |> Enum.filter(&(Path.extname(&1) in text and File.regular?(&1)))
 
     assert length(files) > 300
-    for f <- files, do: refute(File.read!(f) =~ <<0>>, "#{f} holds a NUL character")
+
+    for f <- files do
+      # (tab, line feed and carriage return are text)
+      refute File.read!(f) =~ ~r/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/,
+             "#{f} holds a hidden control character"
+    end
   end
 
   test "the server guide says what hoodride.app actually runs on" do

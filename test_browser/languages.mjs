@@ -1,0 +1,175 @@
+// Every word the app shows comes from the translators' list (languages,
+// stage 1e — owner, 2026-11-04). The standard check ("pseudo-localization"):
+// a made-up language where every message is the English with each letter
+// swapped for an accented one ("Need a ride" → "⟦Ñééð á ŕíðé ~~~⟧") and made
+// about a third longer, as Spanish runs. Anything still in plain English
+// was missed — a word not marked or not wrapped; anything cut off or
+// spilling out wouldn't fit a longer language.
+//
+// The made-up language is loaded as a real one will be (1f): right after
+// i18n.js, before app.js runs — the page's marked words translated then,
+// every message later through t().
+import { readFileSync } from "node:fs";
+import { journey, step, check, BASE } from "./cdp.mjs";
+
+// ----- the list (priv/gettext/default.pot) → a catalog (i18n.js's form)
+// (.po strings escape as JSON does: \" \\ \n \t)
+const unquote = (s) => JSON.parse(s);
+function readPot(path) {
+  const entries = [];
+  let cur = null;
+  let field = null;
+  for (const line of readFileSync(path, "utf8").split("\n")) {
+    const m = line.match(/^(msgctxt|msgid_plural|msgid|msgstr(?:\[\d\])?) (".*")$/);
+    if (m) {
+      // an entry starts at its context, or at a msgid when the one open has its own
+      if (m[1] === "msgctxt" || (m[1] === "msgid" && (!cur || cur.msgid !== undefined))) {
+        cur = {};
+        entries.push(cur);
+      }
+      field = m[1];
+      cur[field] = unquote(m[2]);
+    } else if (/^".*"$/.test(line) && cur && field) {
+      cur[field] += unquote(line);
+    }
+  }
+  return entries.filter((e) => e.msgid);
+}
+
+const LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const ACCENTED = "áƀçðéƒĝĥíĵķĺɱñóþǫŕšţúṽŵẋýžÁƁÇÐÉƑĜĤÍĴĶĹṀÑÓÞǪŔŠŢÚṼŴẊÝŽ";
+// the made-up language: letters accented, {placeholders} kept, a third longer
+export function pseudo(text) {
+  const swapped = text
+    .split(/(\{\w+\})/)
+    .map((part) => (/^\{\w+\}$/.test(part) ? part : [...part].map((c) => (LETTERS.includes(c) ? [...ACCENTED][LETTERS.indexOf(c)] : c)).join("")))
+    .join("");
+  return `⟦${swapped} ${"~".repeat(Math.ceil(text.length / 3))}⟧`;
+}
+
+function catalog() {
+  const messages = {};
+  for (const e of readPot(new URL("../priv/gettext/default.pot", import.meta.url))) {
+    const key = (e.msgctxt !== undefined ? e.msgctxt + "\u0004" : "") + e.msgid + (e.msgid_plural !== undefined ? "\u0000" + e.msgid_plural : "");
+    messages[key] = e.msgid_plural !== undefined ? { one: pseudo(e.msgid), other: pseudo(e.msgid_plural) } : pseudo(e.msgid);
+  }
+  return { lang: "en-XA", messages };
+}
+
+// loaded the moment i18n.js defines HoodI18n (before app.js), the page's
+// marked words translated then — as the loader will (1f)
+const LOAD = (c) => `(() => {
+  let real;
+  Object.defineProperty(window, "HoodI18n", {
+    configurable: true,
+    get: () => real,
+    set: (v) => { real = v; v.load(${JSON.stringify(c)}); v.translatePage(document); },
+  });
+})();`;
+
+// plain English on screen: words, labels and box hints of what's shown.
+// Allowed: names (people, places, brands, the map's credits) — `allow`
+const ENGLISH = `((allow) => {
+  // (the map's credits are its data's required credit, as given: not ours)
+  const seen = (el) => !!el && el.getClientRects().length > 0 && getComputedStyle(el).visibility !== "hidden" && !el.closest("[aria-hidden=true], .maplibregl-ctrl-attrib-inner, .hidden");
+  // the allowed names taken out whole first ("Hood Ride", never "Ride" alone)
+  const english = (s) => allow.reduce((rest, a) => rest.replace(a, " "), s).match(/[A-Za-z][A-Za-z'’]+/g) || [];
+  const found = [];
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let n; (n = w.nextNode()); ) {
+    const el = n.parentElement;
+    if (!seen(el) || el.closest("script, style")) continue;
+    const words = english(n.nodeValue);
+    if (words.length) found.push({ in: el.id || el.className || el.tagName, text: n.nodeValue.trim().slice(0, 90), words });
+  }
+  for (const el of document.querySelectorAll("[aria-label], [title], [placeholder]")) {
+    if (!seen(el)) continue;
+    for (const a of ["aria-label", "title", "placeholder"]) {
+      const words = english(el.getAttribute(a) || "");
+      if (words.length) found.push({ in: (el.id || el.tagName) + " " + a, text: el.getAttribute(a), words });
+    }
+  }
+  return found;
+})`;
+
+// cut off or spilling out: a shown button or banner whose words are wider
+// than its box
+const SPILLS = `(() => [...document.querySelectorAll("button, .btn, .banner, .drawer-row, label")]
+  .filter((el) => el.getClientRects().length > 0 && !el.closest(".hidden") && el.scrollWidth > el.clientWidth + 1)
+  .map((el) => ({ in: el.id || el.className, text: el.textContent.trim().slice(0, 60), over: el.scrollWidth - el.clientWidth })))()`;
+
+await journey("languages: no English left in a made-up language, nothing cut off", async (browser) => {
+  const c = catalog();
+  // names and words that are no language's: people, brands, places, the
+  // demo's pretend people and cars (the car description is put together by
+  // the server, in English — stage 2), the map's own credits
+  // (whole phrases, each a regex taken out of the text before the check)
+  const NAMES = [
+    /Hood Ride|Google Maps|Apple Maps|Samsung Internet|\b(Google|Facebook|GitHub|Discord|Waze|Safari|Chrome|Firefox|Edge|Brave|Instagram)\b/g,
+    /\b(DeShawn|Maria|Tony|Keisha|Jaylen|Aaliyah|BT-\w+)\b/g,
+    // the demo's cars: the car description is the server's, in English
+    // (stage 2) — whole, before the makes alone
+    /Gray Honda Civic|Red Toyota Corolla|Black Ford F-150|White Nissan Altima/g,
+    // the car form's examples (a make and model are names)
+    /\b(Honda|Civic)\b/g,
+    // distances: miles and feet as the US writes them (stage 2: Intl)
+    /\d+(\.\d+)? (mi|ft)\b/g,
+  ];
+  const allow = `[${NAMES.map(String).join(", ")}]`;
+  const leftEnglish = async (p, where) => {
+    const found = await p.eval(`${ENGLISH}(${allow})`);
+    check(found.length === 0, `${where}: no English left`, found);
+    // (a third longer fits everywhere — checked 2026-11-04; words 4× longer
+    // were reported, so the check sees it)
+    const spills = await p.eval(SPILLS);
+    check(spills.length === 0, `${where}: longer words fit, nothing spills out`, spills);
+  };
+
+  step("Lia opens Hood Ride signed out, in the made-up language");
+  const lia = await browser.visitor("BT-Lia");
+  await lia.beforeScripts(LOAD(c));
+  await lia.goto(`${BASE}/`);
+  await lia.waitFor(`!!document.getElementById("auth-buttons") && !document.getElementById("auth-buttons").classList.contains("hidden")`, "the sign-in buttons");
+  check(await lia.eval(`HoodI18n.lang() === "en-XA"`), "the made-up language is loaded");
+  check((await lia.eval(`document.querySelector(".fineprint").textContent`)).startsWith("⟦"), "the agreement line translated", await lia.eval(`document.querySelector(".fineprint").textContent`));
+  check(await lia.eval(`document.querySelector('.fineprint a[href="/privacy"]').textContent.startsWith("⟦")`), "its links, too, still links");
+  await leftEnglish(lia, "the sign-in screen");
+
+  step("the demo in it: the map, a car's card, a chat, a ride; driving");
+  await lia.goto(`${BASE}/?demo=1`);
+  await lia.waitFor(`typeof DEMO !== "undefined" && DEMO && !!map && drivers.length > 0`, "the demo's pretend drivers", 15000);
+  await leftEnglish(lia, "the map");
+  await lia.eval(`openMarkerCard(drivers[0], "driver"), true`);
+  await lia.waitFor(`!document.getElementById("peer-card").classList.contains("hidden")`, "a car's card");
+  await leftEnglish(lia, "a car's card");
+  await lia.click("btn-msg");
+  await lia.waitFor(`!document.getElementById("chat").classList.contains("hidden")`, "the chat");
+  await leftEnglish(lia, "the chat");
+  await lia.click("btn-ride-action");
+  await lia.waitFor(`state.ride && state.ride.status === "connected"`, "the ride, accepted", 5000);
+  await lia.click("chat-close");
+  await leftEnglish(lia, "in a ride");
+  await lia.click("btn-endride");
+  await lia.waitFor(`!state.ride`, "the ride ended");
+  await lia.click("btn-mode");
+  await lia.waitFor(`state.mode === "driver"`, "Drive");
+  await lia.click("btn-online");
+  await lia.waitFor(`state.online`, "online");
+  await leftEnglish(lia, "driving");
+
+  step("the menu, the car form, the map-app box");
+  await lia.click("btn-account");
+  await lia.waitFor(`settingsOpen()`, "the menu");
+  await leftEnglish(lia, "the menu");
+  await lia.click("btn-car");
+  await lia.waitFor(`carSheetOpen()`, "the car form");
+  check((await lia.eval(`document.getElementById("car-color").options[1].text`)).startsWith("⟦"), "the colors, translated", await lia.eval(`document.getElementById("car-color").options[1].text`));
+  await leftEnglish(lia, "the car form");
+  await lia.click("car-cancel");
+  await lia.waitFor(`!carSheetOpen()`, "the car form closed");
+  await lia.eval(`openNavSheet({ lat: 40.71, lng: -74.0 }), true`);
+  await lia.waitFor(`!document.getElementById("nav-sheet").classList.contains("hidden")`, "the map-app box");
+  await leftEnglish(lia, "the map-app box");
+  await lia.click("nav-cancel");
+  check(lia.errors.length === 0, "no page errors", lia.errors);
+});

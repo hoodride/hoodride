@@ -2405,6 +2405,14 @@ function initMap() {
     center: start.center,
     zoom: start.zoom,
     attributionControl: { compact: true },
+    // the map library's own words (screen-reader names) in the reader's
+    // language — the ones this map uses (languages journey, 2026-11-04)
+    locale: {
+      "Map.Title": t("Map"),
+      "Marker.Title": t("Map marker"),
+      "AttributionControl.ToggleAttribution": t("Show or hide the map's credits"),
+      "AttributionControl.MapFeedback": t("Map feedback"),
+    },
     // flat, north-up, always: no tilt, no rotation
     maxPitch: 0,
     pitchWithRotate: false,

@@ -281,6 +281,11 @@ function page(cdp, sessionId, name) {
         setTimeout(() => send("Fetch.continueRequest", { requestId: msg.params.requestId }).catch(() => {}), ms);
       });
     },
+    // run `source` in every page this person opens from now on, before the
+    // page's own scripts (e.g. a language loaded as the app will load one)
+    async beforeScripts(source) {
+      await send("Page.addScriptToEvaluateOnNewDocument", { source });
+    },
     // the page as a PNG (bytes)
     async screenshot() {
       const { data } = await send("Page.captureScreenshot", { format: "png" });

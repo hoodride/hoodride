@@ -102,7 +102,8 @@ defmodule HoodrideWeb.BrowserJourneysTest do
   end
 
   # one at a time: mix test test/browser --only journey:chats
-  for journey <- ~w(offline chats ride account ridedetails map settings visitor signout terms) do
+  for journey <-
+        ~w(offline chats ride account ridedetails map settings visitor signout terms languages) do
     @tag journey: journey
     test "journey: #{journey}", %{server_log: log} do
       {out, code} = run_journey(unquote(journey))

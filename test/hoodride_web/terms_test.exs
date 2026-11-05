@@ -106,7 +106,7 @@ defmodule HoodrideWeb.TermsTest do
     test "no page limits users to the United States", %{conn: conn} do
       for page <- ["/terms", "/privacy", "/"] do
         html = conn |> get(page) |> html_response(200)
-        refute html =~ ~r/(must|only)[^.<]*(United States|US|U\.S\.)/i, page
+        refute html =~ ~r/(must|only)[^.<]*(United States|\bUS\b|\bU\.S\.)/i, page
         refute html =~ ~r/18 or older and in/i, page
       end
     end
