@@ -146,9 +146,23 @@ await journey("visitor: the signed-out screen, signing in, the demo", async (bro
     const f = hexLabels();
     const res = demoPlan && demoPlan.res;
     const inCell = (c) => drivers.filter((d) => h3.latLngToCell(d.pos.lat, d.pos.lng, res) === c).length;
-    return { res, zoom: map.getZoom(), moving: map.isMoving(), tilesLoaded: map.areTilesLoaded(), drawn: f.length, cars: drivers.length,
+    // what's drawn vs what's there: the hex shapes, the numbers' data, and
+    // the map font the numbers need (fetched from the map server on first use)
+    const src = map.getSource("agg-label-src");
+    const fonts = performance.getEntriesByType("resource").filter((e) => /\\/fonts\\//.test(e.name)).map((e) => ({ font: decodeURIComponent(e.name.split("/fonts/")[1] || ""), ms: Math.round(e.duration), status: e.responseStatus }));
+    return { res, zoom: map.getZoom(), moving: map.isMoving(), tilesLoaded: map.areTilesLoaded(), styleLoaded: map.isStyleLoaded(),
+      shapes: map.getLayer("agg-fill") ? map.queryRenderedFeatures({ layers: ["agg-fill"] }).length : "no layer",
+      numbersData: src && src._data && src._data.features ? src._data.features.length : "no source",
+      fonts, drawn: f.length, cars: drivers.length,
       labels: f.map((x) => { const [lng, lat] = x.geometry.coordinates; return { shown: Number(x.properties.label), cars: res ? inCell(h3.latLngToCell(lat, lng, res)) : null }; }) };
   })()`;
+  // the numbers are text in the map's bold font, fetched from the map server
+  // on first use: until it arrives none can be drawn (shapes and data are
+  // there). Proven 2026-11-04 by holding that font back (delayRequests):
+  // "drawn: 0" exactly as the occasional failure on a busy machine. So:
+  // wait for the font first (a slow download isn't the app's fault), then
+  // the numbers must be right
+  await dee.waitFor(`performance.getEntriesByType("resource").some((e) => /\\/fonts\\/Noto(%20| )Sans(%20| )Bold\\//.test(e.name))`, "the map's bold font arrived", 20000);
   const counted = await dee.waitFor(hexCheck, "each hexagon counts the pretend cars inside it", 5000).catch(async (e) => {
     throw new Error(`${e.message.split("\n")[0]}\n  hexagons: ${JSON.stringify(await dee.eval(hexWhy).catch((x) => String(x.message)))}`);
   });

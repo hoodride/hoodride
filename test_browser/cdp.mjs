@@ -271,6 +271,16 @@ function page(cdp, sessionId, name) {
     async phone(width, height, scale = 2) {
       await send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: scale, mobile: true });
     },
+    // hold back every request whose address matches `urlPattern` (Chrome's
+    // wildcards: *) for `ms`, then let it through — to see what a slow
+    // network does (e.g. the map server's fonts)
+    async delayRequests(urlPattern, ms) {
+      await send("Fetch.enable", { patterns: [{ urlPattern }] });
+      cdp.on((msg) => {
+        if (msg.sessionId !== sessionId || msg.method !== "Fetch.requestPaused") return;
+        setTimeout(() => send("Fetch.continueRequest", { requestId: msg.params.requestId }).catch(() => {}), ms);
+      });
+    },
     // the page as a PNG (bytes)
     async screenshot() {
       const { data } = await send("Page.captureScreenshot", { format: "png" });
