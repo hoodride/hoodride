@@ -84,3 +84,10 @@ test("500 of the heaviest emoji are exactly at the limit, not over", () => {
   assert.equal(L.limit(L.count("👩🏻‍❤️‍💋‍👨🏼".repeat(500))).over, false);
   assert.equal(L.limit(L.count("👨‍👩‍👧‍👦".repeat(501))).over, true);
 });
+
+test("an unread badge: the number, 99+ past 99", () => {
+  assert.equal(L.unreadLabel(1), "1");
+  assert.equal(L.unreadLabel(99), "99");
+  assert.equal(L.unreadLabel(100), "99+");
+  assert.equal(L.unreadLabel(2500), "99+");
+});

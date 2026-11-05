@@ -248,7 +248,10 @@
     <!-- chat panel -->
     <div id="chat" class="chat hidden">
       <div class="chat-header">
-        <button id="chat-back" class="card-close chat-back hidden" aria-label="Back" data-t-attr="aria-label">‹</button>
+        <!-- ‹ and the unread messages in your OTHER chats (owner, 2026-11-05:
+             iPhone Messages, Telegram) — nothing waits unseen while you're
+             in one chat -->
+        <button id="chat-back" class="card-close chat-back hidden" aria-label="Back" data-t-attr="aria-label">‹<span id="chat-back-count" class="unread-dot chat-back-count hidden"></span></button>
         <!-- the person you're talking to (an open chat; hidden on the list) -->
         <img id="chat-photo" class="avatar avatar-mini hidden" src="" alt="" />
         <div class="chat-title">

@@ -692,7 +692,9 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 .chat-dist:empty { display: none; }
 .chat-header .card-close { top: 14px; }
 
-.chat-back { position: static; font-size: 22px; padding: 0 6px; }
+.chat-back { position: static; font-size: 22px; padding: 0 6px; display: inline-flex; align-items: center; gap: 4px; }
+/* the other chats' unread count beside ‹: the chat list's own dot */
+.chat-back-count { font-size: 12px; line-height: 1.4; }
 
 .chat-item {
   display: flex;

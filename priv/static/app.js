@@ -2990,8 +2990,11 @@ function openChat(peer) {
   state.chatView = "msgs";
   chatFor(peer).unread = 0;
   markSeen(peer);
-  renderChat();
+  // the panel shown FIRST, then drawn: a hidden box can't scroll, so drawn
+  // while hidden the chat appeared at its oldest message and jumped to the
+  // newest a frame later (owner, 2026-11-05 — measured: the top painted)
   $("chat").classList.remove("hidden");
+  renderChat();
   refreshControls();
 }
 
@@ -3968,6 +3971,14 @@ function refreshControls() {
 
   const msgView = chatOpen && state.chatView === "msgs" && state.chatPeer;
   toggle("chat-back", !!msgView && chats.size > 1);
+  // in one chat: the unread messages in the OTHERS beside ‹ (owner,
+  // 2026-11-05: iPhone Messages, Telegram) — mid-ride too, where others'
+  // messages pop no banner; messages, like "💬 Chat (n)"; 99+ past 99
+  const others = msgView
+    ? [...chats.entries()].reduce((s, [p, c]) => (p === state.chatPeer ? s : s + c.unread), 0)
+    : 0;
+  $("chat-back-count").textContent = HoodChatList.unreadLabel(others);
+  toggle("chat-back-count", others > 0);
   toggle("btn-decline", !!msgView && !rider && state.chatPeer.pending === true && !state.ride);
   const action = $("btn-ride-action");
   if (!msgView || inRide || (state.ride && !requested)) {

@@ -67,6 +67,126 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   await send(rita);
   await dan.waitFor(`chats.has(realPeersById.get(${ritaId})) && chatFor(realPeersById.get(${ritaId})).msgs.some(m => m.text === "hi Dan")`, "Dan has Rita's message");
 
+  // in one chat, another's message never waits unseen: its count beside ‹
+  // (owner, 2026-11-05: iPhone Messages, Telegram)
+  // (Fay, not Eve: Eve stays someone Rita never wrote to — the "isn't in
+  // view" step below needs a first contact)
+  step("in Dan's chat, Fay writes: ‹ 1; the banner and the list don't read it — opening her chat does");
+  const fay = await browser.person("BT-Fay");
+  await goOnline(fay, { color: "Blue", make: "Ford", model: "Focus" });
+  const fayId = await fay.id();
+  await sees(rita, fayId);
+  const backCount = () => rita.eval(`(() => { const b = document.getElementById("chat-back"), c = document.getElementById("chat-back-count"); return { shown: !b.classList.contains("hidden") && !c.classList.contains("hidden"), count: c.textContent, inside: b.contains(c), height: c.getBoundingClientRect().height }; })()`);
+  const fayRow = () => rita.eval(`(() => { const r = [...document.querySelectorAll("#chat-list .chat-item, .chat-item")].find((i) => i.querySelector("strong")?.textContent === "BT-Fay"); return r ? { bold: r.classList.contains("unread"), dot: r.querySelector(".unread-dot")?.textContent ?? null } : null; })()`);
+  await openChatWith(rita, fayId);
+  await typeText(rita, "hi Fay");
+  await send(rita);
+  await fay.waitFor(`chats.has(realPeersById.get(${ritaId})) && chatFor(realPeersById.get(${ritaId})).msgs.some(m => m.text === "hi Fay")`, "Fay has Rita's message");
+  await openChatWith(rita, danId);
+  check(!(await backCount()).shown, "nothing waiting: a plain ‹", await backCount());
+  await fay.eval(`openChat(realPeersById.get(${ritaId})), true`);
+  await typeText(fay, "hi Rita");
+  await send(fay);
+  await rita.waitFor(`chatFor(realPeersById.get(${fayId})).msgs.some(m => m.text === "hi Rita")`, "Rita has Fay's message");
+  // the banner popped up — and reading it isn't reading the chat
+  await rita.waitFor(`document.getElementById("banner").textContent.includes("BT-Fay: hi Rita")`, "the banner: Fay's message");
+  const waiting = await backCount();
+  check(waiting.shown && waiting.count === "1" && waiting.inside && waiting.height > 0, "‹ 1: Fay's message, seen from Dan's chat", waiting);
+  check((await chatOpenWith(rita)) === danId, "still in Dan's chat", await chatOpenWith(rita));
+  check((await unreadFrom(rita, fayId)) === 1, "the banner didn't read it");
+  // the list shows it — bold, its number — and showing it isn't reading it
+  await rita.click("chat-back");
+  check(JSON.stringify(await fayRow()) === JSON.stringify({ bold: true, dot: "1" }), "the list: Fay bold, 1", await fayRow());
+  check((await unreadFrom(rita, fayId)) === 1, "the list didn't read it");
+  // opening her chat does — everywhere: ‹, the list, 💬 Chat
+  await openChatWith(rita, fayId);
+  check((await unreadFrom(rita, fayId)) === 0, "read once her chat opens");
+  await openChatWith(rita, danId);
+  check(!(await backCount()).shown, "back in Dan's chat: a plain ‹ again", await backCount());
+  await rita.click("chat-back");
+  check(JSON.stringify(await fayRow()) === JSON.stringify({ bold: false, dot: null }), "the list: Fay no longer bold, no number", await fayRow());
+  await closeChatPanel(rita);
+  check((await shown(rita, "#btn-chat")) === "💬 Chat", "💬 Chat, no count", await shown(rita, "#btn-chat"));
+
+  // a long chat opens on its newest message (owner, 2026-11-05) — and again
+  // after reading back to the top and closing it. All THEIR messages: your
+  // own always pull the chat down, which hid a missing scroll
+  step("a long chat (40 messages) opens at the bottom — again after scrolling up");
+  await rita.eval(`(() => { const c = chatFor(realPeersById.get(${fayId})); for (let i = 1; i <= 40; i++) c.msgs.push({ text: "line " + i, mine: false, at: Date.now(), ts: null, id: null }); return true; })()`);
+  const scroll = () => rita.eval(`(() => { const b = document.getElementById("chat-messages"); const last = [...b.querySelectorAll(".msg")].pop(); const lr = last?.getBoundingClientRect(), br = b.getBoundingClientRect(); return { scrolls: b.scrollHeight > b.clientHeight + 100, fromBottom: Math.round(b.scrollHeight - b.scrollTop - b.clientHeight), lastText: last?.textContent, lastInView: !!lr && lr.bottom <= br.bottom + 1 && lr.top >= br.top - 1 }; })()`);
+  // opened from the map (the panel closed): at the newest message at once
+  // and in the FIRST painted frame — never the oldest first, then a jump
+  // (it used to: drawn while the panel was hidden)
+  const firstFrame = await rita.eval(`new Promise((done) => { closeChat(); openChat(realPeersById.get(${fayId})); const b = document.getElementById("chat-messages"); const at = () => Math.round(b.scrollHeight - b.scrollTop - b.clientHeight); const now = at(); requestAnimationFrame(() => requestAnimationFrame(() => done({ now, afterFirstPaint: at() }))); })`);
+  check(firstFrame.now <= 2 && firstFrame.afterFirstPaint <= 2, "the first painted frame: the newest message (no jump)", firstFrame);
+  await closeChatPanel(rita);
+  await openChatWith(rita, fayId);
+  const opened = await scroll();
+  check(opened.scrolls && opened.fromBottom <= 2 && opened.lastText === "line 40" && opened.lastInView, "opened at the newest message", opened);
+  await rita.eval(`(document.getElementById("chat-messages").scrollTop = 0, document.getElementById("chat-messages").dispatchEvent(new Event("scroll")), true)`);
+  check((await scroll()).fromBottom > 100, "scrolled up to the top", await scroll());
+  await closeChatPanel(rita);
+  await openChatWith(rita, fayId);
+  const reopened = await scroll();
+  check(reopened.fromBottom <= 2 && reopened.lastInView, "reopened: at the newest message again", reopened);
+  // and from the list (the panel stays open — no resize puts it right: the
+  // open's own scroll must)
+  await rita.click("chat-back");
+  await openChatWith(rita, fayId);
+  const fromList = await scroll();
+  check(fromList.fromBottom <= 2 && fromList.lastInView, "from the list: at the newest message too", fromList);
+  // scrolled up, then a chat opened straight away, the panel open (Message
+  // on a car), in a chat with none of YOUR messages (someone wrote first;
+  // no reply yet): only the open's own scroll brings it down. (Your own
+  // message, redrawn, pulls the chat down by itself — "yours always
+  // follows" — which hid this: measured, owner 2026-11-05. Rita's own
+  // taken out of her screen's copy only; nothing sent)
+  await rita.eval(`(() => { const c = chatFor(realPeersById.get(${fayId})); c.msgs = c.msgs.filter((m) => !m.mine); openChat(realPeersById.get(${fayId})); return true; })()`);
+  await rita.eval(`(document.getElementById("chat-messages").scrollTop = 0, document.getElementById("chat-messages").dispatchEvent(new Event("scroll")), true)`);
+  await rita.waitFor(`chatStick.stuck === false`, "Rita reading back (scrolled up)");
+  await rita.eval(`openChat(realPeersById.get(${fayId})), true`);
+  const direct = await scroll();
+  check(direct.fromBottom <= 2 && direct.lastInView, "opened straight from a scrolled-up chat: at the newest message", direct);
+  await closeChatPanel(rita);
+
+  // two other chats add up; opening one takes off ALL of its messages at
+  // once — a whole chat, never one message at a time (owner, 2026-11-05)
+  step("in Dan's chat: Fay writes 3, Gus 2 — ‹ 5; Fay's opened → ‹ 2; Gus's → plain ‹");
+  const gus = await browser.person("BT-Gus");
+  await goOnline(gus, { color: "Black", make: "Mazda", model: "3" });
+  const gusId = await gus.id();
+  await sees(rita, gusId);
+  await openChatWith(rita, gusId);
+  await typeText(rita, "hi Gus");
+  await send(rita);
+  await gus.waitFor(`chats.has(realPeersById.get(${ritaId})) && chatFor(realPeersById.get(${ritaId})).msgs.some(m => m.text === "hi Gus")`, "Gus has Rita's message");
+  await gus.eval(`openChat(realPeersById.get(${ritaId})), true`);
+  await openChatWith(rita, danId);
+  for (const n of [1, 2, 3]) {
+    await typeText(fay, `fay ${n}`);
+    await send(fay);
+  }
+  for (const n of [1, 2]) {
+    await typeText(gus, `gus ${n}`);
+    await send(gus);
+  }
+  await rita.waitFor(`chatFor(realPeersById.get(${fayId})).unread === 3 && chatFor(realPeersById.get(${gusId})).unread === 2`, "Rita: 3 unread from Fay, 2 from Gus");
+  const five = await backCount();
+  check(five.shown && five.count === "5", "‹ 5: both chats, added up", five);
+  await rita.click("chat-back");
+  await openChatWith(rita, fayId);
+  check((await unreadFrom(rita, fayId)) === 0, "all 3 of Fay's read at once");
+  await openChatWith(rita, danId);
+  const two = await backCount();
+  check(two.shown && two.count === "2", "‹ 2: Gus's left", two);
+  await rita.click("chat-back");
+  await openChatWith(rita, gusId);
+  await openChatWith(rita, danId);
+  check(!(await backCount()).shown, "Gus's read too: a plain ‹", await backCount());
+  await closeChatPanel(rita);
+  await gus.close();
+  await fay.close();
+
   step("Rita's connection drops; Dan replies meanwhile; back — unread, on the button");
   await closeChatPanel(rita);
   await dropAndWait(rita);

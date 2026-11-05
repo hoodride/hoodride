@@ -79,5 +79,11 @@
     };
   }
 
-  return { ago, newestFirst, skew, localAt, MAX_CHARS, COUNT_FROM, count, limit };
+  // an unread count on a badge: the number, "99+" past 99 (the common
+  // badge cap: Material-style badges, Siemens iX)
+  function unreadLabel(n) {
+    return n > 99 ? "99+" : String(n);
+  }
+
+  return { ago, newestFirst, skew, localAt, MAX_CHARS, COUNT_FROM, count, limit, unreadLabel };
 });
