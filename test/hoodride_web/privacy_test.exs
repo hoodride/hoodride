@@ -289,14 +289,21 @@ defmodule HoodrideWeb.PrivacyTest do
 
     # nor any message the app shows (every one is in the translators' list):
     # Google refresh's failure said "open Settings" until 2026-11-04. The
-    # only "Settings" is the profile button's screen-reader name.
-    test "no message the app shows says 'Settings'" do
+    # only "Settings" are the profile button's screen-reader name, and the
+    # PHONE's or browser's Settings as a step in a menu path
+    # ("Settings › Privacy & Security › …" — location help)
+    test "no message the app shows sends people to the app's 'Settings'" do
       {:ok, pot} = Expo.PO.parse_file("priv/gettext/default.pot")
       ids = Enum.map(pot.messages, &IO.iodata_to_binary(&1.msgid))
 
       assert "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google" in ids
 
-      assert Enum.filter(ids, &(&1 =~ ~r/settings/i)) == ["Settings ({name})"]
+      ours =
+        Enum.filter(ids, &(String.replace(&1, ~r/Settings ›/, "") =~ "Settings"))
+
+      assert ours == ["Settings ({name})"]
+      # (the location help is in the list: the rule above really looks at it)
+      assert Enum.any?(ids, &(&1 =~ "Settings › Privacy & Security"))
       refute Enum.any?(ids, &(&1 =~ "round button"))
     end
 

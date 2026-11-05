@@ -63,9 +63,9 @@ defmodule HoodrideWeb.ChatRebuildTest do
       s = send_handler()
 
       assert s =~
-               ~s[out_of_view: `${peer.name} isn't in view — zoom in and find their car again`,]
+               ~s[out_of_view: t("{name} isn't in view — zoom in and find their car again", { name: peer.name }),]
 
-      assert s =~ ~s[unavailable: `${peer.name} isn't available right now`,]
+      assert s =~ ~s[unavailable: t("{name} isn't available right now", { name: peer.name }),]
     end
 
     test "both close the chat (back to the map); not available drops the text" do
@@ -96,12 +96,16 @@ defmodule HoodrideWeb.ChatRebuildTest do
   # Request ride says the same, by name, as Send (owner, 2026-10-30)
   test "Request ride's refusals name the driver" do
     [req] = Regex.run(~r/\$\("btn-ride-action"\)\.addEventListener\("click".*?\n\}\);/s, @app)
-    assert req =~ ~s[driver_busy: `${peer.name} is on a ride right now`,]
-    assert req =~ ~s[driver_offline: `${peer.name}'s gone offline — try another driver`,]
-    assert req =~ ~s[unavailable: `${peer.name} isn't available right now — try another driver`,]
+    assert req =~ ~s[driver_busy: t("{name} is on a ride right now", { name: peer.name }),]
 
     assert req =~
-             ~s[out_of_view: `${peer.name} isn't in view — zoom in and find their car again`,]
+             ~s[driver_offline: t("{name}'s gone offline — try another driver", { name: peer.name }),]
+
+    assert req =~
+             ~s[unavailable: t("{name} isn't available right now — try another driver", { name: peer.name }),]
+
+    assert req =~
+             ~s[out_of_view: t("{name} isn't in view — zoom in and find their car again", { name: peer.name }),]
 
     refute req =~ "That driver"
   end

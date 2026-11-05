@@ -59,6 +59,15 @@
     return t("last seen {n} min ago", { n: Math.max(1, Math.round(peerAgeMs / 60_000)) });
   }
 
+  // heading to where they were last seen (Navigate): its own message — the
+  // English once came from lastSeen with "there" spliced in, which no other
+  // language could follow
+  function lastSeenThere(peerAgeMs, name) {
+    if (typeof peerAgeMs !== "number" || fresh(peerAgeMs)) return null;
+    if (peerAgeMs >= 3_600_000) return t("🧭 {name} was last seen there over an hour ago", { name });
+    return t("🧭 {name} was last seen there {n} min ago", { name, n: Math.max(1, Math.round(peerAgeMs / 60_000)) });
+  }
+
   // you announce your position only in a live ride, with a good reading
   // from the CURRENT watch (never a placeholder, coarse or leftover one)
   function mayAnnounce(ride, liveFix) {
@@ -80,5 +89,5 @@
     return null;
   }
 
-  return { FRESH_MS, fresh, received, ageMs, arrivalTarget, navTarget, lastSeen, mayAnnounce, afterJoin, ARRIVED_SHOW_MS, arrivedPhase };
+  return { FRESH_MS, fresh, received, ageMs, arrivalTarget, navTarget, lastSeen, lastSeenThere, mayAnnounce, afterJoin, ARRIVED_SHOW_MS, arrivedPhase };
 });

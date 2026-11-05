@@ -96,7 +96,7 @@ defmodule HoodrideWeb.ChatAndPinTest do
 
     test "the demo's moving driver doesn't write over it" do
       assert @app =~
-               ~r/else if \(!state\.pinArmed\) \{\s*(\/\/[^\n]*\n\s*)*setBanner\(`\$\{CAR\}\$\{d\.name\} is on the way/
+               ~r/else if \(!state\.pinArmed\) \{\s*(\/\/[^\n]*\n\s*)*setBanner\(CAR \+ t\("\{name\} is on the way", \{ name: d\.name \}\)/
     end
   end
 

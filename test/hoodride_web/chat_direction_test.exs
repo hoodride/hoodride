@@ -43,6 +43,6 @@ defmodule HoodrideWeb.ChatDirectionTest do
   end
 
   test "a refused message with stacked marks says why" do
-    assert @app =~ ~r/stacked_marks: "[^"]+"/
+    assert @app =~ ~r/stacked_marks: t\("[^"]+"\)/
   end
 end

@@ -9,9 +9,34 @@
   if (typeof module === "object" && module.exports) module.exports = factory();
   else root.HoodCar = factory();
 })(typeof self !== "undefined" ? self : this, function () {
+  // the words in the reader's language (i18n.js): HoodI18n in the page,
+  // the file itself in the Node tests
+  const I18n = typeof HoodI18n !== "undefined" ? HoodI18n : require("./i18n.js");
+  const { tc } = I18n;
   // the server's list, in its order (a test keeps the two the same): the
   // most common US car colors first (iSeeCars 2025)
   const COLORS = ["White", "Black", "Gray", "Silver", "Blue", "Red", "Green", "Brown", "Beige", "Yellow", "Orange", "Gold", "Purple", "Other"];
+  // each color as the reader's language names it (the value kept and sent
+  // is the English one above — the server's)
+  const COLOR_NAMES = {
+    White: () => tc("car color", "White"),
+    Black: () => tc("car color", "Black"),
+    Gray: () => tc("car color", "Gray"),
+    Silver: () => tc("car color", "Silver"),
+    Blue: () => tc("car color", "Blue"),
+    Red: () => tc("car color", "Red"),
+    Green: () => tc("car color", "Green"),
+    Brown: () => tc("car color", "Brown"),
+    Beige: () => tc("car color", "Beige"),
+    Yellow: () => tc("car color", "Yellow"),
+    Orange: () => tc("car color", "Orange"),
+    Gold: () => tc("car color", "Gold"),
+    Purple: () => tc("car color", "Purple"),
+    Other: () => tc("car color", "Other"),
+  };
+  function colorName(color) {
+    return COLOR_NAMES[color] ? COLOR_NAMES[color]() : color;
+  }
 
   // suggested while typing (the browser's own list — any make can be typed:
   // make/model databases go stale, and this needs no outside service)
@@ -79,5 +104,5 @@
     return label ? ` · ${label}` : "";
   }
 
-  return { COLORS, MAKES, MAX, tidy, problems, suggest, inLine };
+  return { COLORS, colorName, MAKES, MAX, tidy, problems, suggest, inLine };
 });

@@ -53,6 +53,16 @@ test("\"last seen\" only once stale, in plain minutes", () => {
   assert.equal(R.lastSeen(null), null, "no position: nothing to say");
 });
 
+// Navigate toward a stale position: the same times, as one sentence of its
+// own (it was lastSeen's English with "there" spliced in — 2026-11-04)
+test("\"was last seen there\": the same thresholds, one message", () => {
+  assert.equal(R.lastSeenThere(47_999, "Dan"), null);
+  assert.equal(R.lastSeenThere(48_000, "Dan"), "🧭 Dan was last seen there 1 min ago");
+  assert.equal(R.lastSeenThere(150_000, "Dan"), "🧭 Dan was last seen there 3 min ago");
+  assert.equal(R.lastSeenThere(2 * 3_600_000, "Dan"), "🧭 Dan was last seen there over an hour ago");
+  assert.equal(R.lastSeenThere(null, "Dan"), null);
+});
+
 test("you announce only in a live ride, with a reading from the current watch", () => {
   assert.ok(R.mayAnnounce({ status: "connected" }, true));
   assert.ok(R.mayAnnounce({ status: "arrived" }, true));

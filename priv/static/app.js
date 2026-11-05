@@ -405,7 +405,7 @@ $("btn-facebook").addEventListener("click", (e) => handleLogin("facebook", e.cur
 // your sign-in photo; without one, your initial — what everyone else sees
 // for you too
 function myName() {
-  return state.realUser ? state.realUser.name : "Demo";
+  return state.realUser ? state.realUser.name : t("Demo");
 }
 function myPhoto() {
   return (state.realUser && state.realUser.photo) || HoodAvatar.url(myName());
@@ -414,7 +414,7 @@ function myPhoto() {
 function setAccountButton() {
   $("account-photo").dataset.name = myName();
   $("account-photo").src = myPhoto();
-  const name = state.realUser ? state.realUser.name : "Demo";
+  const name = state.realUser ? state.realUser.name : t("Demo");
   $("btn-account").setAttribute("aria-label", t("Settings ({name})", { name }));
 }
 
@@ -513,7 +513,7 @@ window.addEventListener("pageshow", tryGoogleRefresh);
 function renderSettings() {
   $("settings-photo").dataset.name = myName();
   $("settings-photo").src = myPhoto();
-  $("settings-name").textContent = state.realUser ? state.realUser.name : "Demo";
+  $("settings-name").textContent = state.realUser ? state.realUser.name : t("Demo");
   renderSource();
   // in a ride (or with a request waiting) signing out would vanish on your
   // partner: end it first — either side can, one tap (End ride / Cancel request)
@@ -756,7 +756,7 @@ async function saveCar(e) {
   if (goOnline && state.mode === "driver" && !state.online && !state.ride) loc.tapOnline();
 }
 
-HoodCar.COLORS.forEach((c) => $("car-color").add(new Option(c, c)));
+HoodCar.COLORS.forEach((c) => $("car-color").add(new Option(HoodCar.colorName(c), c)));
 // ----- the Make suggestions (HoodCar.suggest): our own list under the box -----
 let makeActive = -1;
 function makeOptions() {
@@ -1081,7 +1081,7 @@ async function connectSocket() {
     const peer = ensurePeer(from);
     if (spot) rememberShared(peer, { spot, age_ms: 0 });
     peer.pending = true;
-    receiveMsg(peer, "📩 requested a ride");
+    receiveMsg(peer, t("📩 requested a ride"));
     refreshControls();
   });
 
@@ -1089,20 +1089,20 @@ async function connectSocket() {
     const peer = realPeersById.get(from_id);
     if (peer) {
       peer.pending = false;
-      receiveMsg(peer, "(request withdrawn)");
+      receiveMsg(peer, t("(request withdrawn)"));
       refreshControls();
     }
   });
 
   userChannel.on("request_declined", () => {
     if (state.ride && state.ride.status === "requested") state.ride = null;
-    transientBanner("Driver can't take this one — try another");
+    transientBanner(t("Driver can't take this one — try another"));
     refreshControls();
   });
 
   userChannel.on("request_expired", () => {
     if (state.ride && state.ride.status === "requested") state.ride = null;
-    transientBanner("Request expired — ask again or try another driver");
+    transientBanner(t("Request expired — ask again or try another driver"));
     refreshControls();
   });
 
@@ -1130,7 +1130,7 @@ async function connectSocket() {
     })
     .receive("error", (e) => {
       if (sessionMovedReply(e)) onSessionMoved();
-      else transientBanner("Connection problem — retrying");
+      else transientBanner(t("Connection problem — retrying"));
     });
 }
 
@@ -1178,7 +1178,7 @@ function showUpdateAvailable() {
   if (document.getElementById("update-available")) return;
   const btn = document.createElement("button");
   btn.id = "update-available";
-  btn.textContent = "Update available — tap to reload";
+  btn.textContent = t("Update available — tap to reload");
   btn.style.cssText =
     "position:fixed;left:50%;transform:translateX(-50%);" +
     "top:calc(12px + env(safe-area-inset-top));z-index:9998;padding:12px 22px;border:0;" +
@@ -1197,10 +1197,10 @@ function showSessionMoved() {
     "align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;" +
     "background:rgba(17,17,17,.94);color:#fff;font:16px system-ui,sans-serif";
   const msg = document.createElement("div");
-  msg.textContent = "Hood Ride was opened on another device";
+  msg.textContent = t("Hood Ride was opened on another device");
   const btn = document.createElement("button");
   btn.id = "btn-use-here";
-  btn.textContent = "Use here";
+  btn.textContent = t("Use here");
   btn.style.cssText =
     "padding:12px 28px;border:0;border-radius:999px;background:#ffc107;" +
     "color:#111;font-weight:700;font-size:16px;cursor:pointer";
@@ -1367,7 +1367,7 @@ function syncGeoSubscriptions() {
   setWanted(new Set(), new Set());
   if (!zoomedOutWarned) {
     zoomedOutWarned = true;
-    transientBanner("Zoom in to see who's around");
+    transientBanner(t("Zoom in to see who's around"));
   }
 }
 
@@ -1780,12 +1780,12 @@ function openMarkerCard(peer, type) {
     closePeerCard();
     transientBanner(
       result === "rate_limited"
-        ? "⏳ Slow down a sec"
+        ? t("⏳ Slow down a sec")
         : result === "timeout"
-          ? "Couldn't reach the server — try again"
+          ? t("Couldn't reach the server — try again")
           : type === "hand"
-            ? "That rider isn't looking anymore"
-            : "That driver isn't around anymore"
+            ? t("That rider isn't looking anymore")
+            : t("That driver isn't around anymore")
     );
   });
 }
@@ -1893,8 +1893,10 @@ function drawPile(pm) {
     m.textContent = `+${look.more}`;
     pm.el.append(m);
   }
-  const what = pm.type === "driver" ? (n === 1 ? "car" : "cars") : n === 1 ? "person" : "people";
-  pm.el.setAttribute("aria-label", n === 1 ? `1 ${what} here` : `${n} ${what} here`);
+  pm.el.setAttribute(
+    "aria-label",
+    pm.type === "driver" ? tn("{count} car here", "{count} cars here", n) : tn("{count} person here", "{count} people here", n)
+  );
 }
 
 function onPileTap(pm) {
@@ -1941,7 +1943,9 @@ function renderPileSheet() {
   }
   const n = pm.ids.length;
   $("pile-title").textContent =
-    pm.type === "driver" ? `${n} cars around here` : `${n} people need a ride here`;
+    pm.type === "driver"
+      ? tn("{count} car around here", "{count} cars around here", n)
+      : tn("{count} person needs a ride here", "{count} people need a ride here", n);
   const list = $("pile-list");
   list.replaceChildren();
   pileRowWatch.disconnect();
@@ -1958,7 +1962,7 @@ function renderPileSheet() {
     img.src = peer.photo || (pm.type === "driver" ? "car-avatar.png" : "hand-avatar.svg");
     const name = document.createElement("span");
     name.className = "pile-name";
-    name.textContent = peer.revealGone ? "Not available" : peer.name;
+    name.textContent = peer.revealGone ? t("Not available") : peer.name;
     row.append(img, name);
     // a tap asks at once, ahead of the queue (openMarkerCard)
     row.addEventListener("click", () => openMarkerCard(peer, pm.type));
@@ -2226,7 +2230,11 @@ function joinRideChannel() {
       const meetAt = state.pinPos || loc.best;
       setBanner(
         meetAt && HoodRidePos.fresh(partnerAgeMs())
-          ? `${CAR}${state.ride.peer.name} is on the way${HoodCar.inLine(state.ride.peer.car)} · ${away(metersBetween(state.ride.peer.pos, meetAt))}`
+          ? CAR +
+            t("{name} is on the way", { name: state.ride.peer.name }) +
+            HoodCar.inLine(state.ride.peer.car) +
+            " · " +
+            away(metersBetween(state.ride.peer.pos, meetAt))
           : contextBanner()
       );
     }
@@ -2258,7 +2266,7 @@ function joinRideChannel() {
 
   rideChannel.on("ended", ({ by }) => {
     const mine = state.realUser && by === state.realUser.id;
-    if (!mine) transientBanner("Ride ended");
+    if (!mine) transientBanner(t("Ride ended"));
     realRideCleanup();
   });
 
@@ -2290,7 +2298,7 @@ function makePinEl() {
   const el = document.createElement("div");
   el.className = "marker-pin";
   el.append(iconImg({ emoji: "\u{1F4CD}", src: "pin.svg" }));
-  el.title = "Tap to remove";
+  el.title = t("Tap to remove");
   el.addEventListener("click", (e) => {
     e.stopPropagation();
     clearPin();
@@ -2307,13 +2315,13 @@ function clearPin() {
   if (!DEMO) {
     if (rideChannel) rideChannel.push("clear_pin", {});
     // rendering happens on the "pin" broadcast (both sides, consistent)
-    transientBanner("📍 Pin removed — your driver will come to you");
+    transientBanner(t("📍 Pin removed — your driver will come to you"));
     return;
   }
 
   applyRemotePin(null);
-  transientBanner("📍 Pin removed — your driver will come to you");
-  if (state.ride) receiveMsg(state.ride.peer, "aight, coming to you then");
+  transientBanner(t("📍 Pin removed — your driver will come to you"));
+  if (state.ride) receiveMsg(state.ride.peer, t("aight, coming to you then"));
 }
 
 function applyRemotePin(pin) {
@@ -2587,7 +2595,7 @@ function planDemoView() {
   if (plan) zoomedOutWarned = false;
   else if (!zoomedOutWarned) {
     zoomedOutWarned = true;
-    transientBanner("Zoom in to see who's around");
+    transientBanner(t("Zoom in to see who's around"));
   }
   refreshWorldMarkers();
 }
@@ -2670,7 +2678,7 @@ function tick() {
           receiveMsg(d, "here! " + (d.car || ""));
         } else if (!state.pinArmed) {
           // (placing the pin: its hint stays — contextBanner)
-          setBanner(`${CAR}${d.name} is on the way${HoodCar.inLine(d.car)} · ${away(metersBetween(d.pos, target))}`);
+          setBanner(CAR + t("{name} is on the way", { name: d.name }) + HoodCar.inLine(d.car) + " · " + away(metersBetween(d.pos, target)));
         }
       }
     } else if (!inRide) {
@@ -2745,10 +2753,12 @@ function openPeerCard(peer) {
   setIconText(
     $("peer-what"),
     kind === "driver"
-      ? `${peer.car ? peer.car : "Driver"}${partner ? " · your driver" : ""}`
+      ? partner
+        ? t("{car} · your driver", { car: peer.car || t("Driver") })
+        : peer.car || t("Driver")
       : partner
-        ? `${CAR}Your rider`
-        : "✋ needs a ride"
+        ? CAR + t("Your rider")
+        : t("✋ needs a ride")
   );
   $("peer-where").textContent = [seen, dist].filter(Boolean).join(" · ");
   $("peer-card").classList.remove("hidden");
@@ -2803,7 +2813,7 @@ function renderChat() {
   msgCopy.close(); // its bubble is about to go
   box.innerHTML = "";
   if (state.chatView === "list") {
-    $("chat-name").textContent = "Chats";
+    $("chat-name").textContent = t("Chats");
     $("chat-dist").textContent = "";
     $("chat-photo").classList.add("hidden"); // the list's rows have their own
     // (the "about a block" note is off — index.html #chat-note)
@@ -3004,7 +3014,7 @@ function chatScrollTo(top) {
 const copyChip = document.createElement("button");
 copyChip.type = "button";
 copyChip.className = "msg-copy";
-const COPY_LABELS = { copy: "Copy", copied: "Copied ✓", failed: "Couldn't copy" };
+const COPY_LABELS = { copy: () => t("Copy"), copied: () => t("Copied ✓"), failed: () => t("Couldn't copy") };
 const msgCopy = HoodMsgCopy.create({
   // the async clipboard needs a secure page (https, or localhost)
   clipboard: window.isSecureContext && navigator.clipboard ? navigator.clipboard : null,
@@ -3030,8 +3040,8 @@ const msgCopy = HoodMsgCopy.create({
     if (!open) return copyChip.remove();
     const box = $("chat-messages");
     const bubble = open.key;
-    copyChip.textContent = COPY_LABELS[open.label];
-    copyChip.setAttribute("aria-label", open.label === "copy" ? "Copy message" : COPY_LABELS[open.label]);
+    copyChip.textContent = COPY_LABELS[open.label]();
+    copyChip.setAttribute("aria-label", open.label === "copy" ? t("Copy message") : COPY_LABELS[open.label]());
     box.appendChild(copyChip);
     const spot = HoodMsgCopy.place(
       { left: bubble.offsetLeft, top: bubble.offsetTop, width: bubble.offsetWidth, height: bubble.offsetHeight },
@@ -3126,7 +3136,14 @@ $("chat-form").addEventListener("submit", (e) => {
   // over the limit: Send stays tappable (no greyed-out button), sends
   // nothing, keeps the text, and says why — announced at once
   if (HoodChatList.count(text) > HoodChatList.MAX_CHARS) {
-    const why = HoodChatList.limit(HoodChatList.count(text)).text + " — shorten your message to send";
+    // one message (not "{count} characters too many" + a tail): the
+    // language decides how the two halves join
+    const over = HoodChatList.count(text) - HoodChatList.MAX_CHARS;
+    const why = tn(
+      "{count} character too many — shorten your message to send",
+      "{count} characters too many — shorten your message to send",
+      over
+    );
     $("chat-count").textContent = why;
     $("chat-count").classList.remove("hidden");
     $("chat-count").classList.add("over");
@@ -3162,14 +3179,14 @@ $("chat-form").addEventListener("submit", (e) => {
       .push("send_msg", { to: peer.id, text, spot: sharedSpot() })
       .receive("error", (e) => {
         const msgs = {
-          too_long: "Message too long — keep it under 500 characters",
-          stacked_marks: "Message has too many marks stacked on one letter",
-          unavailable: `${peer.name} isn't available right now`,
-          out_of_view: `${peer.name} isn't in view — zoom in and find their car again`,
-          rate_limited: "⏳ You're sending too fast — slow down a sec",
-          too_many_new_chats: "You've started a lot of new chats — try again later",
+          too_long: t("Message too long — keep it under {max} characters", { max: HoodChatList.MAX_CHARS }),
+          stacked_marks: t("Message has too many marks stacked on one letter"),
+          unavailable: t("{name} isn't available right now", { name: peer.name }),
+          out_of_view: t("{name} isn't in view — zoom in and find their car again", { name: peer.name }),
+          rate_limited: t("⏳ You're sending too fast — slow down a sec"),
+          too_many_new_chats: t("You've started a lot of new chats — try again later"),
         };
-        unsay(msgs[e.reason] || "Message didn't send — connection?");
+        unsay(msgs[e.reason] || t("Message didn't send — connection?"));
         // can't message them now (a first message): nothing to keep the
         // chat open for — back to the map. Not in view keeps your text
         // (find the car, tap Message); not available drops it
@@ -3181,7 +3198,7 @@ $("chat-form").addEventListener("submit", (e) => {
           if (state.chatPeer === peer) closeChat();
         }
       })
-      .receive("timeout", () => unsay("Message didn't send — try again"));
+      .receive("timeout", () => unsay(t("Message didn't send — try again")));
     return;
   }
 
@@ -3227,7 +3244,7 @@ $("btn-ride-action").addEventListener("click", () => {
 
   if (!DEMO) {
     if (state.mode === "rider") {
-      startRideAction("Requesting…", "Requesting your ride…");
+      startRideAction(t("Requesting…"), t("Requesting your ride…"));
       loc.requestCheck();
       userChannel
         .push("request_ride", { to: peer.id, spot: sharedSpot() })
@@ -3247,20 +3264,20 @@ $("btn-ride-action").addEventListener("click", () => {
           // knows best — re-sync rather than a puzzling message
           if (e.reason === "already_requested") return softReload();
           const msgs = {
-            already_requested: "You already have an open request",
-            in_ride: "Finish your current ride first",
-            driver_busy: `${peer.name} is on a ride right now`,
-            driver_offline: `${peer.name}'s gone offline — try another driver`,
-            unavailable: `${peer.name} isn't available right now — try another driver`,
-            out_of_view: `${peer.name} isn't in view — zoom in and find their car again`,
-            request_cooldown: "Give this driver a minute before asking again",
-            rate_limited: "⏳ Slow down a sec",
-            too_many_new_chats: "You've contacted a lot of new people — try again later",
+            already_requested: t("You already have an open request"),
+            in_ride: t("Finish your current ride first"),
+            driver_busy: t("{name} is on a ride right now", { name: peer.name }),
+            driver_offline: t("{name}'s gone offline — try another driver", { name: peer.name }),
+            unavailable: t("{name} isn't available right now — try another driver", { name: peer.name }),
+            out_of_view: t("{name} isn't in view — zoom in and find their car again", { name: peer.name }),
+            request_cooldown: t("Give this driver a minute before asking again"),
+            rate_limited: t("⏳ Slow down a sec"),
+            too_many_new_chats: t("You've contacted a lot of new people — try again later"),
           };
-          transientBanner(msgs[e.reason] || "Couldn't send the request");
+          transientBanner(msgs[e.reason] || t("Couldn't send the request"));
         });
     } else {
-      startRideAction("Accepting…", "Accepting the ride…");
+      startRideAction(t("Accepting…"), t("Accepting the ride…"));
       userChannel
         .push("accept_request", { rider_id: peer.id })
         .receive("ok", () => endRideAction())
@@ -3270,10 +3287,10 @@ $("btn-ride-action").addEventListener("click", () => {
           endRideAction();
           peer.pending = false;
           const msgs = {
-            gone: "Too late — the request was withdrawn",
-            busy: "Finish your current ride first",
+            gone: t("Too late — the request was withdrawn"),
+            busy: t("Finish your current ride first"),
           };
-          transientBanner(msgs[e.reason] || "Couldn't accept");
+          transientBanner(msgs[e.reason] || t("Couldn't accept"));
           refreshControls();
         });
       // success arrives as "ride_started"
@@ -3291,7 +3308,7 @@ $("btn-ride-action").addEventListener("click", () => {
       // as in the real app (startRealRide): to the MAP — the chat one tap
       // away, the driver's message as a banner
       closeChat();
-      receiveMsg(peer, "accepted! omw 🚗");
+      receiveMsg(peer, t("accepted! omw 🚗"));
       setBanner(contextBanner());
       refreshControls();
       refreshWorldMarkers();
@@ -3312,7 +3329,7 @@ $("btn-ride-action").addEventListener("click", () => {
     // as in the real app (startRealRide): to the MAP — the chat one tap
     // away, the rider's message as a banner
     closeChat();
-    receiveMsg(peer, "sweet, see you soon!");
+    receiveMsg(peer, t("sweet, see you soon!"));
     setBanner(contextBanner());
   }
   refreshControls();
@@ -3338,7 +3355,7 @@ $("btn-decline").addEventListener("click", () => {
   if (!DEMO) {
     userChannel.push("decline_request", { rider_id: peer.id });
   }
-  transientBanner("Request declined");
+  transientBanner(t("Request declined"));
   if (DEMO) scheduleIncomingRequest();
   refreshControls();
 });
@@ -3353,10 +3370,10 @@ function endRide() {
     if (state.ride.status === "requested") {
       userChannel.push("cancel_request", {});
       state.ride = null;
-      transientBanner("Request cancelled");
+      transientBanner(t("Request cancelled"));
       refreshControls();
     } else if (rideChannel) {
-      transientBanner("Ride ended");
+      transientBanner(t("Ride ended"));
       rideChannel.push("end_ride", {});
       // cleanup happens on the "ended" broadcast (both sides)
     }
@@ -3367,7 +3384,7 @@ function endRide() {
   const wasRequested = state.ride.status === "requested";
   state.ride = null;
   if (wasRequested) {
-    transientBanner("Request cancelled");
+    transientBanner(t("Request cancelled"));
     refreshControls();
     return;
   }
@@ -3417,7 +3434,7 @@ function placePin(pos) {
     if (rideChannel) {
       rideChannel.push("set_pin", { lat: pos.lat, lng: pos.lng });
       // rendering happens on the "pin" broadcast (both sides, consistent)
-      transientBanner("📍 Meetup spot set — your driver sees it");
+      transientBanner(t("📍 Meetup spot set — your driver sees it"));
     }
     refreshControls();
     return;
@@ -3428,8 +3445,8 @@ function placePin(pos) {
     pinMarker = new maplibregl.Marker({ element: makePinEl(), anchor: "bottom" });
   }
   pinMarker.setLngLat([pos.lng, pos.lat]).addTo(map);
-  transientBanner("📍 Meetup spot set — your driver sees it");
-  if (state.ride) receiveMsg(state.ride.peer, "got it, heading to your pin 📍");
+  transientBanner(t("📍 Meetup spot set — your driver sees it"));
+  if (state.ride) receiveMsg(state.ride.peer, t("got it, heading to your pin 📍"));
   refreshControls();
 }
 
@@ -3475,7 +3492,7 @@ function setHand(up) {
         });
         // a message, like the real app: a banner and the unread count — no
         // card popping open (only a tap on a marker opens one)
-        receiveMsg(nearest, "yo, saw your hand ✋ need a pickup?");
+        receiveMsg(nearest, t("yo, saw your hand ✋ need a pickup?"));
       }, 6000);
     }
   } else {
@@ -3594,7 +3611,7 @@ function scheduleDemand() {
     };
     mockHand.marker = makeBubbleMarker("✋", () => openPeerCard(mockHand), "hand");
     refreshWorldMarkers();
-    if (DEMO_HAND_BANNER) transientBanner("✋ Someone nearby needs a ride");
+    if (DEMO_HAND_BANNER) transientBanner(t("✋ Someone nearby needs a ride"));
   }, DEMO_HAND_DELAY_MS);
 }
 
@@ -3609,7 +3626,7 @@ function scheduleIncomingRequest() {
     );
     if (existing) {
       existing.pending = true;
-      receiveMsg(existing, "you sure? still stuck out here 🙏");
+      receiveMsg(existing, t("you sure? still stuck out here 🙏"));
       return;
     }
     const angle = Math.random() * Math.PI * 2;
@@ -3622,7 +3639,7 @@ function scheduleIncomingRequest() {
       photo: HoodAvatar.url(REQUEST_RIDER.name),
       visible: false,
     };
-    receiveMsg(rider, "hey! I'm at the laundromat on 3rd, can you grab me? 🙏");
+    receiveMsg(rider, t("hey! I'm at the laundromat on 3rd, can you grab me? 🙏"));
   }, 14000);
 }
 
@@ -3638,7 +3655,9 @@ $("btn-navigate").addEventListener("click", (e) => {
   if (!target) {
     e.preventDefault();
     if (state.ride)
-      transientBanner(`🧭 Waiting for ${state.ride.peer.name}'s exact location — or ask them to set a 📍 meeting spot`);
+      transientBanner(
+        t("🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot", { name: state.ride.peer.name })
+      );
     return;
   }
   const app = HoodNavLink.chosen(storageOrNull(), PLATFORM);
@@ -3651,8 +3670,8 @@ $("btn-navigate").addEventListener("click", (e) => {
   const url = HoodNavLink.href(target, app, navigator.userAgent);
   if (!url) return e.preventDefault();
   // heading to a position the partner's phone stopped updating: say so
-  const seen = !state.ride.peer.pin && HoodRidePos.lastSeen(partnerAgeMs());
-  if (seen) transientBanner(`🧭 ${state.ride.peer.name} was ${seen.replace("last seen ", "last seen there ")}`);
+  const seen = !state.ride.peer.pin && HoodRidePos.lastSeenThere(partnerAgeMs(), state.ride.peer.name);
+  if (seen) transientBanner(seen);
   link.href = url;
   link.target = HoodNavLink.target(PLATFORM);
 });
@@ -3701,7 +3720,7 @@ $("btn-navapp").addEventListener("click", () => openNavSheet());
 
 function renderNavAppNote() {
   const app = HoodNavLink.chosen(storageOrNull(), PLATFORM);
-  $("navapp-note").textContent = app ? HoodNavLink.label(app) : "Asked the first time you navigate";
+  $("navapp-note").textContent = app ? HoodNavLink.label(app) : t("Asked the first time you navigate");
 }
 
 // ===== I'm here (driver) =====
@@ -3773,7 +3792,7 @@ function refreshControls() {
   const requested = state.ride && state.ride.status === "requested";
   const chatOpen = !$("chat").classList.contains("hidden");
 
-  setIconText($("btn-mode"), rider ? `${CAR}Drive` : "🚶 Ride");
+  setIconText($("btn-mode"), rider ? CAR + t("Drive") : t("🚶 Ride"));
   $("btn-mode").disabled = !!state.ride;
 
   toggle("btn-hand", rider && !inRide && !requested);
@@ -3781,20 +3800,20 @@ function refreshControls() {
   // finding your location: the 📍 pulses (styles.css .searching)
   $("btn-hand").classList.toggle("searching", !!loc.pending.hand);
   setIconText($("btn-hand"), loc.pending.hand
-    ? "📍 Finding your location…  ✕"
+    ? t("📍 Finding your location…") + "  ✕"
     : state.handRaised
-      ? "✋ Looking for a ride…  ✕"
-      : "✋ Need a ride");
+      ? t("✋ Looking for a ride…") + "  ✕"
+      : t("✋ Need a ride"));
   toggle("btn-pin", rider && inRide);
   $("btn-pin").classList.toggle("on", state.pinArmed);
-  setIconText($("btn-pin"), state.pinPos ? "📍 Move pin" : "📍 Meet here");
+  setIconText($("btn-pin"), state.pinPos ? t("📍 Move pin") : t("📍 Meet here"));
 
   toggle("btn-online", !rider && !inRide);
   setIconText($("btn-online"), loc.pending.online
-    ? "📍 Finding your location…  ✕"
+    ? t("📍 Finding your location…") + "  ✕"
     : state.online
-      ? "GO OFFLINE"
-      : "GO ONLINE");
+      ? t("GO OFFLINE")
+      : t("GO ONLINE"));
   $("btn-online").classList.toggle("on", state.online);
   $("btn-online").classList.toggle("searching", !!loc.pending.online);
   // to the rider (or the pin) — gone once arrived: after "I'm here" it read
@@ -3804,9 +3823,9 @@ function refreshControls() {
 
   const unread = [...chats.values()].reduce((s, c) => s + c.unread, 0);
   toggle("btn-chat", chats.size > 0 && !chatOpen);
-  setIconText($("btn-chat"), unread ? `💬 Chat (${unread})` : "💬 Chat");
+  setIconText($("btn-chat"), unread ? t("💬 Chat ({count})", { count: unread }) : t("💬 Chat"));
   toggle("btn-endride", !!inRide || !!requested);
-  $("btn-endride").textContent = requested ? "Cancel request" : "End ride";
+  $("btn-endride").textContent = requested ? t("Cancel request") : t("End ride");
 
   const msgView = chatOpen && state.chatView === "msgs" && state.chatPeer;
   toggle("chat-back", !!msgView && chats.size > 1);
@@ -3816,11 +3835,11 @@ function refreshControls() {
     action.classList.add("hidden");
   } else if (requested && state.ride.peer === state.chatPeer) {
     action.classList.remove("hidden");
-    action.textContent = "Requested…";
+    action.textContent = t("Requested…");
     action.disabled = true;
   } else if (!state.ride && (rider || (state.chatPeer.pending && state.online))) {
     action.classList.remove("hidden");
-    action.textContent = rider ? "Request ride" : "Accept ride";
+    action.textContent = rider ? t("Request ride") : t("Accept ride");
     action.disabled = false;
   } else {
     action.classList.add("hidden");
@@ -3899,7 +3918,7 @@ const booting = HoodBoot.create({
     // to ride on that leftover entry
     if (DEMO) await enterApp();
   },
-  onWaiting: () => ($("boot-status").textContent = "Can't reach Hood Ride — retrying…"),
+  onWaiting: () => ($("boot-status").textContent = t("Can't reach Hood Ride — retrying…")),
   backoff: (attempt) => HoodSync.reconnectBackoff(attempt),
   setTimer: (f, ms) => setTimeout(f, ms),
   clearTimer: (timer) => clearTimeout(timer),

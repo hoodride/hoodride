@@ -15,6 +15,10 @@
   if (typeof module === "object" && module.exports) module.exports = factory();
   else root.HoodSendFilter = factory();
 })(typeof self !== "undefined" ? self : this, function () {
+  // the words in the reader's language (i18n.js): HoodI18n in the page,
+  // the file itself in the Node tests
+  const I18n = typeof HoodI18n !== "undefined" ? HoodI18n : require("./i18n.js");
+  const { t, tc } = I18n;
   const HEARTBEAT_MS = 20000;
   const HEARTBEAT_JITTER = 0.2;
   // a browsing car is a SPOT: no distance is worth a send — only a new spot
@@ -158,23 +162,24 @@
     return { platform, app: platform === "android" ? "Chrome" : null };
   }
 
+  // what location is for: the end of a sentence ("… allow it {why}")
   const PURPOSE = {
-    drive: "to drive",
-    hand: "to ask for a ride",
-    ride: "so your ride partner can find you",
-    request: "so your driver can find you",
-    locate: "to show where you are",
+    drive: () => tc("why location is needed", "to drive"),
+    hand: () => tc("why location is needed", "to ask for a ride"),
+    ride: () => tc("why location is needed", "so your ride partner can find you"),
+    request: () => tc("why location is needed", "so your driver can find you"),
+    locate: () => tc("why location is needed", "to show where you are"),
   };
 
   // iPhone: Apple's one path, to the browser APP's switch (Apple: Settings ›
   // Privacy & Security › Location Services › the app). Safari's entry is
   // "Safari Websites"; unknown might be a browser hiding its name.
   function iosEntry(app) {
-    return app ? app : "Safari Websites (or your browser's name, if you don't use Safari)";
+    return app ? app : t("Safari Websites (or your browser's name, if you don't use Safari)");
   }
   // Android: the phone lets the browser app use location (Settings › Apps)
   function androidAppSteps(app) {
-    return `Settings › Apps › ${app || "your browser"} › Permissions › Location`;
+    return t("Settings › Apps › {app} › Permissions › Location", { app: app || t("your browser") });
   }
 
   // Chrome on Android (May 2026) asks "Precise / Approximate" per site; a
@@ -185,14 +190,17 @@
   }
 
   function preciseSteps(p, app, standalone) {
-    if (p === "ios") return `Settings › Privacy & Security › Location Services › ${iosEntry(app)} › Precise Location: on`;
+    if (p === "ios") return t("Settings › Privacy & Security › Location Services › {app} › Precise Location: on", { app: iosEntry(app) });
     if (p === "android") {
-      const phone = `${androidAppSteps(app)} › Use precise location`;
+      const phone = t("{steps} › Use precise location", { steps: androidAppSteps(app) });
       return chromeLike(app) && !standalone
-        ? `${phone} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise`
+        ? t(
+            "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise",
+            { steps: phone }
+          )
         : phone;
     }
-    return "allow precise location for this site in your browser's settings";
+    return t("allow precise location for this site in your browser's settings");
   }
 
   // in a browser tab: the browser's own site permission (Google's address-bar
@@ -204,26 +212,28 @@
     // Precise too, on the same screen: Hood Ride places you within one block,
     // which "approximate" can't
     if (p === "ios")
-      return `Settings › Privacy & Security › Location Services › ${iosEntry(app)} › While Using the App, and turn on Precise Location`;
+      return t("Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location", {
+        app: iosEntry(app),
+      });
     if (p === "android") {
       const site =
         app === "Samsung Internet"
-          ? "open the menu › Settings › Sites and downloads › Site permissions › Location"
+          ? t("open the menu › Settings › Sites and downloads › Site permissions › Location")
           : app === "Firefox"
-            ? "open ⋮ › Settings › Site permissions › Location › Ask to allow"
+            ? t("open ⋮ › Settings › Site permissions › Location › Ask to allow")
             : standalone
-              ? `open ${app || "your browser"} › ⋮ › Settings › Site settings › Location › allow Hood Ride`
-              : "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)";
-      return `${site} — and in your phone's ${androidAppSteps(app)} › Allow, with Use precise location on`;
+              ? t("open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride", { app: app || t("your browser") })
+              : t("tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)");
+      return t("{site} — and in your phone's {steps} › Allow, with Use precise location on", { site, steps: androidAppSteps(app) });
     }
     return standalone
-      ? "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
-      : "click the icon at the left of the web address bar (top of the browser) › Location › Allow";
+      ? t("open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride")
+      : t("click the icon at the left of the web address bar (top of the browser) › Location › Allow");
   }
   const DEVICE_STEPS = {
-    ios: "turn on Location Services (Settings › Privacy & Security)",
-    android: "turn on Location (swipe down › Location)",
-    other: "turn on location for this device",
+    ios: () => t("turn on Location Services (Settings › Privacy & Security)"),
+    android: () => t("turn on Location (swipe down › Location)"),
+    other: () => t("turn on location for this device"),
   };
 
   // what to tell someone about their location, or null for nothing.
@@ -233,22 +243,25 @@
   // standalone: running as an installed app (no web address bar)
   // app: the browser, when it says which (browserOf) — null: unknown
   function locationMessage({ status, quality, waitedMs, platform, app = null, context, permission, standalone }) {
-    const why = PURPOSE[context] || PURPOSE.locate;
+    const why = (PURPOSE[context] || PURPOSE.locate)();
     const p = DEVICE_STEPS[platform] ? platform : "other";
     // on a phone the fix is in Settings, OUTSIDE the browser — which keeps
     // its "no" for the open page; coming back reloads (locator.js onVisible)
     if (status === "denied") {
-      const steps = `📍 Location is blocked for Hood Ride — allow it ${why}: ${allowSteps(p, app, standalone)}`;
-      return p === "other" ? steps : `${steps}. Hood Ride reloads when you come back.`;
+      const steps = t("📍 Location is blocked for Hood Ride — allow it {why}: {steps}", { why, steps: allowSteps(p, app, standalone) });
+      return p === "other" ? steps : t("{steps}. Hood Ride reloads when you come back.", { steps });
     }
-    if (status === "unavailable") return `📍 Location is off on this device — ${DEVICE_STEPS[p]} ${why}`;
+    if (status === "unavailable") return t("📍 Location is off on this device — {steps} {why}", { steps: DEVICE_STEPS[p](), why });
     // an unanswered prompt sends no callback at all (Firefox "Not now", or
     // just ignored): the question is still open — it isn't the setting
     if (quality !== "approximate" && permission === "prompt" && waitedMs >= PRECISE_HINT_AFTER_MS)
-      return `📍 Allow location when your browser asks — Hood Ride needs it ${why}`;
+      return t("📍 Allow location when your browser asks — Hood Ride needs it {why}", { why });
     if (quality === "approximate" || waitedMs >= PRECISE_HINT_AFTER_MS)
-      return `📍 Your location is only approximate — turn on Precise Location ${why}: ${preciseSteps(p, app, standalone)}`;
-    if (waitedMs >= FINDING_AFTER_MS) return "📍 Finding your location…";
+      return t("📍 Your location is only approximate — turn on Precise Location {why}: {steps}", {
+        why,
+        steps: preciseSteps(p, app, standalone),
+      });
+    if (waitedMs >= FINDING_AFTER_MS) return t("📍 Finding your location…");
     return null;
   }
 
@@ -259,9 +272,9 @@
     if (haveFix || mode !== "driver" || !online) return null;
     if (geoStatus === "denied" || geoStatus === "unavailable") {
       const why = locationMessage({ status: geoStatus, platform, app, context: "drive", standalone });
-      return `Riders can't see you. ${why}`;
+      return t("Riders can't see you. {why}", { why });
     }
-    return "📍 Waiting for your location — riders can't see you yet";
+    return t("📍 Waiting for your location — riders can't see you yet");
   }
 
   // (where auto-arrival aims — the pin, or an EXACT and FRESH partner

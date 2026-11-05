@@ -19,6 +19,23 @@ test("the colors are exactly the server's list, in its order", () => {
   assert.deepEqual(C.COLORS, server);
 });
 
+// the picker shows each color in the reader's language; the value sent
+// stays the server's English one (languages, 2026-11-04)
+test("every color has a name in the reader's language, the English key kept", () => {
+  const I18n = require("../priv/static/i18n.js");
+  for (const c of C.COLORS) assert.equal(C.colorName(c), c, `${c}: English reads as itself`);
+  const es = { [`car color${I18n.CTX}Gray`]: "Gris", [`car color${I18n.CTX}Other`]: "Otro" };
+  I18n.load({ lang: "es", messages: es });
+  try {
+    assert.equal(C.colorName("Gray"), "Gris");
+    assert.equal(C.colorName("Other"), "Otro");
+    assert.equal(C.colorName("Teal"), "Teal", "not one of ours: as it is");
+  } finally {
+    I18n.load(null);
+  }
+  assert.equal(C.colorName("Gray"), "Gray");
+});
+
 test("a full car: no problems; tidied like the server (spaces trimmed, squeezed)", () => {
   assert.deepEqual(C.problems(civic), []);
   assert.deepEqual(C.tidy({ color: "White", make: "  Toyota ", model: " Corolla   Cross " }), {

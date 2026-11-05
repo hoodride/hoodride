@@ -117,7 +117,7 @@ defmodule HoodrideWeb.OfflineTest do
 
   test "Send: no answer is not 'sent' — the bubble goes, the text comes back" do
     [send] = Regex.run(~r/\$\("chat-form"\)\.addEventListener\("submit".*?\n\}\);/s, @app)
-    assert send =~ ~s[.receive("timeout", () => unsay("Message didn't send — try again"));]
+    assert send =~ ~s[.receive("timeout", () => unsay(t("Message didn't send — try again")));]
     [unsay] = Regex.run(~r/const unsay = \(why\) => \{.*?\n    \};/s, send)
     assert unsay =~ "bubble.remove();"
     # (back only into its own chat's box: HoodrideWeb.ChatRebuildTest)

@@ -3,6 +3,22 @@ msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8\n"
 
 #: priv/static/app.js
+msgid "(request withdrawn)"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Accept ride"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Accepting the ride…"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Accepting…"
+msgstr ""
+
+#: priv/static/app.js
 msgid "Add it before you drive"
 msgstr ""
 
@@ -11,11 +27,43 @@ msgid "Add your car"
 msgstr ""
 
 #: priv/static/app.js
+msgid "Asked the first time you navigate"
+msgstr ""
+
+#: priv/static/app.js
 msgid "Back to the sign-in page"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Beige"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Black"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Blue"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Brown"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — retrying…"
 msgstr ""
 
 #: priv/static/app.js
 msgid "Can't reach Hood Ride — try again"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Cancel request"
 msgstr ""
 
 #: priv/static/app.js
@@ -35,7 +83,15 @@ msgid "Chat with {name} ended — they've been away a while"
 msgstr ""
 
 #: priv/static/app.js
+msgid "Chats"
+msgstr ""
+
+#: priv/static/app.js
 msgid "Check the {fields} (up to {max} letters each)."
+msgstr ""
+
+#: priv/static/app.js
+msgid "Connection problem — retrying"
 msgstr ""
 
 #: priv/static/rehydrate.js
@@ -55,6 +111,26 @@ msgid "Connection reset — your ride request was lost, please ask again"
 msgstr ""
 
 #: priv/static/app.js
+msgid "Copied ✓"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Copy"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Copy message"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Couldn't accept"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Couldn't copy"
+msgstr ""
+
+#: priv/static/app.js
 msgid "Couldn't delete your account — please try again."
 msgstr ""
 
@@ -64,6 +140,10 @@ msgstr ""
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — try again"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Couldn't reach the server — try again"
 msgstr ""
 
 #: priv/static/googlerefresh.js
@@ -83,11 +163,35 @@ msgid "Couldn't save that — try again"
 msgstr ""
 
 #: priv/static/app.js
+msgid "Couldn't send the request"
+msgstr ""
+
+#: priv/static/app.js
 msgid "Couldn't sign in — try again"
 msgstr ""
 
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Demo"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Drive"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Driver"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Driver can't take this one — try another"
+msgstr ""
+
+#: priv/static/app.js
+msgid "End ride"
 msgstr ""
 
 #: priv/static/app.js
@@ -99,11 +203,76 @@ msgid "End your ride first."
 msgstr ""
 
 #: priv/static/app.js
+msgid "Finish your current ride first"
+msgstr ""
+
+#: priv/static/app.js
+msgid "GO OFFLINE"
+msgstr ""
+
+#: priv/static/app.js
+msgid "GO ONLINE"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Give this driver a minute before asking again"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gold"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Gray"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Green"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Hood Ride was opened on another device"
+msgstr ""
+
+#: priv/static/app.js
 msgid "Leave demo"
 msgstr ""
 
 #: priv/static/app.js
+msgid "Message didn't send — connection?"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Message didn't send — try again"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Message has too many marks stacked on one letter"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Message too long — keep it under {max} characters"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Not available"
+msgstr ""
+
+#: priv/static/app.js
 msgid "On all your devices"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Orange"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Other"
 msgstr ""
 
 #: priv/static/app.js
@@ -114,12 +283,58 @@ msgstr ""
 msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
 msgstr ""
 
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Purple"
+msgstr ""
+
 #: priv/static/app.js
 msgid "Reconnecting to Hood Ride…"
 msgstr ""
 
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Red"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Request cancelled"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Request declined"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Request expired — ask again or try another driver"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Request ride"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Requested…"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Requesting your ride…"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Requesting…"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Ride ended"
+msgstr ""
+
 #: priv/static/app.js
 msgid "Ride with {name}"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "Riders can't see you. {why}"
 msgstr ""
 
 #: priv/static/app.js
@@ -128,6 +343,10 @@ msgstr ""
 
 #: priv/static/app.js
 msgid "Riders see this so they can find you"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "Safari Websites (or your browser's name, if you don't use Safari)"
 msgstr ""
 
 #: priv/static/app.js
@@ -142,6 +361,18 @@ msgstr ""
 msgid "Settings ({name})"
 msgstr ""
 
+#: priv/static/sendfilter.js
+msgid "Settings › Apps › {app} › Permissions › Location"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › Precise Location: on"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "Settings › Privacy & Security › Location Services › {app} › While Using the App, and turn on Precise Location"
+msgstr ""
+
 #: priv/static/app.js
 msgid "Sign out"
 msgstr ""
@@ -150,8 +381,51 @@ msgstr ""
 msgid "Signing in…"
 msgstr ""
 
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Silver"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Tap to remove"
+msgstr ""
+
+#: priv/static/app.js
+msgid "That driver isn't around anymore"
+msgstr ""
+
+#: priv/static/app.js
+msgid "That rider isn't looking anymore"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Too late — the request was withdrawn"
+msgstr ""
+
 #: priv/static/app.js
 msgid "Type DELETE to confirm."
+msgstr ""
+
+#: priv/static/app.js
+msgid "Update available — tap to reload"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Use here"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "White"
+msgstr ""
+
+#: priv/static/car.js
+msgctxt "car color"
+msgid "Yellow"
+msgstr ""
+
+#: priv/static/app.js
+msgid "You already have an open request"
 msgstr ""
 
 #: priv/static/googlerefresh.js
@@ -162,8 +436,16 @@ msgstr ""
 msgid "You've arrived · picking up {name}"
 msgstr ""
 
+#: priv/static/app.js
+msgid "You've contacted a lot of new people — try again later"
+msgstr ""
+
 #: priv/static/googlerefresh.js
 msgid "You've refreshed a lot — try again in a few minutes"
+msgstr ""
+
+#: priv/static/app.js
+msgid "You've started a lot of new chats — try again later"
 msgstr ""
 
 #: priv/static/app.js
@@ -175,6 +457,18 @@ msgid "Your name and photo come from {provider}"
 msgstr ""
 
 #: priv/static/app.js
+msgid "Your rider"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Zoom in to see who's around"
+msgstr ""
+
+#: priv/static/app.js
+msgid "accepted! omw 🚗"
+msgstr ""
+
+#: priv/static/app.js
 msgid "aight I see you"
 msgstr ""
 
@@ -183,7 +477,19 @@ msgid "aight bet"
 msgstr ""
 
 #: priv/static/app.js
+msgid "aight, coming to you then"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "allow precise location for this site in your browser's settings"
+msgstr ""
+
+#: priv/static/app.js
 msgid "be there in a few"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "click the icon at the left of the web address bar (top of the browser) › Location › Allow"
 msgstr ""
 
 #: priv/static/app.js
@@ -192,6 +498,14 @@ msgstr ""
 
 #: priv/static/app.js
 msgid "cool, I'll watch for you"
+msgstr ""
+
+#: priv/static/app.js
+msgid "got it, heading to your pin 📍"
+msgstr ""
+
+#: priv/static/app.js
+msgid "hey! I'm at the laundromat on 3rd, can you grab me? 🙏"
 msgstr ""
 
 #: priv/static/ridepos.js
@@ -222,6 +536,67 @@ msgstr ""
 msgid "omw in a sec 🚗"
 msgstr ""
 
+#: priv/static/sendfilter.js
+msgid "open the menu › Settings › Sites and downloads › Site permissions › Location"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "open your browser's Settings › Privacy and security › Site settings › Location › allow Hood Ride"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "open {app} › ⋮ › Settings › Site settings › Location › allow Hood Ride"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "open ⋮ › Settings › Site permissions › Location › Ask to allow"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your driver can find you"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "so your ride partner can find you"
+msgstr ""
+
+#: priv/static/app.js
+msgid "sweet, see you soon!"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "tap the icon at the left of the web address bar (top of the screen) › Permissions › Location › Allow (choose Precise if asked)"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to ask for a ride"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to drive"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgctxt "why location is needed"
+msgid "to show where you are"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "turn on Location (swipe down › Location)"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "turn on Location Services (Settings › Privacy & Security)"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "turn on location for this device"
+msgstr ""
+
 #: priv/static/app.js
 msgid "yea I can grab you"
 msgstr ""
@@ -233,6 +608,34 @@ msgstr ""
 #: priv/static/app.js
 msgid "yo what's up"
 msgstr ""
+
+#: priv/static/app.js
+msgid "yo, saw your hand ✋ need a pickup?"
+msgstr ""
+
+#: priv/static/app.js
+msgid "you sure? still stuck out here 🙏"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "your browser"
+msgstr ""
+
+#: priv/static/app.js
+msgid "{car} · your driver"
+msgstr ""
+
+#: priv/static/app.js
+msgid "{count} car around here"
+msgid_plural "{count} cars around here"
+msgstr[0] ""
+msgstr[1] ""
+
+#: priv/static/app.js
+msgid "{count} car here"
+msgid_plural "{count} cars here"
+msgstr[0] ""
+msgstr[1] ""
 
 #: priv/static/chatlist.js
 msgid "{count} character left"
@@ -246,6 +649,24 @@ msgid_plural "{count} characters too many"
 msgstr[0] ""
 msgstr[1] ""
 
+#: priv/static/app.js
+msgid "{count} character too many — shorten your message to send"
+msgid_plural "{count} characters too many — shorten your message to send"
+msgstr[0] ""
+msgstr[1] ""
+
+#: priv/static/app.js
+msgid "{count} person here"
+msgid_plural "{count} people here"
+msgstr[0] ""
+msgstr[1] ""
+
+#: priv/static/app.js
+msgid "{count} person needs a ride here"
+msgid_plural "{count} people need a ride here"
+msgstr[0] ""
+msgstr[1] ""
+
 #: priv/static/distance.js
 msgid "{distance} away"
 msgstr ""
@@ -255,7 +676,27 @@ msgid "{name} has arrived"
 msgstr ""
 
 #: priv/static/app.js
+msgid "{name} is on a ride right now"
+msgstr ""
+
+#: priv/static/app.js
 msgid "{name} is on the way"
+msgstr ""
+
+#: priv/static/app.js
+msgid "{name} isn't available right now"
+msgstr ""
+
+#: priv/static/app.js
+msgid "{name} isn't available right now — try another driver"
+msgstr ""
+
+#: priv/static/app.js
+msgid "{name} isn't in view — zoom in and find their car again"
+msgstr ""
+
+#: priv/static/app.js
+msgid "{name}'s gone offline — try another driver"
 msgstr ""
 
 #: priv/static/distance.js
@@ -278,8 +719,28 @@ msgstr ""
 msgid "{n}m"
 msgstr ""
 
+#: priv/static/sendfilter.js
+msgid "{site} — and in your phone's {steps} › Allow, with Use precise location on"
+msgstr ""
+
 #: priv/static/app.js
 msgid "{status} · Reconnecting…"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "{steps} — or, if you chose Approximate for Hood Ride: tap the icon at the left of the web address › Permissions › Reset permissions, then try again and choose Precise"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "{steps} › Use precise location"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "{steps}. Hood Ride reloads when you come back."
+msgstr ""
+
+#: priv/static/app.js
+msgid "⏳ Slow down a sec"
 msgstr ""
 
 #: priv/static/app.js
@@ -287,11 +748,67 @@ msgid "⏳ Waiting for the driver…"
 msgstr ""
 
 #: priv/static/app.js
+msgid "⏳ You're sending too fast — slow down a sec"
+msgstr ""
+
+#: priv/static/app.js
+msgid "✋ Looking for a ride…"
+msgstr ""
+
+#: priv/static/app.js
 msgid "✋ Nearby drivers can see you need a ride"
 msgstr ""
 
-#: priv/static/locator.js
+#: priv/static/app.js
+msgid "✋ Need a ride"
+msgstr ""
+
+#: priv/static/app.js
+msgid "✋ Someone nearby needs a ride"
+msgstr ""
+
+#: priv/static/app.js
+msgid "✋ needs a ride"
+msgstr ""
+
+#: priv/static/app.js
+msgid "💬 Chat"
+msgstr ""
+
+#: priv/static/app.js
+msgid "💬 Chat ({count})"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "📍 Allow location when your browser asks — Hood Ride needs it {why}"
+msgstr ""
+
+#: priv/static/app.js, priv/static/locator.js, priv/static/sendfilter.js
 msgid "📍 Finding your location…"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is blocked for Hood Ride — allow it {why}: {steps}"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "📍 Location is off on this device — {steps} {why}"
+msgstr ""
+
+#: priv/static/app.js
+msgid "📍 Meet here"
+msgstr ""
+
+#: priv/static/app.js
+msgid "📍 Meetup spot set — your driver sees it"
+msgstr ""
+
+#: priv/static/app.js
+msgid "📍 Move pin"
+msgstr ""
+
+#: priv/static/app.js
+msgid "📍 Pin removed — your driver will come to you"
 msgstr ""
 
 #: priv/static/locator.js
@@ -306,6 +823,34 @@ msgstr ""
 msgid "📍 Tap the map where you want to meet"
 msgstr ""
 
+#: priv/static/sendfilter.js
+msgid "📍 Waiting for your location — riders can't see you yet"
+msgstr ""
+
+#: priv/static/sendfilter.js
+msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgstr ""
+
+#: priv/static/app.js
+msgid "📩 requested a ride"
+msgstr ""
+
+#: priv/static/app.js
+msgid "🚶 Ride"
+msgstr ""
+
 #: priv/static/app.js
 msgid "🟢 You're online"
+msgstr ""
+
+#: priv/static/app.js
+msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
+msgstr ""
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there over an hour ago"
+msgstr ""
+
+#: priv/static/ridepos.js
+msgid "🧭 {name} was last seen there {n} min ago"
 msgstr ""
