@@ -275,7 +275,9 @@ defmodule HoodrideWeb.CarTest do
     html = File.read!("priv/static/index.html")
     app = File.read!("priv/static/app.js")
     assert html =~ ~s(<label class="car-field">Color\n)
-    assert app =~ ~s(const CAR_FIELD_NAMES = { color: "color", make: "make", model: "model" };)
+
+    assert app =~
+             ~s[const CAR_FIELD_NAMES = { color: () => t("color"), make: () => t("make"), model: () => t("model") };]
 
     for file <- ~w(index.html app.js car.js privacy.html styles.css) do
       text = File.read!(Path.join("priv/static", file))

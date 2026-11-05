@@ -25,7 +25,8 @@ const shared = [...html.matchAll(/<script src="([^"]+)"/g)]
   .filter((f) => !f.includes(":") && f !== "app.js")
   .map((file) => ({ file, src: read(file) }))
   .flatMap(({ file, src }) => {
-    const m = src.match(/root\.(Hood[A-Za-z]+) = factory\(/);
+    // (digits too: HoodI18n — without them it was silently left out, 2026-11-04)
+    const m = src.match(/root\.(Hood[A-Za-z0-9]+) = factory\(/);
     return m ? [{ file, name: m[1], src }] : [];
   });
 
@@ -38,7 +39,7 @@ function page() {
 
 test("every shared file is found (none silently skipped)", () => {
   const all = shared.map((s) => s.file);
-  for (const f of ["googlerefresh.js", "chatlist.js", "navlink.js", "ridepos.js", "sendfilter.js", "update.js"])
+  for (const f of ["i18n.js", "googlerefresh.js", "chatlist.js", "navlink.js", "ridepos.js", "sendfilter.js", "update.js"])
     assert.ok(all.includes(f), `${f} not found among the page's shared scripts`);
   assert.ok(shared.length >= 22, `found ${shared.length}`);
 });
@@ -50,7 +51,8 @@ test("in the browser, each registers its global — the name app.js uses", () =>
     const g = ctx[name];
     assert.ok(g && (typeof g === "object" || typeof g === "function"), `${file}: no ${name} on the page`);
     assert.ok(Object.keys(g).length > 0, `${file}: ${name} is empty`);
-    assert.ok(app.includes(name + "."), `${file}: app.js never uses ${name}`);
+    // used as Name.fn(…), or taken apart: `const { t, … } = Name;` (HoodI18n)
+    assert.ok(app.includes(name + ".") || app.includes("} = " + name + ";"), `${file}: app.js never uses ${name}`);
   }
 });
 
@@ -67,6 +69,8 @@ test("the browser copy is the same API as the Node copy the other tests check", 
 
 test("Refresh from Google, in the browser: the functions app.js calls", () => {
   const ctx = page();
+  // the words helper first, as the page loads it
+  vm.runInContext(read("i18n.js"), ctx, { filename: join(STATIC, "i18n.js") });
   vm.runInContext(read("googlerefresh.js"), ctx, { filename: join(STATIC, "googlerefresh.js") });
   for (const fn of ["changeTapped", "take", "forget", "isDue", "shouldRefresh", "outcome", "withoutOutcome"])
     assert.equal(typeof ctx.HoodGoogleRefresh[fn], "function", fn);

@@ -12,6 +12,10 @@
   if (typeof module === "object" && module.exports) module.exports = factory();
   else root.HoodRehydrate = factory();
 })(typeof self !== "undefined" ? self : this, function () {
+  // the words in the reader's language (i18n.js): HoodI18n in the page,
+  // the file itself in the Node tests
+  const I18n = typeof HoodI18n !== "undefined" ? HoodI18n : require("./i18n.js");
+  const { t } = I18n;
   // view: {mode, handRaised, online, ride: {status} | null}
   function summarize(view) {
     const status = view.ride && view.ride.status;
@@ -32,18 +36,19 @@
     return ORDER.filter((k) => before[k] && !after[k] && !(k === "request" && after.ride));
   }
 
+  // (each a function: translated when shown, in the language then)
   const MESSAGES = {
     // (not "message them": after a restart the chat is gone too)
-    ride: "Connection reset — your ride ended unexpectedly, please set it up again",
-    request: "Connection reset — your ride request was lost, please ask again",
-    hand: "Connection reset — tap ✋ again if you still need a ride",
-    shift: "Connection reset — tap GO ONLINE to drive again",
+    ride: () => t("Connection reset — your ride ended unexpectedly, please set it up again"),
+    request: () => t("Connection reset — your ride request was lost, please ask again"),
+    hand: () => t("Connection reset — tap ✋ again if you still need a ride"),
+    shift: () => t("Connection reset — tap GO ONLINE to drive again"),
   };
 
   // one banner, for the most important loss (they're exclusive in practice)
   function lostBanner(lostKinds) {
     const k = ORDER.find((x) => lostKinds.includes(x));
-    return k ? MESSAGES[k] : null;
+    return k ? MESSAGES[k]() : null;
   }
 
   // A refused ride-channel join: is the ride over? Only when the server says

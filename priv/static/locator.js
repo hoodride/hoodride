@@ -22,6 +22,10 @@
   if (typeof module === "object" && module.exports) module.exports = factory();
   else root.HoodLocator = factory();
 })(typeof self !== "undefined" ? self : this, function () {
+  // the words in the reader's language (i18n.js): HoodI18n in the page,
+  // the file itself in the Node tests
+  const I18n = typeof HoodI18n !== "undefined" ? HoodI18n : require("./i18n.js");
+  const { t } = I18n;
   const WATCH_OPTIONS = { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 };
 
   function create({ geolocation, queryPermission, now, h3, rules, platform, browser = null, standalone, app }) {
@@ -201,7 +205,7 @@
       } else {
         if (resume) startWatch();
         app.showShare(
-          app.state().ride ? "📍 Share your location so your ride partner can find you" : "📍 Share your location"
+          app.state().ride ? t("📍 Share your location so your ride partner can find you") : t("📍 Share your location")
         );
       }
     }
@@ -318,7 +322,7 @@
         const status = s.status === "denied" || s.status === "unavailable" ? s.status : "searching";
         return (
           message({ status, quality: s.quality, waitedMs: now() - s.askedAt, context: pending.online ? "drive" : "hand" }) ||
-          "📍 Finding your location…"
+          t("📍 Finding your location…")
         );
       },
       // on duty without a trusted reading: riders can't see you (and why)

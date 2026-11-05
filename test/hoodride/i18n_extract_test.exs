@@ -119,6 +119,28 @@ defmodule Hoodride.I18n.ExtractTest do
     assert length(keys) == 4 and length(Enum.uniq(keys)) == 4
   end
 
+  # a local variable named t (or tc, tn) hides the translation helper in its
+  # function: t("…") there calls the wrong thing. Navigate's code had one
+  # (`const t = …navTarget(…)`); renaming it missed two lines once
+  # (2026-11-04) — so: no script names anything t, tc or tn, except taking
+  # them from the helper
+  test "nothing hides t, tc or tn" do
+    decl =
+      ~r/(?:\b(?:const|let|var)\s+(?:t|tc|tn)\b(?!\s*,|\s*\})|[(,]\s*(?:t|tc|tn)\s*(?:[,)=]|=>)|(?<![\w$.])(?:t|tc|tn)\s*=>|\bfunction\s*\w*\s*\([^)]*\b(?:t|tc|tn)\b)/
+
+    for f <- Extract.sources() do
+      code = Extract.mask(File.read!(f))
+
+      bad =
+        for {line, n} <- code |> String.split("\n") |> Enum.with_index(1),
+            not String.match?(line, ~r/^\s*const \{ [ tcn,]+ \} = (?:HoodI18n|I18n);\s*$/),
+            Regex.match?(decl, line),
+            do: "#{f}:#{n}: #{String.trim(line)}"
+
+      assert bad == [], Enum.join(bad, "\n")
+    end
+  end
+
   test "the app's scripts: all readable, the shipped list up to date" do
     assert {:ok, found} = Extract.scan_all()
     assert File.read!("priv/gettext/default.pot") == Extract.pot(found)

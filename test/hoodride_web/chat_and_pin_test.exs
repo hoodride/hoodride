@@ -83,7 +83,7 @@ defmodule HoodrideWeb.ChatAndPinTest do
 
     test "it's part of the one banner rule, before the ride's own lines" do
       b = body("situationBanner")
-      {hint, _} = :binary.match(b, ~s[if (state.pinArmed) return "#{@hint}";])
+      {hint, _} = :binary.match(b, ~s[if (state.pinArmed) return t("#{@hint}");])
       {ride, _} = :binary.match(b, "if (state.ride) {")
       assert hint < ride
     end

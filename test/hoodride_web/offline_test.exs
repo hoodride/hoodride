@@ -31,7 +31,7 @@ defmodule HoodrideWeb.OfflineTest do
   end
 
   test "one message for it" do
-    assert @app =~ ~s[const CANT_REACH = "Can't reach Hood Ride — try again";]
+    assert @app =~ ~s[const CANT_REACH = () => t("Can't reach Hood Ride — try again");]
   end
 
   test "the socket tells the watch when it opens, closes or fails" do
@@ -47,9 +47,9 @@ defmodule HoodrideWeb.OfflineTest do
   test "lost: 'Reconnecting…' — in a ride after the ride's own banner (not in the demo)" do
     b = body("contextBanner")
     assert b =~ "const lost = !DEMO && connWatch.lost();"
-    assert b =~ ~s[if (lost && !state.ride) return "Reconnecting to Hood Ride…";]
+    assert b =~ ~s[if (lost && !state.ride) return t("Reconnecting to Hood Ride…");]
     assert b =~ "const text = situationBanner();"
-    assert b =~ ~s[return lost ? `${text} · Reconnecting…` : text;]
+    assert b =~ ~s[return lost ? t("{status} · Reconnecting…", { status: text }) : text;]
     assert before?(b, "if (lost && !state.ride)", "situationBanner()")
     assert body("situationBanner") =~ "loc.banner()"
   end
@@ -72,7 +72,7 @@ defmodule HoodrideWeb.OfflineTest do
       b = body(fun)
 
       assert b =~
-               ~s[if (#{flag} && !DEMO && !liveNow()) {\n    refreshControls();\n    queueMicrotask(() => transientBanner(CANT_REACH));\n    return;\n  }]
+               ~s[if (#{flag} && !DEMO && !liveNow()) {\n    refreshControls();\n    queueMicrotask(() => transientBanner(CANT_REACH()));\n    return;\n  }]
 
       assert before?(b, "!liveNow()", "state."), "#{fun}: refused before anything changes"
     end
@@ -84,11 +84,11 @@ defmodule HoodrideWeb.OfflineTest do
   # phone's own business: allowed
   test "✋ and Go online taps are refused while not live (up or down)" do
     hand = click("btn-hand")
-    assert hand =~ "else if (!liveNow() && !loc.pending.hand) transientBanner(CANT_REACH);"
+    assert hand =~ "else if (!liveNow() && !loc.pending.hand) transientBanner(CANT_REACH());"
     assert before?(hand, "!liveNow()", "loc.tapHand()")
 
     online = click("btn-online")
-    assert online =~ "else if (!liveNow() && !loc.pending.online) transientBanner(CANT_REACH);"
+    assert online =~ "else if (!liveNow() && !loc.pending.online) transientBanner(CANT_REACH());"
     assert before?(online, "!liveNow()", "loc.tapOnline()")
   end
 
@@ -96,21 +96,21 @@ defmodule HoodrideWeb.OfflineTest do
     mode = click("btn-mode")
 
     assert mode =~
-             "if (!DEMO && (state.handRaised || state.online) && !liveNow()) return transientBanner(CANT_REACH);"
+             "if (!DEMO && (state.handRaised || state.online) && !liveNow()) return transientBanner(CANT_REACH());"
 
     assert before?(mode, "!liveNow()", "state.mode = ")
   end
 
   test "End ride / Cancel request are refused while not live" do
     b = body("endRide")
-    assert b =~ "if (!DEMO && !liveNow()) return transientBanner(CANT_REACH);"
+    assert b =~ "if (!DEMO && !liveNow()) return transientBanner(CANT_REACH());"
     assert before?(b, "!liveNow()", "cancel_request")
   end
 
   # a message is never shown as sent unless it went
   test "Send: refused while not live, before the bubble; the text stays in the box" do
     [send] = Regex.run(~r/\$\("chat-form"\)\.addEventListener\("submit".*?\n\}\);/s, @app)
-    assert send =~ "if (!DEMO && !liveNow()) return transientBanner(CANT_REACH);"
+    assert send =~ "if (!DEMO && !liveNow()) return transientBanner(CANT_REACH());"
     assert before?(send, "!liveNow()", "chatFor(peer).msgs.push(sentMsg)")
     assert before?(send, "!liveNow()", ~s[input.value = "";])
   end

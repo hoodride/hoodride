@@ -4,6 +4,11 @@
 // requests, rides. Demo mode (?demo=1, or no backend): mocks.
 // ============================================================
 
+// every visible message through t("…") with its English as the key
+// (i18n.js; `mix hoodride.i18n.extract` collects them). Set when SHOWN,
+// never once at load — the language is chosen after the scripts load
+const { t, tc, tn } = HoodI18n;
+
 const H3_RES = 8; // cell topics / registration (coarse)
 const H3_DISPLAY_RES = 9; // car + hand display fuzz: ~block-level (research's ~200m sweet spot)
 const AGG_RESES = [7, 5]; // aggregate-tier ladder, tried in order when markers overflow
@@ -93,8 +98,8 @@ function setIconText(el, text) {
   if (el._iconKey === key && nodes && nodes.length === el.childNodes.length && nodes.every((n, i) => n === el.childNodes[i])) return;
   const items = Array.isArray(text) ? text : [text];
   el.replaceChildren(
-    ...items.flatMap((t) =>
-      typeof t === "string" ? HoodIcons.parts(t).map((x) => (typeof x === "string" ? x : iconImg(x))) : [t.raw]
+    ...items.flatMap((item) =>
+      typeof item === "string" ? HoodIcons.parts(item).map((x) => (typeof x === "string" ? x : iconImg(x))) : [item.raw]
     )
   );
   el._iconKey = key;
@@ -116,8 +121,8 @@ function offsetPos(pos, dxMeters, dyMeters) {
 function stepToward(from, to, meters) {
   const total = metersBetween(from, to);
   if (total <= meters) return { ...to };
-  const t = meters / total;
-  return { lat: from.lat + (to.lat - from.lat) * t, lng: from.lng + (to.lng - from.lng) * t };
+  const frac = meters / total;
+  return { lat: from.lat + (to.lat - from.lat) * frac, lng: from.lng + (to.lng - from.lng) * frac };
 }
 
 // "0.9 mi away" / "1.4 km away" / "nearby": the drive,
@@ -177,12 +182,12 @@ const connWatch = HoodSync.createConnWatch({
     if (!bannerTimer) setBanner(contextBanner());
   },
   setTimer: (f, ms) => setTimeout(f, ms),
-  clearTimer: (t) => clearTimeout(t),
+  clearTimer: (timer) => clearTimeout(timer),
 });
 const liveNow = () => !!userChannel && userChannel.state === "joined";
 // anything that needs the server, tapped while not live: refused, and
 // nothing changes on screen
-const CANT_REACH = "Can't reach Hood Ride — try again";
+const CANT_REACH = () => t("Can't reach Hood Ride — try again");
 // Option B: ONE world channel multiplexes every map subscription — the
 // server holds our watched cells as ~100-byte registry entries instead of
 // one process per cell. These sets mirror what the server holds for us.
@@ -225,17 +230,18 @@ const DRIVER_SEEDS = [
 const HAND_RIDER = { name: "Jaylen", emoji: "🙋", bg: "#e0a030" };
 const REQUEST_RIDER = { name: "Aaliyah", emoji: "💃", bg: "#d9534a" };
 
-const DRIVER_REPLIES = [
-  "yo what's up",
-  "yea I can grab you",
-  "omw in a sec 🚗",
-  "aight bet",
-  "be there in a few",
+// (functions: in the demo's language when said)
+const DRIVER_REPLIES = () => [
+  t("yo what's up"),
+  t("yea I can grab you"),
+  t("omw in a sec 🚗"),
+  t("aight bet"),
+  t("be there in a few"),
 ];
-const RIDER_REPLIES = [
-  "yes please! I'm by the benches 🙏",
-  "cool, I'll watch for you",
-  "aight I see you",
+const RIDER_REPLIES = () => [
+  t("yes please! I'm by the benches 🙏"),
+  t("cool, I'll watch for you"),
+  t("aight I see you"),
   "👍",
 ];
 
@@ -266,9 +272,9 @@ function contextBanner() {
   // everything) — in a ride after the ride's own line, so who's coming
   // and which car stay on screen
   const lost = !DEMO && connWatch.lost();
-  if (lost && !state.ride) return "Reconnecting to Hood Ride…";
+  if (lost && !state.ride) return t("Reconnecting to Hood Ride…");
   const text = situationBanner();
-  return lost ? `${text} · Reconnecting…` : text;
+  return lost ? t("{status} · Reconnecting…", { status: text }) : text;
 }
 
 function situationBanner() {
@@ -281,27 +287,31 @@ function situationBanner() {
   if (noFix && !state.ride) return noFix;
   // Meet here / Move pin armed: the hint stays until the pin is placed (any
   // banner redraw — a ride update, the demo's moving driver — keeps it)
-  if (state.pinArmed) return "📍 Tap the map where you want to meet";
+  if (state.pinArmed) return t("📍 Tap the map where you want to meet");
   if (state.ride) {
     const peer = state.ride.peer;
-    if (state.ride.status === "requested") return "⏳ Waiting for the driver…";
+    if (state.ride.status === "requested") return t("⏳ Waiting for the driver…");
     if (state.ride.status === "arrived") {
       // a minute of "arrived", then the ride itself (HoodRidePos.arrivedPhase)
       const since = state.ride.arrivedAt == null ? null : performance.now() - state.ride.arrivedAt;
       if (HoodRidePos.arrivedPhase(since) === "riding")
-        return `${CAR}Ride with ${peer.name}${state.mode === "rider" ? HoodCar.inLine(peer.car) : ""}`;
-      return state.mode === "rider" ? `${CAR}${peer.name} has arrived${HoodCar.inLine(peer.car)}` : `${CAR}You've arrived · picking up ${peer.name}`;
+        return CAR + t("Ride with {name}", { name: peer.name }) + (state.mode === "rider" ? HoodCar.inLine(peer.car) : "");
+      return state.mode === "rider"
+        ? CAR + t("{name} has arrived", { name: peer.name }) + HoodCar.inLine(peer.car)
+        : CAR + t("You've arrived · picking up {name}", { name: peer.name });
     }
     // a stale partner position says so (ridepos.js: e.g. a driver in Google
     // Maps — a backgrounded web app gets no GPS)
     const seen = HoodRidePos.lastSeen(partnerAgeMs());
     return state.mode === "rider"
-      ? `${CAR}${peer.name} is on the way${HoodCar.inLine(peer.car)}${seen ? " · " + seen : ""}`
-      : `Picking up ${peer.name}${seen ? " · " + seen : ""} · tap 🧭 to navigate`;
+      ? CAR + t("{name} is on the way", { name: peer.name }) + HoodCar.inLine(peer.car) + (seen ? " · " + seen : "")
+      : seen
+        ? t("Picking up {name} · {seen} · tap 🧭 to navigate", { name: peer.name, seen })
+        : t("Picking up {name} · tap 🧭 to navigate", { name: peer.name });
   }
-  if (state.mode === "driver" && state.online) return "🟢 You're online";
+  if (state.mode === "driver" && state.online) return t("🟢 You're online");
   if (state.mode === "rider" && state.handRaised)
-    return "✋ Nearby drivers can see you need a ride";
+    return t("✋ Nearby drivers can see you need a ride");
   return null;
 }
 
@@ -320,13 +330,13 @@ async function handleLogin(provider, button) {
   const label = button.querySelector("span");
   const original = label.textContent;
   button.disabled = true;
-  label.textContent = "Signing in…";
+  label.textContent = t("Signing in…");
   try {
     const result = await auth.signIn(provider);
     if (result.real) {
       await startSignedIn(result.state);
     } else {
-      label.textContent = "Couldn't sign in — try again";
+      label.textContent = t("Couldn't sign in — try again");
       await new Promise((r) => setTimeout(r, 2000));
     }
   } finally {
@@ -405,7 +415,7 @@ function setAccountButton() {
   $("account-photo").dataset.name = myName();
   $("account-photo").src = myPhoto();
   const name = state.realUser ? state.realUser.name : "Demo";
-  $("btn-account").setAttribute("aria-label", `Settings (${name})`);
+  $("btn-account").setAttribute("aria-label", t("Settings ({name})", { name }));
 }
 
 // (a declaration, hoisted: refreshControls may run before this line)
@@ -431,9 +441,9 @@ function renderSource() {
   // only for a known sign-in (none in the demo or for a dev account)
   $("settings-change").classList.toggle("hidden", !p);
   if (p) {
-    $("settings-source").textContent = `Your name and photo come from ${p.label}`;
+    $("settings-source").textContent = t("Your name and photo come from {provider}", { provider: p.label });
     link.href = p.url;
-    link.textContent = `Change on ${p.label} ↗`;
+    link.textContent = t("Change on {provider} ↗", { provider: p.label });
   }
   // Refresh: always in the box for Google (opening it says you came for
   // this) — in a ride a note instead: the round trip reloads the page
@@ -509,12 +519,12 @@ function renderSettings() {
   // partner: end it first — either side can, one tap (End ride / Cancel request)
   const requested = state.ride && state.ride.status === "requested";
   const busy = !!state.ride;
-  const blocked = requested ? "Cancel your ride request first" : "End your ride first";
+  const blocked = requested ? t("Cancel your ride request first") : t("End your ride first");
   // the demo: "Leave demo", any time, and no account to delete (owner,
   // 2026-11-02)
-  $("btn-logout").querySelector(".settings-label").textContent = DEMO ? "Leave demo" : "Sign out";
+  $("btn-logout").querySelector(".settings-label").textContent = DEMO ? t("Leave demo") : t("Sign out");
   $("btn-logout").disabled = busy && !DEMO;
-  $("logout-note").textContent = DEMO ? "Back to the sign-in page" : busy ? blocked : "On all your devices";
+  $("logout-note").textContent = DEMO ? t("Back to the sign-in page") : busy ? blocked : t("On all your devices");
   $("delete-wrap").classList.toggle("hidden", DEMO);
   // the server refuses it then too (409): the same rule as signing out —
   // the sign-out row's note just above says why
@@ -564,7 +574,7 @@ async function deleteAccount() {
       body: JSON.stringify({ confirm: $("delete-typed").value }),
     });
   } catch (_) {
-    return fail("Couldn't reach Hood Ride — check your connection and try again.");
+    return fail(t("Couldn't reach Hood Ride — check your connection and try again."));
   }
   if (res.ok) {
     // the same clean-up as signing out, and the remembered mode too: this
@@ -579,11 +589,11 @@ async function deleteAccount() {
     return;
   }
   const reason = (await res.json().catch(() => ({}))).error;
-  if (reason === "in_ride") return fail("End your ride first.");
-  if (reason === "request_waiting") return fail("Cancel your ride request first.");
+  if (reason === "in_ride") return fail(t("End your ride first."));
+  if (reason === "request_waiting") return fail(t("Cancel your ride request first."));
   if (res.status === 401) return location.reload(); // already signed out
-  if (reason === "confirm") return fail("Type DELETE to confirm.");
-  fail("Couldn't delete your account — please try again.");
+  if (reason === "confirm") return fail(t("Type DELETE to confirm."));
+  fail(t("Couldn't delete your account — please try again."));
 }
 
 $("btn-delete").addEventListener("click", showDeleteConfirm);
@@ -665,7 +675,7 @@ async function loadMyCar() {
 
 function renderCarNote() {
   $("car-note").textContent =
-    state.myCar === undefined ? "" : state.myCar ? state.myCar.label : "Add it before you drive";
+    state.myCar === undefined ? "" : state.myCar ? state.myCar.label : t("Add it before you drive");
 }
 
 function carSheetOpen() {
@@ -682,11 +692,11 @@ function openCarSheet({ goOnline = false } = {}) {
   hideMakes();
   for (const id of ["car-color", "car-make", "car-model"]) $(id).removeAttribute("aria-invalid");
   $("car-error").classList.add("hidden");
-  $("car-title").textContent = goOnline ? "Add your car" : "Your car";
+  $("car-title").textContent = goOnline ? t("Add your car") : t("Your car");
   $("car-why").textContent = goOnline
-    ? "Riders look for it when you pick them up. Add it to go online."
-    : "Riders see this so they can find you";
-  $("car-save").textContent = goOnline ? "Save & go online" : "Save";
+    ? t("Riders look for it when you pick them up. Add it to go online.")
+    : t("Riders see this so they can find you");
+  $("car-save").textContent = goOnline ? t("Save & go online") : t("Save");
   $("car-save").disabled = false;
   $("car-sheet").dataset.goOnline = goOnline ? "1" : "";
   // where focus goes back on close: Drive (going online), else the photo
@@ -712,9 +722,13 @@ function carError(msg, fields = []) {
   $("car-error").classList.remove("hidden");
 }
 
-const CAR_FIELD_NAMES = { color: "color", make: "make", model: "model" };
+// (functions: translated when shown)
+const CAR_FIELD_NAMES = { color: () => t("color"), make: () => t("make"), model: () => t("model") };
 function carFieldsMessage(fields) {
-  return "Check the " + fields.map((f) => CAR_FIELD_NAMES[f]).join(", ") + " (up to " + HoodCar.MAX + " letters each).";
+  return t("Check the {fields} (up to {max} letters each).", {
+    fields: fields.map((f) => CAR_FIELD_NAMES[f]()).join(", "),
+    max: HoodCar.MAX,
+  });
 }
 
 async function saveCar(e) {
@@ -728,13 +742,13 @@ async function saveCar(e) {
     res = await fetch("/api/car", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(car) });
   } catch (_) {
     $("car-save").disabled = false;
-    return carError("Couldn't reach Hood Ride — check your connection and try again.");
+    return carError(t("Couldn't reach Hood Ride — check your connection and try again."));
   }
   $("car-save").disabled = false;
   if (res.status === 401) return location.reload(); // signed out meanwhile
   const body = await res.json().catch(() => ({}));
   if (res.status === 400 && body.fields) return carError(carFieldsMessage(body.fields), body.fields);
-  if (!res.ok) return carError("Couldn't save right now — try again in a moment.");
+  if (!res.ok) return carError(t("Couldn't save right now — try again in a moment."));
   state.myCar = body.car;
   const goOnline = $("car-sheet").dataset.goOnline === "1";
   closeCarSheet();
@@ -853,14 +867,14 @@ $("btn-logout").addEventListener("click", async () => {
   try {
     res = await fetch("/api/logout", { method: "POST" });
   } catch (_) {
-    return transientBanner("Couldn't reach Hood Ride — try again");
+    return transientBanner(t("Couldn't reach Hood Ride — try again"));
   }
   if (!res.ok && res.status !== 401) {
     // refused by the server too (409): a ride or a request this phone hadn't heard of yet
     const reason = (await res.json().catch(() => ({}))).error;
-    if (reason === "in_ride") return transientBanner("End your ride first");
-    if (reason === "request_waiting") return transientBanner("Cancel your ride request first");
-    return transientBanner("Couldn't sign out — try again");
+    if (reason === "in_ride") return transientBanner(t("End your ride first"));
+    if (reason === "request_waiting") return transientBanner(t("Cancel your ride request first"));
+    return transientBanner(t("Couldn't sign out — try again"));
   }
   forgetStoredSpot(); // a shared phone: the next person doesn't inherit it
   HoodGoogleRefresh.forget(storageOrNull());
@@ -892,7 +906,7 @@ function agreeToTerms() {
         return resolve();
       }
       btn.disabled = false;
-      err.textContent = res ? "Couldn't save that — try again" : "Couldn't reach Hood Ride — try again";
+      err.textContent = res ? t("Couldn't save that — try again") : t("Couldn't reach Hood Ride — try again");
       err.classList.remove("hidden");
     };
   });
@@ -2687,13 +2701,13 @@ function distanceTo(peer) {
   // map shows (as the profile card uses it)
   const entry = realEntries.get(peer.id);
   const onMap = DEMO ? !partner && !!peer.pos : !partner && entry && entry.type !== "ridepeer" && browseVisible(entry.type);
-  const t = HoodDistance.target({
+  const target = HoodDistance.target({
     ridePos: partner && (DEMO || peer.posExact) ? peer.pos : null,
     mapPos: onMap ? peer.pos : null,
     shared: peer.shared,
     now: performance.now(),
   });
-  return HoodDistance.label(here, t, metersBetween, UNIT);
+  return HoodDistance.label(here, target, metersBetween, UNIT);
 }
 
 // the open chat's header (also on a timer: the age moves on)
@@ -3030,7 +3044,7 @@ const msgCopy = HoodMsgCopy.create({
     return !!s && !s.isCollapsed && String(s).length > 0;
   },
   setTimer: (f, ms) => setTimeout(f, ms),
-  clearTimer: (t) => clearTimeout(t),
+  clearTimer: (timer) => clearTimeout(timer),
 });
 copyChip.addEventListener("click", (e) => {
   e.stopPropagation();
@@ -3114,7 +3128,7 @@ $("chat-form").addEventListener("submit", (e) => {
     return;
   }
   // never shown as sent unless it can go; the text stays in the box
-  if (!DEMO && !liveNow()) return transientBanner(CANT_REACH);
+  if (!DEMO && !liveNow()) return transientBanner(CANT_REACH());
   $("chat-count-alert").textContent = "";
   const sentMsg = { text, mine: true, at: Date.now() };
   chatFor(peer).msgs.push(sentMsg);
@@ -3166,7 +3180,7 @@ $("chat-form").addEventListener("submit", (e) => {
   }
 
   const c = chatFor(peer);
-  const replies = peer.kind === "driver" ? DRIVER_REPLIES : RIDER_REPLIES;
+  const replies = peer.kind === "driver" ? DRIVER_REPLIES() : RIDER_REPLIES();
   const line = replies[Math.min(c.replyIdx++, replies.length - 1)];
   setTimeout(() => {
     receiveMsg(peer, line);
@@ -3327,7 +3341,7 @@ $("btn-endride").addEventListener("click", endRide);
 
 function endRide() {
   if (!state.ride) return;
-  if (!DEMO && !liveNow()) return transientBanner(CANT_REACH);
+  if (!DEMO && !liveNow()) return transientBanner(CANT_REACH());
 
   if (!DEMO) {
     if (state.ride.status === "requested") {
@@ -3420,7 +3434,7 @@ $("btn-hand").addEventListener("click", () => {
   if (DEMO) setHand(!state.handRaised);
   // up or down, refused at once while not live (no GPS wait for something
   // that can't go through); cancelling a GPS wait is this phone's own
-  else if (!liveNow() && !loc.pending.hand) transientBanner(CANT_REACH);
+  else if (!liveNow() && !loc.pending.hand) transientBanner(CANT_REACH());
   else loc.tapHand();
 });
 
@@ -3434,7 +3448,7 @@ function setHand(up) {
   // reading completes a waiting tap, then redraws the banner: locator.js)
   if (up && !DEMO && !liveNow()) {
     refreshControls();
-    queueMicrotask(() => transientBanner(CANT_REACH));
+    queueMicrotask(() => transientBanner(CANT_REACH()));
     return;
   }
   state.handRaised = up;
@@ -3478,7 +3492,7 @@ $("btn-online").addEventListener("click", () => {
   // on the first good one — a car must be in its block (a second tap
   // cancels the wait; going off never waits)
   if (DEMO) setOnline(!state.online);
-  else if (!liveNow() && !loc.pending.online) transientBanner(CANT_REACH);
+  else if (!liveNow() && !loc.pending.online) transientBanner(CANT_REACH());
   else if (state.online || loc.pending.online) loc.tapOnline(); // off, or cancel the wait
   else goOnlineWithCar();
 });
@@ -3488,7 +3502,7 @@ $("btn-online").addEventListener("click", () => {
 // goes straight on; otherwise asked once.
 async function goOnlineWithCar() {
   if (state.myCar === undefined && !(await loadMyCar()))
-    return transientBanner("Couldn't reach Hood Ride — try again");
+    return transientBanner(t("Couldn't reach Hood Ride — try again"));
   if (!state.myCar) return openCarSheet({ goOnline: true });
   loc.tapOnline();
 }
@@ -3498,7 +3512,7 @@ function setOnline(on) {
   // reading completes a waiting tap, then redraws the banner: locator.js)
   if (on && !DEMO && !liveNow()) {
     refreshControls();
-    queueMicrotask(() => transientBanner(CANT_REACH));
+    queueMicrotask(() => transientBanner(CANT_REACH()));
     return;
   }
   state.online = on;
@@ -3614,8 +3628,8 @@ $("btn-navigate").addEventListener("click", (e) => {
   const link = e.currentTarget;
   // the pin or the rider's EXACT position — never their block centre
   // (owner, 2026-11-02: it went there when tapped too early)
-  const t = state.ride && HoodRidePos.navTarget(state.ride.peer);
-  if (!t) {
+  const target = state.ride && HoodRidePos.navTarget(state.ride.peer);
+  if (!target) {
     e.preventDefault();
     if (state.ride)
       transientBanner(`🧭 Waiting for ${state.ride.peer.name}'s exact location — or ask them to set a 📍 meeting spot`);
@@ -3625,10 +3639,10 @@ $("btn-navigate").addEventListener("click", (e) => {
   // no map app chosen yet on this phone: ask (each choice is the link)
   if (!app) {
     e.preventDefault();
-    if (HoodNavLink.href(t)) openNavSheet(t);
+    if (HoodNavLink.href(target)) openNavSheet(target);
     return;
   }
-  const url = HoodNavLink.href(t, app, navigator.userAgent);
+  const url = HoodNavLink.href(target, app, navigator.userAgent);
   if (!url) return e.preventDefault();
   // heading to a position the partner's phone stopped updating: say so
   const seen = !state.ride.peer.pin && HoodRidePos.lastSeen(partnerAgeMs());
@@ -3638,20 +3652,20 @@ $("btn-navigate").addEventListener("click", (e) => {
 });
 
 // ----- which map app (owner, 2026-11-02): asked at the first Navigate,
-// changed from Settings. `t`: where Navigate goes — the choices are real
+// changed from Settings. `target`: where Navigate goes — the choices are real
 // links there (the phone's app takes the tap); none: just choosing -----
 let navSheetOpener = null;
-function openNavSheet(t = null) {
+function openNavSheet(target = null) {
   closeSettings();
   const offered = HoodNavLink.choices(PLATFORM);
   document.querySelectorAll(".nav-choice").forEach((a) => {
     const app = a.dataset.app;
     a.classList.toggle("hidden", !offered.includes(app));
-    a.href = (t && HoodNavLink.href(t, app, navigator.userAgent)) || "#";
-    a.target = t ? HoodNavLink.target(PLATFORM) : "_self";
+    a.href = (target && HoodNavLink.href(target, app, navigator.userAgent)) || "#";
+    a.target = target ? HoodNavLink.target(PLATFORM) : "_self";
   });
-  $("nav-sheet").dataset.going = t ? "1" : "";
-  navSheetOpener = t ? $("btn-navigate") : $("btn-account");
+  $("nav-sheet").dataset.going = target ? "1" : "";
+  navSheetOpener = target ? $("btn-navigate") : $("btn-account");
   $("nav-backdrop").classList.remove("hidden");
   $("nav-sheet").classList.remove("hidden");
   $("nav-title").focus();
@@ -3707,7 +3721,7 @@ $("btn-chat").addEventListener("click", () => {
 $("btn-mode").addEventListener("click", () => {
   if (state.ride) return;
   // ✋ up or online: switching takes you off the map, which needs the server
-  if (!DEMO && (state.handRaised || state.online) && !liveNow()) return transientBanner(CANT_REACH);
+  if (!DEMO && (state.handRaised || state.online) && !liveNow()) return transientBanner(CANT_REACH());
   state.mode = state.mode === "rider" ? "driver" : "rider";
   HoodModeStore.save(storageOrNull(), DEMO ? "demo" : state.realUser.id, state.mode);
   // a driver now: know the car before Go online is tapped
@@ -3882,7 +3896,7 @@ const booting = HoodBoot.create({
   onWaiting: () => ($("boot-status").textContent = "Can't reach Hood Ride — retrying…"),
   backoff: (attempt) => HoodSync.reconnectBackoff(attempt),
   setTimer: (f, ms) => setTimeout(f, ms),
-  clearTimer: (t) => clearTimeout(t),
+  clearTimer: (timer) => clearTimeout(timer),
   onError: (e) => console.error("couldn't open the app", e),
 });
 booting.start();

@@ -86,7 +86,7 @@ defmodule HoodrideWeb.BrandTest do
           l =~ car,
           do: String.trim(l)
 
-    assert lines == [~s("omw in a sec #{car}",), ~s[receiveMsg(peer, "accepted! omw #{car}");]]
+    assert lines == [~s[t("omw in a sec #{car}"),], ~s[receiveMsg(peer, "accepted! omw #{car}");]]
   end
 
   test "what people see: the page, the install name" do

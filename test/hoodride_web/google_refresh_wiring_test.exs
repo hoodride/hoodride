@@ -54,8 +54,12 @@ defmodule HoodrideWeb.GoogleRefreshWiringTest do
              ~s(<p id="settings-refresh-later" class="muted hidden">You can refresh after your ride</p>)
 
     assert box =~ ~s(<p class="muted settings-refresh-note">Google can take a little while</p>)
-    assert body("renderSource") =~ ~s[`Your name and photo come from ${p.label}`;]
-    assert body("renderSource") =~ ~s[link.textContent = `Change on ${p.label} ↗`;]
+
+    assert body("renderSource") =~
+             ~s[t("Your name and photo come from {provider}", { provider: p.label });]
+
+    assert body("renderSource") =~
+             ~s[link.textContent = t("Change on {provider} ↗", { provider: p.label });]
   end
 
   test "Change opens and closes the box, and says so; the drawer always opens with it shut" do

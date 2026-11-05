@@ -17,6 +17,10 @@
   if (typeof module === "object" && module.exports) module.exports = factory(require("./sendfilter.js"));
   else root.HoodRidePos = factory(root.HoodSendFilter);
 })(typeof self !== "undefined" ? self : this, function (SendFilter) {
+  // the words in the reader's language (i18n.js): HoodI18n in the page,
+  // the file itself in the Node tests
+  const I18n = typeof HoodI18n !== "undefined" ? HoodI18n : require("./i18n.js");
+  const { t } = I18n;
   const FRESH_MS = 2 * SendFilter.HEARTBEAT_MS * (1 + SendFilter.HEARTBEAT_JITTER);
 
   function fresh(ageMs) {
@@ -51,8 +55,8 @@
 
   function lastSeen(peerAgeMs) {
     if (typeof peerAgeMs !== "number" || fresh(peerAgeMs)) return null;
-    if (peerAgeMs >= 3_600_000) return "last seen over an hour ago";
-    return `last seen ${Math.max(1, Math.round(peerAgeMs / 60_000))} min ago`;
+    if (peerAgeMs >= 3_600_000) return t("last seen over an hour ago");
+    return t("last seen {n} min ago", { n: Math.max(1, Math.round(peerAgeMs / 60_000)) });
   }
 
   // you announce your position only in a live ride, with a good reading

@@ -66,11 +66,11 @@
   const SUGGEST_MAX = 6;
   // (`makes`: the list to search — tests pass their own)
   function suggest(text, makes = MAKES) {
-    const t = typeof text === "string" ? text.trim().toLowerCase() : "";
-    if (!t || makes.some((m) => m.toLowerCase() === t)) return [];
-    const starts = makes.filter((m) => m.toLowerCase().startsWith(t));
+    const query = typeof text === "string" ? text.trim().toLowerCase() : "";
+    if (!query || makes.some((m) => m.toLowerCase() === query)) return [];
+    const starts = makes.filter((m) => m.toLowerCase().startsWith(query));
     // (a first word matching is already in `starts`)
-    const later = makes.filter((m) => !starts.includes(m) && m.toLowerCase().split(/[\s-]+/).some((w) => w.startsWith(t)));
+    const later = makes.filter((m) => !starts.includes(m) && m.toLowerCase().split(/[\s-]+/).some((w) => w.startsWith(query)));
     return starts.concat(later).slice(0, SUGGEST_MAX);
   }
 

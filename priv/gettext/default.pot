@@ -1,3 +1,311 @@
 # The app's messages, in English (the keys). Made by `mix hoodride.i18n.extract`; don't edit by hand.
 msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+#: priv/static/app.js
+msgid "Add it before you drive"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Add your car"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Back to the sign-in page"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Can't reach Hood Ride — try again"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Cancel your ride request first"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Cancel your ride request first."
+msgstr ""
+
+#: priv/static/app.js
+msgid "Change on {provider} ↗"
+msgstr ""
+
+#: priv/static/browse.js
+msgid "Chat with {name} ended — they've been away a while"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Check the {fields} (up to {max} letters each)."
+msgstr ""
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap GO ONLINE to drive again"
+msgstr ""
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — tap ✋ again if you still need a ride"
+msgstr ""
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride ended unexpectedly, please set it up again"
+msgstr ""
+
+#: priv/static/rehydrate.js
+msgid "Connection reset — your ride request was lost, please ask again"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Couldn't delete your account — please try again."
+msgstr ""
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — check your connection and try again."
+msgstr ""
+
+#: priv/static/app.js
+msgid "Couldn't reach Hood Ride — try again"
+msgstr ""
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh automatically — open Settings, tap Change, then Refresh from Google"
+msgstr ""
+
+#: priv/static/googlerefresh.js
+msgid "Couldn't refresh right now — try again later"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Couldn't save right now — try again in a moment."
+msgstr ""
+
+#: priv/static/app.js
+msgid "Couldn't save that — try again"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Couldn't sign in — try again"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Couldn't sign out — try again"
+msgstr ""
+
+#: priv/static/app.js
+msgid "End your ride first"
+msgstr ""
+
+#: priv/static/app.js
+msgid "End your ride first."
+msgstr ""
+
+#: priv/static/app.js
+msgid "Leave demo"
+msgstr ""
+
+#: priv/static/app.js
+msgid "On all your devices"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Picking up {name} · tap 🧭 to navigate"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Picking up {name} · {seen} · tap 🧭 to navigate"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Reconnecting to Hood Ride…"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Ride with {name}"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Riders look for it when you pick them up. Add it to go online."
+msgstr ""
+
+#: priv/static/app.js
+msgid "Riders see this so they can find you"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Save"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Save & go online"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Settings ({name})"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Sign out"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Signing in…"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Type DELETE to confirm."
+msgstr ""
+
+#: priv/static/googlerefresh.js
+msgid "You can refresh your name and photo after your ride"
+msgstr ""
+
+#: priv/static/app.js
+msgid "You've arrived · picking up {name}"
+msgstr ""
+
+#: priv/static/googlerefresh.js
+msgid "You've refreshed a lot — try again in a few minutes"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Your car"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Your name and photo come from {provider}"
+msgstr ""
+
+#: priv/static/app.js
+msgid "aight I see you"
+msgstr ""
+
+#: priv/static/app.js
+msgid "aight bet"
+msgstr ""
+
+#: priv/static/app.js
+msgid "be there in a few"
+msgstr ""
+
+#: priv/static/app.js
+msgid "color"
+msgstr ""
+
+#: priv/static/app.js
+msgid "cool, I'll watch for you"
+msgstr ""
+
+#: priv/static/ridepos.js
+msgid "last seen over an hour ago"
+msgstr ""
+
+#: priv/static/ridepos.js
+msgid "last seen {n} min ago"
+msgstr ""
+
+#: priv/static/app.js
+msgid "make"
+msgstr ""
+
+#: priv/static/app.js
+msgid "model"
+msgstr ""
+
+#: priv/static/distance.js
+msgid "nearby"
+msgstr ""
+
+#: priv/static/chatlist.js
+msgid "now"
+msgstr ""
+
+#: priv/static/app.js
+msgid "omw in a sec 🚗"
+msgstr ""
+
+#: priv/static/app.js
+msgid "yea I can grab you"
+msgstr ""
+
+#: priv/static/app.js
+msgid "yes please! I'm by the benches 🙏"
+msgstr ""
+
+#: priv/static/app.js
+msgid "yo what's up"
+msgstr ""
+
+#: priv/static/chatlist.js
+msgid "{count} character left"
+msgid_plural "{count} characters left"
+msgstr[0] ""
+msgstr[1] ""
+
+#: priv/static/chatlist.js
+msgid "{count} character too many"
+msgid_plural "{count} characters too many"
+msgstr[0] ""
+msgstr[1] ""
+
+#: priv/static/distance.js
+msgid "{distance} away"
+msgstr ""
+
+#: priv/static/app.js
+msgid "{name} has arrived"
+msgstr ""
+
+#: priv/static/app.js
+msgid "{name} is on the way"
+msgstr ""
+
+#: priv/static/distance.js
+msgid "{n} h ago"
+msgstr ""
+
+#: priv/static/distance.js
+msgid "{n} min ago"
+msgstr ""
+
+#: priv/static/chatlist.js
+msgid "{n}d"
+msgstr ""
+
+#: priv/static/chatlist.js
+msgid "{n}h"
+msgstr ""
+
+#: priv/static/chatlist.js
+msgid "{n}m"
+msgstr ""
+
+#: priv/static/app.js
+msgid "{status} · Reconnecting…"
+msgstr ""
+
+#: priv/static/app.js
+msgid "⏳ Waiting for the driver…"
+msgstr ""
+
+#: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride"
+msgstr ""
+
+#: priv/static/locator.js
+msgid "📍 Finding your location…"
+msgstr ""
+
+#: priv/static/locator.js
+msgid "📍 Share your location"
+msgstr ""
+
+#: priv/static/locator.js
+msgid "📍 Share your location so your ride partner can find you"
+msgstr ""
+
+#: priv/static/app.js
+msgid "📍 Tap the map where you want to meet"
+msgstr ""
+
+#: priv/static/app.js
+msgid "🟢 You're online"
+msgstr ""

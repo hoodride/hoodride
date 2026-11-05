@@ -9,6 +9,10 @@
   if (typeof module === "object" && module.exports) module.exports = factory();
   else root.HoodChatList = factory();
 })(typeof self !== "undefined" ? self : this, function () {
+  // the words in the reader's language (i18n.js): HoodI18n in the page,
+  // the file itself in the Node tests
+  const I18n = typeof HoodI18n !== "undefined" ? HoodI18n : require("./i18n.js");
+  const { t, tn } = I18n;
   const MIN = 60_000;
   const HOUR = 60 * MIN;
   const DAY = 24 * HOUR;
@@ -16,10 +20,10 @@
   // "now" | "5m" | "3h" | "2d" — a time slightly ahead (two clocks a hair
   // apart) reads "now"
   function ago(ms) {
-    if (ms < MIN) return "now";
-    if (ms < HOUR) return `${Math.floor(ms / MIN)}m`;
-    if (ms < DAY) return `${Math.floor(ms / HOUR)}h`;
-    return `${Math.floor(ms / DAY)}d`;
+    if (ms < MIN) return t("now");
+    if (ms < HOUR) return t("{n}m", { n: Math.floor(ms / MIN) });
+    if (ms < DAY) return t("{n}h", { n: Math.floor(ms / HOUR) });
+    return t("{n}d", { n: Math.floor(ms / DAY) });
   }
 
   // the conversations, newest last message first (a copy; ties keep their
@@ -63,17 +67,15 @@
     return [...splitter.s.segment(text)].length;
   }
 
-  function plural(n, word) {
-    return `${n} ${word}${n === 1 ? "" : "s"}`;
-  }
-
   // n characters → { show, over, text }
   function limit(n) {
     const over = n > MAX_CHARS;
     return {
       show: n >= COUNT_FROM,
       over,
-      text: over ? `${plural(n - MAX_CHARS, "character")} too many` : `${plural(MAX_CHARS - n, "character")} left`,
+      text: over
+        ? tn("{count} character too many", "{count} characters too many", n - MAX_CHARS)
+        : tn("{count} character left", "{count} characters left", MAX_CHARS - n),
     };
   }
 

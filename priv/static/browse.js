@@ -11,6 +11,10 @@
   if (typeof module === "object" && module.exports) module.exports = factory();
   else root.HoodBrowse = factory();
 })(typeof self !== "undefined" ? self : this, function () {
+  // the words in the reader's language (i18n.js): HoodI18n in the page,
+  // the file itself in the Node tests
+  const I18n = typeof HoodI18n !== "undefined" ? HoodI18n : require("./i18n.js");
+  const { t } = I18n;
   // entries: Map id → {type: "driver" | "hand" | "ridepeer", cell}
   // snaps:   [{cell, drivers?: [{id}], hands?: [{id}]}] — a layer the
   //          snapshot doesn't carry counts as empty (a one-sided snapshot
@@ -51,7 +55,7 @@
     return {
       remove: true,
       close: !!isOpen,
-      banner: `Chat with ${name} ended — they've been away a while`,
+      banner: t("Chat with {name} ended — they've been away a while", { name }),
     };
   }
 

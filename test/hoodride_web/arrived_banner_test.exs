@@ -35,7 +35,7 @@ defmodule HoodrideWeb.ArrivedBannerTest do
     assert b =~ "HoodRidePos.arrivedPhase(since)"
     # (owner: no "tap End ride when you're done" — the button is right there)
     assert b =~
-             "return `${CAR}Ride with ${peer.name}${state.mode === \"rider\" ? HoodCar.inLine(peer.car) : \"\"}`;"
+             ~s[return CAR + t("Ride with {name}", { name: peer.name }) + (state.mode === "rider" ? HoodCar.inLine(peer.car) : "");]
 
     refute b =~ "tap End ride"
   end
@@ -44,8 +44,8 @@ defmodule HoodrideWeb.ArrivedBannerTest do
   # the rider's name — who to look for at the curb
   test "just arrived: plain, and the driver sees who they're picking up" do
     b = body("situationBanner")
-    assert b =~ "`${CAR}${peer.name} has arrived${HoodCar.inLine(peer.car)}`"
-    assert b =~ "`${CAR}You've arrived · picking up ${peer.name}`"
+    assert b =~ ~s[CAR + t("{name} has arrived", { name: peer.name }) + HoodCar.inLine(peer.car)]
+    assert b =~ ~s[CAR + t("You've arrived · picking up {name}", { name: peer.name })]
     refute b =~ "has arrived!"
     # unknown arrival time (reloaded mid-ride) → riding
     assert b =~ "state.ride.arrivedAt == null ? null"

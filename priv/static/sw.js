@@ -11,6 +11,7 @@ const ASSETS = [
   "styles.css",
   "app.js",
   "h3-js.umd.js",
+  "i18n.js",
   "viewport.js",
   "sync.js",
   "sendfilter.js",

@@ -17,7 +17,7 @@
   // the app opens when installed, else its website.
   const APPS = {
     // Google's Maps URLs: api=1, the comma encoded (%2C)
-    google: { label: "Google Maps", url: (t) => `https://www.google.com/maps/dir/?api=1&destination=${t.lat}%2C${t.lng}` },
+    google: { label: "Google Maps", url: (target) => `https://www.google.com/maps/dir/?api=1&destination=${target.lat}%2C${target.lng}` },
     // Apple: each iPhone the link of its own iOS. The unified directions
     // link came with iOS 18.4, and the old ?daddr= form "no longer behaves
     // as expected" on recent iOS — Apple's engineer pointed to the unified
@@ -26,15 +26,15 @@
     // Unreadable version: the current one.
     apple: {
       label: "Apple Maps",
-      url: (t, ua) => {
+      url: (target, ua) => {
         const v = iosVersion(ua);
         return v && (v[0] < 18 || (v[0] === 18 && v[1] < 4))
-          ? `https://maps.apple.com/?daddr=${t.lat},${t.lng}&dirflg=d`
-          : `https://maps.apple.com/directions?destination=${t.lat},${t.lng}&mode=driving`;
+          ? `https://maps.apple.com/?daddr=${target.lat},${target.lng}&dirflg=d`
+          : `https://maps.apple.com/directions?destination=${target.lat},${target.lng}&mode=driving`;
       },
     },
     // Waze's deep link (developers.google.com/waze/deeplinks)
-    waze: { label: "Waze", url: (t) => `https://waze.com/ul?ll=${t.lat}%2C${t.lng}&navigate=yes` },
+    waze: { label: "Waze", url: (target) => `https://waze.com/ul?ll=${target.lat}%2C${target.lng}&navigate=yes` },
   };
   const KEY = "hoodride_navapp";
 
@@ -47,9 +47,9 @@
 
   // the directions address in `app` (Google Maps unless chosen), or null;
   // `ua`: the browser's identity text (Apple's link depends on the iOS)
-  function href(t, app = "google", ua = "") {
-    if (!t || !Number.isFinite(t.lat) || !Number.isFinite(t.lng) || !APPS[app]) return null;
-    return APPS[app].url(t, ua);
+  function href(target, app = "google", ua = "") {
+    if (!target || !Number.isFinite(target.lat) || !Number.isFinite(target.lng) || !APPS[app]) return null;
+    return APPS[app].url(target, ua);
   }
 
   // platform: HoodSendFilter.platformOf — "ios" | "android" | "other"
