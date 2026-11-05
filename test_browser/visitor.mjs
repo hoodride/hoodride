@@ -303,5 +303,23 @@ await journey("visitor: the signed-out screen, signing in, the demo", async (bro
     await wes.waitFor(`!document.getElementById("chat").classList.contains("hidden")`, `${w} px: the chat`);
     check(JSON.stringify(await wes.eval(chatBox)) === JSON.stringify(want), `${w} px wide: the chat ${want.width} px, ${want.left} px either side`, await wes.eval(chatBox));
   }
+
+  // a letter avatar's letter in the middle of its circle (owner, 2026-11-04:
+  // the "D" sat ~5% low — "central" centered the font's whole box); drawn
+  // in this browser, its white ink measured against the 96×96 picture
+  step("the letter avatars: each capital in the middle of its circle");
+  const inkCenter = (name) => `(async () => {
+    const i = new Image(); i.src = HoodAvatar.url(${JSON.stringify(name)}); await i.decode();
+    const c = document.createElement("canvas"); c.width = c.height = 96;
+    const x = c.getContext("2d"); x.drawImage(i, 0, 0, 96, 96);
+    const d = x.getImageData(0, 0, 96, 96).data; let t = 96, b = -1, l = 96, r = -1;
+    for (let y = 0; y < 96; y++) for (let k = 0; k < 96; k++) { const o = (y * 96 + k) * 4; if (d[o] > 230 && d[o + 1] > 230 && d[o + 2] > 230) { t = Math.min(t, y); b = Math.max(b, y); l = Math.min(l, k); r = Math.max(r, k); } }
+    return { name: ${JSON.stringify(name)}, down: (t + b) / 2 - 47.5, right: (l + r) / 2 - 47.5 };
+  })()`;
+  // (plain capitals: an accent above, as in Ö, rightly lifts the ink)
+  for (const name of ["Dan", "Jaylen", "Eve", "Maria", "Zoe"]) {
+    const at = await wes.eval(inkCenter(name));
+    check(Math.abs(at.down) <= 2 && Math.abs(at.right) <= 3, `${name}: the letter centered (within 2 of 96 up/down)`, at);
+  }
   await wes.close();
 });

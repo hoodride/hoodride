@@ -40,7 +40,11 @@
       );
     return (
       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" fill="${color(name)}"/>` +
-      `<text x="48" y="50" dominant-baseline="central" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="600" fill="#ffffff">${esc(letter)}</text></svg>`
+      // the letter's middle on the circle's middle (48): its baseline half a
+      // capital's height (~0.7 em in these fonts) below — DiceBear's and D3's
+      // way. "central" centered the font's whole box (room for g, p, y) and
+      // sat a capital ~5% low; browsers also differ on it (owner, 2026-11-04)
+      `<text x="48" y="48" dy="0.35em" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="600" fill="#ffffff">${esc(letter)}</text></svg>`
     );
   }
 
