@@ -55,7 +55,11 @@ function phone({ perm = "prompt", mode = "rider" } = {}) {
   };
   const loc = create({
     geolocation,
-    queryPermission: async () => t.perm,
+    // "throws": a browser whose permission check fails
+    queryPermission: async () => {
+      if (t.perm === "throws") throw new TypeError("permissions.query is not supported");
+      return t.perm;
+    },
     now: () => t.now,
     h3,
     rules,
@@ -496,4 +500,128 @@ test("blocked found by a re-check while the Share button is up: the button goes"
   const hiddenAt = p.log.findIndex((e, i) => i > shownAt && e[0] === "hideShare");
   assert.ok(hiddenAt > shownAt, "the button hidden once blocked");
   assert.match(p.did("message").at(-1)[1], /blocked/i, "the blocked steps shown");
+});
+
+
+// ----- the gaps a mutation sweep found (Stryker, owner 2026-11-05): what
+// happens after something goes wrong, and the banner's wording -----
+
+test("a browser whose permission check fails: treated as 'unknown' — GPS still starts when needed", async () => {
+  const p = phone({ perm: "throws" });
+  await p.loc.start();
+  assert.equal(p.lookups.length, 0, "not 'granted': no quiet lookup on open");
+  p.st.mode = "driver";
+  p.st.online = true;
+  await p.loc.reconcile();
+  assert.equal(p.watches.size, 1, "'unknown' → the watch starts (the browser decides)");
+});
+
+test("blocked, then a tap: the tap retries — GPS again, the banner says 'Finding…' (never 'blocked' again)", () => {
+  const p = phone({ perm: "granted" });
+  p.loc.tapHand();
+  p.fail(1);
+  assert.equal(p.loc.status, "denied");
+  assert.equal(p.watches.size, 0);
+  p.loc.tapHand();
+  assert.equal(p.loc.status, "watching", "the tap retries");
+  assert.equal(p.watches.size, 1);
+  p.t.now += 6000;
+  assert.match(p.loc.banner(), /Finding your location/);
+});
+
+test("location off, then a tap: retried the same way; while waiting, the banner says it's off", () => {
+  const p = phone({ perm: "granted" });
+  p.loc.tapOnline();
+  p.fail(2);
+  assert.equal(p.loc.status, "unavailable");
+  const off = p.loc.banner();
+  assert.match(off, /Location is off on this device/);
+  assert.match(off, /to drive/);
+  assert.doesNotMatch(off, /Finding/);
+  p.loc.cancelPending();
+  p.loc.tapOnline();
+  assert.equal(p.loc.status, "watching", "the tap retries");
+});
+
+test("the waiting banner: none when nothing waits; GO ONLINE in driving words, ✋ in ride-request words", () => {
+  const p = phone({ perm: "granted" });
+  assert.equal(p.loc.banner(), null);
+  p.loc.tapOnline();
+  p.t.now += 16_000;
+  assert.match(p.loc.banner(), /to drive/);
+  p.loc.cancelPending();
+  assert.equal(p.loc.banner(), null);
+  p.loc.tapHand();
+  p.t.now += 16_000;
+  assert.match(p.loc.banner(), /to ask for a ride/);
+});
+
+test("turning off never waits for location: off at once, no GPS asked for", () => {
+  const p = phone({ perm: "granted", mode: "driver" });
+  p.st.online = true;
+  p.loc.tapOnline();
+  assert.deepEqual(p.did("setOnline"), [["setOnline", false]]);
+  assert.equal(p.watches.size, 0);
+  p.st.handRaised = true;
+  p.loc.tapHand();
+  assert.deepEqual(p.did("setHand"), [["setHand", false]]);
+  assert.equal(p.watches.size, 0);
+});
+
+test("stopping: GPS released, back to idle, no live reading left", () => {
+  const p = phone({ perm: "granted" });
+  p.loc.tapOnline();
+  p.fix(10);
+  assert.ok(p.loc.liveFix());
+  p.loc.stop();
+  assert.equal(p.watches.size, 0, "clearWatch: the GPS is released");
+  assert.equal(p.loc.status, "idle");
+  assert.equal(p.loc.liveFix(), false, "an old reading isn't 'live' any more");
+});
+
+test("the app's tick redraws the banner only while a tap waits", () => {
+  const p = phone({ perm: "granted" });
+  p.loc.tick();
+  assert.equal(p.did("redraw").length, 0);
+  p.loc.tapHand();
+  const before = p.did("redraw").length;
+  p.loc.tick();
+  assert.equal(p.did("redraw").length, before + 1);
+});
+
+test("back from Settings: allowed now → a quiet reset; still blocked → stays blocked", async () => {
+  const p = phone({ perm: "granted" });
+  p.loc.tapHand();
+  p.fail(1);
+  p.t.perm = "granted";
+  await p.loc.onVisible();
+  assert.equal(p.loc.status, "idle", "allowed: ready again, no prompt");
+  assert.equal(p.last()[0], "refresh");
+  const q = phone({ perm: "granted" });
+  q.loc.tapHand();
+  q.fail(1);
+  q.t.perm = "denied";
+  await q.loc.onVisible();
+  assert.equal(q.loc.status, "denied", "still blocked: unchanged");
+});
+
+test("only approximate: Request ride warns at once; a plain ◎ doesn't nag", () => {
+  const p = phone({ perm: "granted" });
+  p.loc.requestCheck();
+  p.lookups[0].ok(p.reading(3000));
+  const warned = p.did("message").map((m) => m[1]);
+  assert.equal(warned.length, 1);
+  assert.match(warned[0], /approximate/);
+  const q = phone({ perm: "granted" });
+  q.loc.tapLocate();
+  q.lookups[0].ok(q.reading(3000));
+  assert.equal(q.did("message").length, 0);
+});
+
+test("every reading redraws the banner and refreshes the screen", () => {
+  const p = phone({ perm: "granted" });
+  p.loc.tapHand();
+  p.log.length = 0;
+  p.fix(500);
+  assert.ok(p.did("redraw").length >= 1 && p.did("refresh").length >= 1, JSON.stringify(p.log.map((e) => e[0])));
 });

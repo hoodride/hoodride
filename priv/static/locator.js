@@ -249,7 +249,10 @@
       if (on) return set(false);
       if (liveFix()) return set(true);
       pending[which] = true;
-      if (s.status === "denied" || s.status === "unavailable") s.status = "idle"; // the tap retries
+      // the tap retries: "watching" if a watch still runs (location off keeps
+      // one going, to catch the signal coming back), else "idle" — found by a
+      // mutation sweep: it said "idle" with GPS still on (owner, 2026-11-05)
+      if (s.status === "denied" || s.status === "unavailable") s.status = s.watchId !== null ? "watching" : "idle";
       startWatch();
       app.redrawBanner();
       app.refresh();
@@ -268,7 +271,10 @@
       tapLocate() {
         const now_ = !!s.best;
         if (!now_) s.wantsCentre = true;
-        if (s.status === "denied" || s.status === "unavailable") s.status = "idle"; // the tap retries
+        // the tap retries: "watching" if a watch still runs (location off keeps
+        // one going, to catch the signal coming back), else "idle" — found by a
+        // mutation sweep: it said "idle" with GPS still on (owner, 2026-11-05)
+        if (s.status === "denied" || s.status === "unavailable") s.status = s.watchId !== null ? "watching" : "idle";
         locateOnce("locate");
         return now_;
       },

@@ -96,3 +96,59 @@ test("where the map opens: the remembered area, else the placeholder at zoom 14"
   });
   assert.deepEqual(V.startView(null, fallback), { center: [-74.006, 40.7128], zoom: 14 });
 });
+
+// ----- gaps a mutation sweep found (Stryker, owner 2026-11-05) -----
+
+test("the exact edges are valid; one step past them isn't", () => {
+  const s = memory();
+  for (const edge of [
+    { lng: 180, lat: 0, zoom: 14 },
+    { lng: -180, lat: 0, zoom: 14 },
+    { lng: 0, lat: 90, zoom: 14 },
+    { lng: 0, lat: -90, zoom: 14 },
+    { lng: 0, lat: 0, zoom: 0 },
+    { lng: 0, lat: 0, zoom: 22 },
+  ]) {
+    s.setItem(V.key(7), JSON.stringify(edge));
+    assert.deepEqual(V.read(s, 7), edge, JSON.stringify(edge));
+  }
+  for (const past of [
+    { lng: 180.0001, lat: 0, zoom: 14 },
+    { lng: 0, lat: -90.0001, zoom: 14 },
+    { lng: 0, lat: 0, zoom: -0.0001 },
+    { lng: 0, lat: 0, zoom: 22.0001 },
+  ]) {
+    s.setItem(V.key(7), JSON.stringify(past));
+    assert.equal(V.read(s, 7), null, JSON.stringify(past));
+  }
+});
+
+test("partly broken: each of the three must be a number — one missing or bad is enough to ignore it", () => {
+  const s = memory();
+  for (const bad of [
+    { lat: 40, zoom: 14 },
+    { lng: -74, zoom: 14 },
+    { lng: -74, lat: 40 },
+    { lng: -74, lat: null, zoom: 14 },
+    { lng: -74, lat: 40, zoom: "14" },
+    null,
+  ]) {
+    s.setItem(V.key(7), JSON.stringify(bad));
+    assert.equal(V.read(s, 7), null, JSON.stringify(bad));
+    V.save(s, 8, bad);
+    assert.equal(s.getItem(V.key(8)), null, `not saved: ${JSON.stringify(bad)}`);
+  }
+});
+
+test("no account (signed out): nothing saved, read or forgotten — even with storage working", () => {
+  const s = memory();
+  V.save(s, 7, { lng: -74, lat: 40.7, zoom: 14 });
+  V.save(s, null, { lng: 1, lat: 1, zoom: 1 });
+  V.save(s, undefined, { lng: 1, lat: 1, zoom: 1 });
+  assert.equal(s.length, 1, "only account 7's");
+  assert.equal(V.read(s, undefined), null);
+  V.forget(s, null);
+  assert.ok(V.read(s, 7), "someone else's left alone");
+  V.save(null, 7, { lng: 2, lat: 2, zoom: 2 });
+  assert.equal(V.read(s, 7).lng, -74, "no storage: nothing written anywhere");
+});

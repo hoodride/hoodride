@@ -67,3 +67,7 @@ config :hoodride, :sign_in_failures, nil
 # every language switched on in tests, the made-up en-XA too (Hoodride.I18n):
 # the languages journey checks no English is left through the real loader
 config :hoodride, :languages, :all
+
+# property tests (StreamData): 100 random cases each by default; a deeper
+# search when asked — PROP_RUNS=2000 mix test test/hoodride_web/properties_test.exs
+config :stream_data, max_runs: String.to_integer(System.get_env("PROP_RUNS", "100"))

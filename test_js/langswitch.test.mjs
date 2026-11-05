@@ -98,3 +98,24 @@ test("the server's language names are the switch's own", () => {
   assert.deepEqual(Object.keys(names).sort(), [...known].sort(), "a name for every language");
   for (const tag of known) assert.equal(names[tag], L.name(tag), tag);
 });
+
+// ----- gaps a mutation sweep found (Stryker, owner 2026-11-05) -----
+
+test("search ranks: the whole name 0, a start — of the name or of a later word — 1, only inside 2", () => {
+  const rank = (q, tag, page = "en") => L.search(ALL, q, page).find((x) => x.tag === tag)?.rank;
+  assert.equal(rank("filipino", "fil"), 0, "the whole name");
+  assert.equal(rank("brasil", "pt-BR"), 1, "a later word's start: Português (Brasil)");
+  assert.equal(rank("melayu", "ms"), 1, "a later word's start: Bahasa Melayu");
+  assert.equal(rank("donesia", "id"), 2, "only inside: Bahasa Indonesia");
+  assert.equal(rank("asil", "pt-BR"), 2, "inside a later word: not a start");
+  assert.equal(rank("pt-br", "pt-BR"), 0, "its tag, too");
+});
+
+test("every other name people type finds its language", () => {
+  for (const [q, tag] of [
+    ["mandarin", "zh-Hans"], ["普通话", "zh-Hans"], ["國語", "zh-Hant"], ["castellano", "es"],
+    ["norsk", "nb"], ["oriya", "or"], ["panjabi", "pa"], ["malay", "ms"], ["indonesian", "id"],
+    ["tagalog", "fil"], ["bengali", "bn"], ["norwegian", "nb"],
+  ])
+    assert.ok(found(q).includes(tag), `${q} → ${tag}: ${found(q)}`);
+});

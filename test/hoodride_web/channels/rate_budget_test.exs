@@ -344,9 +344,10 @@ defmodule HoodrideWeb.RateBudgetTest do
   end
 
   test "the sweeper forgets budgets that have fully refilled, and only those" do
-    now = System.monotonic_time(:millisecond)
-    :ets.insert(:rate_budgets, {{:sync, 1}, now - 5_000})
-    :ets.insert(:rate_budgets, {{:sync, 2}, now + 60_000})
+    # (the table's times: whole nanoseconds — RateBudget)
+    now = System.monotonic_time(:millisecond) * 1_000_000
+    :ets.insert(:rate_budgets, {{:sync, 1}, now - 5_000_000_000})
+    :ets.insert(:rate_budgets, {{:sync, 2}, now + 60_000_000_000})
 
     Hoodride.Sweeper.sweep_now()
 
