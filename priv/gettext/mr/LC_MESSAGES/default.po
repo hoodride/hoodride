@@ -380,6 +380,10 @@ msgstr "मी सहमत आहे"
 msgid "I'm here"
 msgstr "मी इथे आहे"
 
+#: priv/static/index.html
+msgid "Language"
+msgstr "भाषा"
+
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "डेमोमधून बाहेर पडा"

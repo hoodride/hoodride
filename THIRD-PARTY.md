@@ -9,6 +9,7 @@ files written by others, each under its own license:
 | `h3-js.umd.js` | [h3-js](https://github.com/uber/h3-js) 4.5.0 (Uber) | Apache-2.0 | `h3-js.LICENSE.txt` |
 | `phoenix.min.js` | [Phoenix](https://github.com/phoenixframework/phoenix) 1.8 | MIT | `phoenix.LICENSE.txt` |
 | `hand.svg`, `pin.svg`, `compass.svg`, `chat.svg`, `person.svg`, `hand-avatar.svg` (from `icons.js`) | [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) | MIT | `fluent-emoji.LICENSE.txt` |
+| `translate.svg` (the language switch's 文A, unchanged) | [Material Symbols](https://github.com/google/material-design-icons) (Google), "translate", outlined, 24 px | Apache-2.0 | `material-symbols.LICENSE.txt` |
 
 `github-invertocat-white.svg` is GitHub's own logo, unchanged, linking to
 this project's code as [GitHub's brand rules](https://brand.github.com/foundations/logo)

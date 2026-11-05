@@ -380,6 +380,10 @@ msgstr "ମୁଁ ସହମତ"
 msgid "I'm here"
 msgstr "ମୁଁ ପହଞ୍ଚିଗଲି"
 
+#: priv/static/index.html
+msgid "Language"
+msgstr "ଭାଷା"
+
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "ଡେମୋରୁ ବାହାରନ୍ତୁ"

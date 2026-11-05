@@ -15,7 +15,7 @@ defmodule HoodrideWeb.PageController do
     conn
     |> Lang.vary()
     |> put_resp_content_type("text/html")
-    |> send_resp(200, page() |> with_link_preview() |> in_language(lang))
+    |> send_resp(200, page() |> with_link_preview() |> with_languages() |> in_language(lang))
   end
 
   @doc """
@@ -53,6 +53,14 @@ defmodule HoodrideWeb.PageController do
   # (checked 2026-11-02) — the release would not have booted
   defp with_link_preview(html),
     do: String.replace(html, "</head>", link_preview() <> "</head>", global: false)
+
+  # the languages switched on, for the page's language switch (HoodLang;
+  # one alone: no switch) — per request, as LANGUAGES is read at start-up
+  defp with_languages(html) do
+    meta = ~s(  <meta name="hoodride-languages" content="#{Enum.join(I18n.on(), ",")}">
+)
+    String.replace(html, "</head>", meta <> "</head>", global: false)
+  end
 
   # An address that doesn't exist: a real 404 — Google ignores a 4xx page
   # and never indexes it, and scanners stop reporting "/.env found"

@@ -16,6 +16,9 @@
 
   <!-- ===== Login screen ===== -->
   <section id="screen-login" class="screen active">
+    <!-- the language, top right (owner, 2026-11-05): 文A and its own name;
+         only when more than one is on (HoodLang, app.js) -->
+    <button id="btn-lang-login" class="lang-button hidden" type="button" aria-label="Language" data-t-attr="aria-label"><span class="lang-icon" aria-hidden="true"></span><span class="lang-current"></span></button>
     <div class="brand">
       <img class="brand-car" src="car.png" alt="" />
       <h1>Hood Ride</h1>
@@ -169,6 +172,11 @@
           <span class="settings-label" data-t><img class="emoji-icon" src="compass.svg" alt="" data-emoji="&#x1F9ED;" />Navigation app</span>
           <span id="navapp-note" class="muted settings-note"></span>
         </button>
+        <!-- the language (owner, 2026-11-05): the list, each in its own words -->
+        <button id="btn-lang" class="drawer-row hidden">
+          <span class="settings-label" data-t><span class="lang-icon" aria-hidden="true"></span>Language</span>
+          <span id="lang-note" class="muted settings-note"></span>
+        </button>
       </nav>
       <div class="drawer-bottom">
         <button id="btn-logout" class="drawer-row settings-danger">
@@ -281,6 +289,13 @@
   <script src="phoenix.min.js"></script>
   <script src="h3-js.umd.js"></script>
   <!-- the words, in the reader's language: before every script of ours -->
+  <!-- the languages, each in its own words (HoodLang): a pick reloads in it -->
+  <div id="lang-backdrop" class="car-backdrop hidden"></div>
+  <div id="lang-sheet" class="car-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="lang-title">
+    <h2 id="lang-title" tabindex="-1" data-t>Language</h2>
+    <div id="lang-list" class="lang-list"></div>
+    <button id="lang-cancel" type="button" class="btn btn-small" data-t>Cancel</button>
+  </div>
   <script src="i18n.js"></script>
   <script src="viewport.js"></script>
   <script src="sync.js"></script>
@@ -307,6 +322,7 @@
   <script src="chatscroll.js"></script>
   <script src="navlink.js"></script>
   <script src="googlerefresh.js"></script>
+  <script src="langswitch.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

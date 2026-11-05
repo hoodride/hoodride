@@ -380,6 +380,10 @@ msgstr "Elfogadom"
 msgid "I'm here"
 msgstr "Itt vagyok"
 
+#: priv/static/index.html
+msgid "Language"
+msgstr "Nyelv"
+
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Kilépés a bemutatóból"

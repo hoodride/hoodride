@@ -37,6 +37,8 @@ const ASSETS = [
   "chatscroll.js",
   "navlink.js",
   "googlerefresh.js",
+  "langswitch.js",
+  "translate.svg",
   "phoenix.min.js",
   "maplibre-gl.js",
   "maplibre-gl.css",

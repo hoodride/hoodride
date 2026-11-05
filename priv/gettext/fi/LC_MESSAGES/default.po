@@ -380,6 +380,10 @@ msgstr "Hyväksyn"
 msgid "I'm here"
 msgstr "Olen täällä"
 
+#: priv/static/index.html
+msgid "Language"
+msgstr "Kieli"
+
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Poistu demosta"

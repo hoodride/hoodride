@@ -380,6 +380,10 @@ msgstr "Nakubali"
 msgid "I'm here"
 msgstr "Nimefika"
 
+#: priv/static/index.html
+msgid "Language"
+msgstr "Lugha"
+
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Ondoka kwenye onyesho"

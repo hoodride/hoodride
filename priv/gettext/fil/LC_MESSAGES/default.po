@@ -380,6 +380,10 @@ msgstr "Sumasang-ayon ako"
 msgid "I'm here"
 msgstr "Nandito na ako"
 
+#: priv/static/index.html
+msgid "Language"
+msgstr "Wika"
+
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Umalis sa demo"

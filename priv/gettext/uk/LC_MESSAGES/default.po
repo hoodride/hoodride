@@ -380,6 +380,10 @@ msgstr "Погоджуюся"
 msgid "I'm here"
 msgstr "Я на місці"
 
+#: priv/static/index.html
+msgid "Language"
+msgstr "Мова"
+
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Вийти з демо"

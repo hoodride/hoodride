@@ -380,6 +380,10 @@ msgstr "Συμφωνώ"
 msgid "I'm here"
 msgstr "Είμαι εδώ"
 
+#: priv/static/index.html
+msgid "Language"
+msgstr "Γλώσσα"
+
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Έξοδος από την επίδειξη"

@@ -380,6 +380,10 @@ msgstr "Akkoord"
 msgid "I'm here"
 msgstr "Ik ben er"
 
+#: priv/static/index.html
+msgid "Language"
+msgstr "Taal"
+
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Demo verlaten"

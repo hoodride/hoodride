@@ -26,7 +26,8 @@ defmodule Hoodride.OpenSourceTest do
           {"h3-js.umd.js", "h3-js.LICENSE.txt",
            "Apache License\n                           Version 2.0, January 2004"},
           {"phoenix.min.js", "phoenix.LICENSE.txt", "Copyright (c) 2014 Chris McCord"},
-          {"icons.js", "fluent-emoji.LICENSE.txt", "Copyright (c) Microsoft Corporation."}
+          {"icons.js", "fluent-emoji.LICENSE.txt", "Copyright (c) Microsoft Corporation."},
+          {"translate.svg", "material-symbols.LICENSE.txt", "Apache License"}
         ] do
       assert File.read!(Path.join(@static, license)) =~ must, license
       assert file in HoodrideWeb.static_paths() and license in HoodrideWeb.static_paths(), license

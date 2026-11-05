@@ -3749,6 +3749,68 @@ function renderNavAppNote() {
   $("navapp-note").textContent = app ? HoodNavLink.label(app) : t("Asked the first time you navigate");
 }
 
+// ===== The language (owner, 2026-11-05) =====
+// the languages switched on, from the server's page (HoodrideWeb.Lang):
+// one alone — no switch at all
+const LANGS = (document.querySelector('meta[name="hoodride-languages"]')?.content || "en").split(",").filter(Boolean);
+const LANG_NOW = HoodI18n.lang();
+let langOpener = null;
+
+function renderLangSwitch() {
+  const many = LANGS.length > 1;
+  const own = HoodLang.name(LANG_NOW);
+  $("btn-lang-login").classList.toggle("hidden", !many);
+  $("btn-lang").classList.toggle("hidden", !many);
+  $("btn-lang-login").querySelector(".lang-current").textContent = own;
+  $("lang-note").textContent = own;
+}
+
+function openLangSheet(from) {
+  langOpener = from;
+  const list = $("lang-list");
+  list.replaceChildren(
+    ...HoodLang.sorted(LANGS).map(({ tag, name }) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = name;
+      // each name in its own language and direction (a screen reader says
+      // it right; Arabic reads right to left in an English list)
+      b.lang = tag;
+      b.dir = "auto";
+      if (tag === LANG_NOW) b.setAttribute("aria-current", "true");
+      b.addEventListener("click", () => pickLang(tag));
+      return b;
+    })
+  );
+  $("lang-backdrop").classList.remove("hidden");
+  $("lang-sheet").classList.remove("hidden");
+  $("lang-title").focus({ focusVisible: false });
+}
+
+function closeLangSheet() {
+  $("lang-backdrop").classList.add("hidden");
+  $("lang-sheet").classList.add("hidden");
+  if (langOpener) langOpener.focus({ focusVisible: false });
+  langOpener = null;
+}
+
+// kept (a cookie the server reads) only once someone picks; the page comes
+// back in it — every word, the direction, the legal pages
+function pickLang(tag) {
+  if (tag === LANG_NOW) return closeLangSheet();
+  document.cookie = HoodLang.cookie(tag, location.protocol === "https:");
+  location.reload();
+}
+
+$("btn-lang-login").addEventListener("click", () => openLangSheet($("btn-lang-login")));
+$("btn-lang").addEventListener("click", () => openLangSheet($("btn-lang")));
+$("lang-cancel").addEventListener("click", closeLangSheet);
+$("lang-backdrop").addEventListener("click", closeLangSheet);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !$("lang-sheet").classList.contains("hidden")) closeLangSheet();
+});
+renderLangSwitch();
+
 // ===== I'm here (driver) =====
 $("btn-arrived").addEventListener("click", declareArrived);
 

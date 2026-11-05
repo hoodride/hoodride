@@ -137,6 +137,24 @@ defmodule HoodrideWeb.LangTest do
       assert catalog < app
     end
 
+    # the language switch's list: the languages switched on (one alone —
+    # the page shows no switch: app.js renderLangSwitch)
+    test "the page lists the languages switched on" do
+      html = build_conn() |> get("/") |> html_response(200)
+      on = Hoodride.I18n.on() |> Enum.join(",")
+      assert html =~ ~s(<meta name="hoodride-languages" content="#{on}">)
+
+      before = Application.get_env(:hoodride, :languages)
+      Application.put_env(:hoodride, :languages, ["en"])
+
+      try do
+        assert build_conn() |> get("/") |> html_response(200) =~
+                 ~s(<meta name="hoodride-languages" content="en">)
+      after
+        Application.put_env(:hoodride, :languages, before)
+      end
+    end
+
     # Arabic, Hebrew, Urdu read right to left: the whole page mirrors
     # (owner, 2026-11-05)
     test "a right-to-left language: the page served dir=rtl; the others not" do

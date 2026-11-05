@@ -380,6 +380,10 @@ msgstr "Sunt de acord"
 msgid "I'm here"
 msgstr "Am ajuns"
 
+#: priv/static/index.html
+msgid "Language"
+msgstr "Limbă"
+
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Ieși din demo"

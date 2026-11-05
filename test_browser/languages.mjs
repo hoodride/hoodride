@@ -20,7 +20,9 @@ const PICK = `(document.cookie = "hoodride_lang=en-XA; path=/; SameSite=Lax", tr
 // Allowed: names (people, places, brands, the map's credits) — `allow`
 const ENGLISH = `((allow) => {
   // (the map's credits are its data's required credit, as given: not ours)
-  const seen = (el) => !!el && el.getClientRects().length > 0 && getComputedStyle(el).visibility !== "hidden" && !el.closest("[aria-hidden=true], .maplibregl-ctrl-attrib-inner, .hidden");
+  // (nor the languages' own names — "English", "日本語": each written in its
+  // own language on purpose, like a person's name)
+  const seen = (el) => !!el && el.getClientRects().length > 0 && getComputedStyle(el).visibility !== "hidden" && !el.closest("[aria-hidden=true], .maplibregl-ctrl-attrib-inner, .hidden, .lang-current, #lang-note, #lang-list");
   // the allowed names taken out whole first ("Hood Ride", never "Ride" alone)
   const english = (s) => allow.reduce((rest, a) => rest.replace(a, " "), s).match(/[A-Za-z][A-Za-z'’]+/g) || [];
   const found = [];
@@ -199,6 +201,42 @@ await journey("languages: no English left in a made-up language, nothing cut off
     const spills = await p.eval(SPILLS);
     check(spills.length === 0, `${where}: longer words fit, nothing spills out`, spills);
   };
+
+  // the language switch (owner, 2026-11-05): 文A and the language's own
+  // name on the sign-in screen; the list, each in its own words; a pick
+  // comes back in that language and is kept — only then a cookie
+  step("Ken opens Hood Ride signed out: English, 文A at the top; picks Español, then back to English");
+  const ken = await browser.visitor("BT-Ken");
+  await ken.phone(390, 780, 2);
+  await ken.goto(`${BASE}/`);
+  await ken.waitFor(`!document.getElementById("btn-lang-login").classList.contains("hidden")`, "the language button");
+  check(await ken.eval(`document.querySelector("#btn-lang-login .lang-current").textContent`) === "English", "it says English");
+  check(!(await ken.eval(`document.cookie.includes("hoodride_lang")`)), "nothing kept before a choice");
+  await ken.click("btn-lang-login");
+  await ken.waitFor(`!document.getElementById("lang-sheet").classList.contains("hidden")`, "the list");
+  const listed = await ken.eval(`[...document.querySelectorAll("#lang-list button")].map((b) => ({ name: b.textContent, lang: b.lang, current: b.getAttribute("aria-current") === "true" }))`);
+  const names = listed.map((x) => x.name);
+  check(listed.length >= 46, "every language switched on", listed.length);
+  check(["Español", "日本語", "العربية", "Deutsch", "Bahasa Indonesia"].every((n) => names.includes(n)), "each in its own words", names.slice(0, 12));
+  check(JSON.stringify(listed.filter((x) => x.current).map((x) => x.lang)) === JSON.stringify(["en"]), "English marked as the one now", listed.filter((x) => x.current));
+  await ken.eval(`[...document.querySelectorAll("#lang-list button")].find((b) => b.lang === "es").click(), true`);
+  // (the app fills the button once it runs — after the language loads:
+  // checked the moment between, the label was still empty)
+  await ken.waitFor(`document.documentElement.lang === "es" && typeof HoodI18n !== "undefined" && HoodI18n.lang() === "es" && document.querySelector("#btn-lang-login .lang-current").textContent !== ""`, "back in Spanish", 15000);
+  check(await ken.eval(`document.querySelector("#btn-lang-login .lang-current").textContent`) === "Español", "the button says Español", await ken.eval(`({ text: document.querySelector("#btn-lang-login").textContent, html: document.querySelector("#btn-lang-login").innerHTML.slice(0, 200), now: HoodI18n.lang(), errors: ${JSON.stringify(ken.errors)} })`));
+  check(await ken.eval(`document.cookie.includes("hoodride_lang=es")`), "the choice kept");
+  await ken.click("btn-lang-login");
+  await ken.waitFor(`!document.getElementById("lang-sheet").classList.contains("hidden")`, "the list again");
+  await ken.eval(`[...document.querySelectorAll("#lang-list button")].find((b) => b.lang === "en").click(), true`);
+  await ken.waitFor(`document.documentElement.lang === "en" && HoodI18n.lang() === "en" && document.querySelector("#btn-lang-login .lang-current").textContent === "English"`, "back in English", 15000);
+  // and in the menu: the row with the language now
+  await ken.goto(`${BASE}/?demo=1`);
+  await ken.waitFor(`typeof DEMO !== "undefined" && DEMO && !!map`, "the demo");
+  await ken.eval(`(openSettings(), true)`);
+  await ken.waitFor(`settingsOpen() && !document.getElementById("btn-lang").classList.contains("hidden")`, "the menu's Language row");
+  check(await ken.eval(`document.getElementById("lang-note").textContent`) === "English", "it says English");
+  check(ken.errors.length === 0, "no page errors", ken.errors);
+  await ken.close();
 
   step("Lia opens Hood Ride signed out, in the made-up language");
   const lia = await browser.visitor("BT-Lia");

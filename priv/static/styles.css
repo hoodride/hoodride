@@ -789,3 +789,55 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
    choice per app, named (Google's guidance: name the app on the button) */
 .nav-choice { display: block; text-align: center; text-decoration: none; background: #2c2c2e; color: var(--text); }
 #nav-sheet p { text-align: center; }
+
+/* ===== the language (owner, 2026-11-05): 文A and its own name ===== */
+/* Google's Material "translate" symbol, unchanged (translate.svg,
+   Apache-2.0 — THIRD-PARTY.md), painted in the text's own color */
+.lang-icon {
+  display: inline-block;
+  width: 1.25em;
+  height: 1.25em;
+  vertical-align: -0.28em;
+  margin-inline-end: 0.35em;
+  background: currentColor;
+  -webkit-mask: url("translate.svg") center / contain no-repeat;
+  mask: url("translate.svg") center / contain no-repeat;
+}
+/* on the sign-in screen: the top corner, the page's end (right in English,
+   left in Arabic) */
+.lang-button {
+  position: absolute;
+  top: calc(14px + env(safe-area-inset-top));
+  inset-inline-end: 14px;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+#screen-login { position: relative; }
+/* the list: every language, each in its own words; the current one ✓ */
+.lang-list { display: flex; flex-direction: column; gap: 2px; max-height: 60vh; overflow-y: auto; }
+.lang-list button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+  text-align: start;
+  cursor: pointer;
+}
+.lang-list button[aria-current="true"] { background: rgba(255, 255, 255, 0.08); font-weight: 700; }
+.lang-list button[aria-current="true"]::after { content: "✓"; color: var(--accent); }

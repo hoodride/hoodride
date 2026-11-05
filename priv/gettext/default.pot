@@ -377,6 +377,10 @@ msgstr ""
 msgid "I'm here"
 msgstr ""
 
+#: priv/static/index.html
+msgid "Language"
+msgstr ""
+
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr ""

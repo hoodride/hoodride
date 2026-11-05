@@ -124,10 +124,23 @@ defmodule HoodrideWeb.PrivacyTest do
     # and its effective date." So the date is pinned here — change the page,
     # change this date with it (2026-10-29: Google only, one area wording,
     # Refresh from Google; 2026-10-30: which messages you've read;
-    # 2026-10-31: sign-out takes you off the map, "open Settings")
+    # 2026-10-31: sign-out takes you off the map, "open Settings";
+    # 2026-11-05: the language cookie, kept only if you choose)
     test "the effective date is the date of the last change", %{conn: conn} do
       html = conn |> get("/privacy") |> html_response(200)
-      assert html =~ "Effective October 31, 2026"
+      assert html =~ "Effective November 5, 2026"
+    end
+
+    # the language switch (owner, 2026-11-05): its cookie listed, and kept
+    # only on a choice
+    test "lists the language cookie: only if you choose", %{conn: conn} do
+      html = conn |> get("/privacy") |> html_response(200)
+      assert html =~ "If you choose a language, a cookie remembers your choice for a year"
+
+      assert html =~
+               "if you don't choose, the app follows your phone's language and stores nothing"
+
+      assert File.read!("priv/static/langswitch.js") =~ "max-age=31536000"
     end
 
     # what sign-out does on the server (AuthController.logout, owner

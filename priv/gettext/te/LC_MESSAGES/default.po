@@ -380,6 +380,10 @@ msgstr "నేను అంగీకరిస్తున్నాను"
 msgid "I'm here"
 msgstr "నేను ఇక్కడ ఉన్నాను"
 
+#: priv/static/index.html
+msgid "Language"
+msgstr "భాష"
+
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "డెమో నుండి నిష్క్రమించండి"

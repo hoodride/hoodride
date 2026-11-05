@@ -380,6 +380,10 @@ msgstr "동의합니다"
 msgid "I'm here"
 msgstr "도착했어요"
 
+#: priv/static/index.html
+msgid "Language"
+msgstr "언어"
+
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "데모 나가기"
