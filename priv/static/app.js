@@ -3398,7 +3398,13 @@ function endRide() {
       state.ride = null;
       transientBanner(t("Request cancelled"));
       refreshControls();
-    } else if (rideChannel) {
+    } else {
+      // right after a reload the ride is known before its channel is set up
+      // (that waits for the socket): join it now — the push waits for the
+      // join. It was skipped there, silently: the tap did nothing and the
+      // ride went on (a journey's flaky "Rob's ride ended", 2026-11-05)
+      if (!rideChannel) joinRideChannel();
+      if (!rideChannel) return transientBanner(CANT_REACH());
       transientBanner(t("Ride ended"));
       rideChannel.push("end_ride", {});
       // cleanup happens on the "ended" broadcast (both sides)

@@ -84,6 +84,12 @@ await journey("signout: off the map at once; refused in a ride or a waiting requ
   await rob.open();
   await rob.waitFor(`state.ride && state.ride.status === "connected"`, "Rob: the ride, from the server");
   check(await eve.eval(`!!state.ride && state.ride.status === "connected"`), "Eve still in the ride");
+  // the moment after a reload: the ride known, the connection up, the
+  // ride's own channel not set up yet — a tap on End ride then did nothing
+  // at all (this journey failed now and then on it, 2026-11-05). Made
+  // certain here: the channel left and gone, then the tap
+  await rob.waitFor(`liveNow()`, "Rob: connected");
+  await rob.eval(`(rideChannel && rideChannel.leave(), rideChannel = null, true)`);
   await rob.click("btn-endride");
   await rob.waitFor(`!state.ride`, "Rob's ride ended");
   await eve.waitFor(`!state.ride`, "Eve's ride ended");
