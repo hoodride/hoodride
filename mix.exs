@@ -81,6 +81,8 @@ defmodule Hoodride.MixProject do
         "compile --warnings-as-errors",
         "deps.unlock --unused",
         "format",
+        # every message in the translators' list (priv/gettext/default.pot)
+        "hoodride.i18n.extract --check",
         # security scan: fails on any finding not reviewed in place (a
         # `# sobelow_skip [...]` above the function — survives line shifts)
         "sobelow --config",
