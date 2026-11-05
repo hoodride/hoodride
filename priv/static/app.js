@@ -1577,6 +1577,7 @@ async function softReload() {
 
   const before = HoodRehydrate.summarize(state);
   const openChatPeerId = !$("chat").classList.contains("hidden") && state.chatPeer ? state.chatPeer.id : null;
+  const openCardPeerId = !$("peer-card").classList.contains("hidden") && state.cardPeer ? state.cardPeer.id : null;
   resetMirror();
   hydrate(st);
 
@@ -1602,6 +1603,11 @@ async function softReload() {
   syncGeoSubscriptions();
   refreshControls();
   refreshWorldMarkers();
+  // the card that was open comes back too, if they're still on the map
+  // (this runs right after start-up connects: it closed silently, so a tap
+  // in the first seconds lost its card — 2026-11-04)
+  const cardBack = openCardPeerId && realPeersById.get(openCardPeerId);
+  if (cardBack && realEntries.has(openCardPeerId)) openPeerCard(cardBack);
 }
 
 // everything hydrate rebuilds, back to a fresh page's state (the map, the

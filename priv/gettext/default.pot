@@ -67,7 +67,7 @@ msgid "Couldn't reach Hood Ride — try again"
 msgstr ""
 
 #: priv/static/googlerefresh.js
-msgid "Couldn't refresh automatically — open Settings, tap Change, then Refresh from Google"
+msgid "Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"
 msgstr ""
 
 #: priv/static/googlerefresh.js

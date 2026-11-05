@@ -50,6 +50,19 @@ await journey("signout: off the map at once; refused in a ride or a waiting requ
   const rob = await browser.person("BT-Rob");
   const [eveId, robId] = [await eve.id(), await rob.id()];
   await sees(rob, eveId, "(her car)");
+  // her card stays open through the app's own reload (it runs right after
+  // start-up connects, and after every reconnect): it closed silently, so a
+  // tap in the first seconds lost the card — this journey failed now and
+  // then on a busy machine, the reload landing just after the tap (2026-11-04)
+  await rob.eval(`openMarkerCard(realPeersById.get(${eveId}), "driver"), true`);
+  await rob.waitFor(`!document.getElementById("peer-card").classList.contains("hidden") && state.cardPeer && state.cardPeer.id === ${eveId}`, "Rob: Eve's card open");
+  await rob.eval(`softReload().then(() => true)`);
+  check(
+    await rob.eval(`!document.getElementById("peer-card").classList.contains("hidden") && state.cardPeer === realPeersById.get(${eveId})`),
+    "Rob: after the app's reload, Eve's card is still open",
+    await rob.eval(`({ open: !document.getElementById("peer-card").classList.contains("hidden"), card: state.cardPeer && state.cardPeer.id })`)
+  );
+  await rob.eval(`closePeerCard(), true`);
   await openChatWith(rob, eveId);
   await rob.waitFor(`document.getElementById("btn-ride-action").textContent === "Request ride"`, "Request ride button");
   await rob.click("btn-ride-action");

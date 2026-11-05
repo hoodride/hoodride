@@ -67,7 +67,9 @@
   // person, or null. Only these; anything else in the address is ignored.
   // (Each a function: translated when shown, in the language then)
   const OUTCOMES = {
-    failed: () => t("Couldn't refresh automatically — open Settings, tap Change, then Refresh from Google"),
+    // (the steps as the screen shows them — no screen says "Settings"; owner,
+    // 2026-11-04)
+    failed: () => t("Couldn't refresh automatically — tap your profile picture at the top left, then Change, then Refresh from Google"),
     ride: () => t("You can refresh your name and photo after your ride"),
     limit: () => t("You've refreshed a lot — try again in a few minutes"),
     // the address is blocked for sign-ins (made-up codes from someone on

@@ -49,7 +49,9 @@ test("refresh only when due, a Google account, back from away, and not busy", ()
 });
 
 test("what the server says back: a short message, or nothing", () => {
-  assert.match(R.outcome("?refresh=failed"), /tap Change, then Refresh from Google/);
+  // the steps as the screen shows them — no screen says "Settings" (2026-11-04)
+  assert.match(R.outcome("?refresh=failed"), /tap your profile picture at the top left, then Change, then Refresh from Google/);
+  assert.doesNotMatch(R.outcome("?refresh=failed"), /Settings/);
   assert.match(R.outcome("?refresh=ride"), /after your ride/);
   assert.match(R.outcome("?refresh=limit"), /try again in a few minutes/);
   assert.match(R.outcome("?refresh=blocked"), /Couldn't refresh right now/);
