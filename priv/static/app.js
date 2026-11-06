@@ -2897,7 +2897,12 @@ function renderChat() {
     // page still says it)
     // $("chat-note").classList.toggle("hidden", state.mode !== "rider");
     $("chat-form").classList.remove("hidden");
-    chatFor(state.chatPeer).msgs.forEach((m) => appendBubble(m.text, m.mine));
+    // drawing: every bubble follows (none is "new below you")
+    chatStick.stuck = true;
+    chatFor(state.chatPeer).msgs.forEach((m) => {
+      if (m === chatLineMsg) box.appendChild(newMessagesLine());
+      appendBubble(m.text, m.mine);
+    });
   }
   // (re)drawn: the newest at the bottom, nothing waiting below
   chatScrollTo(box.scrollHeight);
@@ -2909,11 +2914,63 @@ function renderChat() {
 // scrolling sets it, the app's scrolls and resizes don't
 const chatStick = HoodChatScroll.createStick();
 
-// "↓ New message": shown when a message arrives while you've scrolled up
-// (HoodChatScroll); a tap takes you down, and reaching the bottom yourself
-// clears it
+// the "New messages" line: above the first message that was unread when
+// this chat was opened, if they didn't fit on screen — it stays put while
+// you read (as Slack and Discord), gone the next time the chat is opened
+let chatLineMsg = null;
+
+function newMessagesLine() {
+  const line = document.createElement("div");
+  line.className = "chat-line";
+  line.textContent = t("New messages");
+  return line;
+}
+
+function removeNewMessagesLine() {
+  chatLineMsg = null;
+  const line = $("chat-messages").querySelector(".chat-line");
+  if (!line) return;
+  line.remove();
+  // the list is a line shorter: the browser moves it up to fit, and that
+  // move would read as YOU scrolling up (↓ at the bottom — the gate caught
+  // it on a busy machine, owner 2026-11-05). At the bottom: put back there
+  // by the app itself, so the move is the app's own
+  if (chatStick.stuck) chatScrollTo($("chat-messages").scrollHeight);
+}
+
+// opened with unread messages: more than a screen of them → at the line,
+// near the top, reading down from there; else (or none) at the newest,
+// as renderChat left it (HoodChatScroll.openAt)
+function openAtLine() {
+  const box = $("chat-messages");
+  const line = box.querySelector(".chat-line");
+  const lineTop = line ? line.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop : null;
+  const at = HoodChatScroll.openAt({ lineTop, scrollHeight: box.scrollHeight, clientHeight: box.clientHeight });
+  if (at === "bottom") {
+    removeNewMessagesLine();
+    return;
+  }
+  chatScrollTo(at);
+  chatStick.stuck = false;
+  updateChatJump();
+}
+
+// ↓: shown whenever you're scrolled up; its badge counts the messages that
+// came in below you (HoodChatScroll.jump). A tap takes you to the newest;
+// reaching the bottom yourself clears it
+let chatBelow = 0;
+
+function updateChatJump() {
+  const j = HoodChatScroll.jump({ stuck: chatStick.stuck, below: chatBelow });
+  $("chat-jump").classList.toggle("hidden", !j.show);
+  $("chat-jump-count").textContent = j.badge || "";
+  $("chat-jump-count").classList.toggle("hidden", !j.badge);
+}
+
 function hideChatJump() {
+  chatBelow = 0;
   $("chat-jump").classList.add("hidden");
+  $("chat-jump-count").classList.add("hidden");
 }
 
 $("chat-jump").addEventListener("click", () => {
@@ -2927,6 +2984,7 @@ $("chat-jump").addEventListener("click", () => {
 $("chat-messages").addEventListener("scroll", () => {
   chatStick.onScroll($("chat-messages"));
   if (chatStick.stuck) hideChatJump();
+  else updateChatJump();
 });
 
 // the list or the visible area changed size (the keyboard opening or
@@ -2988,13 +3046,18 @@ function openChat(peer) {
   chatDraftFor = peer.id;
   state.chatPeer = peer;
   state.chatView = "msgs";
-  chatFor(peer).unread = 0;
+  const c = chatFor(peer);
+  // the line goes above the first of what's unread now (opening reads all)
+  const first = HoodChatScroll.firstUnread(c.msgs, c.unread);
+  chatLineMsg = first >= 0 ? c.msgs[first] : null;
+  c.unread = 0;
   markSeen(peer);
   // the panel shown FIRST, then drawn: a hidden box can't scroll, so drawn
   // while hidden the chat appeared at its oldest message and jumped to the
   // newest a frame later (owner, 2026-11-05 — measured: the top painted)
   $("chat").classList.remove("hidden");
   renderChat();
+  openAtLine();
   refreshControls();
 }
 
@@ -3023,7 +3086,11 @@ function appendBubble(text, mine) {
   if (HoodChatScroll.onNew({ mine, wasAtBottom }) === "follow") {
     chatScrollTo($("chat-messages").scrollHeight);
     chatStick.stuck = true;
-  } else $("chat-jump").classList.remove("hidden");
+  } else {
+    // (only theirs ever waits: yours always follows)
+    chatBelow++;
+    updateChatJump();
+  }
   return div;
 }
 
@@ -3187,6 +3254,8 @@ $("chat-form").addEventListener("submit", (e) => {
   const sentMsg = { text, mine: true, at: Date.now() };
   chatFor(peer).msgs.push(sentMsg);
   chatFor(peer).lastAt = sentMsg.at;
+  // you replied: caught up — the "New messages" line goes (as Discord)
+  removeNewMessagesLine();
   const bubble = appendBubble(text, true);
   input.value = "";
   updateChatCount();

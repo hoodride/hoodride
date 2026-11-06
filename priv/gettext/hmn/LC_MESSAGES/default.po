@@ -460,6 +460,10 @@ msgstr "Xav caij tsheb"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Neeg zej zog pab neeg zej zog caij tsheb. Pom tsheb thiab cov neeg xav caij tsheb nyob ze, sib xa lus, thiab caij tsheb ua ke."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "Cov lus tshiab"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "Nrhiav tsis tau hom lus"
@@ -1066,10 +1070,6 @@ msgstr "{steps} › Use precise location"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. Hood Ride yuav rov thauj thaum koj rov los."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ Lus tshiab"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

@@ -460,6 +460,10 @@ msgstr "Tarvitsen kyydin"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Naapurit antavat kyytejä naapureille. Näe lähellä olevat autot ja kyytiä tarvitsevat ihmiset, lähetä viestejä ja matkustakaa yhdessä."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "Uudet viestit"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "Kieliä ei löytynyt"
@@ -1073,10 +1077,6 @@ msgstr "{steps} › Käytä tarkkaa sijaintia"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. Hood Ride latautuu uudelleen, kun palaat."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ Uusi viesti"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

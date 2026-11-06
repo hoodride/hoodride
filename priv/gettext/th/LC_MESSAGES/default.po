@@ -460,6 +460,10 @@ msgstr "ต้องการรถ"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "เพื่อนบ้านไปส่งเพื่อนบ้าน ดูรถและคนที่ต้องการรถในบริเวณใกล้เคียง ส่งข้อความหากัน แล้วเดินทางไปด้วยกัน"
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "ข้อความใหม่"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "ไม่พบภาษา"
@@ -1066,10 +1070,6 @@ msgstr "{steps} › ใช้ตำแหน่งที่แน่นอน"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps} Hood Ride จะโหลดซ้ำเมื่อคุณกลับมา"
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ ข้อความใหม่"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

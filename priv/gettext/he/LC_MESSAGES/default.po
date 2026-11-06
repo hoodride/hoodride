@@ -460,6 +460,10 @@ msgstr "דרושה נסיעה"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "שכנים מסיעים שכנים. רואים מכוניות ואנשים בסביבה שצריכים נסיעה, שולחים הודעות ונוסעים יחד."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "הודעות חדשות"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "לא נמצאו שפות"
@@ -1080,10 +1084,6 @@ msgstr "{steps} › שימוש במיקום מדויק"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. Hood Ride ייטען מחדש כשחוזרים."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ הודעה חדשה"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

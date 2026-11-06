@@ -460,6 +460,10 @@ msgstr "乗せてほしい"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "ご近所どうしで送り合う相乗りアプリ。近くの車や乗せてほしい人を地図で見て、メッセージを送り合い、一緒に移動しましょう。"
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "新しいメッセージ"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "言語が見つかりません"
@@ -1066,10 +1070,6 @@ msgstr "{steps} › 正確な現在地情報を使用"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}。戻ってくると Hood Ride が再読み込みされます。"
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ 新しいメッセージ"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

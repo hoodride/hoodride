@@ -161,6 +161,77 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   check(direct.fromBottom <= 2 && direct.lastInView, "opened straight from a scrolled-up chat: at the newest message", direct);
   await closeChatPanel(rita);
 
+  // more than a screen unread (owner, 2026-11-05 — as Telegram, Slack,
+  // Discord): the chat opens at the first of them, a "New messages" line
+  // just above; it stays put while you're there, and goes when you reply.
+  // ↓ (the bottom corner) whenever you're scrolled up, counting what comes
+  // in below you; a tap: the newest. A few unread: the newest, no line.
+  // (Fay's messages arrive as the socket hands them over: receiveMsg)
+  step("Fay sends 30 while Rita's away: they open at a 'New messages' line; ↓ down; ↓ 3 when more come; a reply ends the line");
+  const view = () => rita.eval(`(() => {
+    const b = document.getElementById("chat-messages"), br = b.getBoundingClientRect();
+    const line = b.querySelector(".chat-line");
+    const next = line && line.nextElementSibling;
+    const j = document.getElementById("chat-jump"), jr = j.getBoundingClientRect();
+    const badge = document.getElementById("chat-jump-count");
+    return {
+      line: line ? { text: line.textContent, fromTop: Math.round(line.getBoundingClientRect().top - br.top), lines: b.querySelectorAll(".chat-line").length } : null,
+      after: next ? next.textContent : null,
+      fromBottom: Math.round(b.scrollHeight - b.scrollTop - b.clientHeight),
+      jump: !j.classList.contains("hidden"),
+      badge: badge.classList.contains("hidden") ? null : badge.textContent,
+      corner: jr.right <= br.right && br.right - jr.right < 40 && jr.left > br.left + br.width / 2,
+    };
+  })()`);
+  const fayWrites = (prefix, n) => rita.eval(`(() => { const p = realPeersById.get(${fayId}); for (let i = 1; i <= ${n}; i++) receiveMsg(p, "${prefix} " + i); return true; })()`);
+  await fayWrites("new", 30);
+  check((await unreadFrom(rita, fayId)) === 30, "30 unread from Fay", await unreadFrom(rita, fayId));
+  await openChatWith(rita, fayId);
+  await settled();
+  const atLine = await view();
+  check(!!atLine.line && atLine.line.lines === 1 && atLine.line.text === "New messages" && atLine.after === "new 1", "a 'New messages' line, just above the first new one", atLine);
+  check(atLine.line.fromTop >= 0 && atLine.line.fromTop < 40 && atLine.fromBottom > 100, "opened at the line, near the top — not the newest", atLine);
+  check(atLine.jump && atLine.badge === null && atLine.corner, "↓ in the bottom corner, no count: nothing came in since", atLine);
+  check((await unreadFrom(rita, fayId)) === 0, "opening read them all");
+
+  await rita.click("chat-jump");
+  const down = await view();
+  check(down.fromBottom <= 2 && !down.jump, "↓ tapped: at the newest, the button gone", down);
+  check(!!down.line && down.line.lines === 1, "the line stays put while she's here", down);
+
+  await scrollUp();
+  const upAgain = await view();
+  check(upAgain.jump && upAgain.badge === null, "scrolled up: ↓, no count", upAgain);
+  await fayWrites("more", 3);
+  const three = await view();
+  check(three.jump && three.badge === "3" && three.fromBottom > 100, "3 came in below: ↓ 3, and Rita stays where she's reading", three);
+  await rita.click("chat-jump");
+  const down3 = await view();
+  check(down3.fromBottom <= 2 && !down3.jump && down3.badge === null, "↓ 3 tapped: at the newest; the button and its count gone", down3);
+
+  await typeText(rita, "thanks Fay");
+  await send(rita);
+  const replied = await view();
+  check(replied.line === null, "Rita replies: caught up, the line goes", replied);
+
+  await closeChatPanel(rita);
+  await fayWrites("few", 2);
+  await openChatWith(rita, fayId);
+  await settled();
+  const few = await view();
+  check(few.line === null && few.fromBottom <= 2 && !few.jump, "2 unread: they fit — the newest, no line, no ↓", few);
+  // …and from the list, the panel already open (nothing resizing to hide
+  // it): taking the line back out shortened the chat, the browser moved the
+  // list up to fit, and that move read as Rita scrolling up — ↓ at the
+  // bottom (the gate caught it, owner 2026-11-05: only on a busy machine)
+  await rita.click("chat-back");
+  await fayWrites("list", 2);
+  await openChatWith(rita, fayId);
+  await settled();
+  const fromList2 = await view();
+  check(fromList2.line === null && fromList2.fromBottom <= 2 && !fromList2.jump, "from the list, 2 unread: the newest, no line, no ↓", fromList2);
+  await closeChatPanel(rita);
+
   // two other chats add up; opening one takes off ALL of its messages at
   // once — a whole chat, never one message at a time (owner, 2026-11-05)
   step("in Dan's chat: Fay writes 3, Gus 2 — ‹ 5; Fay's opened → ‹ 2; Gus's → plain ‹");

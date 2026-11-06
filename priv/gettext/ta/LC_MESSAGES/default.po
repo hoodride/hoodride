@@ -460,6 +460,10 @@ msgstr "பயணம் வேண்டும்"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "அக்கம்பக்கத்தினருக்கு அக்கம்பக்கத்தினரே பயணம் தருகிறார்கள். அருகிலுள்ள கார்களையும் பயணம் தேவைப்படுபவர்களையும் பார்த்து, ஒருவருக்கொருவர் மெசேஜ் அனுப்பி, சேர்ந்து பயணியுங்கள்."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "புதிய மெசேஜ்கள்"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "மொழிகள் எதுவும் கிடைக்கவில்லை"
@@ -1073,10 +1077,6 @@ msgstr "{steps} › துல்லியமான இருப்பிடத�
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. நீங்கள் திரும்பி வரும்போது Hood Ride மீண்டும் ஏற்றப்படும்."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ புதிய மெசேஜ்"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

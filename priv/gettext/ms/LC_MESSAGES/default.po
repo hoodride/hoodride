@@ -460,6 +460,10 @@ msgstr "Perlukan tumpangan"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Jiran menumpangkan jiran. Lihat kereta dan orang berdekatan yang perlukan tumpangan, hantar mesej antara satu sama lain dan bertolak bersama-sama."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "Mesej baharu"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "Tiada bahasa ditemui"
@@ -1066,10 +1070,6 @@ msgstr "{steps} › Gunakan lokasi tepat"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. Hood Ride dimuat semula apabila anda kembali."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ Mesej baharu"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

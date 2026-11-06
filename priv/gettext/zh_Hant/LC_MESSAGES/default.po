@@ -460,6 +460,10 @@ msgstr "我要搭車"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "鄰居載鄰居。查看附近的車輛和需要搭車的人，互傳訊息，一起出發。"
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "新訊息"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "找不到語言"
@@ -1066,10 +1070,6 @@ msgstr "{steps} › 使用精確位置"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}。返回後 Hood Ride 會重新載入。"
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ 新訊息"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

@@ -460,6 +460,10 @@ msgstr "Χρειάζομαι διαδρομή"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Γείτονες μεταφέρουν γείτονες. Δες αυτοκίνητα και ανθρώπους κοντά σου που χρειάζονται διαδρομή, στείλτε μηνύματα και πηγαίνετε μαζί."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "Νέα μηνύματα"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "Δεν βρέθηκαν γλώσσες"
@@ -1073,10 +1077,6 @@ msgstr "{steps} › Χρήση ακριβούς τοποθεσίας"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. Το Hood Ride θα φορτώσει ξανά όταν επιστρέψεις."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ Νέο μήνυμα"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

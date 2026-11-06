@@ -460,6 +460,10 @@ msgstr "Araç lazım"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Komşular komşuları götürüyor. Yakındaki araçları ve araç arayan kişileri gör, mesajlaşın ve birlikte yola çıkın."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "Yeni mesajlar"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "Dil bulunamadı"
@@ -1073,10 +1077,6 @@ msgstr "{steps} › Tam konumu kullan"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. Geri döndüğünde Hood Ride yeniden yüklenir."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ Yeni mesaj"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

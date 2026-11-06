@@ -460,6 +460,10 @@ msgstr "Nahitaji usafiri"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Majirani wakiwapa majirani usafiri. Ona magari na watu wanaohitaji usafiri karibu nawe, tumianeni ujumbe, na msafiri pamoja."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "Ujumbe mpya"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "Hakuna lugha iliyopatikana"
@@ -1073,10 +1077,6 @@ msgstr "{steps} › Tumia data sahihi ya mahali"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. Hood Ride itapakia upya utakaporudi."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ Ujumbe mpya"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

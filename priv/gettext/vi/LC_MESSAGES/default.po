@@ -460,6 +460,10 @@ msgstr "Cần đi xe"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Hàng xóm chở hàng xóm. Xem xe và những người cần đi xe ở gần, nhắn tin cho nhau và cùng đi."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "Tin nhắn mới"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "Không tìm thấy ngôn ngữ nào"
@@ -1066,10 +1070,6 @@ msgstr "{steps} › Sử dụng vị trí chính xác"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. Hood Ride sẽ tải lại khi bạn quay lại."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ Tin nhắn mới"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

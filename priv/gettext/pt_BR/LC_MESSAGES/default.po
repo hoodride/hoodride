@@ -460,6 +460,10 @@ msgstr "Preciso de carona"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Vizinhos dando carona para vizinhos. Veja carros e pessoas por perto que precisam de carona, troquem mensagens e viajem juntos."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "Novas mensagens"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "Nenhum idioma encontrado"
@@ -1080,10 +1084,6 @@ msgstr "{steps} › Usar local exato"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. O Hood Ride recarrega quando você voltar."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ Nova mensagem"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

@@ -460,6 +460,10 @@ msgstr "ጉዞ እፈልጋለሁ"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "ጎረቤቶች ለጎረቤቶች ጉዞ ይሰጣሉ። በአቅራቢያዎ ያሉ መኪኖችን እና ጉዞ የሚፈልጉ ሰዎችን ይመልከቱ፣ መልእክት ይለዋወጡ፣ አብረው ይጓዙ።"
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "አዲስ መልእክቶች"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "ምንም ቋንቋ አልተገኘም"
@@ -1073,10 +1077,6 @@ msgstr "{steps} › Use precise location"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}። ሲመለሱ Hood Ride እንደገና ይጫናል።"
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ አዲስ መልእክት"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

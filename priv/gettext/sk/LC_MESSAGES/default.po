@@ -460,6 +460,10 @@ msgstr "Potrebujem odvoz"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Susedia vozia susedov. Pozri si autá a ľudí v okolí, ktorí potrebujú odvoz, napíšte si a jazdite spolu."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "Nové správy"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "Nenašli sa žiadne jazyky"
@@ -1080,10 +1084,6 @@ msgstr "{steps} › Používať presnú polohu"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. Po návrate sa Hood Ride znova načíta."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ Nová správa"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

@@ -460,6 +460,10 @@ msgstr "Am nevoie de o cursă"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Vecini care își duc vecinii. Vezi mașinile și oamenii din apropiere care au nevoie de o cursă, scrieți-vă și mergeți împreună."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "Mesaje noi"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "Nu s-au găsit limbi"
@@ -1080,10 +1084,6 @@ msgstr "{steps} › Folosește locația exactă"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. Hood Ride se reîncarcă atunci când revii."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ Mesaj nou"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

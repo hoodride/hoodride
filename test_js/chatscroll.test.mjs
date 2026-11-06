@@ -1,5 +1,5 @@
 // The chat follows new messages only if you're at the bottom; scrolled up
-// to reread, it stays put and offers "↓ New message" (owner, 2026-10-29;
+// to reread, it stays put and offers the ↓ button (owner, 2026-10-29;
 // as iMessage, WhatsApp, Slack). Your own message always goes to the
 // bottom — you just sent it.
 // Run: node --test "test_js/*.test.mjs"   (part of `mix precommit`)
@@ -30,7 +30,7 @@ test("a new message: follow if you were at the bottom, else hold and offer the b
 // ── "stuck to the bottom" is REMEMBERED, not measured when a message comes
 // (owner's iPhone, 2026-10-29: tapping the text box opened the keyboard, the
 // list moved — browser scroll anchoring and/or the area shrinking — and the
-// next reply showed "↓ New message" though they never scrolled up). Rules as
+// next reply showed the ↓ button though they never scrolled up). Rules as
 // use-stick-to-bottom: only an UPWARD scroll that isn't the app's own and
 // isn't caused by a resize unsticks; back near the bottom re-sticks; a resize
 // (keyboard, rotation) keeps a stuck reader at the bottom.
@@ -80,4 +80,42 @@ test("the list shrinks under you (keyboard): still stuck, so the next message fo
   assert.equal(S.atBottom(el(600, 1000, 250)), false);
   // …but nobody scrolled: the message follows
   assert.equal(S.onNew({ mine: false, wasAtBottom: s.stuck }), "follow");
+});
+
+// ── opening a chat with unread messages (owner, 2026-11-05: Telegram, Slack,
+// Discord): more than a screen of them → open at the first, a "New
+// messages" line above it; a few → at the newest, as before
+const them = (n) => Array.from({ length: n }, () => ({ mine: false }));
+const me = (n) => Array.from({ length: n }, () => ({ mine: true }));
+
+test("the first unread: counted back among THEIR messages (yours are never unread)", () => {
+  assert.equal(S.firstUnread([...me(2), ...them(5)], 3), 4, "the 3rd of theirs from the end");
+  assert.equal(S.firstUnread([...them(2), ...me(1), ...them(2)], 3), 1, "your reply in between is skipped over");
+  assert.equal(S.firstUnread(them(4), 4), 0, "all of them unread: the very first");
+  assert.equal(S.firstUnread(them(4), 0), -1, "none unread");
+  assert.equal(S.firstUnread(them(2), 5), -1, "more counted than there are (a cleared chat): none to point at");
+  assert.equal(S.firstUnread([], 1), -1);
+});
+
+test("where it opens: the line near the top when the unread ones don't fit; else the newest", () => {
+  // the line 800px down a 2000px chat, a 600px box: 1200 to read > 600 → there
+  assert.equal(S.openAt({ lineTop: 800, scrollHeight: 2000, clientHeight: 600 }), 800 - S.LINE_GAP);
+  // the line 1700 down: 300 to read fits in 600 → the newest, as always
+  assert.equal(S.openAt({ lineTop: 1700, scrollHeight: 2000, clientHeight: 600 }), "bottom");
+  // exactly a screen: fits
+  assert.equal(S.openAt({ lineTop: 1400, scrollHeight: 2000, clientHeight: 600 }), "bottom");
+  // nothing unread
+  assert.equal(S.openAt({ lineTop: null, scrollHeight: 2000, clientHeight: 600 }), "bottom");
+  // the line at the very top: never above 0
+  assert.equal(S.openAt({ lineTop: 2, scrollHeight: 2000, clientHeight: 600 }), 0);
+});
+
+// ── the ↓ button (owner, 2026-11-05): shown whenever you're scrolled up; a
+// badge counts the messages that came in below you (Telegram, WhatsApp)
+test("the ↓ button: shown while scrolled up; the badge counts what arrived below", () => {
+  assert.deepEqual(S.jump({ stuck: true, below: 0 }), { show: false, badge: null });
+  assert.deepEqual(S.jump({ stuck: false, below: 0 }), { show: true, badge: null }, "scrolled up: ↓ alone");
+  assert.deepEqual(S.jump({ stuck: false, below: 4 }), { show: true, badge: "4" });
+  assert.deepEqual(S.jump({ stuck: false, below: 120 }), { show: true, badge: "99+" }, "big counts shortened, as the ‹ count");
+  assert.deepEqual(S.jump({ stuck: true, below: 4 }), { show: false, badge: null }, "back at the bottom: nothing waiting");
 });

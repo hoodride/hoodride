@@ -460,6 +460,10 @@ msgstr "Brug for et lift"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Naboer, der giver naboer et lift. Se biler og folk i nærheden, der har brug for et lift, skriv til hinanden, og kør sammen."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "Nye beskeder"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "Ingen sprog fundet"
@@ -1073,10 +1077,6 @@ msgstr "{steps} › Brug præcis lokation"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. Hood Ride genindlæses, når du kommer tilbage."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ Ny besked"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

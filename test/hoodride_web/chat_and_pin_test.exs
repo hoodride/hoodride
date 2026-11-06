@@ -1,7 +1,7 @@
 defmodule HoodrideWeb.ChatAndPinTest do
   @moduledoc """
   (owner, 2026-10-29) The chat follows new messages only if you're at the
-  bottom — scrolled up, it holds and shows "↓ New message" (rules:
+  bottom — scrolled up, it holds and shows ↓ with a count (rules:
   chatscroll.js, test_js/chatscroll.test.mjs). Meet here / Move pin zoom
   the map in to street level (PIN_ZOOM 16: side streets named, a fingertip
   about one corner), centred on you or on the pin — never zooming out.
@@ -28,9 +28,11 @@ defmodule HoodrideWeb.ChatAndPinTest do
       assert "chatscroll.js" in HoodrideWeb.static_paths()
     end
 
-    test "the button is in the chat, hidden until needed, and says what it does" do
+    # ↓ with a badge counting what came in below (owner, 2026-11-05: as
+    # Telegram, WhatsApp — a number reads the same in every language)
+    test "the button is in the chat, hidden until needed: ↓ and its count badge" do
       assert @html =~
-               ~r/<button id="chat-jump"[^>]*class="chat-jump hidden"[^>]*>↓ New message<\/button>/
+               ~r/<button id="chat-jump"[^>]*class="chat-jump hidden"[^>]*>↓<span id="chat-jump-count" class="[^"]*chat-jump-count hidden"><\/span><\/button>/
     end
 
     # "at the bottom" is REMEMBERED (chatStick), not measured when a message

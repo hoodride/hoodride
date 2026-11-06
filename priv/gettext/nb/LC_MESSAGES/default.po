@@ -460,6 +460,10 @@ msgstr "Trenger skyss"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Naboer som gir naboer skyss. Se biler og folk i nærheten som trenger skyss, send meldinger til hverandre og kjør sammen."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "Nye meldinger"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "Fant ingen språk"
@@ -1073,10 +1077,6 @@ msgstr "{steps} › Bruk nøyaktig posisjon"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. Hood Ride lastes inn på nytt når du kommer tilbake."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ Ny melding"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

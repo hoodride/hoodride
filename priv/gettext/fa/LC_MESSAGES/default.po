@@ -460,6 +460,10 @@ msgstr "سفر می‌خواهم"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "همسایه‌ها همسایه‌ها را می‌رسانند. ماشین‌ها و افرادی را که نزدیک شما سفر می‌خواهند ببینید، به هم پیام دهید و با هم سفر کنید."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "پیام‌های جدید"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "زبانی پیدا نشد"
@@ -1073,10 +1077,6 @@ msgstr "{steps} › Use precise location"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. وقتی برگردید، Hood Ride دوباره بارگذاری می‌شود."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ پیام جدید"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

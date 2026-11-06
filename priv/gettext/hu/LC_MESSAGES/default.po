@@ -460,6 +460,10 @@ msgstr "Fuvar kell"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Szomszéd viszi a szomszédot. Nézd meg a közeli autókat és a fuvart kereső embereket, írjatok egymásnak, és utazzatok együtt."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "Új üzenetek"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "Nincs találat"
@@ -1073,10 +1077,6 @@ msgstr "{steps} › Pontos helyadatok használata"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. A Hood Ride újratöltődik, amikor visszajössz."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ Új üzenet"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

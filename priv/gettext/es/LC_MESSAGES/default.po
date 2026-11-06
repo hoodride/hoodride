@@ -460,6 +460,10 @@ msgstr "Necesito un viaje"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Vecinos que llevan a vecinos. Mira los autos y las personas cerca que necesitan un viaje, envíense mensajes y viajen juntos."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "Mensajes nuevos"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "No se encontraron idiomas"
@@ -1080,10 +1084,6 @@ msgstr "{steps} › Usar la ubicación precisa"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. Hood Ride se recarga cuando vuelvas."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ Mensaje nuevo"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

@@ -269,8 +269,9 @@
         <button id="chat-close" class="card-close" aria-label="Close" data-t-attr="aria-label">✕</button>
       </div>
       <div id="chat-messages" class="chat-messages"></div>
-      <!-- scrolled up when a message came: it waits below (HoodChatScroll) -->
-      <button id="chat-jump" type="button" class="chat-jump hidden" data-t>↓ New message</button>
+      <!-- ↓ while you're scrolled up; the badge: messages that came in below
+           you (HoodChatScroll.jump — owner, 2026-11-05, as Telegram, WhatsApp) -->
+      <button id="chat-jump" type="button" class="chat-jump hidden">↓<span id="chat-jump-count" class="unread-dot chat-jump-count hidden"></span></button>
       <!-- off (owner, 2026-10-29): the privacy page's "who sees what" table
            still says it. To bring it back, uncomment this and the two
            chat-note lines in app.js (closeChat, renderChat):

@@ -460,6 +460,10 @@ msgstr "أحتاج إلى توصيلة"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "جيران يوصلون جيرانهم. شاهد السيارات والأشخاص القريبين الذين يحتاجون إلى توصيلة، وتبادلوا الرسائل، وانطلقوا معًا."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "رسائل جديدة"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "لم يتم العثور على لغات"
@@ -1101,10 +1105,6 @@ msgstr "{steps} › استخدام الموقع الجغرافي الدقيق"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. ستتم إعادة تحميل Hood Ride عند عودتك."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ رسالة جديدة"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"

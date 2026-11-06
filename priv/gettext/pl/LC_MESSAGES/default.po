@@ -460,6 +460,10 @@ msgstr "Szukam przejazdu"
 msgid "Neighbors giving neighbors rides. See cars and people who need a ride nearby, message each other, and ride together."
 msgstr "Sąsiedzi podwożą sąsiadów. Zobacz samochody w pobliżu i osoby, które potrzebują przejazdu, napiszcie do siebie i jedźcie razem."
 
+#: priv/static/app.js
+msgid "New messages"
+msgstr "Nowe wiadomości"
+
 #: priv/static/index.html
 msgid "No languages found"
 msgstr "Nie znaleziono języków"
@@ -1080,10 +1084,6 @@ msgstr "{steps} › Używaj dokładnej lokalizacji"
 #: priv/static/sendfilter.js
 msgid "{steps}. Hood Ride reloads when you come back."
 msgstr "{steps}. Po powrocie Hood Ride załaduje się ponownie."
-
-#: priv/static/index.html
-msgid "↓ New message"
-msgstr "↓ Nowa wiadomość"
 
 #: priv/static/app.js
 msgid "⏳ Slow down a sec"
