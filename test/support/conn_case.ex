@@ -31,8 +31,13 @@ defmodule HoodrideWeb.ConnCase do
     end
   end
 
+  # `@moduletag db: false`: a test that never touches the database doesn't
+  # take its ONE connection (config/test.exs) — a slow one holding it made
+  # the tests queued behind it give up (owner, 2026-11-05: the sitemap's
+  # page walks, 20 s each, dropped nine). Touching it anyway fails at once:
+  # no connection is checked out for it.
   setup tags do
-    Hoodride.DataCase.setup_sandbox(tags)
+    if tags[:db] != false, do: Hoodride.DataCase.setup_sandbox(tags)
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end

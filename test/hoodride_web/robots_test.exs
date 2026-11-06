@@ -61,6 +61,7 @@ defmodule HoodrideWeb.RobotsTest do
     assert conn.status == 200
     assert [type] = get_resp_header(conn, "content-type")
     assert type =~ "text/plain"
-    assert conn.resp_body == @robots
+    # the rules exactly as written, then the server's sitemap line
+    assert String.starts_with?(conn.resp_body, String.trim_trailing(@robots) <> "\n")
   end
 end

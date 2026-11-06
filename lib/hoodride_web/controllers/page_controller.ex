@@ -93,6 +93,57 @@ defmodule HoodrideWeb.PageController do
     end
   end
 
+  @doc """
+  /sitemap.xml (owner, 2026-11-05): every page in every language switched
+  on — the home page, the privacy policy and the terms — so search engines
+  find them all (Google: a sitemap helps a new site with few links to it).
+  Made from the language list, so it never drifts from it. Full addresses,
+  each page's own canonical one (never /en: it forwards to /). No dates,
+  priority or change frequency: Google ignores the last two and trusts
+  dates only when always accurate. The pages name their languages already
+  (alternates): one way is enough, Google says.
+  """
+  # (only our own addresses: the language list and the site's address, from
+  # config — nothing a visitor sends — each escaped)
+  # sobelow_skip ["XSS.SendResp"]
+  def sitemap(conn, _params) do
+    conn
+    |> put_resp_content_type("application/xml")
+    |> send_resp(200, sitemap_xml(HoodrideWeb.Endpoint.url(), ["en" | I18n.addressed()]))
+  end
+
+  @doc """
+  /robots.txt: the rules as written (priv/static/robots.txt), then the
+  sitemap by its full address — Google's rule — made from the site's own
+  address, never written into the file (owner, 2026-11-05: nothing
+  hard-coded; a copy of the project names its own sitemap).
+  """
+  def robots(conn, _params) do
+    conn
+    |> put_resp_content_type("text/plain")
+    |> send_resp(200, robots_txt(static("robots.txt"), HoodrideWeb.Endpoint.url()))
+  end
+
+  @doc "The rules, then a blank line and the sitemap line for the site at `base`."
+  def robots_txt(rules, base),
+    do: String.trim_trailing(rules) <> "\n\nSitemap: #{base}/sitemap.xml\n"
+
+  @doc "The sitemap's addresses: each language's home page, privacy policy and terms."
+  def sitemap_paths(langs),
+    do: for(lang <- langs, rest <- ["", "/privacy", "/terms"], do: address(lang, rest))
+
+  @doc "The sitemap itself (sitemaps.org 0.9) for the site at `base`."
+  def sitemap_xml(base, langs) do
+    urls =
+      Enum.map_join(sitemap_paths(langs), fn path ->
+        "  <url><loc>#{Plug.HTML.html_escape(base <> path)}</loc></url>\n"
+      end)
+
+    ~s(<?xml version="1.0" encoding="UTF-8"?>\n) <>
+      ~s(<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n) <>
+      urls <> "</urlset>\n"
+  end
+
   @doc "The address of a page (`rest`: empty, `/privacy` or `/terms`) in a language."
   def address("en", ""), do: "/"
   def address("en", rest), do: rest

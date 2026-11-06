@@ -1,5 +1,7 @@
 # Hood Ride: crawl the pages; don't start sign-ins (/auth/).
 # The front page needs /api/state to show itself: never block /api/.
 # (Not privacy or security — the server guards those. test/hoodride_web/robots_test.exs)
+# The server adds the Sitemap line below, with the site's own full address
+# (PageController.robots): nothing to change here when you host your own.
 User-agent: *
 Disallow: /auth/

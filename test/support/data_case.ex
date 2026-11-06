@@ -36,8 +36,29 @@ defmodule Hoodride.DataCase do
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Hoodride.Repo, shared: not tags[:async])
+    pid =
+      Ecto.Adapters.SQL.Sandbox.start_owner!(Hoodride.Repo,
+        shared: not tags[:async],
+        ownership_timeout: ownership_timeout(tags)
+      )
+
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+  end
+
+  # How long a test may hold its database connection: as long as the test
+  # itself may run (owner, 2026-11-05: the languages journey, allowed 3
+  # minutes, lost its connection at Ecto's 2 — a warning, not a failure,
+  # and any later database step would have failed at random). Ecto: raise
+  # it for "a handful of long-running tests" only. Never under Ecto's own
+  # 2 minutes; a test without a longer limit keeps exactly that.
+  @ecto_default 120_000
+  @doc false
+  def ownership_timeout(tags) do
+    case tags[:timeout] do
+      :infinity -> :infinity
+      ms when is_integer(ms) and ms > @ecto_default -> ms
+      _ -> @ecto_default
+    end
   end
 
   @doc """

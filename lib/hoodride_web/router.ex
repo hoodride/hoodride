@@ -67,6 +67,10 @@ defmodule HoodrideWeb.Router do
     get "/sw.js", PageController, :service_worker
     get "/privacy", PageController, :privacy
     get "/terms", PageController, :terms
+    # every page's address, for search engines (robots.txt names it)
+    get "/sitemap.xml", PageController, :sitemap
+    # the crawl rules (priv/static/robots.txt) and the sitemap's full address
+    get "/robots.txt", PageController, :robots
     # each language's own addresses (owner, 2026-11-05): /ja, /ja/privacy,
     # /ja/terms — a language that isn't switched on: not found
     get "/:lang", PageController, :lang_index
