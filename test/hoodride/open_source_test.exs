@@ -68,6 +68,30 @@ defmodule Hoodride.OpenSourceTest do
     assert "hoodride.secrets" in Mix.Project.config()[:aliases][:precommit]
   end
 
+  # the libraries' known security holes (Hex's audit): before compiling —
+  # compiling a library runs its code (owner, 2026-11-05)
+  test "precommit audits the libraries first, before anything compiles" do
+    assert ["hex.audit" | _] = Mix.Project.config()[:aliases][:precommit]
+  end
+
+  # the gate runs in :test (preferred_envs) and audits only the libraries
+  # that setup has: a dev-only or prod-only one would never be checked
+  # (owner, 2026-11-05 — a planted dev-only library slipped past)
+  test "every library is in the test setup, so the gate's audit sees it" do
+    unseen =
+      for dep <- Mix.Project.config()[:deps],
+          opts =
+            if(is_tuple(dep) and is_list(elem(dep, tuple_size(dep) - 1)),
+              do: elem(dep, tuple_size(dep) - 1),
+              else: []
+            ),
+          only = opts[:only],
+          only != nil and :test not in List.wrap(only),
+          do: elem(dep, 0)
+
+    assert unseen == [], "not audited by the gate (add :test to only:): #{inspect(unseen)}"
+  end
+
   describe "the secret scan" do
     @describetag :tmp_dir
     # (where gitleaks isn't installed these pass without running: the scan

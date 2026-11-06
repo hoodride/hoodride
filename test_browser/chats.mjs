@@ -123,8 +123,21 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   await openChatWith(rita, fayId);
   const opened = await scroll();
   check(opened.scrolls && opened.fromBottom <= 2 && opened.lastText === "line 40" && opened.lastInView, "opened at the newest message", opened);
-  await rita.eval(`(document.getElementById("chat-messages").scrollTop = 0, document.getElementById("chat-messages").dispatchEvent(new Event("scroll")), true)`);
-  check((await scroll()).fromBottom > 100, "scrolled up to the top", await scroll());
+  // scrolling up only once the opening has SETTLED: while the box is
+  // resizing (the panel just shown), a scroll counts as the resize's and the
+  // app keeps a reader at the bottom (HoodChatScroll's stick) — a finger
+  // can't land in that one frame, but code can: on a busy machine (a full
+  // gate) the test's scroll-up did, and was pulled back down (owner,
+  // 2026-11-05 — caught: onChatResize's scroll, 2 ms after)
+  const settled = () => rita.eval(`new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => done(true), 20))))`);
+  const scrollUp = async () => {
+    await settled();
+    await rita.eval(`(document.getElementById("chat-messages").scrollTop = 0, document.getElementById("chat-messages").dispatchEvent(new Event("scroll")), true)`);
+    await rita.waitFor(`chatStick.stuck === false`, "Rita reading back (scrolled up)");
+  };
+  await scrollUp();
+  const up = await scroll();
+  check(up.fromBottom > 100, "scrolled up to the top", up);
   await closeChatPanel(rita);
   await openChatWith(rita, fayId);
   const reopened = await scroll();
@@ -142,8 +155,7 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   // follows" — which hid this: measured, owner 2026-11-05. Rita's own
   // taken out of her screen's copy only; nothing sent)
   await rita.eval(`(() => { const c = chatFor(realPeersById.get(${fayId})); c.msgs = c.msgs.filter((m) => !m.mine); openChat(realPeersById.get(${fayId})); return true; })()`);
-  await rita.eval(`(document.getElementById("chat-messages").scrollTop = 0, document.getElementById("chat-messages").dispatchEvent(new Event("scroll")), true)`);
-  await rita.waitFor(`chatStick.stuck === false`, "Rita reading back (scrolled up)");
+  await scrollUp();
   await rita.eval(`openChat(realPeersById.get(${fayId})), true`);
   const direct = await scroll();
   check(direct.fromBottom <= 2 && direct.lastInView, "opened straight from a scrolled-up chat: at the newest message", direct);

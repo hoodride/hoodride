@@ -78,6 +78,13 @@ defmodule Hoodride.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       precommit: [
+        # FIRST, before anything compiles (compiling a library runs its
+        # code): no library with a known security advisory, none withdrawn
+        # by its authors (Hex 2.5+, built in; the registry asked live, never
+        # a cache). An advisory that truly doesn't affect us: listed under
+        # `hex: [ignore_advisories: [...]]` in project/0, with why
+        # (owner, 2026-11-05)
+        "hex.audit",
         "compile --warnings-as-errors",
         "deps.unlock --unused",
         "format",
