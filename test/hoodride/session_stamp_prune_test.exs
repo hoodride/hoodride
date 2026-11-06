@@ -39,21 +39,27 @@ defmodule Hoodride.SessionStampPruneTest do
     pid
   end
 
-  defp disconnect(pid) do
+  defp disconnect(user_id, pid) do
     ref = Process.monitor(pid)
     send(pid, :stop)
     assert_receive {:DOWN, ^ref, :process, ^pid, _}
     # the Registry drops a dead process's entries asynchronously: wait for it
     # (a fixed 20 ms could lose that race on a busy machine)
-    unregistered(pid, 500)
+    unregistered(user_id, pid, 500)
   end
 
-  defp unregistered(_pid, 0), do: flunk("the Registry never dropped the device")
+  defp unregistered(_user_id, _pid, 0), do: flunk("the Registry never dropped the device")
 
-  defp unregistered(pid, tries) do
-    if Registry.keys(Hoodride.SocketStamps, pid) != [] do
+  # Waits for what prune/1 checks — the ACCOUNT's entry (lookup by user id),
+  # not the process's own (keys by pid): the Registry takes the process's
+  # first and the account's a moment later (Elixir's Registry.Partition:
+  # :ets.take(pid), then __unregister__ per key). Waiting on the first, a
+  # busy gate ran prune/1 in between, saw the device still connected, and
+  # kept the row (owner, 2026-11-06)
+  defp unregistered(user_id, pid, tries) do
+    if Enum.any?(Registry.lookup(Hoodride.SocketStamps, user_id), fn {p, _} -> p == pid end) do
       Process.sleep(10)
-      unregistered(pid, tries - 1)
+      unregistered(user_id, pid, tries - 1)
     end
   end
 
@@ -65,7 +71,7 @@ defmodule Hoodride.SessionStampPruneTest do
     SessionStamp.prune(t)
     SessionStamp.prune(t + 10 * @day_ms)
     assert SessionStamp.highest(u) == 100
-    disconnect(dev)
+    disconnect(u, dev)
   end
 
   test "nothing connected: kept through a short gap and through 23 hours" do
@@ -96,7 +102,7 @@ defmodule Hoodride.SessionStampPruneTest do
     dev = connected(u)
     # …and a pass that finds the device connected moves it on
     SessionStamp.prune(t + 5 * @day_ms)
-    disconnect(dev)
+    disconnect(u, dev)
     # 5 days after the row was made, but only 12 h after the device left
     SessionStamp.prune(t + 5 * @day_ms + 12 * 3_600_000)
     assert SessionStamp.highest(u) == 100
