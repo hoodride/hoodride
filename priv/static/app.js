@@ -2962,6 +2962,16 @@ let chatBelow = 0;
 
 function updateChatJump() {
   const j = HoodChatScroll.jump({ stuck: chatStick.stuck, below: chatBelow });
+  // clear of the list's scrollbar: its width as measured — a computer's
+  // takes ~15px, a phone's floats over the text and takes none (owner,
+  // 2026-11-06: the badge sat on the scrollbar). Full width minus the
+  // inside minus borders (MDN clientWidth)
+  if (j.show) {
+    const box = $("chat-messages");
+    const cs = getComputedStyle(box);
+    const bar = box.offsetWidth - box.clientWidth - parseFloat(cs.borderLeftWidth) - parseFloat(cs.borderRightWidth);
+    $("chat").style.setProperty("--chat-scrollbar", `${Math.max(0, Math.round(bar))}px`);
+  }
   $("chat-jump").classList.toggle("hidden", !j.show);
   $("chat-jump-count").textContent = j.badge || "";
   $("chat-jump-count").classList.toggle("hidden", !j.badge);

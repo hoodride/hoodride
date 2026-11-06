@@ -174,7 +174,14 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
     const next = line && line.nextElementSibling;
     const j = document.getElementById("chat-jump"), jr = j.getBoundingClientRect();
     const badge = document.getElementById("chat-jump-count");
+    // the list's scrollbar (full width minus the inside): ↓ and its badge
+    // must stay left of it (owner, 2026-11-06: the badge sat on it)
+    const bar = b.offsetWidth - b.clientWidth;
+    const inside = br.left + b.clientWidth;
+    const badgeR = badge.classList.contains("hidden") ? null : badge.getBoundingClientRect().right;
     return {
+      bar,
+      clear: !j.classList.contains("hidden") && jr.right <= inside && (badgeR === null || badgeR <= inside),
       line: line ? { text: line.textContent, fromTop: Math.round(line.getBoundingClientRect().top - br.top), lines: b.querySelectorAll(".chat-line").length } : null,
       after: next ? next.textContent : null,
       fromBottom: Math.round(b.scrollHeight - b.scrollTop - b.clientHeight),
@@ -192,6 +199,9 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   check(!!atLine.line && atLine.line.lines === 1 && atLine.line.text === "New messages" && atLine.after === "new 1", "a 'New messages' line, just above the first new one", atLine);
   check(atLine.line.fromTop >= 0 && atLine.line.fromTop < 40 && atLine.fromBottom > 100, "opened at the line, near the top — not the newest", atLine);
   check(atLine.jump && atLine.badge === null && atLine.corner, "↓ in the bottom corner, no count: nothing came in since", atLine);
+  // (this browser's scrollbar takes room — else the next check couldn't fail)
+  check(atLine.bar > 0, "the test browser's scrollbar takes room", atLine);
+  check(atLine.clear, "↓ clear of the scrollbar", atLine);
   check((await unreadFrom(rita, fayId)) === 0, "opening read them all");
 
   await rita.click("chat-jump");
@@ -205,6 +215,7 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   await fayWrites("more", 3);
   const three = await view();
   check(three.jump && three.badge === "3" && three.fromBottom > 100, "3 came in below: ↓ 3, and Rita stays where she's reading", three);
+  check(three.clear, "↓ and its badge clear of the scrollbar", three);
   await rita.click("chat-jump");
   const down3 = await view();
   check(down3.fromBottom <= 2 && !down3.jump && down3.badge === null, "↓ 3 tapped: at the newest; the button and its count gone", down3);
@@ -293,6 +304,11 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   await dan.waitFor(`chatFor(realPeersById.get(${ritaId})).msgs.some(m => m.text === "while your app was closed")`, "sent");
   await rita.open();
   await rita.waitFor(`realPeersById.has(${danId}) && chats.has(realPeersById.get(${danId}))`, "Rita's chats rebuilt");
+  // the chats come by a plain request (/api/state), the live connection a
+  // moment after — sending in between is refused ("Can't reach", the text
+  // kept), as it should be. The next step sends: connected first (owner,
+  // 2026-11-06: a busy run sent in that gap)
+  await rita.waitFor(`liveNow()`, "Rita's live connection back");
   check((await unreadFrom(rita, danId)) === 1, "1 unread after reopening", await unreadFrom(rita, danId));
   check((await textsFrom(rita, danId)).includes("reply while you were away"), "the older reply is there too");
 
