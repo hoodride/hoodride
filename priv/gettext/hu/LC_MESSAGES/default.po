@@ -290,6 +290,10 @@ msgstr "Törlöd a fiókodat?"
 msgid "Demo"
 msgstr "Bemutató"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Piszkozat"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Vezetés"

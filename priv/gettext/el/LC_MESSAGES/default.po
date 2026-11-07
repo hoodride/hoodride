@@ -290,6 +290,10 @@ msgstr "Διαγραφή του λογαριασμού σου;"
 msgid "Demo"
 msgstr "Επίδειξη"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Πρόχειρο"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Οδήγηση"

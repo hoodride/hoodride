@@ -290,6 +290,10 @@ msgstr "Excluir sua conta?"
 msgid "Demo"
 msgstr "Demo"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Rascunho"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Dirigir"

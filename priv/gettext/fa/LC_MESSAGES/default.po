@@ -290,6 +290,10 @@ msgstr "حسابتان حذف شود؟"
 msgid "Demo"
 msgstr "دمو"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "پیش‌نویس"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "رانندگی"

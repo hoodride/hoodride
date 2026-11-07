@@ -1,0 +1,120 @@
+// ‹ Back and drafts (owner, 2026-11-07): ‹ always opens the chat list —
+// it used to drop the chat you'd just opened (nothing written yet) and jump
+// straight into the one other chat. A chat opened from the map stays in the
+// list while the window is open; ✕ drops it unless something's typed in it.
+// What's typed stays with its chat ("Draft" in the list, as WhatsApp).
+// Both directions: a driver writing to a ✋, a rider writing to a car.
+import { journey, step, check } from "./cdp.mjs";
+import { goOnline, sees, openChatWith, typeText, box, send, chatOpenWith, closeChatPanel } from "./app.mjs";
+
+// the chat window: open? the list or a chat — whose?
+const where = (p) =>
+  p.eval(`(() => document.getElementById("chat").classList.contains("hidden") ? "closed" : state.chatView === "list" ? "list" : "chat:" + state.chatPeer.name)()`);
+// the list's rows, top to bottom: name, unread number, "Draft"?, the line
+const rows = (p) =>
+  p.eval(`[...document.querySelectorAll("#chat-messages .chat-item")].map((r) => ({
+    name: r.querySelector("strong").textContent,
+    unread: r.querySelector(".unread-dot")?.textContent ?? null,
+    draft: r.querySelector(".chat-draft")?.textContent ?? null,
+    line: r.querySelector(".chat-item-info .muted").textContent,
+  }))`);
+const row = async (p, name) => (await rows(p)).find((r) => r.name === name) || null;
+const tapRow = (p, name) =>
+  p.eval(`([...document.querySelectorAll("#chat-messages .chat-item")].find((r) => r.querySelector("strong").textContent === ${JSON.stringify(name)}).click(), true)`);
+const backBadge = (p) =>
+  p.eval(`(() => { const b = document.getElementById("chat-back"), c = document.getElementById("chat-back-count"); return b.classList.contains("hidden") ? "no ‹" : c.classList.contains("hidden") ? "‹" : "‹ " + c.textContent; })()`);
+const has = (p, id) => p.eval(`realPeersById.has(${id}) && chats.has(realPeersById.get(${id}))`);
+
+await journey("chatback: ‹ opens the list; drafts stay with their chat", async (browser) => {
+  step("Dora and Ed (drivers, online), Ray (✋ up), Sam (rider) sign in");
+  const dora = await browser.person("BT-Dora");
+  const ed = await browser.person("BT-Ed");
+  const ray = await browser.person("BT-Ray");
+  const sam = await browser.person("BT-Sam");
+  await goOnline(dora, { color: "Gray", make: "Honda", model: "Civic" });
+  await goOnline(ed, { color: "Red", make: "Kia", model: "Soul" });
+  const [doraId, edId, rayId, samId] = [await dora.id(), await ed.id(), await ray.id(), await sam.id()];
+  await ray.click("btn-hand");
+  await ray.waitFor("state.handRaised", "Ray's ✋ up");
+  await sees(dora, rayId, "(Ray's ✋)");
+  await sees(sam, doraId);
+  await sees(sam, edId);
+
+  step("driver: Dora taps Ray's ✋ → Message; Sam writes to her meanwhile: ‹ 1");
+  await openChatWith(dora, rayId, "hand");
+  await openChatWith(sam, doraId);
+  await typeText(sam, "hi Dora");
+  await send(sam);
+  await dora.waitFor(`realPeersById.has(${samId}) && chats.has(realPeersById.get(${samId}))`, "Dora has Sam's message");
+  check((await where(dora)) === "chat:BT-Ray", "still in Ray's chat", await where(dora));
+  check((await backBadge(dora)) === "‹ 1", "‹ 1", await backBadge(dora));
+
+  step("‹ → the list (not Sam's chat): Ray, nothing written yet, and Sam, 1 unread");
+  await dora.click("chat-back");
+  check((await where(dora)) === "list", "the list", await where(dora));
+  check(JSON.stringify(await row(dora, "BT-Ray")) === JSON.stringify({ name: "BT-Ray", unread: null, draft: null, line: "" }), "Ray's empty chat is in it", await row(dora, "BT-Ray"));
+  check((await row(dora, "BT-Sam"))?.unread === "1", "Sam's: 1 unread", await row(dora, "BT-Sam"));
+
+  step("back into Ray's chat from the list; typed, not sent — it stays with Ray");
+  await tapRow(dora, "BT-Ray");
+  check((await where(dora)) === "chat:BT-Ray", "Ray's chat", await where(dora));
+  await typeText(dora, "  need a ride?  ");
+  await dora.click("chat-back");
+  check(JSON.stringify(await row(dora, "BT-Ray")) === JSON.stringify({ name: "BT-Ray", unread: null, draft: "Draft", line: "Draft need a ride?" }), "the list: Ray's row says Draft", await row(dora, "BT-Ray"));
+  await tapRow(dora, "BT-Sam");
+  check((await box(dora)) === "", "Sam's box is empty (never Ray's text)", await box(dora));
+  await dora.click("chat-back");
+  await tapRow(dora, "BT-Ray");
+  check((await box(dora)) === "  need a ride?  ", "Ray's text is back in the box", await box(dora));
+
+  step("✕ with a draft: Ray's chat stays; 💬 Chat → the list, Draft");
+  await closeChatPanel(dora);
+  check(await has(dora, rayId), "Ray's chat kept");
+  await dora.click("btn-chat");
+  check((await where(dora)) === "list", "💬 Chat: the list (two chats)", await where(dora));
+  check((await row(dora, "BT-Ray"))?.draft === "Draft", "still Draft", await row(dora, "BT-Ray"));
+
+  step("the text cleared, then ✕: Ray's chat goes (nothing in it)");
+  await tapRow(dora, "BT-Ray");
+  await typeText(dora, "");
+  await dora.click("chat-back");
+  check((await row(dora, "BT-Ray"))?.draft === null, "no Draft once the text is gone", await row(dora, "BT-Ray"));
+  check(await has(dora, rayId), "but still in the list while the window's open");
+  await closeChatPanel(dora);
+  check(!(await has(dora, rayId)), "✕: Ray's empty chat dropped");
+
+  step("rider: Sam taps Ed's car → Message; Dora answers Sam meanwhile: ‹ 1");
+  await openChatWith(sam, edId);
+  await dora.eval(`openChat(realPeersById.get(${samId})), true`);
+  await typeText(dora, "hi Sam");
+  await send(dora);
+  await sam.waitFor(`chatFor(realPeersById.get(${doraId})).msgs.some((m) => m.text === "hi Sam")`, "Sam has Dora's answer");
+  check((await where(sam)) === "chat:BT-Ed", "still in Ed's chat", await where(sam));
+  check((await backBadge(sam)) === "‹ 1", "‹ 1", await backBadge(sam));
+
+  step("‹ → the list: Ed, nothing written yet, and Dora, 1 unread; ✕ drops Ed's");
+  await sam.click("chat-back");
+  check((await where(sam)) === "list", "the list (not Dora's chat)", await where(sam));
+  check(JSON.stringify(await row(sam, "BT-Ed")) === JSON.stringify({ name: "BT-Ed", unread: null, draft: null, line: "" }), "Ed's empty chat is in it", await row(sam, "BT-Ed"));
+  check((await row(sam, "BT-Dora"))?.unread === "1", "Dora's: 1 unread", await row(sam, "BT-Dora"));
+  await tapRow(sam, "BT-Ed");
+  check((await where(sam)) === "chat:BT-Ed", "back in Ed's chat", await where(sam));
+
+  // a reload for an update waits while anything's typed — in the open chat
+  // or another (HoodUpdate.isBusy: Sam is a rider with no ✋, nothing else)
+  step("a draft in Ed's chat, Dora's open with an empty box: an update still waits");
+  const busy = () => sam.eval(`HoodUpdate.isBusy({ mode: state.mode, online: state.online, handRaised: state.handRaised, ride: state.ride, draft: allDrafts() })`);
+  check(!(await busy()), "nothing typed: not busy");
+  await typeText(sam, "for Ed");
+  await sam.click("chat-back");
+  await tapRow(sam, "BT-Dora");
+  check((await box(sam)) === "", "Dora's box is empty", await box(sam));
+  check(await busy(), "Ed's draft: busy");
+  await sam.click("chat-back");
+  await tapRow(sam, "BT-Ed");
+  await typeText(sam, "");
+  await closeChatPanel(sam);
+  check(!(await has(sam, edId)), "✕: Ed's empty chat dropped");
+  check(await has(sam, doraId), "Dora's stays");
+  check((await chatOpenWith(sam)) === null, "the window closed");
+});

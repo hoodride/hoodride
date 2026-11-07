@@ -290,6 +290,10 @@ msgstr "Ma tirtiraysaa akoonkaaga?"
 msgid "Demo"
 msgstr "Tijaabo"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Qabyo"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Wad"

@@ -290,6 +290,10 @@ msgstr "ਕੀ ਆਪਣਾ ਖਾਤਾ ਮਿਟਾਉਣਾ ਹੈ?"
 msgid "Demo"
 msgstr "ਡੈਮੋ"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "ਡਰਾਫਟ"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "ਡਰਾਈਵ ਕਰੋ"

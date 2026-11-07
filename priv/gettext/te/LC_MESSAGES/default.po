@@ -290,6 +290,10 @@ msgstr "మీ ఖాతాను తొలగించాలా?"
 msgid "Demo"
 msgstr "డెమో"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "డ్రాఫ్ట్"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "డ్రైవ్ చేయండి"

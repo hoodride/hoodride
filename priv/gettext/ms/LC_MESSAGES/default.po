@@ -290,6 +290,10 @@ msgstr "Padamkan akaun anda?"
 msgid "Demo"
 msgstr "Demo"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Draf"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Memandu"

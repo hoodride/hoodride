@@ -290,6 +290,10 @@ msgstr "നിങ്ങളുടെ അക്കൗണ്ട് ഇല്ലാ�
 msgid "Demo"
 msgstr "ഡെമോ"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "ഡ്രാഫ്റ്റ്"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "ഡ്രൈവ് ചെയ്യുക"

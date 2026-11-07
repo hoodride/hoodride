@@ -290,6 +290,10 @@ msgstr "Rho koj tus account tawm?"
 msgid "Demo"
 msgstr "Sim saib"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Tsab ntawv sau tseg"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Tsav tsheb"

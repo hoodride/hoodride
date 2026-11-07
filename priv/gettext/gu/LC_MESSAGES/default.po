@@ -290,6 +290,10 @@ msgstr "તમારું એકાઉન્ટ ડિલીટ કરીએ?"
 msgid "Demo"
 msgstr "ડેમો"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "ડ્રાફ્ટ"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "ડ્રાઇવ કરો"

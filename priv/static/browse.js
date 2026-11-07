@@ -44,7 +44,9 @@
   // partner is still in the inbox afterwards.
   // chat: {msgs, server}; isRidePeer: the chat is with the current ride's partner
   function chatPrunable(chat, isRidePeer) {
-    return !chat.msgs.length && !chat.server && !isRidePeer;
+    // something typed and not sent (a draft) keeps it too, as WhatsApp's
+    // "Draft" (owner, 2026-11-07)
+    return !chat.msgs.length && !chat.server && !isRidePeer && !(chat.draft || "").trim();
   }
 
   // The server deleted a conversation (one of the two was gone past grace):

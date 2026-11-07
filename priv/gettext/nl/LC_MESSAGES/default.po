@@ -290,6 +290,10 @@ msgstr "Je account verwijderen?"
 msgid "Demo"
 msgstr "Demo"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Concept"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Rijden"

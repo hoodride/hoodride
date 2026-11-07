@@ -290,6 +290,10 @@ msgstr "アカウントを削除しますか？"
 msgid "Demo"
 msgstr "デモ"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "下書き"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "運転する"

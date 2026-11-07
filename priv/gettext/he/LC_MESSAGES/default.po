@@ -290,6 +290,10 @@ msgstr "למחוק את החשבון?"
 msgid "Demo"
 msgstr "הדגמה"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "טיוטה"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "נהיגה"

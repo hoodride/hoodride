@@ -290,6 +290,10 @@ msgstr "अपना खाता मिटाना है?"
 msgid "Demo"
 msgstr "डेमो"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "ड्राफ़्ट"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "ड्राइव करें"

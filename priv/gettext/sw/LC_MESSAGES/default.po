@@ -290,6 +290,10 @@ msgstr "Ungependa kufuta akaunti yako?"
 msgid "Demo"
 msgstr "Onyesho"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Rasimu"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Endesha"

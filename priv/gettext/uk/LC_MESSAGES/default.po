@@ -290,6 +290,10 @@ msgstr "Видалити обліковий запис?"
 msgid "Demo"
 msgstr "Демо"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Чернетка"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Підвозити"

@@ -715,6 +715,9 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 /* the right side of a row: how long ago, then the unread count */
 .chat-item-side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
 .chat-time { font-size: 12px; }
+/* typed, not sent: "Draft" before the text, in the accent (WhatsApp marks
+   it in its own color) */
+.chat-draft { color: var(--accent); font-weight: 600; }
 /* read rows: the name in normal weight — so unread ones stand out */
 .chat-item-info strong { font-weight: 500; }
 /* unread: name and last message bold and bright, like chat apps */

@@ -290,6 +290,10 @@ msgstr "ଆପଣଙ୍କ ଆକାଉଣ୍ଟ ଡିଲିଟ କରିବେ
 msgid "Demo"
 msgstr "ଡେମୋ"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "ଡ୍ରାଫ୍ଟ"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "ଡ୍ରାଇଭ କରନ୍ତୁ"

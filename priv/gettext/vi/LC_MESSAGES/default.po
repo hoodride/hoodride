@@ -290,6 +290,10 @@ msgstr "Xóa tài khoản của bạn?"
 msgid "Demo"
 msgstr "Bản demo"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Bản nháp"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Lái xe"

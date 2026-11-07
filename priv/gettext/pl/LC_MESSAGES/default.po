@@ -290,6 +290,10 @@ msgstr "Usunąć konto?"
 msgid "Demo"
 msgstr "Demo"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Wersja robocza"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Podwoź"

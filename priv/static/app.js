@@ -203,21 +203,27 @@ const pileMarkers = new Map(); // "type:spot" → { marker, el, type, ids }
 const realPeersById = new Map(); // user_id → stable peer object (chat identity)
 let zoomedOutWarned = false;
 
-// chats: Map<peer object, { msgs, unread, replyIdx, server }>
+// chats: Map<peer object, { msgs, unread, replyIdx, server, draft }>
 // server: the server holds this conversation (from a reload, or a ride's —
 // which exists from ride start even if nobody types), so it's never pruned
+// draft: what's typed in it and not sent — each chat its own (opening
+// another puts ITS text in the box: never sent to the wrong person), kept
+// while you switch, "Draft" in the list (owner, 2026-11-07). Memory only.
 const chats = new Map();
-// whose text is in the message box: the last chat opened (opening someone
-// else's clears it — never sent to the wrong person). Memory only.
-let chatDraftFor = null;
 // the server's clock minus this phone's (ms), from the last /api/state:
 // message times are the server's (HoodChatList.localAt)
 let chatSkew = 0;
 function chatFor(peer) {
   // lastAt: when its last message came, on this phone's clock (the chat
   // list: newest first, "2m" — HoodChatList)
-  if (!chats.has(peer)) chats.set(peer, { msgs: [], unread: 0, replyIdx: 0, server: false, lastAt: Date.now() });
+  if (!chats.has(peer)) chats.set(peer, { msgs: [], unread: 0, replyIdx: 0, server: false, lastAt: Date.now(), draft: "" });
   return chats.get(peer);
+}
+
+// every chat's unsent text, and the box's: a reload or an update waits
+// while any is there (HoodUpdate.isBusy)
+function allDrafts() {
+  return [$("chat-input") ? $("chat-input").value : "", ...[...chats.values()].map((c) => c.draft || "")].join("");
 }
 
 // ===== Mock peers (demo) =====
@@ -490,7 +496,7 @@ function tryGoogleRefresh() {
     online: state.online,
     handRaised: state.handRaised,
     ride: state.ride,
-    draft: $("chat-input") ? $("chat-input").value : "",
+    draft: allDrafts(),
   };
   const go = HoodGoogleRefresh.shouldRefresh({
     due: HoodGoogleRefresh.isDue(storageOrNull()),
@@ -1169,7 +1175,7 @@ function checkForUpdate() {
     online: state.online,
     handRaised: state.handRaised,
     ride: state.ride,
-    draft: $("chat-input") ? $("chat-input").value : "",
+    draft: allDrafts(),
   };
   const action = HoodUpdate.decide({
     loadedBuild: LOADED_BUILD,
@@ -1598,8 +1604,18 @@ async function softReload() {
   const before = HoodRehydrate.summarize(state);
   const openChatPeerId = !$("chat").classList.contains("hidden") && state.chatPeer ? state.chatPeer.id : null;
   const openCardPeerId = !$("peer-card").classList.contains("hidden") && state.cardPeer ? state.cardPeer.id : null;
+  // what the server doesn't hold: the drafts, and the not-yet-written chats
+  // while the window is open (HoodChatList.carried)
+  const carried = HoodChatList.carried(
+    [...chats].map(([p, c]) => ({ id: p.id, server: c.server, msgs: c.msgs, draft: c.draft })),
+    !$("chat").classList.contains("hidden")
+  );
   resetMirror();
   hydrate(st);
+  carried.forEach(({ id, draft }) => {
+    const p = realPeersById.get(id);
+    if (p) chatFor(p).draft = draft;
+  });
 
   const msg = HoodRehydrate.lostBanner(HoodRehydrate.lost(before, HoodRehydrate.summarize(state)));
   // a message on screen keeps it (it restores the banner itself when it
@@ -2834,7 +2850,17 @@ function closeChat() {
   refreshControls();
 }
 $("chat-close").addEventListener("click", closeChat);
-$("chat-back").addEventListener("click", openChatList);
+
+// ‹: the list — always, even with one other chat left (it jumped straight
+// into that one: owner, 2026-11-07). Nothing is dropped while the window is
+// open: a chat you opened and haven't written in yet stays in the list, to
+// go back to without finding them on the map again; ✕ drops it
+function backToList() {
+  state.chatView = "list";
+  renderChat();
+  refreshControls();
+}
+$("chat-back").addEventListener("click", backToList);
 
 function renderChat() {
   const box = $("chat-messages");
@@ -2865,7 +2891,16 @@ function renderChat() {
       // each in its own direction (an Arabic name, a Hebrew message)
       strong.dir = "auto";
       last.dir = "auto";
-      last.textContent = c.msgs.length ? c.msgs[c.msgs.length - 1].text : "";
+      // typed, not sent: "Draft" and that text (HoodChatList.preview)
+      const line = HoodChatList.preview(c);
+      if (line.draft) {
+        const label = document.createElement("span");
+        label.className = "chat-draft";
+        label.textContent = t("Draft");
+        last.append(label, " ", line.text);
+      } else {
+        last.textContent = line.text;
+      }
       info.append(strong, last);
       const when = document.createElement("span");
       when.className = "chat-time muted";
@@ -3049,14 +3084,12 @@ function markSeen(peer) {
 }
 
 function openChat(peer) {
-  if (chatDraftFor !== peer.id) {
-    $("chat-input").value = "";
-    updateChatCount();
-  }
-  chatDraftFor = peer.id;
+  const c = chatFor(peer);
+  // the box holds THIS chat's draft (another's stays with them)
+  $("chat-input").value = c.draft;
+  updateChatCount();
   state.chatPeer = peer;
   state.chatView = "msgs";
-  const c = chatFor(peer);
   // the line goes above the first of what's unread now (opening reads all)
   const first = HoodChatScroll.firstUnread(c.msgs, c.unread);
   chatLineMsg = first >= 0 ? c.msgs[first] : null;
@@ -3233,7 +3266,11 @@ function updateChatCount() {
   clearTimeout(chatCountTimer);
   chatCountTimer = setTimeout(() => (sr.textContent = s.show ? s.text : ""), 500);
 }
-$("chat-input").addEventListener("input", updateChatCount);
+$("chat-input").addEventListener("input", () => {
+  // what's typed is the open chat's draft
+  if (state.chatPeer && chats.has(state.chatPeer)) chats.get(state.chatPeer).draft = $("chat-input").value;
+  updateChatCount();
+});
 
 $("chat-form").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -3268,6 +3305,7 @@ $("chat-form").addEventListener("submit", (e) => {
   removeNewMessagesLine();
   const bubble = appendBubble(text, true);
   input.value = "";
+  chatFor(peer).draft = "";
   updateChatCount();
 
   if (!DEMO) {
@@ -3279,9 +3317,15 @@ $("chat-form").addEventListener("submit", (e) => {
       const i = arr.indexOf(sentMsg);
       if (i > -1) arr.splice(i, 1);
       bubble.remove();
-      if (chatDraftFor === peer.id && !input.value) {
-        input.value = text;
-        updateChatCount();
+      // back as their draft, if nothing new was typed for them meanwhile —
+      // in the box too if their chat is the one open
+      const c = chats.get(peer);
+      if (c && !c.draft) {
+        c.draft = text;
+        if (state.chatPeer === peer) {
+          input.value = text;
+          updateChatCount();
+        }
       }
       transientBanner(why);
     };
@@ -3301,9 +3345,12 @@ $("chat-form").addEventListener("submit", (e) => {
         // chat open for — back to the map. Not in view keeps your text
         // (find the car, tap Message); not available drops it
         if (e.reason === "out_of_view" || e.reason === "unavailable") {
-          if (e.reason === "unavailable" && chatDraftFor === peer.id) {
-            $("chat-input").value = "";
-            updateChatCount();
+          if (e.reason === "unavailable") {
+            if (chats.has(peer)) chats.get(peer).draft = "";
+            if (state.chatPeer === peer) {
+              $("chat-input").value = "";
+              updateChatCount();
+            }
           }
           if (state.chatPeer === peer) closeChat();
         }
@@ -4146,9 +4193,8 @@ const booting = HoodBoot.create({
     $("boot-status").classList.add("hidden");
     $("auth-buttons").classList.remove("hidden");
     auth.signOut(); // signed out: clear any leftover of the old fake sign-in
-    // ?demo=1 (and nobody signed in): the mock world, straight in — it used
-    // to ride on that leftover entry
-    if (DEMO) await enterApp();
+    // (?demo=1 never gets here: it starts the pretend world without asking
+    // the server — see the end of this file)
   },
   onWaiting: () => ($("boot-status").textContent = t("Can't reach Hood Ride — retrying…")),
   backoff: (attempt) => HoodSync.reconnectBackoff(attempt),
@@ -4156,12 +4202,20 @@ const booting = HoodBoot.create({
   clearTimer: (timer) => clearTimeout(timer),
   onError: (e) => console.error("couldn't open the app", e),
 });
-booting.start();
-// back online, or the app shown again: try at once instead of waiting
-window.addEventListener("online", () => booting.poke());
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible") booting.poke();
-});
+// ?demo=1: the pretend world, whoever opens it — never the account, never
+// the server (owner, 2026-11-07: signed in, the demo ALSO connected as you,
+// and the server's first answer closed a card tapped right after load).
+// "Leave demo" goes to the normal page, signed in as before.
+if (DEMO) {
+  enterApp();
+} else {
+  booting.start();
+  // back online, or the app shown again: try at once instead of waiting
+  window.addEventListener("online", () => booting.poke());
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") booting.poke();
+  });
+}
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");

@@ -290,6 +290,10 @@ msgstr "Hesabın silinsin mi?"
 msgid "Demo"
 msgstr "Demo"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Taslak"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Sürücü ol"

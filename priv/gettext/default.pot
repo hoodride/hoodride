@@ -287,6 +287,10 @@ msgstr ""
 msgid "Demo"
 msgstr ""
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr ""
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr ""

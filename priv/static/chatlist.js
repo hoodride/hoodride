@@ -85,5 +85,24 @@
     return n > 99 ? "99+" : String(n);
   }
 
-  return { ago, newestFirst, skew, localAt, MAX_CHARS, COUNT_FROM, count, limit, unreadLabel };
+  // a chat's line in the list: what you typed and didn't send over its last
+  // message — shown after "Draft", as WhatsApp (owner, 2026-11-07)
+  function preview(chat) {
+    const draft = (chat.draft || "").trim();
+    if (draft) return { draft: true, text: draft };
+    const last = chat.msgs[chat.msgs.length - 1];
+    return { draft: false, text: last ? last.text : "" };
+  }
+
+  // a rebuild (a reconnect, reopening the app) starts the chats over from
+  // the server: what it doesn't hold comes back from here — every draft,
+  // and, while the chat window is open, the chats nothing was sent in yet
+  // (✕ drops those anyway). held: [{id, server, msgs, draft}]
+  function carried(held, panelOpen) {
+    return held
+      .filter((c) => (c.draft || "").trim() || (panelOpen && !c.server && !c.msgs.length))
+      .map((c) => ({ id: c.id, draft: c.draft || "" }));
+  }
+
+  return { ago, newestFirst, skew, localAt, MAX_CHARS, COUNT_FROM, count, limit, unreadLabel, preview, carried };
 });

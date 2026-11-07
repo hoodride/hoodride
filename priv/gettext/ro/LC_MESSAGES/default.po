@@ -290,6 +290,10 @@ msgstr "Ștergi contul?"
 msgid "Demo"
 msgstr "Demo"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Ciornă"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Conduc"

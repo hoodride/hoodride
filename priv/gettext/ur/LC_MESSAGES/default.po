@@ -290,6 +290,10 @@ msgstr "اپنا اکاؤنٹ حذف کریں؟"
 msgid "Demo"
 msgstr "ڈیمو"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "ڈرافٹ"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "ڈرائیو"

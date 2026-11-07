@@ -290,6 +290,10 @@ msgstr "আপনার অ্যাকাউন্ট মুছবেন?"
 msgid "Demo"
 msgstr "ডেমো"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "খসড়া"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "ড্রাইভ করুন"

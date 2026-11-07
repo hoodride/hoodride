@@ -290,6 +290,10 @@ msgstr "هل تريد حذف حسابك؟"
 msgid "Demo"
 msgstr "عرض تجريبي"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "مسودة"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "قيادة"

@@ -290,6 +290,10 @@ msgstr "Vil du slette din konto?"
 msgid "Demo"
 msgstr "Demo"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Kladde"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Kør"

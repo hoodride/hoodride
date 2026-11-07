@@ -290,6 +290,10 @@ msgstr "要删除你的账号吗？"
 msgid "Demo"
 msgstr "演示"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "草稿"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "开车"

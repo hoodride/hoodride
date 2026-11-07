@@ -47,7 +47,12 @@ defmodule HoodrideWeb.ChatLimitTest do
   end
 
   test "typing updates the counter; screen readers hear it politely after a pause" do
-    assert @app =~ ~s[$("chat-input").addEventListener("input", updateChatCount);]
+    # typing: the open chat's draft (owner, 2026-11-07), then the counter
+    [typing] =
+      Regex.run(~r/\$\("chat-input"\)\.addEventListener\("input", \(\) => \{.*?\n\}\);/s, @app)
+
+    assert typing =~ ~s[chats.get(state.chatPeer).draft = $("chat-input").value;]
+    assert typing =~ "updateChatCount();"
     b = body("updateChatCount")
     assert b =~ "HoodChatList.limit(HoodChatList.count("
     assert b =~ ~s[sr.setAttribute("aria-live", "polite");]
@@ -64,7 +69,9 @@ defmodule HoodrideWeb.ChatLimitTest do
   end
 
   test "a sent message clears the counter too" do
-    assert submit() =~ ~r/input\.value = "";\s*updateChatCount\(\);/
+    # (and its chat's draft: sent, nothing left unsent)
+    assert submit() =~
+             ~r/input\.value = "";\s*chatFor\(peer\)\.draft = "";\s*updateChatCount\(\);/
   end
 
   test "over the limit reads in red AND in words; sr-only hides text only visually" do

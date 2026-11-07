@@ -121,7 +121,9 @@ defmodule HoodrideWeb.OfflineTest do
     [unsay] = Regex.run(~r/const unsay = \(why\) => \{.*?\n    \};/s, send)
     assert unsay =~ "bubble.remove();"
     # (back only into its own chat's box: HoodrideWeb.ChatRebuildTest)
-    assert unsay =~ "if (chatDraftFor === peer.id && !input.value) {\n        input.value = text;"
+    assert unsay =~
+             "c.draft = text;\n        if (state.chatPeer === peer) {\n          input.value = text;"
+
     assert unsay =~ "transientBanner(why);"
   end
 

@@ -290,6 +290,10 @@ msgstr "உங்கள் கணக்கை நீக்கவா?"
 msgid "Demo"
 msgstr "டெமோ"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "வரைவு"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "ஓட்டு"

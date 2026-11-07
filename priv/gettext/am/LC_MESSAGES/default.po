@@ -290,6 +290,10 @@ msgstr "አካውንትዎን ይሰርዙ?"
 msgid "Demo"
 msgstr "ማሳያ"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "ረቂቅ"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "ማሽከርከር"

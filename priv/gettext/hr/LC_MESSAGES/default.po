@@ -290,6 +290,10 @@ msgstr "Izbrisati račun?"
 msgid "Demo"
 msgstr "Demo"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Skica"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Vozi"

@@ -48,13 +48,18 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     # (and the Terms version, after server("terms_new"))
     on_exit(fn -> Application.delete_env(:hoodride, :terms_version) end)
 
+    # the server's side of a failure: every socket connect and channel join,
+    # when and how long it took (a join stuck "joining" under load, 2026-11-02).
+    # Started BEFORE the server: ExUnit stops them in reverse, so the log
+    # outlives the server — a browser's last request as the journey ends
+    # (its tabs closing) found the log gone, and the recorder crashed
+    # (2026-11-07)
+    log = start_supervised!({Agent, fn -> [] end})
+
     start_supervised!(
       {Bandit, plug: {HoodrideWeb.MinifiedStatic, minified}, ip: {127, 0, 0, 1}, port: @port}
     )
 
-    # the server's side of a failure: every socket connect and channel join,
-    # when and how long it took (a join stuck "joining" under load, 2026-11-02)
-    log = start_supervised!({Agent, fn -> [] end})
     started = System.monotonic_time(:millisecond)
     handler = "journeys-#{System.unique_integer([:positive])}"
 

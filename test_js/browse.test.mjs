@@ -75,6 +75,12 @@ test("a chat with messages, or with the current ride partner, is kept", () => {
   assert.equal(B.chatPrunable({ msgs: [], server: false }, true), false);
 });
 
+test("an empty chat with something typed in it (a draft) is KEPT; spaces alone are no draft", () => {
+  assert.equal(B.chatPrunable({ msgs: [], server: false, draft: "on my way?" }, false), false);
+  assert.equal(B.chatPrunable({ msgs: [], server: false, draft: "  \n " }, false), true);
+  assert.equal(B.chatPrunable({ msgs: [], server: false, draft: "" }, false), true);
+});
+
 // ---- chat_closed: the server deleted a conversation ----
 
 test("chat_closed for a chat I have: remove it, and say why", () => {

@@ -80,8 +80,10 @@ defmodule HoodrideWeb.ChatRebuildTest do
           s
         )
 
-      assert gone =~ ~s[if (e.reason === "unavailable" && chatDraftFor === peer.id) {]
-      assert gone =~ ~s[$("chat-input").value = "";]
+      # dropped from their chat's draft, and from the box if theirs is open
+      assert gone =~ ~s[if (e.reason === "unavailable") {]
+      assert gone =~ ~s[if (chats.has(peer)) chats.get(peer).draft = "";]
+      assert gone =~ ~s[if (state.chatPeer === peer) {\n              $("chat-input").value = "";]
       assert gone =~ "if (state.chatPeer === peer) closeChat();"
     end
 
@@ -89,7 +91,12 @@ defmodule HoodrideWeb.ChatRebuildTest do
     # chat you opened while it was on its way
     test "a refused or unanswered message's text goes back only to its own chat" do
       [unsay] = Regex.run(~r/const unsay = \(why\) => \{.*?\n    \};/s, send_handler())
-      assert unsay =~ "if (chatDraftFor === peer.id && !input.value) {"
+      # back as ITS chat's draft (if nothing new was typed for them), in the
+      # box only if their chat is the one open
+      assert unsay =~
+               "const c = chats.get(peer);\n      if (c && !c.draft) {\n        c.draft = text;"
+
+      assert unsay =~ "if (state.chatPeer === peer) {\n          input.value = text;"
     end
   end
 
@@ -111,11 +118,15 @@ defmodule HoodrideWeb.ChatRebuildTest do
   end
 
   describe "3. the box belongs to one person" do
-    test "opening someone else's chat clears it; the same person keeps it" do
+    # each chat keeps its own draft (owner, 2026-11-07): opening a chat puts
+    # ITS text in the box — never another person's
+    test "opening a chat fills the box with that chat's own draft" do
       b = body("openChat")
 
       assert b =~
-               ~s[if (chatDraftFor !== peer.id) {\n    $("chat-input").value = "";\n    updateChatCount();\n  }\n  chatDraftFor = peer.id;]
+               ~s[const c = chatFor(peer);\n  // the box holds THIS chat's draft (another's stays with them)\n  $("chat-input").value = c.draft;]
+
+      refute @app =~ "chatDraftFor"
     end
   end
 

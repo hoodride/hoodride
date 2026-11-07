@@ -290,6 +290,10 @@ msgstr "Efase kont ou?"
 msgid "Demo"
 msgstr "Demo"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Bouyon"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Kondui"

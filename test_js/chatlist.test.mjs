@@ -91,3 +91,35 @@ test("an unread badge: the number, 99+ past 99", () => {
   assert.equal(L.unreadLabel(100), "99+");
   assert.equal(L.unreadLabel(2500), "99+");
 });
+
+// ---- a chat's line in the list, and what survives a rebuild ----
+
+test("the list line: what you typed and didn't send (a draft) over the last message", () => {
+  const msgs = [{ text: "hi" }, { text: "where are you?" }];
+  assert.deepEqual(L.preview({ msgs, draft: "" }), { draft: false, text: "where are you?" });
+  assert.deepEqual(L.preview({ msgs, draft: "  be there in 5 " }), { draft: true, text: "be there in 5" });
+  assert.deepEqual(L.preview({ msgs, draft: "   " }), { draft: false, text: "where are you?" });
+  assert.deepEqual(L.preview({ msgs: [] }), { draft: false, text: "" });
+  assert.deepEqual(L.preview({ msgs: [], draft: "hey" }), { draft: true, text: "hey" });
+});
+
+test("a rebuild (reconnect, reopen) keeps every draft, and — while the chat window is open — the empty chats too", () => {
+  const held = [
+    { id: 1, server: true, msgs: [{ text: "hi" }], draft: "half typed" },
+    { id: 2, server: false, msgs: [], draft: "" },
+    { id: 3, server: false, msgs: [], draft: "for 3" },
+    { id: 4, server: true, msgs: [{ text: "x" }], draft: "" },
+    { id: 5, server: false, msgs: [], draft: "  " },
+  ];
+  assert.deepEqual(L.carried(held, true), [
+    { id: 1, draft: "half typed" },
+    { id: 2, draft: "" },
+    { id: 3, draft: "for 3" },
+    { id: 5, draft: "  " },
+  ]);
+  // closed: an empty chat is gone anyway (✕ drops it) — drafts only
+  assert.deepEqual(L.carried(held, false), [
+    { id: 1, draft: "half typed" },
+    { id: 3, draft: "for 3" },
+  ]);
+});

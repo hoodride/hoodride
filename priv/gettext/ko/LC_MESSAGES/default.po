@@ -290,6 +290,10 @@ msgstr "계정을 삭제할까요?"
 msgid "Demo"
 msgstr "데모"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "임시 저장"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "운전하기"

@@ -290,6 +290,10 @@ msgstr "Удалить аккаунт?"
 msgid "Demo"
 msgstr "Демо"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "Черновик"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "Подвозить"

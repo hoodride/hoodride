@@ -290,6 +290,10 @@ msgstr "ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಅಳಿಸಬೇಕೇ?"
 msgid "Demo"
 msgstr "ಡೆಮೊ"
 
+#: priv/static/app.js
+msgid "Draft"
+msgstr "ಡ್ರಾಫ್ಟ್"
+
 #: priv/static/app.js, priv/static/index.html
 msgid "Drive"
 msgstr "ಡ್ರೈವ್ ಮಾಡಿ"

@@ -352,6 +352,8 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   await bannerIs(rita, "BT-Eve isn't available right now");
   check((await chatOpenWith(rita)) === null, "the chat closed");
   check((await box(rita)) === "", "the text dropped", await box(rita));
+  // dropped from her chat too (a draft would keep it in the list)
+  check(!(await rita.eval(`realPeersById.has(${eveId}) && chats.has(realPeersById.get(${eveId}))`)), "Eve's chat is gone with it");
 
   // the privacy page: "Signing out removes them" — which messages you've read
   step("Rita signs out: this device no longer knows which messages she read");
