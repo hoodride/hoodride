@@ -1096,6 +1096,10 @@ msgid "✋ Nearby drivers can see you need a ride"
 msgstr "✋ 近くのドライバーに、あなたが乗車を希望していることが表示されています"
 
 #: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride · nobody nearby yet"
+msgstr "✋ 近くのドライバーに、あなたが乗車を希望していることが表示されています · 近くにはまだ誰もいません"
+
+#: priv/static/app.js
 msgid "✋ Need a ride"
 msgstr "✋ 乗せてほしい"
 
@@ -1178,6 +1182,10 @@ msgstr "🚶 乗る"
 #: priv/static/app.js
 msgid "🟢 You're online"
 msgstr "🟢 オンラインです"
+
+#: priv/static/app.js
+msgid "🟢 You're online · nobody nearby yet"
+msgstr "🟢 オンラインです · 近くにはまだ誰もいません"
 
 #: priv/static/app.js
 msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"

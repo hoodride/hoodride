@@ -49,8 +49,9 @@ defmodule HoodrideWeb.MapStartTest do
   end
 
   test "the first reading centres on you at INTENT_ZOOM, unless you moved the map" do
+    # (online or ✋ up: the nearest found too — intent_zoom_test.exs)
     assert @app =~
-             ~r/if \(first && !centre && !movedByYou\) map\.easeTo\(\{ center: \[pos\.lng, pos\.lat\], zoom: INTENT_ZOOM \}\);/
+             "if (first && !centre && !movedByYou) {\n        if (HoodNearby.lookingFor(state)) findNearest(pos);\n        else map.easeTo({ center: [pos.lng, pos.lat], zoom: INTENT_ZOOM });"
   end
 
   test "signing out (here, elsewhere, or deleting the account) forgets it" do

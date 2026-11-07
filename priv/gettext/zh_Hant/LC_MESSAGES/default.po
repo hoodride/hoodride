@@ -1096,6 +1096,10 @@ msgid "✋ Nearby drivers can see you need a ride"
 msgstr "✋ 附近的司機看得到你需要搭車"
 
 #: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride · nobody nearby yet"
+msgstr "✋ 附近的司機看得到你需要搭車 · 附近還沒有人"
+
+#: priv/static/app.js
 msgid "✋ Need a ride"
 msgstr "✋ 我要搭車"
 
@@ -1178,6 +1182,10 @@ msgstr "🚶 搭車"
 #: priv/static/app.js
 msgid "🟢 You're online"
 msgstr "🟢 你已上線"
+
+#: priv/static/app.js
+msgid "🟢 You're online · nobody nearby yet"
+msgstr "🟢 你已上線 · 附近還沒有人"
 
 #: priv/static/app.js
 msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"

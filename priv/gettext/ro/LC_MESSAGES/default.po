@@ -1110,6 +1110,10 @@ msgid "✋ Nearby drivers can see you need a ride"
 msgstr "✋ Șoferii din apropiere văd că ai nevoie de o cursă"
 
 #: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride · nobody nearby yet"
+msgstr "✋ Șoferii din apropiere văd că ai nevoie de o cursă · încă nu e nimeni prin apropiere"
+
+#: priv/static/app.js
 msgid "✋ Need a ride"
 msgstr "✋ Am nevoie de o cursă"
 
@@ -1192,6 +1196,10 @@ msgstr "🚶 Călătoresc"
 #: priv/static/app.js
 msgid "🟢 You're online"
 msgstr "🟢 Ești online"
+
+#: priv/static/app.js
+msgid "🟢 You're online · nobody nearby yet"
+msgstr "🟢 Ești online · încă nu e nimeni prin apropiere"
 
 #: priv/static/app.js
 msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"

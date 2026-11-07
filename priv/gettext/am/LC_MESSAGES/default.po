@@ -1103,6 +1103,10 @@ msgid "✋ Nearby drivers can see you need a ride"
 msgstr "✋ በአቅራቢያ ያሉ ሹፌሮች ጉዞ እንደሚፈልጉ ማየት ይችላሉ"
 
 #: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride · nobody nearby yet"
+msgstr "✋ በአቅራቢያ ያሉ ሹፌሮች ጉዞ እንደሚፈልጉ ማየት ይችላሉ · እስካሁን በአቅራቢያ ማንም የለም"
+
+#: priv/static/app.js
 msgid "✋ Need a ride"
 msgstr "✋ ጉዞ እፈልጋለሁ"
 
@@ -1185,6 +1189,10 @@ msgstr "🚶 መሳፈር"
 #: priv/static/app.js
 msgid "🟢 You're online"
 msgstr "🟢 መስመር ላይ ነዎት"
+
+#: priv/static/app.js
+msgid "🟢 You're online · nobody nearby yet"
+msgstr "🟢 መስመር ላይ ነዎት · እስካሁን በአቅራቢያ ማንም የለም"
 
 #: priv/static/app.js
 msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"

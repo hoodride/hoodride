@@ -1110,6 +1110,10 @@ msgid "✋ Nearby drivers can see you need a ride"
 msgstr "✋ Řidiči v okolí vidí, že potřebuješ odvoz"
 
 #: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride · nobody nearby yet"
+msgstr "✋ Řidiči v okolí vidí, že potřebuješ odvoz · zatím nikdo poblíž"
+
+#: priv/static/app.js
 msgid "✋ Need a ride"
 msgstr "✋ Potřebuju odvoz"
 
@@ -1192,6 +1196,10 @@ msgstr "🚶 Svézt se"
 #: priv/static/app.js
 msgid "🟢 You're online"
 msgstr "🟢 Jsi online"
+
+#: priv/static/app.js
+msgid "🟢 You're online · nobody nearby yet"
+msgstr "🟢 Jsi online · zatím nikdo poblíž"
 
 #: priv/static/app.js
 msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"

@@ -560,6 +560,56 @@ test("resync before joining sends nothing (the join will)", () => {
   assert.equal(ch.pushes.length, 0);
 });
 
+// find the nearest (nearby.js) decides "nobody nearby yet" only once the
+// server has answered for the whole view — never on a half-loaded map
+test("settled: only once the server has answered for exactly what's wanted, nothing on its way", () => {
+  const { clock, ch, sync } = setup();
+  assert.equal(sync.settled(), false, "not joined");
+  sync.onJoined();
+  assert.equal(sync.settled(), false, "the join's sync in flight");
+  ch.reply(ch.last(), "ok", {});
+  assert.equal(sync.settled(), true, "nothing wanted, nothing held");
+
+  sync.setWanted(set("a", "b"), set());
+  assert.equal(sync.settled(), false, "a change waiting to settle");
+  clock.advance(S.SETTLE_MS);
+  assert.equal(sync.settled(), false, "in flight");
+  ch.reply(ch.last(), "ok", {});
+  assert.equal(sync.settled(), true, "answered");
+
+  // a change while one is in flight: not settled at that reply — only at the follow-up's
+  sync.setWanted(set("c"), set());
+  clock.advance(S.SETTLE_MS);
+  const first = ch.last();
+  sync.setWanted(set("d"), set("x"));
+  clock.advance(S.SETTLE_MS);
+  ch.reply(first, "ok", {});
+  assert.equal(sync.settled(), false, "the follow-up is on its way");
+  ch.reply(ch.last(), "ok", {});
+  assert.equal(sync.settled(), true);
+
+  // a role change's resync: in flight again until answered
+  sync.resync();
+  assert.equal(sync.settled(), false);
+  ch.reply(ch.last(), "ok", {});
+  assert.equal(sync.settled(), true);
+});
+
+test("settled: never while a failed sync waits to be retried, nor after the channel's gone", () => {
+  const { clock, ch, sync } = setup();
+  sync.onJoined();
+  ch.reply(ch.last(), "ok", {});
+  sync.setWanted(set("a"), set());
+  clock.advance(S.SETTLE_MS);
+  ch.reply(ch.last(), "timeout");
+  assert.equal(sync.settled(), false, "a timeout: retry pending");
+  clock.advance(60000);
+  ch.reply(ch.last(), "ok", {});
+  assert.equal(sync.settled(), true);
+  sync.onLeft();
+  assert.equal(sync.settled(), false, "left");
+});
+
 // ---- the live connection as the person sees it (createConnWatch) ----
 // "Reconnecting…" only once it has been down LOST_AFTER_MS: a reload's
 // hand-over or a blip of a second never flashes it (owner, 2026-10-30)

@@ -44,6 +44,35 @@ defmodule HoodrideWeb.StaticVersionsTest do
       assert StaticVersions.compute(dir, ["a.js"])["a.js"] != v["a.js"]
     end
 
+    # dev and test: read again only when the file changed (size or time) —
+    # every page used to read every file again (the sitemap tests timed out)
+    test "outside production: the same fingerprints, a file read again only once it changed" do
+      dir = Path.join(System.tmp_dir!(), "vsn-#{System.unique_integer([:positive])}")
+      File.mkdir_p!(dir)
+      on_exit(fn -> File.rm_rf!(dir) end)
+      a = Path.join(dir, "a.js")
+
+      File.write!(a, "one")
+      File.touch!(a, 1_800_000_000)
+      v = StaticVersions.live(dir, ["a.js", "missing.js"])
+      assert v == StaticVersions.compute(dir, ["a.js", "missing.js"])
+
+      # other contents, but the same size and time: not read again (kept)
+      File.write!(a, "two")
+      File.touch!(a, 1_800_000_000)
+      assert StaticVersions.live(dir, ["a.js"]) == v
+
+      # changed time: read again at once — the new contents' fingerprint
+      File.touch!(a, 1_800_000_060)
+      assert StaticVersions.live(dir, ["a.js"]) == StaticVersions.compute(dir, ["a.js"])
+      refute StaticVersions.live(dir, ["a.js"]) == v
+
+      # changed size (same time): read again too
+      File.write!(a, "three")
+      File.touch!(a, 1_800_000_060)
+      assert StaticVersions.live(dir, ["a.js"]) == StaticVersions.compute(dir, ["a.js"])
+    end
+
     # (the not-found page names its files from the root — 2026-11-04)
     test "stamped by name, as written or from the root; anything else untouched" do
       v = %{"a.js" => "abc123"}

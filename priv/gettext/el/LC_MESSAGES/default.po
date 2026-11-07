@@ -1103,6 +1103,10 @@ msgid "✋ Nearby drivers can see you need a ride"
 msgstr "✋ Οι οδηγοί κοντά σου βλέπουν ότι χρειάζεσαι διαδρομή"
 
 #: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride · nobody nearby yet"
+msgstr "✋ Οι οδηγοί κοντά σου βλέπουν ότι χρειάζεσαι διαδρομή · κανείς κοντά ακόμα"
+
+#: priv/static/app.js
 msgid "✋ Need a ride"
 msgstr "✋ Χρειάζομαι διαδρομή"
 
@@ -1185,6 +1189,10 @@ msgstr "🚶 Μετακίνηση"
 #: priv/static/app.js
 msgid "🟢 You're online"
 msgstr "🟢 Είσαι σε υπηρεσία"
+
+#: priv/static/app.js
+msgid "🟢 You're online · nobody nearby yet"
+msgstr "🟢 Είσαι σε υπηρεσία · κανείς κοντά ακόμα"
 
 #: priv/static/app.js
 msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"

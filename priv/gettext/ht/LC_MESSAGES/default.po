@@ -1096,6 +1096,10 @@ msgid "✋ Nearby drivers can see you need a ride"
 msgstr "✋ Chofè ki toupre yo ka wè ou bezwen woulib"
 
 #: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride · nobody nearby yet"
+msgstr "✋ Chofè ki toupre yo ka wè ou bezwen woulib · poko gen pèsonn toupre"
+
+#: priv/static/app.js
 msgid "✋ Need a ride"
 msgstr "✋ Bezwen woulib"
 
@@ -1178,6 +1182,10 @@ msgstr "🚶 Pran woulib"
 #: priv/static/app.js
 msgid "🟢 You're online"
 msgstr "🟢 Ou an liy"
+
+#: priv/static/app.js
+msgid "🟢 You're online · nobody nearby yet"
+msgstr "🟢 Ou an liy · poko gen pèsonn toupre"
 
 #: priv/static/app.js
 msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"

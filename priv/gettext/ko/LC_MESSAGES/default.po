@@ -1096,6 +1096,10 @@ msgid "✋ Nearby drivers can see you need a ride"
 msgstr "✋ 근처 운전자에게 차가 필요하다고 표시되고 있어요"
 
 #: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride · nobody nearby yet"
+msgstr "✋ 근처 운전자에게 차가 필요하다고 표시되고 있어요 · 아직 근처에 아무도 없어요"
+
+#: priv/static/app.js
 msgid "✋ Need a ride"
 msgstr "✋ 태워 주세요"
 
@@ -1178,6 +1182,10 @@ msgstr "🚶 탑승하기"
 #: priv/static/app.js
 msgid "🟢 You're online"
 msgstr "🟢 온라인 상태예요"
+
+#: priv/static/app.js
+msgid "🟢 You're online · nobody nearby yet"
+msgstr "🟢 온라인 상태예요 · 아직 근처에 아무도 없어요"
 
 #: priv/static/app.js
 msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"

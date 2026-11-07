@@ -1110,6 +1110,10 @@ msgid "✋ Nearby drivers can see you need a ride"
 msgstr "✋ Motoristas por perto veem que você precisa de carona"
 
 #: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride · nobody nearby yet"
+msgstr "✋ Motoristas por perto veem que você precisa de carona · ninguém por perto ainda"
+
+#: priv/static/app.js
 msgid "✋ Need a ride"
 msgstr "✋ Preciso de carona"
 
@@ -1192,6 +1196,10 @@ msgstr "🚶 Pegar carona"
 #: priv/static/app.js
 msgid "🟢 You're online"
 msgstr "🟢 Você está online"
+
+#: priv/static/app.js
+msgid "🟢 You're online · nobody nearby yet"
+msgstr "🟢 Você está online · ninguém por perto ainda"
 
 #: priv/static/app.js
 msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"

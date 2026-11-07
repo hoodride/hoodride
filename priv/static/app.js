@@ -317,9 +317,12 @@ function situationBanner() {
         ? t("Picking up {name} · {seen} · tap 🧭 to navigate", { name: peer.name, seen })
         : t("Picking up {name} · tap 🧭 to navigate", { name: peer.name });
   }
-  if (state.mode === "driver" && state.online) return t("🟢 You're online");
+  // looked around you, nobody yet (findNearest) — until someone shows up
+  const nobody = nobodyNear && !!HoodNearby.lookingFor(state);
+  if (state.mode === "driver" && state.online)
+    return nobody ? t("🟢 You're online · nobody nearby yet") : t("🟢 You're online");
   if (state.mode === "rider" && state.handRaised)
-    return t("✋ Nearby drivers can see you need a ride");
+    return nobody ? t("✋ Nearby drivers can see you need a ride · nobody nearby yet") : t("✋ Nearby drivers can see you need a ride");
   return null;
 }
 
@@ -1884,6 +1887,7 @@ function renderRealMarkers() {
     }
   });
   if (state.pileKey) renderPileSheet();
+  nearbyArrived();
 }
 
 function makePileMarker(g) {
@@ -2485,6 +2489,9 @@ function initMap() {
   // only gestures carry an originalEvent (a camera move of the app's doesn't)
   map.on("movestart", (e) => {
     if (e.originalEvent) movedByYou = true;
+    // any move but find-the-nearest's own ends it (and its "nobody nearby
+    // yet": what's on screen no longer says who's near you)
+    if (!e.nearSearch) stopFindNearest();
   });
 
   if (DEMO) {
@@ -2528,10 +2535,14 @@ const loc = HoodLocator.create({
     onReading(pos, { first, centre }) {
       meMarker.setLngLat([pos.lng, pos.lat]);
       if (first) meMarker.addTo(map);
-      if (centre) map.easeTo({ center: [pos.lng, pos.lat], zoom: Math.max(map.getZoom(), 15) });
+      if (centre) centreOnYou(pos);
       // the first reading (allowed already at load, a resumed shift, a tap):
-      // the map comes to you — unless you've moved it yourself
-      if (first && !centre && !movedByYou) map.easeTo({ center: [pos.lng, pos.lat], zoom: INTENT_ZOOM });
+      // the map comes to you — unless you've moved it yourself (online or
+      // ✋ up: the nearest found too)
+      if (first && !centre && !movedByYou) {
+        if (HoodNearby.lookingFor(state)) findNearest(pos);
+        else map.easeTo({ center: [pos.lng, pos.lat], zoom: INTENT_ZOOM });
+      }
     },
     onGood(pos) {
       state.me = pos;
@@ -2694,6 +2705,7 @@ function refreshWorldMarkers() {
       mockHand.visible = false;
     }
   }
+  nearbyArrived();
 }
 
 // ===== World tick =====
@@ -3629,6 +3641,102 @@ $("btn-hand").addEventListener("click", () => {
 // drivers see the hands around them and riders the cars around them
 const INTENT_ZOOM = 14;
 
+// ===== Find the nearest (nearby.js; owner, 2026-11-07) =====
+// Go online, ✋ up, or the locate button while either is on: centred on
+// you, the map looks as wide as it still shows people one by one, waits for
+// the server's answer for that view, then zooms back in just far enough to
+// show the nearest — never closer than INTENT_ZOOM. Nobody: it stays wide
+// and the banner adds "nobody nearby yet" until someone shows up on screen.
+// Only what the map already shows is used (no "nearest" question to the
+// server). Any other move of the map — yours, or the app's — ends it.
+// what covers the map's edges (px): the banner on top, the buttons below
+const NEAR_PAD = { top: 130, bottom: 120, left: 40, right: 40 };
+const NEAR_WAIT_MS = 3000; // the longest it waits for the server's answer
+let nearSeq = 0; // the search under way; a newer number ends an older one
+let nearLooking = false; // looking (between the zoom out and the answer)
+let nobodyNear = false; // looked: nobody — the banner says so
+
+function mapSize() {
+  const c = map.getContainer();
+  return { w: c.clientWidth, h: c.clientHeight };
+}
+
+// who the map has now, of the kind you're looking for: where it shows them
+function peopleOnMap(type) {
+  if (DEMO) {
+    if (type === "driver") return drivers.map((d) => ({ pos: d.pos }));
+    return mockHand ? [{ pos: mockHand.pos }] : [];
+  }
+  return [...realEntries.values()].filter((e) => e.type === type).map((e) => ({ pos: e.peer.pos }));
+}
+
+function setNobodyNear(on) {
+  if (nobodyNear === on) return;
+  nobodyNear = on;
+  if (!bannerTimer) setBanner(contextBanner());
+}
+
+// over: a newer search, a move of the map's, ✋ down, offline
+function stopFindNearest() {
+  nearSeq++;
+  nearLooking = false;
+  setNobodyNear(false);
+}
+
+function findNearest(at) {
+  stopFindNearest();
+  const type = HoodNearby.lookingFor(state);
+  if (!type || !map) return;
+  const seq = nearSeq;
+  const size = mapSize();
+  const widestZoom = HoodNearby.widestMarkerZoom({
+    viewport: HoodViewport,
+    h3,
+    center: at,
+    size,
+    rungs: [H3_RES, ...AGG_RESES],
+    budget: MAX_WATCHED_CELLS,
+    maxZoom: INTENT_ZOOM,
+  });
+  const decide = () =>
+    HoodNearby.decide({ me: at, people: peopleOnMap(type), size, pad: NEAR_PAD, widestZoom, maxZoom: INTENT_ZOOM });
+  // the camera's own moves carry the search's number (the movestart
+  // listener: any other move ends the search)
+  const camera = (zoom) => map.easeTo({ center: [at.lng, at.lat], zoom }, { nearSearch: seq });
+
+  // someone close on the map already: the usual view, no need to look wider
+  const now = decide();
+  if (now.nearest && now.zoom === INTENT_ZOOM) return camera(INTENT_ZOOM);
+
+  nearLooking = true;
+  camera(widestZoom);
+  // the server answers for the view the map watches once it stops moving,
+  // as the role you're looking as (an online driver: ✋)
+  const role = type === "driver" ? "viewer" : "driver";
+  const until = performance.now() + NEAR_WAIT_MS;
+  const check = () => {
+    if (seq !== nearSeq) return;
+    if (HoodNearby.lookingFor(state) !== type) return stopFindNearest();
+    const answered = DEMO || (worldSync.settled() && serverRole === role);
+    if ((map.isMoving() || !answered) && performance.now() < until) return setTimeout(check, 100);
+    nearLooking = false;
+    const d = decide();
+    if (d.zoom !== widestZoom) camera(d.zoom);
+    setNobodyNear(!d.nearest);
+  };
+  setTimeout(check, 100);
+}
+
+// "nobody nearby yet" holds until someone shows up on screen (the map
+// stays where it is)
+function nearbyArrived() {
+  if (!nobodyNear) return;
+  const type = HoodNearby.lookingFor(state);
+  if (!type) return setNobodyNear(false);
+  const b = map.getBounds();
+  if (peopleOnMap(type).some((p) => b.contains([p.pos.lng, p.pos.lat]))) setNobodyNear(false);
+}
+
 function setHand(up) {
   // not live: refused — the message after the step that called this (a GPS
   // reading completes a waiting tap, then redraws the banner: locator.js)
@@ -3643,8 +3751,8 @@ function setHand(up) {
 
   if (state.handRaised) {
     // the hand goes up at YOUR location, wherever the map was panned — the
-    // camera shows it there, as wide as Go online's (INTENT_ZOOM)
-    map.easeTo({ center: [state.me.lng, state.me.lat], zoom: INTENT_ZOOM });
+    // camera comes to you there and finds the nearest car (findNearest)
+    findNearest(state.me);
     setBanner(contextBanner());
     if (DEMO) {
       handPingTimer = setTimeout(() => {
@@ -3660,6 +3768,7 @@ function setHand(up) {
     }
   } else {
     clearTimeout(handPingTimer);
+    stopFindNearest();
     if (DEMO && !state.ride) {
       // chats stay, as in the real app (lowering a hand deletes none) — this
       // once deleted the last chat opened, closed or not (2026-11-01)
@@ -3705,9 +3814,9 @@ function setOnline(on) {
   if (state.online) {
     setBanner(contextBanner());
     requestWakeLock();
-    // going on duty: centred on you, wide enough to survey the patch
-    // (INTENT_ZOOM — the same as Need a ride's)
-    map.easeTo({ center: [state.me.lng, state.me.lat], zoom: INTENT_ZOOM });
+    // going on duty: centred on you, and the nearest ✋ found (findNearest
+    // — the same as Need a ride's)
+    findNearest(state.me);
     if (DEMO) {
       scheduleDemand();
       scheduleIncomingRequest();
@@ -3716,6 +3825,7 @@ function setOnline(on) {
       pushDriverUpdate();
     }
   } else {
+    stopFindNearest();
     setBanner(null);
     // offline = unavailable: no dangling card to message/accept ghosts through
     closeMapOverlays();
@@ -3996,11 +4106,17 @@ $("btn-arrived").addEventListener("click", declareArrived);
 
 // ===== Locate =====
 $("btn-locate").addEventListener("click", () => {
-  if (DEMO) return map.easeTo({ center: [state.me.lng, state.me.lat], zoom: Math.max(map.getZoom(), 15) });
+  if (DEMO) return centreOnYou(state.me);
   // centre on your last reading now (with none yet, the reading centres
   // the map when it arrives)
-  if (loc.tapLocate()) map.easeTo({ center: [loc.best.lng, loc.best.lat], zoom: Math.max(map.getZoom(), 15) });
+  if (loc.tapLocate()) centreOnYou(loc.best);
 });
+
+// online or ✋ up: the nearest found too (findNearest); else up close
+function centreOnYou(at) {
+  if (HoodNearby.lookingFor(state)) findNearest(at);
+  else map.easeTo({ center: [at.lng, at.lat], zoom: Math.max(map.getZoom(), 15) });
+}
 
 // ===== Chat button =====
 $("btn-chat").addEventListener("click", () => {

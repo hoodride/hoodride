@@ -40,6 +40,7 @@ const ASSETS = [
   "navlink.js",
   "googlerefresh.js",
   "langswitch.js",
+  "nearby.js",
   "translate.svg",
   "phoenix.min.js",
   "maplibre-gl.js",

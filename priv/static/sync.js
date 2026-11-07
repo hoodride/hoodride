@@ -273,6 +273,11 @@
       wantsAgg: (cell) => wantedAgg.has(cell) || heldAgg.has(cell),
       wantedGeoSize: () => wantedGeo.size,
       wantedAggSize: () => wantedAgg.size,
+      // the server has answered for what we want, and nothing is on its
+      // way: the map shows all there is in view (find the nearest — nearby.js
+      // — waits for this before it decides "nobody nearby yet")
+      settled: () =>
+        joined && !inFlight && !dirty && !retryPending && same(wantedGeo, heldGeo) && same(wantedAgg, heldAgg),
     };
   }
 

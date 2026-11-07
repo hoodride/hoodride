@@ -17,12 +17,12 @@ defmodule HoodrideWeb.StaticVersions do
   @key {__MODULE__, :versions}
 
   @doc "Every app file's fingerprint, fixed at start-up in prod (prepare/0)."
-  def current, do: :persistent_term.get(@key, nil) || compute(dir(), files())
+  def current, do: :persistent_term.get(@key, nil) || live(dir(), files())
 
   @doc "One file's current fingerprint, or nil if it isn't an app file."
   def of(name) do
     case :persistent_term.get(@key, nil) do
-      nil -> if name in files(), do: compute(dir(), [name])[name]
+      nil -> if name in files(), do: live(dir(), [name])[name]
       versions -> versions[name]
     end
   end
@@ -43,9 +43,42 @@ defmodule HoodrideWeb.StaticVersions do
         path = Path.join(dir, name),
         File.regular?(path),
         into: %{} do
-      hash = :crypto.hash(:sha256, File.read!(path))
-      {name, hash |> Base.encode16(case: :lower) |> binary_part(0, 12)}
+      {name, fingerprint(path)}
     end
+  end
+
+  @doc """
+  DEV and TEST (no prepare/0): the same fingerprints, each file read again
+  only when its size or last-changed time differs from when it was last
+  read. Every page request used to read every app file again (~2.7 MB of
+  scripts alone): the sitemap tests' ~150 pages took over half a minute and,
+  with the whole suite running, passed the 60 s limit (2026-11-07).
+  """
+  # sobelow_skip ["Traversal.FileModule"]
+  def live(dir, names) do
+    for name <- names,
+        path = Path.join(dir, name),
+        {:ok, %File.Stat{type: :regular, size: size, mtime: mtime}} <- [
+          File.stat(path, time: :posix)
+        ],
+        into: %{} do
+      seen = {size, mtime}
+
+      case :persistent_term.get({__MODULE__, :file, path}, nil) do
+        {^seen, v} ->
+          {name, v}
+
+        _ ->
+          v = fingerprint(path)
+          :persistent_term.put({__MODULE__, :file, path}, {seen, v})
+          {name, v}
+      end
+    end
+  end
+
+  # sobelow_skip ["Traversal.FileModule"]
+  defp fingerprint(path) do
+    :crypto.hash(:sha256, File.read!(path)) |> Base.encode16(case: :lower) |> binary_part(0, 12)
   end
 
   @doc ~S"""

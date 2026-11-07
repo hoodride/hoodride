@@ -1096,6 +1096,10 @@ msgid "✋ Nearby drivers can see you need a ride"
 msgstr "✋ Pemandu berdekatan dapat melihat anda perlukan tumpangan"
 
 #: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride · nobody nearby yet"
+msgstr "✋ Pemandu berdekatan dapat melihat anda perlukan tumpangan · belum ada sesiapa berdekatan"
+
+#: priv/static/app.js
 msgid "✋ Need a ride"
 msgstr "✋ Perlukan tumpangan"
 
@@ -1178,6 +1182,10 @@ msgstr "🚶 Menumpang"
 #: priv/static/app.js
 msgid "🟢 You're online"
 msgstr "🟢 Anda dalam talian"
+
+#: priv/static/app.js
+msgid "🟢 You're online · nobody nearby yet"
+msgstr "🟢 Anda dalam talian · belum ada sesiapa berdekatan"
 
 #: priv/static/app.js
 msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"

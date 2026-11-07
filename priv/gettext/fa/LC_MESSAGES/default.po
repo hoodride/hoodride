@@ -1103,6 +1103,10 @@ msgid "✋ Nearby drivers can see you need a ride"
 msgstr "✋ راننده‌های نزدیک می‌بینند که سفر می‌خواهید"
 
 #: priv/static/app.js
+msgid "✋ Nearby drivers can see you need a ride · nobody nearby yet"
+msgstr "✋ راننده‌های نزدیک می‌بینند که سفر می‌خواهید · هنوز کسی نزدیک نیست"
+
+#: priv/static/app.js
 msgid "✋ Need a ride"
 msgstr "✋ سفر می‌خواهم"
 
@@ -1185,6 +1189,10 @@ msgstr "🚶 مسافر"
 #: priv/static/app.js
 msgid "🟢 You're online"
 msgstr "🟢 شما آنلاین هستید"
+
+#: priv/static/app.js
+msgid "🟢 You're online · nobody nearby yet"
+msgstr "🟢 شما آنلاین هستید · هنوز کسی نزدیک نیست"
 
 #: priv/static/app.js
 msgid "🧭 Waiting for {name}'s exact location — or ask them to set a 📍 meeting spot"
