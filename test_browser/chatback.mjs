@@ -4,8 +4,8 @@
 // list while the window is open; ✕ drops it unless something's typed in it.
 // What's typed stays with its chat ("Draft" in the list, as WhatsApp).
 // Both directions: a driver writing to a ✋, a rider writing to a car.
-import { journey, step, check } from "./cdp.mjs";
-import { goOnline, sees, openChatWith, typeText, box, send, chatOpenWith, closeChatPanel } from "./app.mjs";
+import { journey, step, check, server } from "./cdp.mjs";
+import { goOnline, sees, openChatWith, typeText, box, send, chatOpenWith, closeChatPanel, bannerIs } from "./app.mjs";
 
 // the chat window: open? the list or a chat — whose?
 const where = (p) =>
@@ -117,4 +117,21 @@ await journey("chatback: ‹ opens the list; drafts stay with their chat", async
   check(!(await has(sam, edId)), "✕: Ed's empty chat dropped");
   check(await has(sam, doraId), "Dora's stays");
   check((await chatOpenWith(sam)) === null, "the window closed");
+
+  // 20 new chats an hour (Hoodride.Throttle): the server's refusal, as the
+  // app shows it — the server side: abuse_limits_test.exs
+  step("Sam has started 20 new chats this hour: a 21st (Ed) is refused and says so, the text kept; Dora (already talking) still works");
+  await server(`cold_used_up ${samId}`); // (throws if the server couldn't)
+  await openChatWith(sam, edId);
+  await typeText(sam, "are you free?");
+  await send(sam);
+  await bannerIs(sam, "You've started a lot of new chats — try again later");
+  check(!(await sam.eval(`chatFor(realPeersById.get(${edId})).msgs.some((m) => m.mine)`)), "not shown as sent");
+  check((await box(sam)) === "are you free?", "the text is back in the box", await box(sam));
+  check((await where(sam)) === "chat:BT-Ed", "Ed's chat stays open", await where(sam));
+  await sam.click("chat-back");
+  await tapRow(sam, "BT-Dora");
+  await typeText(sam, "still on?");
+  await send(sam);
+  await dora.waitFor(`chatFor(realPeersById.get(${samId})).msgs.some((m) => m.text === "still on?")`, "Dora gets it: someone you already talk to costs nothing");
 });

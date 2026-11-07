@@ -165,5 +165,22 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     "ok"
   end
 
+  # as if this person had already started the hour's 20 new chats: spent
+  # until the real limit (Hoodride.Throttle) refuses — whatever the journey
+  # used already — so the next cold contact is refused
+  defp server("cold_used_up " <> id) do
+    user = String.to_integer(id)
+
+    spent =
+      Enum.reduce_while(1..21, 0, fn _, n ->
+        case Hoodride.Throttle.new_conversation(user) do
+          :ok -> {:cont, n + 1}
+          {:deny, _} -> {:halt, n}
+        end
+      end)
+
+    if spent < 21, do: "ok", else: "the limit never refused"
+  end
+
   defp server(other), do: "unknown request: #{other}"
 end
