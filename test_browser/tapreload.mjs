@@ -253,4 +253,118 @@ await journey("tapreload: what you do while the app reloads stays done", async (
   await duringReload(dora, () => dora.click("btn-online"));
   check(!(await dora.eval("state.online")), "offline on Dora's screen");
   check(!(await server(dora)).onMap, "her car off the map (server)");
+
+  // the ride ends AND a new one with the same person starts, both while Sam
+  // waits for his Meet-here tap and hears neither: the reload brings the new
+  // ride — it isn't waiting for a tap he made for the old one
+  step("Sam taps 📍 Meet here; his ride ends and a new one with Dora starts, unheard; a reload: the new ride isn't waiting for a tap");
+  await onServer(`start_ride ${samId} ${doraId}`);
+  await sam.waitFor(`state.ride && state.ride.status === "connected" && !!rideChannel && rideChannel.state === "joined"`, "Sam in the ride");
+  const firstRide = await sam.eval("state.ride.id");
+  await sam.waitFor(`!document.getElementById("btn-pin").classList.contains("hidden")`, "the Meet here button");
+  await sam.click("btn-pin");
+  await sam.waitFor("state.pinArmed", "Meet here: waiting for the tap");
+  // he hears nothing of it live
+  await sam.eval(`(() => {
+    rideChannel.leave();
+    window.__trigger = userChannel.trigger;
+    const on = userChannel.trigger.bind(userChannel);
+    userChannel.trigger = (ev, ...a) => (String(ev).startsWith("ride_") ? undefined : on(ev, ...a));
+    return true;
+  })()`);
+  await onServer(`swap_ride ${samId} ${doraId}`);
+  check(await sam.eval("state.pinArmed"), "(still waiting for the tap, just before the reload)");
+  await sam.eval(`softReload(), true`);
+  await sam.waitFor(`hydrated && !reloading && !!state.ride && state.ride.id !== ${JSON.stringify(firstRide)}`, "reloaded: the new ride");
+  check(!(await sam.eval("state.pinArmed")), "not waiting for a tap");
+  check(!(await sam.banner()).includes("Tap the map"), "no 'Tap the map' line", await sam.banner());
+  await sam.eval(`(userChannel.trigger = window.__trigger), true`);
+
+  // at the pickup a driver's app says "I'm here" by itself with every
+  // update until the server's answer comes — it was counted each time, and
+  // a reload loading meanwhile threw its answer away and asked again, over
+  // and over. Here the answer is held back so she keeps saying it
+  step("Dora, at the pickup, says 'I'm here' again and again while a reload is loading: the reload still finishes");
+  await dora.waitFor(`state.ride && state.ride.status === "connected" && !!rideChannel && rideChannel.state === "joined"`, "Dora in the new ride");
+  await dora.eval(`(() => {
+    const on = rideChannel.trigger.bind(rideChannel);
+    rideChannel.trigger = (ev, ...a) => (ev === "arrived" ? undefined : on(ev, ...a));
+    window.__said = 0;
+    window.__saying = setInterval(() => { if (reloading) window.__said++; declareArrived(); }, 400);
+    return true;
+  })()`);
+  try {
+    await duringReload(dora, async () => {});
+  } finally {
+    await dora.eval(`clearInterval(window.__saying), true`);
+  }
+  check((await dora.eval("window.__said")) >= 2, "she kept saying it while it loaded", await dora.eval("window.__said"));
+  check(await dora.eval(`!!state.ride && state.ride.status === "arrived"`), "arrived: the reload's answer says so", await dora.eval("state.ride && state.ride.status"));
+
+  // news of the ride partner (a name looked up again) while Sam's list
+  // shows, reached by ‹ from her chat: her ROW is redrawn — the heading
+  // stays "Chats" (it got her name)
+  step("Sam goes ‹ from Dora's chat to his list; news of Dora comes on the ride: the heading still says Chats");
+  await sam.eval(`openChat(realPeersById.get(${doraId})), true`);
+  await sam.waitFor(`state.chatView !== "list" && state.chatPeer && state.chatPeer.id === ${doraId}`, "Dora's chat open");
+  await sam.click("chat-back");
+  await sam.waitFor(`state.chatView === "list"`, "the list");
+  const chatsHeading = await sam.eval(`document.getElementById("chat-name").textContent`);
+  check(chatsHeading === "Chats", "(the list's heading: Chats)", chatsHeading);
+  const rows = () => sam.eval(`[...document.querySelectorAll("#chat-messages .chat-item strong")].map((e) => e.textContent)`);
+  const newsOfDora = (name) => sam.eval(`(rideChannel.trigger("peer", { id: ${doraId}, name: ${JSON.stringify(name)}, photo: null }), true)`);
+  await newsOfDora("BT-Dora (new)");
+  check((await sam.eval(`document.getElementById("chat-name").textContent`)) === chatsHeading, "the heading unchanged", { was: chatsHeading, now: await sam.eval(`document.getElementById("chat-name").textContent`) });
+  check((await rows()).includes("BT-Dora (new)"), "her row has the news", await rows());
+
+  // the list reached from someone ELSE's chat: her row is redrawn too
+  step("…and with the list reached from someone else's chat: her row has the news");
+  await sam.eval(`openChat(ensurePeer({ id: 990011, name: "BT-Other" })), true`);
+  await sam.waitFor(`state.chatView !== "list" && state.chatPeer && state.chatPeer.id === 990011`, "BT-Other's chat open");
+  // (someone else's chat on screen: its heading is theirs, whatever comes)
+  await newsOfDora("BT-Dora (again)");
+  check((await sam.eval(`document.getElementById("chat-name").textContent`)) === "BT-Other", "BT-Other's chat: its heading unchanged", await sam.eval(`document.getElementById("chat-name").textContent`));
+  await sam.click("chat-back");
+  await sam.waitFor(`state.chatView === "list"`, "the list");
+  await newsOfDora("BT-Dora");
+  check((await rows()).includes("BT-Dora"), "her row has the news", await rows());
+  await sam.eval(`(closeChat(), chats.delete(realPeersById.get(990011))), true`);
+
+  // her chat on screen: the heading has her new name AND her photo
+  step("Dora's chat open; news of Dora with a photo: the heading has her name and photo");
+  await sam.eval(`openChat(realPeersById.get(${doraId})), true`);
+  await sam.waitFor(`state.chatView !== "list" && state.chatPeer && state.chatPeer.id === ${doraId}`, "Dora's chat open");
+  const pic = "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%2F%3E";
+  const heading = () => sam.eval(`({ name: document.getElementById("chat-name").textContent, photo: document.getElementById("chat-photo").getAttribute("src"), initialOf: document.getElementById("chat-photo").dataset.name })`);
+  await sam.eval(`(rideChannel.trigger("peer", { id: ${doraId}, name: "BT-Dora (pic)", photo: ${JSON.stringify(pic)} }), true)`);
+  const head = await heading();
+  check(head.name === "BT-Dora (pic)" && head.photo === pic, "her new name and photo", head);
+  // no photo: her new name's initial (HoodAvatar)
+  await sam.eval(`(rideChannel.trigger("peer", { id: ${doraId}, name: "Zoe", photo: null }), true)`);
+  const noPic = await heading();
+  const zoeAvatar = await sam.eval(`HoodAvatar.url("Zoe")`);
+  check(noPic.name === "Zoe" && noPic.photo === zoeAvatar && noPic.initialOf === "Zoe", "no photo: her new name's initial", noPic);
+  await sam.eval(`(rideChannel.trigger("peer", { id: ${doraId}, name: "BT-Dora", photo: null }), closeChat(), true)`);
+
+  // Message hides a card but remembers whose it was: news of her then
+  // brought it back up over the chat
+  step("Sam opens Dora's card and taps Message; news of Dora comes: her card stays hidden");
+  await sam.eval(`openPeerCard(realPeersById.get(${doraId})), true`);
+  await sam.waitFor(`!document.getElementById("peer-card").classList.contains("hidden")`, "her card");
+  await sam.click("btn-msg");
+  await sam.waitFor(`state.chatPeer && state.chatPeer.id === ${doraId} && !document.getElementById("chat").classList.contains("hidden")`, "her chat");
+  await sam.eval(`(rideChannel.trigger("peer", { id: ${doraId}, name: "BT-Dora", photo: null }), true)`);
+  check(await sam.eval(`document.getElementById("peer-card").classList.contains("hidden")`), "her card stays hidden");
+  await sam.eval(`closeChat(), true`);
+
+  step("Sam's looking at Dora's card; news of Dora comes: the card shows it");
+  await sam.eval(`openPeerCard(realPeersById.get(${doraId})), true`);
+  await sam.waitFor(`!document.getElementById("peer-card").classList.contains("hidden")`, "her card");
+  await sam.eval(`(rideChannel.trigger("peer", { id: ${doraId}, name: "BT-Dora (card)", photo: null }), true)`);
+  const card = await sam.eval(`({ open: !document.getElementById("peer-card").classList.contains("hidden"), text: document.getElementById("peer-card").textContent })`);
+  check(card.open && card.text.includes("BT-Dora (card)"), "the card still open, with the news", card);
+  await sam.eval(`(rideChannel.trigger("peer", { id: ${doraId}, name: "BT-Dora", photo: null }), closePeerCard()), true`);
+
+  await sam.click("btn-endride");
+  await sam.waitFor(`!state.ride`, "the new ride ended");
 });

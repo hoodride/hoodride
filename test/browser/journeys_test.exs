@@ -212,5 +212,79 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     "ok"
   end
 
+  # a ride between this rider and driver, started as an accept starts one
+  # (both are told)
+  defp server("start_ride " <> ids) do
+    [rider, driver] = ids |> String.split() |> Enum.map(&String.to_integer/1)
+    {:ok, _} = Hoodride.Rides.start_ride(rider, driver)
+    "ok"
+  end
+
+  # the rider's ride ends and a new one starts between the same two — at
+  # once, as if both landed within one reload
+  defp server("swap_ride " <> ids) do
+    [rider, driver] = ids |> String.split() |> Enum.map(&String.to_integer/1)
+    old = Hoodride.Rides.ride_id_of_user(rider)
+    [{pid, _}] = Registry.lookup(Hoodride.Rides.Registry, old)
+    ref = Process.monitor(pid)
+    Hoodride.Rides.end_ride(old, rider)
+
+    receive do
+      {:DOWN, ^ref, :process, ^pid, _} -> :ok
+    after
+      5_000 -> raise "the ride didn't end"
+    end
+
+    {:ok, _new} = Hoodride.Rides.start_ride(rider, driver)
+    "ok"
+  end
+
+  # every conversation this person has is deleted (as when everyone they
+  # talked to has gone) — both sides are told, as by the sweeper
+  defp server("close_chats " <> id) do
+    user = String.to_integer(id)
+
+    for c <- Hoodride.Chat.conversations_for(user),
+        do: Hoodride.Chat.delete_conversation(Hoodride.Chat.pair_key(user, c.peer_id))
+
+    "ok"
+  end
+
+  # `n` messages from one person to another, sent at once ("m1"…"mN", or
+  # another prefix), past the per-minute limits (those aren't what's tested)
+  defp server("many_msgs " <> args) do
+    [from, to, n | rest] = String.split(args)
+    prefix = List.first(rest) || "m"
+    sender = Hoodride.Accounts.get_user(String.to_integer(from))
+
+    for i <- 1..String.to_integer(n),
+        do: {:ok, _} = Hoodride.Chat.send_message(sender, String.to_integer(to), "#{prefix}#{i}")
+
+    "ok"
+  end
+
+  # these two's conversation is deleted (as when one of them has gone) —
+  # both are told, as by the sweeper
+  defp server("close_chat " <> ids) do
+    [a, b] = ids |> String.split() |> Enum.map(&String.to_integer/1)
+    Hoodride.Chat.delete_conversation(Hoodride.Chat.pair_key(a, b))
+    "ok"
+  end
+
+  # someone new and this person share a conversation with no message in it
+  # yet (as a ride opens one)
+  defp server("quiet_chat " <> id) do
+    {:ok, quiet} =
+      Hoodride.Accounts.upsert_oauth_user(%{
+        provider: "dev",
+        provider_id: "BT-Quiet",
+        name: "BT-Quiet",
+        photo: nil
+      })
+
+    :ok = Hoodride.Chat.open(String.to_integer(id), quiet.id)
+    "ok"
+  end
+
   defp server(other), do: "unknown request: #{other}"
 end

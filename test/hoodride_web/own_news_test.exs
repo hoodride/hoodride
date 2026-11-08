@@ -23,10 +23,17 @@ defmodule HoodrideWeb.OwnNewsTest do
     refute @app =~ ~r/(userChannel|rideChannel) = socket\.channel\(/
   end
 
-  test "everything counts but the position updates (a reload would never settle)" do
-    assert @app =~ ~s|const QUIET_PUSHES = new Set(["driver_update", "pos"]);|
+  test "everything counts but what repeats on its own (a reload would never settle)" do
+    assert @app =~ ~s|const QUIET_PUSHES = new Set(["driver_update", "pos", "arrived"]);|
     [own] = Regex.run(~r/function ownNews\(channel\) \{.*?\n\}/s, @app)
     assert own =~ "if (!QUIET_PUSHES.has(event)) tapNews();"
+  end
+
+  test "\"I'm here\" counts once per ride, where it's said (it repeats at the pickup)" do
+    [arrived] = Regex.run(~r/function declareArrived\(\) \{.*?\n\}/s, @app)
+
+    assert arrived =~
+             "if (!state.ride.arrivedNews) {\n      state.ride.arrivedNews = true;\n      tapNews();\n    }"
   end
 
   test "going online counts, where it's tapped (its update is a position update)" do

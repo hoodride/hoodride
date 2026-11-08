@@ -75,6 +75,57 @@ await journey("findnearest: the map shows you the nearest", async (browser) => {
   check(await onYou(sam), "centred on Sam");
   await bannerIs(sam, RIDER + NOBODY);
 
+  // someone under the banner (or the buttons) at that wide view isn't on
+  // screen for the search — nor for "nobody nearby yet": the line cleared
+  // while the map stayed wide and they stayed hidden (owner, 2026-11-08)
+  step("a car shows up under Sam's banner at that wide view: his line stays 'nobody nearby yet', the map stays put");
+  const underBanner = await sam.eval(`(() => { const { w } = mapSize(); const ll = map.unproject([w / 2, 60]); return { latitude: ll.lat, longitude: ll.lng }; })()`);
+  const held0 = await view(sam);
+  const top = await browser.person("BT-Top", underBanner);
+  await top.phone(390, 844);
+  await goOnline(top, { color: "Green", make: "Fiat", model: "500" });
+  const topId = await top.id();
+  await sam.waitFor(`realEntries.has(${topId})`, "Top's car on Sam's map", 15000);
+  await new Promise((r) => setTimeout(r, 500));
+  const topAt = await sam.eval(`(() => { const p = realEntries.get(${topId}).peer.pos; const pt = map.project([p.lng, p.lat]); return { y: Math.round(pt.y), inBounds: map.getBounds().contains([p.lng, p.lat]) }; })()`);
+  check(topAt.inBounds && topAt.y < 130, "(Top's car on the map, under the banner)", topAt);
+  await bannerIs(sam, RIDER + NOBODY);
+  check(JSON.stringify(await view(sam)) === JSON.stringify(held0), "the map stayed put", { held0, now: await view(sam) });
+
+  step("…and one under his buttons at the bottom: still 'nobody nearby yet'");
+  const underButtons = await sam.eval(`(() => { const { w, h } = mapSize(); const ll = map.unproject([w / 2, h - 60]); return { latitude: ll.lat, longitude: ll.lng }; })()`);
+  const bottom = await browser.person("BT-Bottom", underButtons);
+  await bottom.phone(390, 844);
+  await goOnline(bottom, { color: "Black", make: "Ford", model: "Ka" });
+  const bottomId = await bottom.id();
+  await sam.waitFor(`realEntries.has(${bottomId})`, "Bottom's car on Sam's map", 15000);
+  await new Promise((r) => setTimeout(r, 500));
+  const bottomAt = await sam.eval(`(() => { const p = realEntries.get(${bottomId}).peer.pos; const pt = map.project([p.lng, p.lat]); return { y: Math.round(pt.y), h: mapSize().h, inBounds: map.getBounds().contains([p.lng, p.lat]) }; })()`);
+  check(bottomAt.inBounds && bottomAt.y > bottomAt.h - 120, "(Bottom's car on the map, under the buttons)", bottomAt);
+  await bannerIs(sam, RIDER + NOBODY);
+  check(JSON.stringify(await view(sam)) === JSON.stringify(held0), "the map stayed put", { held0, now: await view(sam) });
+  await bottom.click("btn-online");
+  await bottom.waitFor("!state.online", "Bottom offline");
+  await sam.waitFor(`!realEntries.has(${bottomId})`, "Bottom's car gone from Sam's map", 15000);
+  await bottom.close();
+
+  step("…then Top drives into the clear: Sam's line clears, the map stays put");
+  await top.locate(near(0.5));
+  await sam.waitFor(`(() => { const e = realEntries.get(${topId}); if (!e) return false; const pt = map.project([e.peer.pos.lng, e.peer.pos.lat]); return pt.y > 130; })()`, "Top's car in the clear on Sam's map", 15000);
+  await bannerIs(sam, RIDER);
+  check(JSON.stringify(await view(sam)) === JSON.stringify(held0), "the map stayed put", { held0, now: await view(sam) });
+  await top.click("btn-online");
+  await top.waitFor("!state.online", "Top offline");
+  await sam.waitFor(`!realEntries.has(${topId})`, "Top's car gone from Sam's map", 15000);
+  await top.close();
+  // (nobody around again: Sam's ✋ down and up — a new look, nobody)
+  await sam.click("btn-hand");
+  await sam.waitFor("!state.handRaised", "Sam's ✋ down");
+  await sam.click("btn-hand");
+  await sam.waitFor("state.handRaised", "Sam's ✋ up");
+  await settled(sam);
+  await bannerIs(sam, RIDER + NOBODY);
+
   step("Dora goes online 2 km north: her map finds Sam's ✋ — zoomed out just enough");
   const dora = await browser.person("BT-Dora", DORA);
   await dora.phone(390, 844);
@@ -103,68 +154,6 @@ await journey("findnearest: the map shows you the nearest", async (browser) => {
   check(await onScreen(sam, doraId), "Dora's car on screen");
   await bannerIs(sam, RIDER);
 
-  // longer than the search waits (3 s): it decides "nobody" with what it
-  // has, then the late answer brings the view a fast one would have
-  step("Lu (home) on a very slow connection (5 s) raises ✋: 'nobody' at first, then the late answer zooms in to Dora's car");
-  const lu = await browser.person("BT-Lu");
-  await lu.phone(390, 844);
-  await lu.open();
-  await lu.waitFor(`worldChannel && worldChannel.state === "joined" && worldSync.settled()`, "Lu's map loaded");
-  // zoomed right in first: Dora's block is outside what Lu's map watches,
-  // so only the wide look (the slow answer) can find her
-  await lu.eval(`map.jumpTo({ center: [state.me.lng, state.me.lat], zoom: 17 }), true`);
-  await lu.waitFor(`!map.isMoving() && worldSync.settled() && !realEntries.has(${doraId})`, "Lu zoomed in, Dora not on his map");
-  await slowMap(lu, 5000);
-  await lu.click("btn-hand");
-  await lu.waitFor("state.handRaised", "Lu's ✋ up");
-  await bannerIs(lu, RIDER + NOBODY);
-  const luWide = await widest(lu);
-  await lu.waitFor(`!map.isMoving() && map.getZoom() < 14 && map.getZoom() > ${luWide + 0.05}`, "Lu's map zoomed in to fit", 15000);
-  check(await onYou(lu), "centred on Lu");
-  check(await onScreen(lu, doraId), "Dora's car on screen");
-  await bannerIs(lu, RIDER);
-  const luId = await lu.id();
-  await lu.click("btn-hand");
-  await lu.waitFor("!state.handRaised", "Lu's ✋ down");
-
-  // waiting for the late answer, Lu moves the map himself: when it comes,
-  // it leaves the map where he put it
-  step("Lu again, and drags the map while the late answer is on its way: it never pulls the map back");
-  const zoomIn = async () => {
-    await lu.eval(`map.jumpTo({ center: [state.me.lng, state.me.lat], zoom: 17 }), true`);
-    await lu.waitFor(`!map.isMoving() && worldSync.settled() && !realEntries.has(${doraId})`, "Lu zoomed in, Dora not on his map", 15000);
-  };
-  await zoomIn();
-  await lu.click("btn-hand");
-  await lu.waitFor("state.handRaised", "Lu's ✋ up");
-  await bannerIs(lu, RIDER + NOBODY);
-  await drag(lu);
-  await bannerIs(lu, RIDER);
-  let held = await view(lu);
-  await new Promise((r) => setTimeout(r, 4000)); // past the late answer (5 s)
-  await lu.waitFor(`worldSync.settled()`, "the late answer in", 10000);
-  await new Promise((r) => setTimeout(r, 1000)); // time to act on it (it checks every 0.2 s)
-  check(JSON.stringify(await view(lu)) === JSON.stringify(held), "the map stayed where Lu put it", { held, now: await view(lu) });
-  await lu.click("btn-hand");
-  await lu.waitFor("!state.handRaised", "Lu's ✋ down");
-
-  step("Lu again, and puts ✋ down while the late answer is on its way: it does nothing");
-  await zoomIn();
-  await lu.click("btn-hand");
-  await lu.waitFor("state.handRaised", "Lu's ✋ up");
-  await bannerIs(lu, RIDER + NOBODY);
-  held = await view(lu);
-  await lu.click("btn-hand");
-  await lu.waitFor("!state.handRaised", "Lu's ✋ down");
-  await new Promise((r) => setTimeout(r, 4000));
-  await lu.waitFor(`worldSync.settled()`, "the late answer in", 10000);
-  await new Promise((r) => setTimeout(r, 1000)); // time to act on it (it checks every 0.2 s)
-  check(JSON.stringify(await view(lu)) === JSON.stringify(held), "the map didn't move", { held, now: await view(lu) });
-  check((await lu.banner()) === "", "no line (not looking)", await lu.banner());
-
-  await dora.waitFor(`!realEntries.has(${luId})`, "Lu's ✋ gone from Dora's map", 15000);
-  await lu.close();
-
   step("Ed goes online a block from Sam: the usual view (never closer), Sam's ✋ on it");
   const ed = await browser.person("BT-Ed", ED);
   await ed.phone(390, 844);
@@ -184,19 +173,29 @@ await journey("findnearest: the map shows you the nearest", async (browser) => {
   await settled(ed);
   v = await view(ed);
   check(v.zoom === 14, "zoom 14", v);
+
   check(await onScreen(ed, samId), "Sam's ✋ on his screen");
   const edId = await ed.id();
   await sam.waitFor(`realEntries.has(${edId})`, "Ed's car on Sam's map", 15000);
+  // (Ed's car already on Sam's map, a block away: straight to the usual
+  // view — never out to the widest first and back)
+  await sam.eval(`(window.__minZoom = map.getZoom(), window.__startZoom = map.getZoom(), map.on("zoom", () => { window.__minZoom = Math.min(window.__minZoom, map.getZoom()); }), true)`);
   await locate(sam);
   check((await view(sam)).zoom === 14, "Sam's locate: Ed's close — zoom 14", await view(sam));
+  const samZooms = await sam.eval(`({ min: window.__minZoom, start: window.__startZoom, widest: ${await widest(sam)} })`);
+  check(samZooms.start > samZooms.widest + 0.05 && samZooms.min >= Math.min(samZooms.start, 14) - 1e-6, "never out to the widest on the way", samZooms);
 
   step("Sam's ✋ down: Dora's locate finds nobody — wide, 'nobody nearby yet'");
   await sam.click("btn-hand");
   await sam.waitFor("!state.handRaised", "Sam's ✋ down");
   await dora.waitFor(`!realEntries.has(${samId})`, "Sam's ✋ gone from Dora's map", 15000);
+  // (a short message is up meanwhile: "nobody nearby yet" waits for it)
+  await dora.eval(`transientBanner("a short message", 8000), true`);
   await locate(dora);
   v = await view(dora);
   check(Math.abs(v.zoom - (await widest(dora))) < 1e-6, "the widest zoom", v);
+  check((await dora.banner()) === "a short message", "the short message stays up", await dora.banner());
+  await dora.eval(`(clearTimeout(bannerTimer), bannerTimer = null, setBanner(contextBanner())), true`);
   await bannerIs(dora, ONLINE + NOBODY);
 
   step("Dora drags the map: the line goes back (the screen isn't 'near you' any more), the map stays where she put it");

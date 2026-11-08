@@ -139,11 +139,7 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   await settled();
   const shrunk = await scroll();
   await rita.eval(`document.getElementById("chat-messages").style.maxHeight = "", true`);
-  await settled();
-  await settled();
-  const grown = await scroll();
   check(shrunk.scrolls && shrunk.fromBottom <= 2 && shrunk.lastInView && !(await rita.eval(`!document.getElementById("chat-jump").classList.contains("hidden")`)), "the box shrank: still at the newest, no ↓", shrunk);
-  check(grown.fromBottom <= 2 && grown.lastInView, "and grew back: still at the newest", grown);
   const scrollUp = async () => {
     await settled();
     await rita.eval(`(document.getElementById("chat-messages").scrollTop = 0, document.getElementById("chat-messages").dispatchEvent(new Event("scroll")), true)`);

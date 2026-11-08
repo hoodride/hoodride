@@ -51,10 +51,11 @@ defmodule HoodrideWeb.ChatRebuildTest do
       refute b =~ "if (reopen && chats.has(reopen))"
     end
 
-    test "reopened is read: no unread, bookmark moved" do
+    test "reopened is read: no unread, bookmark moved — if it's the chat on screen, not the list" do
       [reopen] = Regex.run(~r/if \(reopen\) \{.*?\n  \}/s, body("softReload"))
-      assert reopen =~ "chatFor(reopen).unread = 0;"
-      assert reopen =~ "markSeen(reopen);"
+
+      assert reopen =~
+               ~s[if (state.chatView !== "list") {\n      chatFor(reopen).unread = 0;\n      markSeen(reopen);]
     end
   end
 
@@ -68,7 +69,7 @@ defmodule HoodrideWeb.ChatRebuildTest do
       assert s =~ ~s[unavailable: t("{name} isn't available right now", { name: peer.name }),]
     end
 
-    test "both close the chat (back to the map); not available drops the text" do
+    test "both close their chat if it's on screen (the list stays); not available drops the text" do
       s = send_handler()
 
       assert s =~
@@ -84,7 +85,12 @@ defmodule HoodrideWeb.ChatRebuildTest do
       assert gone =~ ~s[if (e.reason === "unavailable") {]
       assert gone =~ ~s[if (chats.has(peer)) chats.get(peer).draft = "";]
       assert gone =~ ~s[if (state.chatPeer === peer) {\n              $("chat-input").value = "";]
-      assert gone =~ "if (state.chatPeer === peer) closeChat();"
+      # their chat closes if it's the one on screen (the list, if that's what
+      # shows, stays — test_browser/chatsgone.mjs)
+      assert gone =~
+               ~s[const theirsOnScreen = !$("chat").classList.contains("hidden") && !listShowing && state.chatPeer === peer;]
+
+      assert gone =~ "} else if (theirsOnScreen) closeChat();"
     end
 
     # the text goes back only into ITS person's box — never into another
@@ -93,8 +99,10 @@ defmodule HoodrideWeb.ChatRebuildTest do
       [unsay] = Regex.run(~r/const unsay = \(why\) => \{.*?\n    \};/s, send_handler())
       # back as ITS chat's draft (if nothing new was typed for them), in the
       # box only if their chat is the one open
-      assert unsay =~
-               "const c = chats.get(peer);\n      if (c && !c.draft) {\n        c.draft = text;"
+      # (its chat: the one it was sent in — rebuilt if a reload dropped it,
+      # never another chat: test_browser/reloadscreens.mjs, chatsgone.mjs)
+      assert unsay =~ "let c = chats.get(peer);"
+      assert unsay =~ "if (!c.draft) {\n        c.draft = text;"
 
       assert unsay =~ "if (state.chatPeer === peer) {\n          input.value = text;"
     end

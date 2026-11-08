@@ -36,5 +36,8 @@ defmodule HoodrideWeb.DefaultPhotoTest do
     assert @app =~ "const fallback = HoodAvatar.url(img.dataset.name);"
     assert @app =~ ~s[$("peer-photo").dataset.name = peer.name || "";]
     assert @app =~ ~s[$("chat-photo").dataset.name = state.chatPeer.name || "";]
+    # …and the ride partner's, when their name and photo come late
+    assert @app =~ ~s[$("chat-photo").dataset.name = name || "";]
+    assert @app =~ ~s[$("chat-photo").src = peer.photo || HoodAvatar.url(name);]
   end
 end

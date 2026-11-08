@@ -119,7 +119,9 @@ defmodule HoodrideWeb.OfflineTest do
     [send] = Regex.run(~r/\$\("chat-form"\)\.addEventListener\("submit".*?\n\}\);/s, @app)
     assert send =~ ~s[.receive("timeout", () => unsay(t("Message didn't send — try again")));]
     [unsay] = Regex.run(~r/const unsay = \(why\) => \{.*?\n    \};/s, send)
-    assert unsay =~ "bubble.remove();"
+    # (the bubble on screen now — redrawn if the chat was left and opened
+    # again: test_browser/reloadscreens.mjs)
+    assert unsay =~ "bubbleOf.get(sentMsg)?.remove();"
     # (back only into its own chat's box: HoodrideWeb.ChatRebuildTest)
     assert unsay =~
              "c.draft = text;\n        if (state.chatPeer === peer) {\n          input.value = text;"

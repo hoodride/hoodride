@@ -68,8 +68,23 @@ await journey("chatlistscroll: the chat list opens at the top", async (browser) 
   const reopened = await look();
   check(reopened.top === 0 && reopened.seen[0] === "P5" && !reopened.jump, "at the top: P5 in view, no ↓", reopened);
 
-  step("in a long chat Sam scrolls up (↓ showing), then ‹: the list, no ↓");
+  // the chat's place isn't the list's: at the bottom of a long chat, ‹ must
+  // still open the list at the top
+  step("at the bottom of a long chat, ‹: the list at the top");
   await sam.eval(`(() => { const c = chatFor(realPeersById.get(900003)); for (let i = 1; i <= 40; i++) c.msgs.push({ text: "line " + i, mine: false, at: c.lastAt }); return true; })()`);
+  await sam.eval(`openChat(realPeersById.get(900003)), true`);
+  await sam.waitFor(`state.chatView !== "list"`, "P3's chat");
+  await frame();
+  await frame();
+  const atBottom = await sam.eval(`(() => { const b = document.getElementById("chat-messages"); return { top: Math.round(b.scrollTop), fromBottom: Math.round(b.scrollHeight - b.scrollTop - b.clientHeight) }; })()`);
+  check(atBottom.top > 300 && atBottom.fromBottom <= 2, "at the bottom of P3's long chat", atBottom);
+  await sam.click("chat-back");
+  await sam.waitFor(`state.chatView === "list"`, "the list");
+  await frame();
+  const fromBottom = await look();
+  check(fromBottom.top === 0 && fromBottom.seen[0] === fromBottom.first && !fromBottom.jump, "the list at the top, its first row in view", fromBottom);
+
+  step("in a long chat Sam scrolls up (↓ showing), then ‹: the list, no ↓");
   await sam.eval(`openChat(realPeersById.get(900003)), true`);
   await sam.waitFor(`state.chatView !== "list"`, "P3's chat");
   await frame();
@@ -103,4 +118,27 @@ await journey("chatlistscroll: the chat list opens at the top", async (browser) 
   await frame();
   const after = await look();
   check(after.rows === 15 && after.first === "BT-W15" && after.top === mid && mid > 0 && !after.jump, "after the reload: where he was, W15 first, no ↓", { after, mid });
+
+  // scrolled up in a long chat (↓ showing), then ‹ to the list: a reload
+  // keeps a chat READER's place — the list isn't one: no ↓ over it, the
+  // list at the top where ‹ put it
+  step("scrolled up in W15's long chat (↓), ‹ to the list; a reload: the list at the top, no ↓");
+  await sam.eval(`(() => { const c = chatFor(realPeersById.get([...chats.keys()].find((p) => p.name === "BT-W15").id)); for (let i = 40; i >= 1; i--) c.msgs.unshift({ text: "old " + i, mine: false, at: 0, ts: null, id: null }); return true; })()`);
+  await sam.eval(`openChat([...chats.keys()].find((p) => p.name === "BT-W15")), true`);
+  await sam.waitFor(`state.chatView !== "list"`, "W15's chat");
+  await frame();
+  await frame();
+  await scrollTo(0);
+  await frame();
+  check(await sam.eval(`!document.getElementById("chat-jump").classList.contains("hidden")`), "(scrolled up: ↓ showing)");
+  await sam.click("chat-back");
+  await sam.waitFor(`state.chatView === "list"`, "the list");
+  await frame();
+  const listBefore = await look();
+  check(listBefore.top === 0 && listBefore.overflows && !listBefore.jump, "(the list at the top, no ↓)", listBefore);
+  await sam.eval(`softReload(), true`);
+  await sam.waitFor(`hydrated && !reloading`, "reloaded");
+  await frame();
+  const listReloaded = await look();
+  check(listReloaded.top === 0 && !listReloaded.jump, "after the reload: the list at the top, no ↓", listReloaded);
 });

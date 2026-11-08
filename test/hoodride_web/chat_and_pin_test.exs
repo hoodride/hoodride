@@ -58,6 +58,10 @@ defmodule HoodrideWeb.ChatAndPinTest do
       b = body("onChatResize")
       assert b =~ "chatStick.resizeStarted()"
       assert b =~ "chatStick.resizeDone()"
+      # decided now, done a frame later — only if the reader is STILL at the
+      # bottom then (a chat opened meanwhile at its "New messages" line
+      # isn't), and never the list (test_browser/chats.mjs, chatlistscroll.mjs)
+      assert b =~ ~s[if (keep && chatStick.stuck && state.chatView !== "list") chatScrollTo]
     end
 
     test "the browser's scroll anchoring can't move the list" do
@@ -66,7 +70,8 @@ defmodule HoodrideWeb.ChatAndPinTest do
     end
 
     test "opening a chat goes to the newest, with no button left over" do
-      assert body("renderChat") =~ "hideChatJump();"
+      assert body("renderChat") =~
+               "chatScrollTo(box.scrollHeight);\n  chatStick.stuck = true;\n  hideChatJump();\n}"
     end
 
     test "tapping the button, or reaching the bottom yourself, clears it" do
