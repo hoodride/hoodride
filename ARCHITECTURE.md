@@ -554,7 +554,7 @@ first-action-wins atomics (no double-booking, mutation-verified).
 | cold contact (first message OR request to someone with no conversation and no open request) | 20/hour | per account | `too_many_new_chats` |
 | re-asking a driver after a decline or cancel | 60 s from the moment of the "no" (or the cancel) | per rider→driver pair | `request_cooldown` + `retry_ms` |
 | user-channel sessions | **1 per account, newest wins** (also on join) | presence Registry | old app told `session_moved`, then its socket closes |
-| map channels | **1 per account, newest wins** (2026-10-23) | `Hoodride.WorldChannels` Registry | the older one closes cleanly (no auto-rejoin). Without it, world-only sockets multiplied the per-connection sync and reveal budgets |
+| map channels | **1 per account, the device chosen last** (2026-10-23; by stamp since 2026-11-08) | `Hoodride.WorldChannels` Registry + the sockets' stamps | an OLDER device's map join is refused (`session_moved`); an older device's map already there goes with its whole connection (a map closed under a live connection never comes back); equal or unknown stamps are left alone. "Newest map join wins" let an older device's LATE join shut down the newer device's map (server review). Without a limit, world-only sockets multiplied the per-connection sync and reveal budgets |
 
 Design notes:
 - Budgets = honest maximum × margin (a moving driver sends ~40 updates/min;
@@ -786,7 +786,14 @@ Design notes:
   rider's reconnect gap (2/2, 0 real misses); then a clean 8/8 mega run.
 - Order in send_msg/request_ride: free checks (self, length), then
   reachable? (a relation, or on your screen: HoodrideWeb.Reach), then the
-  budgets; a refused contact spends nothing. (Until 2026-10-23 a "user
+  budgets are LOOKED AT, then the request or message — and only once it has
+  gone are they charged: a refused contact spends nothing. (Until
+  2026-11-08 they were charged before the cooldown and the request's own
+  refusals: Request tapped during a cooldown, or while waiting on another
+  driver, used up the hour's new contacts; a message refused by the
+  per-person limit used up the total. Looking and charging are two steps:
+  two sessions of one account at the same instant — a hand-over — can pass
+  the limit by one.) (Until 2026-10-23 a "user
   exists" check ran first and answered `no_such_user`, which told anyone,
   unthrottled, which ids are real; a missing id is now simply unreachable.) The re-request cooldown is STARTED in
   Requests when a request ends with a decline or cancel (Hammer `set`, which
@@ -2030,8 +2037,11 @@ image_mode, forum avatar caches) serve outside images themselves. Plan
   random 22-character names (unguessable, uncountable); `users.photo` =
   `/avatars/<name>`. An unchanged photo keeps its name (byte-identical);
   a new one gets a new name (browsers cache forever, a change shows at
-  once); the replaced file is kept a DAY (socket tokens carry the old link
-  that long), then deleted; deleting the account deletes it at once;
+  once); once the account is SAVED with it, the replaced file is kept a DAY
+  (socket tokens carry the old link that long), then deleted — if the save
+  fails, the new file goes at once and the old one stays the account's
+  (`Avatars.keep_if_saved/3`, 2026-11-08: the old one used to be retired
+  before the save); deleting the account deletes it at once;
   start-up removes any file nothing points to (older than a day).
 - **Served** at `/avatars/:name` to SIGNED-IN users only; the name must
   match the pattern exactly; `Content-Security-Policy: default-src 'none'`,

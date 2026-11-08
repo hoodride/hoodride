@@ -58,8 +58,11 @@ defmodule HoodrideWeb.UserChannel do
          do: do_join(topic, params, socket)
   end
 
+  # the EXACT id as text: "user:abc" used to crash the join, and "user:0<id>"
+  # or "user:+<id>" joined a topic nothing is ever sent to (server review,
+  # 2026-11-08)
   defp do_join("user:" <> id, _params, socket) do
-    if String.to_integer(id) == socket.assigns.user_id do
+    if id == Integer.to_string(socket.assigns.user_id) do
       # the live-channel directory IS presence: this entry vanishes with the
       # process (clean close, crash, or dirty socket death alike), so a spare
       # tab closing can never mark a still-connected user as departing
@@ -186,10 +189,17 @@ defmodule HoodrideWeb.UserChannel do
 
         # no "does this user exist?" check up front: it told anyone which
         # ids are real. A missing id simply isn't reachable (HoodrideWeb.Reach).
-        with :ok <- reach(socket, to_id),
-             :ok <- throttle(Hoodride.Throttle.message(me, to_id), "rate_limited") do
+        with {:ok, cold?} <- reach(socket, to_id),
+             :ok <-
+               limits([
+                 {cold_allowed(cold?, me), "too_many_new_chats"},
+                 {Hoodride.Throttle.message_allowed(me, to_id), "rate_limited"}
+               ]) do
           spot = shareable_spot(socket, payload)
           {:ok, receipt} = Hoodride.Chat.send_message(socket.assigns.user, to_id, text, spot)
+          # it went: only now are the allowances spent
+          Hoodride.Throttle.sent_message(me, to_id)
+          if cold?, do: Hoodride.Throttle.started_conversation(me)
           {:reply, {:ok, receipt}, socket}
         else
           {:error, reply} -> {:reply, {:error, reply}, socket}
@@ -203,15 +213,22 @@ defmodule HoodrideWeb.UserChannel do
 
     # reachability FIRST: a stranger's id learns nothing from the cooldown
     # or the request's own refusals
-    with :ok <- reach(socket, driver_id),
+    with {:ok, cold?} <- reach(socket, driver_id),
+         :ok <- limits([{cold_allowed(cold?, me), "too_many_new_chats"}]),
          :ok <- request_cooldown(me, driver_id) do
       case Hoodride.Requests.create(
              socket.assigns.user,
              driver_id,
              shareable_spot(socket, payload)
            ) do
-        :ok -> {:reply, :ok, socket}
-        {:error, reason} -> {:reply, {:error, %{reason: to_string(reason)}}, socket}
+        # it went: only now is a new contact spent (a refusal — waiting on
+        # another driver, the driver gone — spends nothing)
+        :ok ->
+          if cold?, do: Hoodride.Throttle.started_conversation(me)
+          {:reply, :ok, socket}
+
+        {:error, reason} ->
+          {:reply, {:error, %{reason: to_string(reason)}}, socket}
       end
     else
       {:error, reply} -> {:reply, {:error, reply}, socket}
@@ -286,17 +303,30 @@ defmodule HoodrideWeb.UserChannel do
   # only that spends the new-conversation budget; replies and follow-ups are
   # free. (Checking both stops a request-then-message from being charged
   # twice — a request doesn't create a conversation.) A refused contact
-  # spends nothing.
+  # spends nothing: the budget is only LOOKED AT here, and charged once the
+  # request or message has gone (Hoodride.Throttle).
+  # → {:ok, cold?} | {:error, reply}
   defp reach(socket, other) do
     case HoodrideWeb.Reach.check(socket, other) do
-      :related ->
+      :related -> {:ok, false}
+      :cold -> {:ok, true}
+      {:error, reply} -> {:error, reply}
+    end
+  end
+
+  defp cold_allowed(false, _me), do: :ok
+  defp cold_allowed(true, me), do: Hoodride.Throttle.new_conversation_allowed(me)
+
+  # every limit is looked at (nothing charged); if several refuse, the one
+  # lifting LAST is named — its wait is the real one
+  defp limits(checks) do
+    case for({{:deny, ms}, reason} <- checks, do: {ms, reason}) do
+      [] ->
         :ok
 
-      :cold ->
-        throttle(Hoodride.Throttle.new_conversation(socket.assigns.user_id), "too_many_new_chats")
-
-      {:error, reply} ->
-        {:error, reply}
+      refused ->
+        {ms, reason} = Enum.max_by(refused, &elem(&1, 0))
+        {:error, %{reason: reason, retry_ms: ms}}
     end
   end
 

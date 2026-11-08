@@ -16,8 +16,9 @@ defmodule Hoodride.Avatars do
 
   Files live next to the database (`:avatar_dir`) under random names
   (unguessable, uncountable). The same photo again keeps its name (browser
-  caches stay valid); a new one gets a new name and the old file is kept a
-  day — socket tokens carry the old link that long — then removed.
+  caches stay valid); a new one gets a new name and, once the account is
+  saved with it (`keep_if_saved/3`), the old file is kept a day — socket
+  tokens carry the old link that long — then removed.
   Deleting the account removes it at once; start-up removes any file
   nothing points to.
   """
@@ -61,7 +62,6 @@ defmodule Hoodride.Avatars do
 
     case Req.get(graph_url, opts ++ base_opts()) do
       {:ok, %{status: 200, body: %{"data" => %{"is_silhouette" => true}}}} ->
-        retire(current)
         nil
 
       {:ok, %{status: 200, body: %{"data" => %{"url" => url}}}} ->
@@ -73,6 +73,30 @@ defmodule Hoodride.Avatars do
       _ ->
         current
     end
+  end
+
+  @doc """
+  Save an account with its new photo (`save` returns `{:ok, _}` or anything
+  else): the OLD photo is retired only once the account points at the new
+  one; if the save fails or raises, the NEW file — which nothing points to
+  — goes at once. Fetching never retires anything itself: a database
+  failure after the download used to leave the account pointing at a file
+  deleted a day later (server review, 2026-11-08).
+  """
+  def keep_if_saved(new, old, save) do
+    case save.() do
+      {:ok, _} = saved ->
+        if new != old, do: retire(old)
+        saved
+
+      failed ->
+        if new != old, do: remove(new)
+        failed
+    end
+  rescue
+    e ->
+      if new != old, do: remove(new)
+      reraise e, __STACKTRACE__
   end
 
   @doc "Remove our file for `photo` now (account deletion); anything else is left alone."
@@ -161,7 +185,6 @@ defmodule Hoodride.Avatars do
       with :ok <- File.mkdir_p(dir()),
            :ok <- File.write(tmp, bytes),
            :ok <- File.rename(tmp, Path.join(dir(), name)) do
-        retire(current)
         "/avatars/" <> name
       else
         error ->

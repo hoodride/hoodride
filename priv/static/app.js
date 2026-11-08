@@ -1522,6 +1522,8 @@ function joinWorldChannel() {
     // a tab left open across a deploy: its code can't read the new messages
     if (reply && HoodBrowse.versionMismatch(reply.v, PROTOCOL)) showUpdateAvailable();
     if (reply && reply.build) serverBuild = reply.build;
+    // the tab's stamp (as the user join's reply): kept even if that one is lost
+    if (reply && reply.stamp) sessionStamp = reply.stamp;
     checkForUpdate();
     if (map && state.worldSpawned) syncGeoSubscriptions();
     if (reply && reply.role) onServerRole(reply.role, { rejoin: true });

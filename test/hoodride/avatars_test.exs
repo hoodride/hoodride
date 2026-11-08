@@ -222,9 +222,65 @@ defmodule Hoodride.AvatarsTest do
       new = Avatars.from_google(@google, old)
 
       assert new != old
+      assert {:ok, :saved} = Avatars.keep_if_saved(new, old, fn -> {:ok, :saved} end)
       assert File.exists?(file_of(old, dir)), "kept a while: links handed out earlier still work"
       assert gone_within?(file_of(old, dir), 5_000), "the old file was never removed"
       assert File.exists?(file_of(new, dir))
+    end
+
+    # the account's save comes AFTER the download: the old photo is retired
+    # only once the account points at the new one — a database failure used
+    # to leave the account pointing at a file deleted a day later (server
+    # review, 2026-11-08)
+    test "fetching alone never retires the old photo", %{dir: dir} do
+      Application.put_env(:hoodride, :avatar_keep_ms, 50)
+      on_exit(fn -> Application.delete_env(:hoodride, :avatar_keep_ms) end)
+
+      serve(&image(&1, @jpeg))
+      old = Avatars.from_google(@google, nil)
+      serve(&image(&1, @png))
+      _new = Avatars.from_google(@google, old)
+      refute gone_within?(file_of(old, dir), 300), "retired before the account was saved"
+    end
+
+    test "the save failing or raising: the NEW file goes at once, the old one stays", %{dir: dir} do
+      Application.put_env(:hoodride, :avatar_keep_ms, 50)
+      on_exit(fn -> Application.delete_env(:hoodride, :avatar_keep_ms) end)
+
+      serve(&image(&1, @jpeg))
+      old = Avatars.from_google(@google, nil)
+
+      for outcome <- [:error, :raise] do
+        serve(&image(&1, @png <> Atom.to_string(outcome)))
+        new = Avatars.from_google(@google, old)
+        assert new != old
+
+        save =
+          case outcome do
+            :error -> fn -> {:error, :changeset} end
+            :raise -> fn -> raise DBConnection.ConnectionError, "connection not available" end
+          end
+
+        if outcome == :raise do
+          assert_raise DBConnection.ConnectionError, fn ->
+            Avatars.keep_if_saved(new, old, save)
+          end
+        else
+          assert {:error, :changeset} = Avatars.keep_if_saved(new, old, save)
+        end
+
+        refute File.exists?(file_of(new, dir)), "#{outcome}: the unused new file was left behind"
+      end
+
+      refute gone_within?(file_of(old, dir), 300), "the old photo is still the account's"
+    end
+
+    test "the same photo (unchanged): nothing removed either way", %{dir: dir} do
+      serve(&image(&1, @jpeg))
+      photo = Avatars.from_google(@google, nil)
+      assert {:error, :x} = Avatars.keep_if_saved(photo, photo, fn -> {:error, :x} end)
+      assert {:ok, :y} = Avatars.keep_if_saved(photo, photo, fn -> {:ok, :y} end)
+      assert File.exists?(file_of(photo, dir))
     end
 
     test "remove/1 deletes our file now; anything else is left alone", %{dir: dir} do

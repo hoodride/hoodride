@@ -7,6 +7,16 @@ defmodule Hoodride.Throttle do
   The hot-path flow limits (map syncs, channel events, ride actions, joins,
   connects) are per user too, but need exact millisecond timing and atomic
   spends: Hoodride.RateBudget.
+
+  A REFUSED contact spends nothing (server review, 2026-11-08): the
+  allowances are looked at first (`*_allowed`) and charged only once the
+  request or message has gone through (`sent_message/2`,
+  `started_conversation/1`). They used to be charged before the refusals —
+  a rider tapping Request during a cooldown, or while waiting on another
+  driver, used up the hour's new contacts without reaching anyone. Looking
+  and charging are two steps: two live sessions of one account at the same
+  instant (only during a hand-over) can both pass at the last one, so the
+  limit can be passed by one per extra session. Never charged for nothing.
   """
 
   alias Hoodride.RateLimit
@@ -28,16 +38,42 @@ defmodule Hoodride.Throttle do
   # "no" sticks for a minute, but a genuine retry is still possible
   @request_cooldown @minute
 
-  @doc "A message from `from_id` to `to_id`: total budget, then per-pair."
-  def message(from_id, to_id) do
-    with :ok <- hit({:msg, from_id}, @minute, @messages_per_minute) do
-      hit({:msg_pair, from_id, to_id}, @minute, @pair_messages_per_minute)
-    end
+  @doc """
+  May `from_id` message `to_id` now? Read-only: `:ok`, or `{:deny, ms}` —
+  when both the total and the per-person limit refuse, the LATER wait (the
+  real one).
+  """
+  def message_allowed(from_id, to_id) do
+    latest([
+      peek({:msg, from_id}, @minute, @messages_per_minute),
+      peek({:msg_pair, from_id, to_id}, @minute, @pair_messages_per_minute)
+    ])
   end
 
-  @doc "Starting cold contact (first message or request to someone new)."
+  @doc "A message went: charge the total and the per-person allowance."
+  def sent_message(from_id, to_id) do
+    RateLimit.inc({:msg, from_id}, @minute)
+    RateLimit.inc({:msg_pair, from_id, to_id}, @minute)
+    :ok
+  end
+
+  @doc "May `from_id` start a cold contact (someone new) now? Read-only."
+  def new_conversation_allowed(from_id),
+    do: peek({:new_conv, from_id}, @hour, @new_conversations_per_hour)
+
+  @doc "A cold contact went through (a first message, or a request): charge it."
+  def started_conversation(from_id) do
+    RateLimit.inc({:new_conv, from_id}, @hour)
+    :ok
+  end
+
+  @doc """
+  Look, and charge if allowed — in one call. Only for the browser journeys'
+  `cold_used_up` (test/browser/journeys_test.exs), which spends the hour as
+  if real contacts had been made.
+  """
   def new_conversation(from_id) do
-    hit({:new_conv, from_id}, @hour, @new_conversations_per_hour)
+    with :ok <- new_conversation_allowed(from_id), do: started_conversation(from_id)
   end
 
   @doc """
@@ -63,10 +99,21 @@ defmodule Hoodride.Throttle do
     end
   end
 
-  defp hit(key, scale, limit) do
-    case RateLimit.hit(key, scale, limit) do
-      {:allow, _count} -> :ok
-      {:deny, retry_ms} -> {:deny, retry_ms}
+  # the allowance used up (count at the limit): refused, with the wait
+  # until its window ends (never 0 or less: the window can end between the
+  # two reads)
+  defp peek(key, scale, limit) do
+    if RateLimit.get(key, scale) >= limit do
+      {:deny, max(RateLimit.expires_at(key, scale) - System.system_time(:millisecond), 1)}
+    else
+      :ok
+    end
+  end
+
+  defp latest(results) do
+    case for({:deny, ms} <- results, do: ms) do
+      [] -> :ok
+      waits -> {:deny, Enum.max(waits)}
     end
   end
 end

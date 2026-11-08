@@ -106,20 +106,74 @@ defmodule HoodrideWeb.WorldChannel do
 
   defp do_join("world", _params, socket) do
     user_id = socket.assigns.user_id
+    own = socket.transport_pid
+    mine = socket.assigns[:stamp]
 
-    # newest wins: register FIRST, then close every older map channel of
-    # this account. The value is our transport, so the user channel on the
-    # SAME socket can find us (HoodrideWeb.Reach).
-    {:ok, _} = Registry.register(Hoodride.WorldChannels, user_id, socket.transport_pid)
+    # One map per account, the device chosen LAST (Hoodride.SessionStamp) —
+    # not whichever map join lands last: that let an older device's late
+    # join shut down the newer device's map, which then never updated again
+    # (server review, 2026-11-08). Register FIRST, then look: two map joins
+    # at the same moment each see the other and reach the same verdict.
+    # The value is our transport, so the user channel on the SAME socket
+    # can find us (HoodrideWeb.Reach).
+    {:ok, _} = Registry.register(Hoodride.WorldChannels, user_id, own)
+    stamps = Map.new(Registry.lookup(Hoodride.SocketStamps, user_id))
 
-    for {pid, _} <- Registry.lookup(Hoodride.WorldChannels, user_id),
-        pid != self(),
-        do: send(pid, :replaced)
+    if Enum.any?(stamps, fn {transport, s} -> transport != own and newer?(s, mine) end) do
+      # a newer device is live: this one steps aside, as HoodrideWeb.SessionGate
+      # (the transport writes this join's reply first, then reads this)
+      send(own, %Phoenix.Socket.Broadcast{
+        topic: "user_socket:#{user_id}",
+        event: "disconnect",
+        payload: %{}
+      })
 
+      {:error, %{reason: "session_moved"}}
+    else
+      # strictly OLDER devices' maps go — with their whole connection: a map
+      # shut down under a live connection never comes back. Equal or unknown
+      # stamps are left alone (the same tab's own leftover, already being
+      # closed; replacing on equal stamps could leave two dead maps), and
+      # never our own connection.
+      for transport <- Registry.lookup(Hoodride.WorldChannels, user_id) |> transports(),
+          transport != own,
+          older?(Map.get(stamps, transport), mine),
+          do: move_aside(user_id, transport)
+
+      joined(socket, user_id, mine)
+    end
+  end
+
+  # (a connection rejoining its map is briefly listed twice)
+  defp transports(entries), do: entries |> Enum.map(&elem(&1, 1)) |> Enum.uniq()
+
+  defp newer?(stamp, mine), do: is_integer(stamp) and is_integer(mine) and stamp > mine
+  defp older?(stamp, mine), do: is_integer(stamp) and is_integer(mine) and stamp < mine
+
+  # an older device's connection: told "opened on another device" by its
+  # user channel (which then closes the socket), or closed directly
+  defp move_aside(user_id, transport) do
+    case for({chan, ^transport} <- Registry.lookup(Hoodride.UserChannels, user_id), do: chan) do
+      [chan | _] ->
+        send(chan, :session_moved)
+
+      [] ->
+        send(transport, %Phoenix.Socket.Broadcast{
+          topic: "user_socket:#{user_id}",
+          event: "disconnect",
+          payload: %{}
+        })
+    end
+  end
+
+  defp joined(socket, user_id, stamp) do
     :ok = Phoenix.PubSub.subscribe(Hoodride.PubSub, Roles.topic(user_id))
     role = Roles.of(user_id)
 
-    {:ok, %{role: role_name(role), v: @protocol, build: HoodrideWeb.Build.current()},
+    # the tab's stamp here too: the app keeps it even if the user join's
+    # reply is lost (it carries it on every automatic reconnect)
+    {:ok,
+     %{role: role_name(role), v: @protocol, build: HoodrideWeb.Build.current(), stamp: stamp},
      assign(socket,
        geo: MapSet.new(),
        agg: MapSet.new(),
@@ -393,9 +447,6 @@ defmodule HoodrideWeb.WorldChannel do
 
   def handle_info(:flush_map, socket),
     do: {:noreply, flush(%{socket | assigns: %{socket.assigns | flush_timer: nil}})}
-
-  # a newer map channel of this account took over
-  def handle_info(:replaced, socket), do: {:stop, :normal, socket}
 
   def handle_info(_other, socket), do: {:noreply, socket}
 

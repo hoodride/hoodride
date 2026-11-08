@@ -60,10 +60,12 @@ defmodule HoodrideWeb.AuthController do
   # ID from the SERVER's session, never the request (Google: login_hint is
   # "either an email address or the sub string"). Not during a ride — the
   # page reload would interrupt it — and 5 per 10 minutes per account.
+  # The database not answering: back to the app ("Couldn't refresh") —
+  # it used to crash the request onto a bare error page.
   # → {mode | nil, extra params} | {:back, why}
   defp refresh(conn, "google", mode) when mode in ["1", "silent"] do
     with %{id: id} <- conn.assigns[:current_user],
-         %{provider: "google", provider_id: sub} <- Accounts.get_user(id) do
+         %Accounts.User{provider: "google", provider_id: sub} <- Accounts.profile(id) do
       cond do
         in_ride?(id) -> {:back, "ride"}
         not refresh_allowed?(id) -> {:back, "limit"}
@@ -71,6 +73,7 @@ defmodule HoodrideWeb.AuthController do
         true -> {mode, %{login_hint: sub}}
       end
     else
+      {:error, :unavailable} -> {:back, "failed"}
       _ -> {nil, %{}}
     end
   end
@@ -161,10 +164,12 @@ defmodule HoodrideWeb.AuthController do
       Hoodride.SignInFailures.blocked?(address(conn)) ->
         too_many_failures(conn)
 
-      # …nor without the state this browser was given (RFC 6819 §4.4.1.12)
-      not (is_binary(expected) and is_binary(verifier) and
-               Plug.Crypto.secure_compare(expected, state)) ->
-        send_resp(conn, 403, "Sign-in session mismatch — go back and try again.")
+      # …nor without the state this browser was given (RFC 6819 §4.4.1.12).
+      # Only TEXT: a crafted `state[]=x` or `code[]=x` used to crash the
+      # request (server review, 2026-11-08)
+      not (is_binary(expected) and is_binary(verifier) and is_binary(state) and
+             is_binary(code) and Plug.Crypto.secure_compare(expected, state)) ->
+        failed(conn, refreshing, 403, "Sign-in session mismatch — go back and try again.")
 
       true ->
         case exchange(conn, p, code, verifier) do
@@ -176,15 +181,17 @@ defmodule HoodrideWeb.AuthController do
 
           # our database couldn't save you: the same friendly page, not a raw error
           :db_failed ->
-            send_resp(conn, 503, "#{@labels[p]} sign-in failed — go back and try again.")
+            failed(conn, refreshing, 503, "#{@labels[p]} sign-in failed — go back and try again.")
 
-          # the provider refused the code (made up, used, expired): counted
+          # the provider refused the code (made up, used, expired): counted —
+          # a refresh's too (someone signed in could otherwise try made-up
+          # codes without ever being blocked)
           {:error, :rejected} ->
             Hoodride.SignInFailures.record(address(conn))
-            send_resp(conn, 502, "#{@labels[p]} sign-in failed — go back and try again.")
+            failed(conn, refreshing, 502, "#{@labels[p]} sign-in failed — go back and try again.")
 
           _ ->
-            send_resp(conn, 502, "#{@labels[p]} sign-in failed — go back and try again.")
+            failed(conn, refreshing, 502, "#{@labels[p]} sign-in failed — go back and try again.")
         end
     end
   end
@@ -198,6 +205,22 @@ defmodule HoodrideWeb.AuthController do
     if refresh, do: redirect(conn, to: "/?refresh=failed"), else: redirect(conn, to: "/")
   end
 
+  # A sign-in that didn't work. Someone still signed in goes back to the app
+  # — "Couldn't refresh" when it was a refresh — never to a bare page
+  # outside it: the silent refresh runs on its own when the app comes back
+  # to the front, and a second tab refreshing at the same moment replaces
+  # the first one's state (server review, 2026-11-08). Anyone else: the page.
+  # sobelow_skip ["XSS.SendResp"]
+  defp failed(conn, refreshing, status, text) do
+    signed_in = conn.assigns[:current_user] != nil
+
+    cond do
+      signed_in and refreshing -> back(conn, "failed")
+      signed_in -> redirect(conn, to: "/")
+      true -> send_resp(conn, status, text)
+    end
+  end
+
   defp forget_sign_in(conn) do
     conn
     |> delete_session(:oauth_state)
@@ -208,7 +231,12 @@ defmodule HoodrideWeb.AuthController do
   # the token endpoint's answer: a token; the code REFUSED (a 4xx — made
   # up, used, expired: counted, Hoodride.SignInFailures); or anything else
   # (the provider down, a network error) — not counted
-  defp token({:ok, %{status: 200, body: %{"access_token" => token}}}), do: {:token, token}
+  # (only a token that is TEXT: anything else crashed the next request —
+  # and it isn't the code being refused either, so it isn't counted)
+  defp token({:ok, %{status: 200, body: %{"access_token" => token}}}) when is_binary(token),
+    do: {:token, token}
+
+  defp token({:ok, %{status: 200}} = malformed), do: malformed
   defp token({:ok, %{status: status}}) when status in 400..499, do: {:error, :rejected}
   defp token(other), do: other
 
@@ -237,18 +265,25 @@ defmodule HoodrideWeb.AuthController do
                ] ++ req_options("google")
              )
            ),
-         {:ok, %{status: 200, body: info}} <-
+         # an account ID that is TEXT, in a profile that is a map: anything
+         # else used to crash (Ecto refuses a nil comparison)
+         {:ok, %{status: 200, body: %{"sub" => sub} = info}} when is_binary(sub) <-
            Req.get(@google_userinfo, [auth: {:bearer, token}] ++ req_options("google")) do
-      Accounts.upsert_oauth_user(%{
-        provider: "google",
-        provider_id: info["sub"],
-        # strangers see a first name only (Accounts.first_name/2) — never
-        # the email
-        name: Accounts.first_name(info["given_name"], info["name"]),
-        # our own small copy, made now (Hoodride.Avatars) — viewers never
-        # ask Google, and the link can't rot
-        photo: Avatars.from_google(info["picture"], Accounts.photo_of("google", info["sub"]))
-      })
+      old = Accounts.photo_of("google", sub)
+      # our own small copy, made now (Hoodride.Avatars) — viewers never
+      # ask Google, and the link can't rot
+      new = Avatars.from_google(info["picture"], old)
+
+      Avatars.keep_if_saved(new, old, fn ->
+        Accounts.upsert_oauth_user(%{
+          provider: "google",
+          provider_id: sub,
+          # strangers see a first name only (Accounts.first_name/2) — never
+          # the email
+          name: Accounts.first_name(info["given_name"], info["name"]),
+          photo: new
+        })
+      end)
     end
   end
 
@@ -274,21 +309,22 @@ defmodule HoodrideWeb.AuthController do
              [params: [fields: "id,first_name"], auth: {:bearer, token}] ++
                req_options("facebook")
            ) do
-      Accounts.upsert_oauth_user(%{
-        provider: "facebook",
-        # app-scoped: unique to Hood Ride, useless to other apps
-        provider_id: id,
-        name: Accounts.first_name(info["first_name"], nil),
-        # our own small copy, made now with the user's own token
-        # (Hoodride.Avatars): Facebook's tokenless picture address gives a
-        # SILHOUETTE to apps in Development mode, and its photo URLs expire
-        photo:
-          Avatars.from_facebook(
-            token,
-            Accounts.photo_of("facebook", id),
-            "https://graph.facebook.com/#{@fb_graph}/me/picture"
-          )
-      })
+      old = Accounts.photo_of("facebook", id)
+      # our own small copy, made now with the user's own token
+      # (Hoodride.Avatars): Facebook's tokenless picture address gives a
+      # SILHOUETTE to apps in Development mode, and its photo URLs expire
+      new =
+        Avatars.from_facebook(token, old, "https://graph.facebook.com/#{@fb_graph}/me/picture")
+
+      Avatars.keep_if_saved(new, old, fn ->
+        Accounts.upsert_oauth_user(%{
+          provider: "facebook",
+          # app-scoped: unique to Hood Ride, useless to other apps
+          provider_id: id,
+          name: Accounts.first_name(info["first_name"], nil),
+          photo: new
+        })
+      end)
     end
   end
 
@@ -321,26 +357,40 @@ defmodule HoodrideWeb.AuthController do
   def dev_login(conn, params) do
     if Application.get_env(:hoodride, :dev_login, false) and local_request?(conn) do
       name = params["name"] || "Test User"
+      photo = params["photo"]
 
-      {:ok, user} =
-        Accounts.upsert_oauth_user(%{
-          provider: "dev",
-          provider_id: name,
-          name: name,
-          photo: params["photo"]
-        })
-
-      # the load and test scripts (test_load/*.mjs) skip the Terms screen: they
-      # say {"agree_terms": true}. The browser journeys tap the real button.
-      if params["agree_terms"] == true, do: :ok = Accounts.agree_to_terms(user.id)
-      user = Accounts.get_user(user.id)
-
-      conn
-      |> Auth.sign_in(user)
-      |> json(%{ok: true})
+      # text only, and small: the name and photo go into the session cookie
+      # (4 KB). Anything else used to crash halfway — after the account was
+      # written (server review, 2026-11-08)
+      if dev_name?(name) and dev_photo?(photo),
+        do: dev_sign_in(conn, name, photo, params["agree_terms"] == true),
+        else: conn |> put_status(400) |> json(%{error: "invalid"})
     else
       send_resp(conn, 404, "not found")
     end
+  end
+
+  # (a blank name is refused by the account's own changeset: name required)
+  defp dev_name?(name), do: is_binary(name) and String.length(name) <= 60
+
+  defp dev_photo?(photo), do: is_nil(photo) or (is_binary(photo) and byte_size(photo) <= 2_000)
+
+  # the load and test scripts (test_load/*.mjs) skip the Terms screen: they
+  # say {"agree_terms": true}. The browser journeys tap the real button.
+  defp dev_sign_in(conn, name, photo, agree?) do
+    attrs = %{provider: "dev", provider_id: name, name: name, photo: photo}
+
+    with {:ok, user} <- Accounts.upsert_oauth_user(attrs),
+         :ok <- if(agree?, do: Accounts.agree_to_terms(user.id), else: :ok),
+         %Accounts.User{} = user <- Accounts.profile(user.id) do
+      conn |> Auth.sign_in(user) |> json(%{ok: true})
+    else
+      {:error, %Ecto.Changeset{}} -> conn |> put_status(400) |> json(%{error: "invalid"})
+      _ -> conn |> put_status(503) |> json(%{error: "unavailable"})
+    end
+  rescue
+    _ in [DBConnection.ConnectionError, Exqlite.Error] ->
+      conn |> put_status(503) |> json(%{error: "unavailable"})
   end
 
   @loopback [{127, 0, 0, 1}, {0, 0, 0, 0, 0, 0, 0, 1}]

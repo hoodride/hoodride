@@ -417,16 +417,18 @@ defmodule HoodrideWeb.RolePrivacyTest do
     end
   end
 
-  describe "one map channel per account (newest wins, like the user channel)" do
-    test "a second world join closes the first" do
+  describe "one map channel per account (the device chosen last, like the user channel)" do
+    test "a newer device's world join closes the older device's connection" do
       u = user("pv-r")
       _first = TestClient.start(:first, u, ["world"])
       _second = TestClient.start(:second, u, ["world"])
 
-      # a clean server-side close (the real socket sends the app phx_close,
-      # and Phoenix does not auto-rejoin after it)
-      assert_receive {:first, :got, {:socket_close, _, :normal}},
-                     1_000
+      # the older device's WHOLE connection goes, not just its map: a map
+      # closed under a live connection (phx_close) is never rejoined, and
+      # left the older device's app connected with a dead map
+      # (HoodrideWeb.SessionStampTest, the map join; 2026-11-08)
+      assert_receive {:first, :got, %Phoenix.Socket.Broadcast{event: "disconnect"}}, 1_000
+      refute_receive {:second, :got, %Phoenix.Socket.Broadcast{event: "disconnect"}}, 200
     end
   end
 

@@ -355,4 +355,117 @@ defmodule HoodrideWeb.AbuseLimitsTest do
 
     assert w > 50_000 and w <= 60_000
   end
+
+  # ===== A refused contact spends nothing (server review, 2026-11-08) =====
+  # (the general event lane — 30 events at once, per account — is a separate
+  # limit; tests needing more than 30 events in a row let it refill)
+  defp lane_refilled, do: :ets.match_delete(:rate_budgets, {{:events, :_}, :_})
+
+  # The allowances used to be charged BEFORE the refusals: a rider tapping
+  # Request during a cooldown, or while waiting on another driver, used up
+  # the hour's 20 new contacts without reaching anyone; a message refused by
+  # the per-person limit still used up the 30-a-minute total. Now each is
+  # looked at first and charged only when the request or message goes through.
+
+  test "a request refused by the cooldown spends no new-contact allowance", %{a: a, b: b} do
+    others = users("cdf", 20)
+    for d <- [b | others], do: car(d, "cF")
+    t = tab(a)
+    see(a, "cF")
+
+    # one real request (cold: charged), cancelled — the cooldown starts
+    assert {:ok, _} = reply(t, "request_ride", %{"to" => b.id})
+    assert {:ok, _} = reply(t, "cancel_request", %{})
+
+    # tapping Request again and again during the cooldown: all refused…
+    for _ <- 1..5,
+        do:
+          assert(
+            {:error, %{reason: "request_cooldown"}} = reply(t, "request_ride", %{"to" => b.id})
+          )
+
+    # …and none of them counted: 19 more new contacts still go through (1 + 19)
+    for d <- Enum.take(others, 19), do: assert({:ok, _} = msg(t, d))
+    assert {:error, %{reason: "too_many_new_chats"}} = msg(t, List.last(others))
+  end
+
+  test "requests refused while waiting on another driver spend nothing", %{a: a} do
+    [d1, d2 | others] = users("wai", 22)
+    for d <- [d1, d2 | others], do: car(d, "cG")
+    t = tab(a)
+    see(a, "cG")
+
+    # waiting on driver 1 (charged); requests to driver 2 meanwhile are
+    # refused — a SECOND driver: a cold contact each time, charged before
+    assert {:ok, _} = reply(t, "request_ride", %{"to" => d1.id})
+
+    for _ <- 1..5,
+        do:
+          assert(
+            {:error, %{reason: "already_requested"}} = reply(t, "request_ride", %{"to" => d2.id})
+          )
+
+    assert {:ok, _} = reply(t, "cancel_request", %{})
+    for d <- Enum.take(others, 19), do: assert({:ok, _} = msg(t, d))
+    assert {:error, %{reason: "too_many_new_chats"}} = msg(t, List.last(others))
+  end
+
+  test "messages refused by the per-person limit spend none of the 30-a-minute total", %{a: a} do
+    [b, c, d] = users("ppl", 3)
+    for u <- [b, c, d], do: car(u, "cH")
+    t = tab(a)
+    see(a, "cH")
+
+    for _ <- 1..15, do: assert({:ok, _} = msg(t, b))
+    # 10 more to the same person: refused by the per-person 15…
+    for _ <- 1..10, do: assert({:error, %{reason: "rate_limited", retry_ms: _}} = msg(t, b))
+    lane_refilled()
+    # …and they didn't count toward the 30: 15 more to someone else go through
+    for _ <- 1..15, do: assert({:ok, _} = msg(t, c))
+    # the total is 30 now: the 31st is refused
+    assert {:error, %{reason: "rate_limited", retry_ms: _}} = msg(t, d)
+  end
+
+  test "a message refused by the total limit spends no new-contact allowance", %{a: a, b: b} do
+    others = users("tot", 21)
+    for u <- [b | others], do: car(u, "cJ")
+    t = tab(a)
+    see(a, "cJ")
+
+    # 30 to b and the others' first ones would mix allowances: use one
+    # existing conversation for the total. b: 1 cold + 14 more = 15
+    for _ <- 1..15, do: assert({:ok, _} = msg(t, b))
+    lane_refilled()
+    # 15 cold contacts to new people (16 cold so far), total now 30
+    for u <- Enum.take(others, 15), do: assert({:ok, _} = msg(t, u))
+    # a new person now: refused by the total — and must cost no new contact
+    for _ <- 1..5,
+        do: assert({:error, %{reason: "rate_limited", retry_ms: _}} = msg(t, Enum.at(others, 15)))
+
+    lane_refilled()
+
+    # a minute later (the per-minute counters reset; the hour's stays)
+    :ets.match_delete(Hoodride.RateLimit, {{:msg, :_}, :_, :_})
+    :ets.match_delete(Hoodride.RateLimit, {{:msg_pair, :_, :_}, :_, :_})
+
+    # 16 + 4 = 20 new contacts: the refused ones didn't count
+    for u <- Enum.slice(others, 15, 4), do: assert({:ok, _} = msg(t, u))
+    assert {:error, %{reason: "too_many_new_chats"}} = msg(t, List.last(others))
+  end
+
+  test "both limits refusing: the new-contact one (the hour) is named, with its wait", %{a: a} do
+    others = users("bth", 21)
+    for u <- others, do: car(u, "cL")
+    t = tab(a)
+    see(a, "cL")
+
+    # 20 new contacts (all 20 cold), then 10 more to an existing one: total 30
+    for u <- Enum.take(others, 20), do: assert({:ok, _} = msg(t, u))
+    lane_refilled()
+    for _ <- 1..10, do: assert({:ok, _} = msg(t, hd(others)))
+
+    # a new person: BOTH refuse — the reply names the later-lifting one
+    assert {:error, %{reason: "too_many_new_chats", retry_ms: w}} = msg(t, List.last(others))
+    assert w > 3_000_000
+  end
 end

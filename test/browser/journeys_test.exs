@@ -11,6 +11,9 @@ defmodule HoodrideWeb.BrowserJourneysTest do
   """
   use HoodrideWeb.ConnCase, async: false
 
+  # (server("older_device …"): another device's socket, made here)
+  require Phoenix.ChannelTest
+
   @moduletag :browser
   @moduletag timeout: 180_000
   @port 4100
@@ -286,5 +289,60 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     "ok"
   end
 
+  # another device of this account: connected (a choice — it takes over
+  # from the page open now), but joined to nothing yet. A page loaded AFTER
+  # it is newer (Hoodride.SessionStamp). Lives until the journey ends.
+  defp server("older_device " <> id) do
+    user = String.to_integer(id)
+    test = self()
+
+    pid =
+      spawn_link(fn ->
+        {:ok, socket} =
+          Phoenix.ChannelTest.connect(HoodrideWeb.UserSocket, %{"takeover" => "true"},
+            connect_info: %{session: Hoodride.TestHelpers.session_for(user)},
+            test_process: test
+          )
+
+        send(test, {:older_device, :connected})
+        older_device(socket)
+      end)
+
+    receive do
+      {:older_device, :connected} ->
+        Process.put(:older_device, pid)
+        "ok"
+    after
+      5_000 -> "the other device didn't connect"
+    end
+  end
+
+  # …its join of `topic` arriving now (late): "ok" only if it is REFUSED as
+  # the older device ("opened on another device")
+  defp server("older_device_refused " <> topic) do
+    send(Process.get(:older_device), {:join, topic, self()})
+
+    receive do
+      {:older_device, "refused session_moved"} -> "ok"
+      {:older_device, other} -> "the older device's join was not refused: #{other}"
+    after
+      5_000 -> "no answer"
+    end
+  end
+
   defp server(other), do: "unknown request: #{other}"
+
+  defp older_device(socket) do
+    receive do
+      {:join, topic, from} ->
+        result =
+          case Phoenix.ChannelTest.join(socket, topic, %{}) do
+            {:ok, _reply, _chan} -> "joined"
+            {:error, %{reason: reason}} -> "refused " <> reason
+          end
+
+        send(from, {:older_device, result})
+        older_device(socket)
+    end
+  end
 end

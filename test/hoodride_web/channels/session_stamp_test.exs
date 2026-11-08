@@ -418,4 +418,90 @@ defmodule HoodrideWeb.SessionStampTest do
     t = choose(:t, u)
     assert is_integer(stamp_of(t)) and stamp_of(t) > 0
   end
+
+  # ---------- the map join follows the stamps too (server review, 2026-11-08) ----------
+  # It used to be "the latest map join wins": an older device's late map
+  # join shut down the NEWER device's map — which then stopped updating
+  # (cars frozen, no hands) until a reload, because the app never asks for
+  # the map again by itself. Now: a strictly older device steps aside; a
+  # strictly older one already there is replaced AND its connection closed
+  # (a map left dead under a live connection never comes back); equal or
+  # unknown stamps are left alone (the same tab's own leftover, already
+  # being closed — replacing on equal stamps could leave two dead maps).
+
+  defp map_alive?(tab) do
+    name = tab.name
+
+    receive do
+      {^name, :got, %Phoenix.Socket.Message{event: "phx_close"}} -> false
+    after
+      200 ->
+        Registry.lookup(Hoodride.WorldChannels, tab.user.id)
+        |> Enum.any?(fn {_, transport} -> transport == tab.pid end)
+    end
+  end
+
+  test "the older device's map join arriving LATE: refused — the newer device keeps its map",
+       %{u: u} do
+    laptop = connected(:laptop, u, %{"takeover" => "true"})
+    phone = choose(:phone, u)
+
+    # the laptop's map request arrives after the phone's map is up
+    assert join_now(laptop, "world") == {:error, %{reason: "session_moved"}}
+    assert closed?(laptop)
+    assert map_alive?(phone), "the newer device's map was shut down"
+    refute told_moved?(phone)
+    refute closed?(phone)
+  end
+
+  test "the older device's map already there: replaced, and its connection closed", %{u: u} do
+    laptop = tab(:laptop, u, %{"takeover" => "true"}, ["world"])
+    phone = connected(:phone, u, %{"takeover" => "true"})
+    # (the phone's connect already tells the laptop's socket to close — a
+    # real connect racing the laptop's can miss it: what the MAP join does
+    # is what's tested here)
+    _ = closed?(laptop)
+
+    assert {:ok, _} = join_now(phone, "world")
+    assert map_alive?(phone)
+    # no map left dead under a live connection: the whole connection goes
+    assert closed?(laptop, 500), "the older connection was left with a dead map"
+  end
+
+  test "the same tab's leftover (equal stamps): both maps left alone, nobody closed", %{u: u} do
+    first = choose(:tab, u)
+    again = auto(:tab_again, u, stamp_of(first))
+
+    assert admitted?(again)
+    assert map_alive?(again)
+    refute closed?(again)
+  end
+
+  test "an equal stamp's map is never closed by a map join", %{u: u} do
+    first = tab(:first, u, %{"takeover" => "true"}, ["world"])
+    {_, {:ok, %{stamp: s}}} = List.keyfind(first.joins, "world", 0)
+    again = connected(:again, u, %{"stamp" => to_string(s), "takeover" => "false"})
+    # (the reconnect's own connect already told the leftover to close — what
+    # the MAP join does is what's tested here)
+    _ = closed?(first)
+
+    assert {:ok, _} = join_now(again, "world")
+    refute closed?(first, 300), "a map join closed an equal stamp's connection"
+    assert map_alive?(again)
+  end
+
+  test "a second map join on the SAME connection never closes that connection", %{u: u} do
+    t = tab(:twice, u, %{"takeover" => "true"}, ["world", "user:#{u.id}", "world"])
+    assert admitted?(t)
+    refute closed?(t)
+    refute told_moved?(t)
+  end
+
+  test "the map join reply carries the tab's stamp too (a lost user reply can't lose it)", %{
+    u: u
+  } do
+    t = choose(:t, u)
+    {_, {:ok, %{stamp: s}}} = List.keyfind(t.joins, "world", 0)
+    assert s == stamp_of(t)
+  end
 end
