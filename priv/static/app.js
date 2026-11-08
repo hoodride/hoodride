@@ -1071,7 +1071,7 @@ async function connectSocket() {
   });
   socket.connect();
   joinWorldChannel(); // its join callback runs the first subscription sync
-  userChannel = socket.channel(`user:${state.realUser.id}`);
+  userChannel = ownNews(socket.channel(`user:${state.realUser.id}`));
 
   // the server deleted a conversation (the other person has been gone past
   // grace): clear it here too, instead of leaving a chat that can't be used
@@ -1266,6 +1266,8 @@ function hydrate(st) {
     chat.lastAt = chat.msgs.length
       ? chat.msgs[chat.msgs.length - 1].at
       : HoodChatList.localAt(c.last_activity, chatSkew);
+    // the last message's server id: which of two same-second chats is newer
+    chat.lastId = chat.msgs.length ? chat.msgs[chat.msgs.length - 1].id : null;
     if (c.peer_spot) rememberShared(peer, c.peer_spot);
   });
   applyReadState();
@@ -1607,18 +1609,27 @@ async function softReload() {
   const before = HoodRehydrate.summarize(state);
   const openChatPeerId = !$("chat").classList.contains("hidden") && state.chatPeer ? state.chatPeer.id : null;
   const openCardPeerId = !$("peer-card").classList.contains("hidden") && state.cardPeer ? state.cardPeer.id : null;
+  const openPileKey = !$("pile-sheet").classList.contains("hidden") ? state.pileKey : null;
+  const listOpen = !$("chat").classList.contains("hidden") && state.chatView === "list";
   // what the server doesn't hold: the drafts, and the not-yet-written chats
   // while the window is open (HoodChatList.carried)
   const carried = HoodChatList.carried(
     [...chats].map(([p, c]) => ({ id: p.id, server: c.server, msgs: c.msgs, draft: c.draft })),
     !$("chat").classList.contains("hidden")
   );
+  // 📍 Meet here tapped, the map tap not yet: the server doesn't know
+  const armedRide = state.pinArmed && state.ride ? state.ride.id : null;
   resetMirror();
   hydrate(st);
   carried.forEach(({ id, draft }) => {
     const p = realPeersById.get(id);
     if (p) chatFor(p).draft = draft;
   });
+  // …so it stays armed, if it's still that ride: a reload in between left
+  // "Tap the map where you want to meet" on screen, and the tap did nothing
+  // (owner, 2026-11-07). (Still yours to pin: only a connected or arrived
+  // ride's rider has Meet here, and a ride that ends is gone)
+  if (armedRide && state.ride && state.ride.id === armedRide) state.pinArmed = true;
 
   const msg = HoodRehydrate.lostBanner(HoodRehydrate.lost(before, HoodRehydrate.summarize(state)));
   // a message on screen keeps it (it restores the banner itself when it
@@ -1629,15 +1640,25 @@ async function softReload() {
 
   // the chat that was open comes back — one the server has, or a new one
   // nothing was sent in yet (the server decides at Send whether they can
-  // be messaged); it's on screen, so it's read
+  // be messaged); if it's the one on screen (not the list), it's read
   const reopen = openChatPeerId && realPeersById.get(openChatPeerId);
   if (reopen) {
     state.chatPeer = reopen;
-    chatFor(reopen).unread = 0;
-    markSeen(reopen);
+    // read only if it's the one ON SCREEN: with the list showing (‹ from
+    // that chat) its news was marked read unseen — no unread, and saved as
+    // read (owner, 2026-11-07)
+    if (state.chatView !== "list") {
+      chatFor(reopen).unread = 0;
+      markSeen(reopen);
+    }
     renderChat();
   } else if (openChatPeerId) {
     closeChat();
+  } else if (listOpen) {
+    // the chat list, opened from 💬 Chat before any chat was: drawn again
+    // from what the reload brought — it showed the old rows (no new
+    // message, no unread) though the 💬 button counted it (owner, 2026-11-07)
+    renderChat();
   }
   syncGeoSubscriptions();
   refreshControls();
@@ -1647,6 +1668,10 @@ async function softReload() {
   // in the first seconds lost its card — 2026-11-04)
   const cardBack = openCardPeerId && realPeersById.get(openCardPeerId);
   if (cardBack && realEntries.has(openCardPeerId)) openPeerCard(cardBack);
+  // …and the list of who's in one block, if that pile's still there: it
+  // closed under your finger (owner, 2026-11-07). (Gone, or down to one:
+  // openPileSheet refuses)
+  if (openPileKey) openPileSheet(openPileKey);
 }
 
 // everything hydrate rebuilds, back to a fresh page's state (the map, the
@@ -1950,9 +1975,14 @@ function onPileTap(pm) {
 
 // ----- the pile list: who is in this block -----
 function openPileSheet(key) {
+  // only a pile of two or more has a list: one person is their card (a
+  // tap opens it), none is nothing — refused here, whoever asks (owner,
+  // 2026-11-07: an empty sheet otherwise)
+  const pm = pileMarkers.get(key);
+  if (!pm || pm.ids.length < 2) return;
   closePeerCard();
   // an explicit open asks again for anyone refused before
-  (pileMarkers.get(key)?.ids || []).forEach((id) => {
+  pm.ids.forEach((id) => {
     const e = realEntries.get(id);
     if (e) e.peer.revealGone = false;
   });
@@ -2156,6 +2186,32 @@ function pushDriverOffline() {
   });
 }
 
+// What YOU do is news too: a reload whose snapshot was taken just before
+// it reached the server would put things back as they were — a ✋ down on
+// your screen while every driver still sees it, a message gone from your
+// chat though it was delivered (both found 2026-11-07, owner). Anything
+// you send while a reload is loading makes it ask again
+// (HoodRehydrate.freshState). Every push on your own channel and your
+// ride's counts — except the position updates, sent every ~1.5 s (a reload
+// would never settle): going online is counted where it's tapped. (Accept,
+// the pin, End ride: the server already answers them with news of its own
+// — ride_started, pin, ride_ended — so for them this is a second safety net,
+// for any later action it doesn't answer; test_browser/tapreload.mjs.)
+const QUIET_PUSHES = new Set(["driver_update", "pos"]);
+
+function tapNews() {
+  liveNews++;
+}
+
+function ownNews(channel) {
+  const push = channel.push.bind(channel);
+  channel.push = (event, ...rest) => {
+    if (!QUIET_PUSHES.has(event)) tapNews();
+    return push(event, ...rest);
+  };
+  return channel;
+}
+
 function pushHand(up) {
   if (!userChannel) return;
   if (up) {
@@ -2247,7 +2303,7 @@ function startRealRide(r) {
 function joinRideChannel() {
   if (!state.ride || !state.ride.id || !socket) return;
   lastRidePosSent = null; // a fresh ride always announces immediately
-  rideChannel = socket.channel(`ride:${state.ride.id}`);
+  rideChannel = ownNews(socket.channel(`ride:${state.ride.id}`));
 
   // live, or — right after we (re)join — the partner's LAST position with
   // its age (age_ms), kept by the server for exactly this
@@ -2266,7 +2322,10 @@ function joinRideChannel() {
     // rider's live countdown while the driver approaches
     // (not over a message that's up, e.g. "location is blocked")
     // (a stale hand-over shows "last seen" instead: contextBanner)
-    if (state.ride.status === "connected" && state.ride.role === "rider" && !bannerTimer) {
+    // (and not over "📍 Tap the map where you want to meet" while you place
+    // the pin: it was gone within a second of a moving driver's update —
+    // owner, 2026-11-07; placing it brings the distance back)
+    if (state.ride.status === "connected" && state.ride.role === "rider" && !bannerTimer && !state.pinArmed) {
       const meetAt = state.pinPos || loc.best;
       setBanner(
         meetAt && HoodRidePos.fresh(partnerAgeMs())
@@ -2853,6 +2912,9 @@ function openChatList() {
   state.chatView = "list";
   renderChat();
   $("chat").classList.remove("hidden");
+  // at the top, once it shows: while hidden it can't be scrolled, and it
+  // came back where it was left (owner, 2026-11-07)
+  chatScrollTo(0);
   refreshControls();
 }
 
@@ -2877,6 +2939,11 @@ $("chat-back").addEventListener("click", backToList);
 function renderChat() {
   const box = $("chat-messages");
   msgCopy.close(); // its bubble is about to go
+  // the list, newest on top: opened at the top; redrawn while it's on
+  // screen (news, a reload), where you were (owner, 2026-11-07 — with more
+  // than a screen of chats it opened at the bottom: the oldest)
+  const listShown = !!box.querySelector(".chat-item");
+  const listTop = listShown ? box.scrollTop : 0;
   box.innerHTML = "";
   if (state.chatView === "list") {
     $("chat-name").textContent = t("Chats");
@@ -2886,7 +2953,7 @@ function renderChat() {
     // $("chat-note").classList.add("hidden");
     $("chat-form").classList.add("hidden");
     // newest last message first; unread bold; how long ago (HoodChatList)
-    const rows = HoodChatList.newestFirst([...chats].map(([peer, c]) => ({ peer, c, lastAt: c.lastAt })));
+    const rows = HoodChatList.newestFirst([...chats].map(([peer, c]) => ({ peer, c, lastAt: c.lastAt, lastId: c.lastId })));
     rows.forEach(({ peer, c }) => {
       const item = document.createElement("div");
       item.className = "chat-item" + (c.unread ? " unread" : "");
@@ -2931,6 +2998,9 @@ function renderChat() {
       item.addEventListener("click", () => openChat(peer));
       box.appendChild(item);
     });
+    chatScrollTo(listTop);
+    hideChatJump();
+    return;
   } else if (state.chatPeer) {
     $("chat-name").textContent = state.chatPeer.name;
     $("chat-dist").textContent = distanceTo(state.chatPeer);
@@ -3039,6 +3109,8 @@ $("chat-jump").addEventListener("click", () => {
 
 // your own scrolling decides "stuck to the bottom" (HoodChatScroll)
 $("chat-messages").addEventListener("scroll", () => {
+  // the list: no "stuck to the bottom", no ↓ (its newest are on top)
+  if (state.chatView === "list") return;
   chatStick.onScroll($("chat-messages"));
   if (chatStick.stuck) hideChatJump();
   else updateChatJump();
@@ -3048,10 +3120,15 @@ $("chat-messages").addEventListener("scroll", () => {
 // closing, a rotation): a reader at the bottom stays there. Both, because
 // phones differ — iPhone and current Chrome/Firefox shrink only the visible
 // area (visualViewport), some browsers shrink the page (ResizeObserver)
+// The decision is made now and done a frame later — and only if the reader
+// is STILL stuck then: a chat opened in between at its "New messages" line
+// isn't (openAtLine), and was sent to the bottom past its unread messages
+// (the gate caught it on a busy machine, owner 2026-11-07)
 function onChatResize() {
   const keep = chatStick.resizeStarted();
   requestAnimationFrame(() => {
-    if (keep) chatScrollTo($("chat-messages").scrollHeight);
+    // (never the list: its newest are on top — it stays where it is)
+    if (keep && chatStick.stuck && state.chatView !== "list") chatScrollTo($("chat-messages").scrollHeight);
     setTimeout(() => chatStick.resizeDone(), 1);
   });
 }
@@ -3242,6 +3319,7 @@ function receiveMsg(peer, text, meta) {
   const c = chatFor(peer);
   const at = meta ? HoodChatList.localAt(meta.ts, chatSkew) : Date.now();
   c.lastAt = at;
+  c.lastId = meta ? meta.id : null;
   c.msgs.push({ text, mine: false, at, ts: meta ? meta.ts : null, id: meta ? meta.id : null });
   const chatOpen = !$("chat").classList.contains("hidden");
   const viewingThis = chatOpen && state.chatView === "msgs" && state.chatPeer === peer;
@@ -3311,6 +3389,10 @@ $("chat-form").addEventListener("submit", (e) => {
   if (!DEMO && !liveNow()) return transientBanner(CANT_REACH());
   $("chat-count-alert").textContent = "";
   const sentMsg = { text, mine: true, at: Date.now() };
+  // the chat's time before it, for an un-say (below). (Its id needs no
+  // putting back: nothing changes it before the answer — a message coming
+  // in makes this one not the last)
+  const before = chatFor(peer).lastAt;
   chatFor(peer).msgs.push(sentMsg);
   chatFor(peer).lastAt = sentMsg.at;
   // you replied: caught up — the "New messages" line goes (as Discord)
@@ -3339,10 +3421,33 @@ $("chat-form").addEventListener("submit", (e) => {
           updateChatCount();
         }
       }
+      // it was the chat's last: the chat's time is its last real message's
+      // again — a refused message put the chat on top of the list, "now"
+      // (owner, 2026-11-07). The list, if it's showing: drawn again (its
+      // order, and the draft)
+      if (i === arr.length) {
+        const last = arr[arr.length - 1];
+        chatFor(peer).lastAt = last ? last.at : before;
+        if (!$("chat").classList.contains("hidden") && state.chatView === "list") renderChat();
+      }
       transientBanner(why);
     };
     userChannel
       .push("send_msg", { to: peer.id, text, spot: sharedSpot() })
+      // sent: its time and id are the server's from now on, like everyone
+      // else's (whole seconds, then the id) — this phone's exact time put it
+      // ahead of a message that came in later the same second (owner,
+      // 2026-11-07)
+      .receive("ok", (r) => {
+        if (!r || typeof r.ts !== "number") return;
+        sentMsg.ts = r.ts;
+        sentMsg.id = r.id;
+        sentMsg.at = HoodChatList.localAt(r.ts, chatSkew);
+        const c = chats.get(peer);
+        if (!c || c.msgs[c.msgs.length - 1] !== sentMsg) return; // something newer since
+        c.lastAt = sentMsg.at;
+        c.lastId = r.id;
+      })
       .receive("error", (e) => {
         const msgs = {
           too_long: t("Message too long — keep it under {max} characters", { max: HoodChatList.MAX_CHARS }),
@@ -3652,6 +3757,9 @@ const INTENT_ZOOM = 14;
 // what covers the map's edges (px): the banner on top, the buttons below
 const NEAR_PAD = { top: 130, bottom: 120, left: 40, right: 40 };
 const NEAR_WAIT_MS = 3000; // the longest it waits for the server's answer
+// …then it decides with what it has, and keeps listening this long: a
+// slow connection's answer still brings the view a fast one would have
+const NEAR_LATE_MS = 30000;
 let nearSeq = 0; // the search under way; a newer number ends an older one
 let nearLooking = false; // looking (between the zoom out and the answer)
 let nobodyNear = false; // looked: nobody — the banner says so
@@ -3714,15 +3822,28 @@ function findNearest(at) {
   // as the role you're looking as (an online driver: ✋)
   const role = type === "driver" ? "viewer" : "driver";
   const until = performance.now() + NEAR_WAIT_MS;
+  const answered = () => DEMO || (worldSync.settled() && serverRole === role);
+  const show = (d) => {
+    if (d.zoom !== map.getZoom()) camera(d.zoom);
+    setNobodyNear(!d.nearest);
+  };
   const check = () => {
     if (seq !== nearSeq) return;
     if (HoodNearby.lookingFor(state) !== type) return stopFindNearest();
-    const answered = DEMO || (worldSync.settled() && serverRole === role);
-    if ((map.isMoving() || !answered) && performance.now() < until) return setTimeout(check, 100);
+    const done = answered();
+    if ((map.isMoving() || !done) && performance.now() < until) return setTimeout(check, 100);
     nearLooking = false;
-    const d = decide();
-    if (d.zoom !== widestZoom) camera(d.zoom);
-    setNobodyNear(!d.nearest);
+    show(decide());
+    // no answer yet (a slow connection): decided with what there was —
+    // decide again once it comes, unless the map was moved meanwhile
+    if (!done) setTimeout(late, 200);
+  };
+  const lateUntil = until + NEAR_LATE_MS;
+  const late = () => {
+    if (seq !== nearSeq) return;
+    if (HoodNearby.lookingFor(state) !== type) return stopFindNearest();
+    if (answered()) return show(decide());
+    if (performance.now() < lateUntil) setTimeout(late, 200);
   };
   setTimeout(check, 100);
 }
@@ -3822,6 +3943,7 @@ function setOnline(on) {
       scheduleIncomingRequest();
     } else {
       lastGeoSent = null; // going online always announces immediately
+      tapNews();
       pushDriverUpdate();
     }
   } else {

@@ -31,6 +31,16 @@ test("newest first; the original order breaks ties", () => {
   assert.deepEqual(L.newestFirst([a, b, c, d]).map((x) => x.name), ["b", "d", "c", "a"]);
 });
 
+test("last messages in the same second (server times are whole seconds): the higher server id is newer", () => {
+  const older = { name: "older", lastAt: 300, lastId: 7 };
+  const newer = { name: "newer", lastAt: 300, lastId: 9 };
+  const noId = { name: "noId", lastAt: 300 };
+  assert.deepEqual(L.newestFirst([older, newer]).map((x) => x.name), ["newer", "older"]);
+  assert.deepEqual(L.newestFirst([noId, older]).map((x) => x.name), ["older", "noId"]);
+  // a later second still wins over a higher id
+  assert.deepEqual(L.newestFirst([{ name: "x", lastAt: 299, lastId: 99 }, older]).map((x) => x.name), ["older", "x"]);
+});
+
 test("newest first doesn't touch the list it was given", () => {
   const list = [{ lastAt: 1 }, { lastAt: 2 }];
   L.newestFirst(list);

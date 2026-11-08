@@ -35,6 +35,21 @@ const onScreen = (p, id) =>
   p.eval(`realEntries.has(${id}) && map.getBounds().contains([realEntries.get(${id}).peer.pos.lng, realEntries.get(${id}).peer.pos.lat])`);
 // a gesture of yours: a drag (it carries the pointer's event, as a real one)
 const drag = (p) => p.eval(`map.panBy([0, 300], { duration: 0 }, { originalEvent: new MouseEvent("mousedown") }), true`);
+// a slow connection: this person's map asks the server who's in view, and
+// the question gets there `ms` late — so the answer, and the live news for
+// the new area, come that late too (as on a slow phone connection)
+const slowMap = (p, ms) =>
+  p.eval(`(() => {
+    const push = worldChannel.push.bind(worldChannel);
+    worldChannel.push = (event, ...rest) => {
+      if (event !== "sync") return push(event, ...rest);
+      const cbs = [];
+      const later = { receive(status, cb) { cbs.push([status, cb]); return later; } };
+      setTimeout(() => cbs.reduce((p, [status, cb]) => p.receive(status, cb), push(event, ...rest)), ${ms});
+      return later;
+    };
+    return true;
+  })()`);
 const locate = async (p) => {
   await p.click("btn-locate");
   await settled(p);
@@ -88,6 +103,68 @@ await journey("findnearest: the map shows you the nearest", async (browser) => {
   check(await onScreen(sam, doraId), "Dora's car on screen");
   await bannerIs(sam, RIDER);
 
+  // longer than the search waits (3 s): it decides "nobody" with what it
+  // has, then the late answer brings the view a fast one would have
+  step("Lu (home) on a very slow connection (5 s) raises ✋: 'nobody' at first, then the late answer zooms in to Dora's car");
+  const lu = await browser.person("BT-Lu");
+  await lu.phone(390, 844);
+  await lu.open();
+  await lu.waitFor(`worldChannel && worldChannel.state === "joined" && worldSync.settled()`, "Lu's map loaded");
+  // zoomed right in first: Dora's block is outside what Lu's map watches,
+  // so only the wide look (the slow answer) can find her
+  await lu.eval(`map.jumpTo({ center: [state.me.lng, state.me.lat], zoom: 17 }), true`);
+  await lu.waitFor(`!map.isMoving() && worldSync.settled() && !realEntries.has(${doraId})`, "Lu zoomed in, Dora not on his map");
+  await slowMap(lu, 5000);
+  await lu.click("btn-hand");
+  await lu.waitFor("state.handRaised", "Lu's ✋ up");
+  await bannerIs(lu, RIDER + NOBODY);
+  const luWide = await widest(lu);
+  await lu.waitFor(`!map.isMoving() && map.getZoom() < 14 && map.getZoom() > ${luWide + 0.05}`, "Lu's map zoomed in to fit", 15000);
+  check(await onYou(lu), "centred on Lu");
+  check(await onScreen(lu, doraId), "Dora's car on screen");
+  await bannerIs(lu, RIDER);
+  const luId = await lu.id();
+  await lu.click("btn-hand");
+  await lu.waitFor("!state.handRaised", "Lu's ✋ down");
+
+  // waiting for the late answer, Lu moves the map himself: when it comes,
+  // it leaves the map where he put it
+  step("Lu again, and drags the map while the late answer is on its way: it never pulls the map back");
+  const zoomIn = async () => {
+    await lu.eval(`map.jumpTo({ center: [state.me.lng, state.me.lat], zoom: 17 }), true`);
+    await lu.waitFor(`!map.isMoving() && worldSync.settled() && !realEntries.has(${doraId})`, "Lu zoomed in, Dora not on his map", 15000);
+  };
+  await zoomIn();
+  await lu.click("btn-hand");
+  await lu.waitFor("state.handRaised", "Lu's ✋ up");
+  await bannerIs(lu, RIDER + NOBODY);
+  await drag(lu);
+  await bannerIs(lu, RIDER);
+  let held = await view(lu);
+  await new Promise((r) => setTimeout(r, 4000)); // past the late answer (5 s)
+  await lu.waitFor(`worldSync.settled()`, "the late answer in", 10000);
+  await new Promise((r) => setTimeout(r, 1000)); // time to act on it (it checks every 0.2 s)
+  check(JSON.stringify(await view(lu)) === JSON.stringify(held), "the map stayed where Lu put it", { held, now: await view(lu) });
+  await lu.click("btn-hand");
+  await lu.waitFor("!state.handRaised", "Lu's ✋ down");
+
+  step("Lu again, and puts ✋ down while the late answer is on its way: it does nothing");
+  await zoomIn();
+  await lu.click("btn-hand");
+  await lu.waitFor("state.handRaised", "Lu's ✋ up");
+  await bannerIs(lu, RIDER + NOBODY);
+  held = await view(lu);
+  await lu.click("btn-hand");
+  await lu.waitFor("!state.handRaised", "Lu's ✋ down");
+  await new Promise((r) => setTimeout(r, 4000));
+  await lu.waitFor(`worldSync.settled()`, "the late answer in", 10000);
+  await new Promise((r) => setTimeout(r, 1000)); // time to act on it (it checks every 0.2 s)
+  check(JSON.stringify(await view(lu)) === JSON.stringify(held), "the map didn't move", { held, now: await view(lu) });
+  check((await lu.banner()) === "", "no line (not looking)", await lu.banner());
+
+  await dora.waitFor(`!realEntries.has(${luId})`, "Lu's ✋ gone from Dora's map", 15000);
+  await lu.close();
+
   step("Ed goes online a block from Sam: the usual view (never closer), Sam's ✋ on it");
   const ed = await browser.person("BT-Ed", ED);
   await ed.phone(390, 844);
@@ -101,17 +178,7 @@ await journey("findnearest: the map shows you the nearest", async (browser) => {
   await ed.open();
   await ed.click("btn-mode");
   await ed.waitFor(`state.mode === "driver" && state.myCar !== undefined && worldChannel && worldChannel.state === "joined"`, "Ed: driver mode, car known");
-  await ed.eval(`(() => {
-    const push = worldChannel.push.bind(worldChannel);
-    worldChannel.push = (event, ...rest) => {
-      const p = push(event, ...rest);
-      if (event !== "sync") return p;
-      const receive = p.receive.bind(p);
-      p.receive = (status, cb) => receive(status, (r) => setTimeout(() => cb(r), 1500));
-      return p;
-    };
-    return true;
-  })()`);
+  await slowMap(ed, 1500);
   await ed.click("btn-online");
   await ed.waitFor("state.online", "Ed online");
   await settled(ed);

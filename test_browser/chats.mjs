@@ -130,6 +130,20 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   // gate) the test's scroll-up did, and was pulled back down (owner,
   // 2026-11-05 — caught: onChatResize's scroll, 2 ms after)
   const settled = () => rita.eval(`new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => done(true), 20))))`);
+  // at the bottom of the long chat, the box shrinks (as the keyboard
+  // opening does): she stays at the bottom — the box alone would leave her
+  // above it, the newest out of sight
+  await settled();
+  await rita.eval(`(() => { const b = document.getElementById("chat-messages"); b.style.maxHeight = (b.clientHeight - 60) + "px"; return true; })()`);
+  await settled();
+  await settled();
+  const shrunk = await scroll();
+  await rita.eval(`document.getElementById("chat-messages").style.maxHeight = "", true`);
+  await settled();
+  await settled();
+  const grown = await scroll();
+  check(shrunk.scrolls && shrunk.fromBottom <= 2 && shrunk.lastInView && !(await rita.eval(`!document.getElementById("chat-jump").classList.contains("hidden")`)), "the box shrank: still at the newest, no ↓", shrunk);
+  check(grown.fromBottom <= 2 && grown.lastInView, "and grew back: still at the newest", grown);
   const scrollUp = async () => {
     await settled();
     await rita.eval(`(document.getElementById("chat-messages").scrollTop = 0, document.getElementById("chat-messages").dispatchEvent(new Event("scroll")), true)`);
@@ -241,6 +255,30 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   await settled();
   const fromList2 = await view();
   check(fromList2.line === null && fromList2.fromBottom <= 2 && !fromList2.jump, "from the list, 2 unread: the newest, no line, no ↓", fromList2);
+  await closeChatPanel(rita);
+
+  // a resize (the keyboard closing) is decided at once — "at the bottom:
+  // keep her there" — and done a frame later; Fay's chat opened in between
+  // got that, and opened at the bottom past her new messages (the gate
+  // caught it on a busy machine, owner 2026-11-07). Here the opening is
+  // put exactly in between, every time
+  step("at the bottom of Dan's chat, the box changes size and Fay's chat (30 new) opens before the next frame: at the 'New messages' line");
+  await openChatWith(rita, danId);
+  await settled();
+  check((await view()).fromBottom <= 2, "at the bottom of Dan's chat", await view());
+  await fayWrites("race", 30);
+  await rita.eval(`(() => {
+    const b = document.getElementById("chat-messages");
+    const ro = new ResizeObserver(() => { ro.disconnect(); queueMicrotask(() => openChat(realPeersById.get(${fayId}))); });
+    ro.observe(b);
+    b.style.maxHeight = (b.clientHeight - 40) + "px";
+    return true;
+  })()`);
+  await rita.waitFor(`state.chatPeer && state.chatPeer.id === ${fayId}`, "Fay's chat opened");
+  await settled();
+  const raced = await view();
+  await rita.eval(`document.getElementById("chat-messages").style.maxHeight = "", true`);
+  check(!!raced.line && raced.line.fromTop >= 0 && raced.line.fromTop < 40 && raced.fromBottom > 100 && raced.jump, "at the line, near the top, ↓ showing — not sent to the bottom", raced);
   await closeChatPanel(rita);
 
   // two other chats add up; opening one takes off ALL of its messages at

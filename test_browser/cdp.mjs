@@ -38,23 +38,51 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // (e.g. "new_build": as if a new version were deployed). One line out
 // ("@@server <what>"), one line back ("ok", or why not).
 let stdinLines = null;
+function readStdin() {
+  if (stdinLines) return;
+  stdinLines = [];
+  let buf = "";
+  const waiting = [];
+  process.stdin.setEncoding("utf8");
+  process.stdin.on("data", (d) => {
+    buf += d;
+    let i;
+    while ((i = buf.indexOf("\n")) >= 0) {
+      const line = buf.slice(0, i).trim();
+      buf = buf.slice(i + 1);
+      waiting.length ? waiting.shift()(line) : stdinLines.push(line);
+    }
+  });
+  stdinLines.next = () => (stdinLines.length ? Promise.resolve(stdinLines.shift()) : new Promise((r) => waiting.push(r)));
+}
+
+// The test that started us is on the other end of our stdin: when it's
+// gone — stopped, crashed, timed out — the pipe closes. Then quit, and take
+// the browser along: a crashed run's script and its headless browser kept
+// running for hours, its pages reconnecting to every later test server
+// (2026-11-07). (Run by hand in a terminal, stdin is the keyboard: no pipe.)
+const browsersOpen = new Set();
+// the browsers this script started and that still run (their process ids) —
+// for test_js/journey_orphans.test.mjs
+export const browserPids = () => [...browsersOpen].map((proc) => proc.pid);
+// (Only once a journey runs: a file that merely imports this one — a Node
+// test — must not start watching its own stdin.)
+function watchTheTest() {
+  if (process.stdin.isTTY) return;
+  readStdin();
+  process.stdin.on("end", () => {
+    console.log("  the test that started this journey is gone: quitting");
+    for (const proc of browsersOpen) {
+      try {
+        proc.kill();
+      } catch (_) {}
+    }
+    process.exit(1);
+  });
+}
+
 export async function server(what) {
-  if (!stdinLines) {
-    stdinLines = [];
-    let buf = "";
-    const waiting = [];
-    process.stdin.setEncoding("utf8");
-    process.stdin.on("data", (d) => {
-      buf += d;
-      let i;
-      while ((i = buf.indexOf("\n")) >= 0) {
-        const line = buf.slice(0, i).trim();
-        buf = buf.slice(i + 1);
-        waiting.length ? waiting.shift()(line) : stdinLines.push(line);
-      }
-    });
-    stdinLines.next = () => (stdinLines.length ? Promise.resolve(stdinLines.shift()) : new Promise((r) => waiting.push(r)));
-  }
+  readStdin();
   console.log(`@@server ${what}`);
   const reply = await stdinLines.next();
   if (reply !== "ok") throw new Error(`the server couldn't ${what}: ${reply}`);
@@ -128,6 +156,8 @@ export async function launch() {
     ],
     { stdio: "ignore" }
   );
+  browsersOpen.add(proc);
+  proc.on("exit", () => browsersOpen.delete(proc));
   // the browser writes its debugging port here once it listens
   const portFile = join(dir, "DevToolsActivePort");
   let port = null;
@@ -411,6 +441,7 @@ function page(cdp, sessionId, name) {
 // run a journey: the steps, then the page errors check; exit code = verdict
 export async function journey(title, body) {
   console.log(`journey: ${title}`);
+  watchTheTest();
   let browser;
   try {
     browser = await launch();

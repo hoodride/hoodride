@@ -182,5 +182,35 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     if spent < 21, do: "ok", else: "the limit never refused"
   end
 
+  # as if a minute had passed since a cancel or a decline: the pair's
+  # re-request cooldown (Hoodride.Throttle) is over — every rate counter
+  # starts afresh, as at the start of each test (scrub_live_state)
+  defp server("cooldown_over") do
+    :ets.delete_all_objects(Hoodride.RateLimit)
+    "ok"
+  end
+
+  # 15 people have each written this person once (W1 first, W15 last): more
+  # chats than fit on screen, real ones a reload brings back
+  defp server("fifteen_write " <> id) do
+    to = String.to_integer(id)
+
+    for i <- 1..15 do
+      name = "BT-W#{i}"
+
+      {:ok, u} =
+        Hoodride.Accounts.upsert_oauth_user(%{
+          provider: "dev",
+          provider_id: name,
+          name: name,
+          photo: nil
+        })
+
+      {:ok, _} = Hoodride.Chat.send_message(u, to, "w#{i}")
+    end
+
+    "ok"
+  end
+
   defp server(other), do: "unknown request: #{other}"
 end

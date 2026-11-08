@@ -26,12 +26,15 @@
     return t("{n}d", { n: Math.floor(ms / DAY) });
   }
 
-  // the conversations, newest last message first (a copy; ties keep their
-  // order)
+  // the conversations, newest last message first (a copy). Server times are
+  // whole seconds, so two last messages in the same second tie: the later
+  // one has the higher server id (lastId; owner, 2026-11-07 — after a reload
+  // the older chat could sit on top). Still tied: the given order
   function newestFirst(chats) {
+    const id = (c) => (typeof c.lastId === "number" ? c.lastId : -1);
     return chats
       .map((c, i) => [c, i])
-      .sort((x, y) => y[0].lastAt - x[0].lastAt || x[1] - y[1])
+      .sort((x, y) => y[0].lastAt - x[0].lastAt || id(y[0]) - id(x[0]) || x[1] - y[1])
       .map(([c]) => c);
   }
 
