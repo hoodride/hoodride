@@ -133,12 +133,19 @@ defmodule HoodrideWeb.UserSocket do
         socket
         |> assign(:user_id, user.id)
         |> assign(:user, %{id: user.id, name: user.name, photo: user.photo})
+        # the sign-in this connection belongs to: every join checks it is
+        # still there (HoodrideWeb.SessionGate) — a connect made while a
+        # sign-out ran can't keep going
+        |> assign(:token_hash, token_hash(user))
 
       {:ok, admit(socket, user.id, choice?(params), stamp(params))}
     else
       {:deny, _} -> {:error, :rate_limited}
     end
   end
+
+  defp token_hash(%{token_hash: hash}), do: hash
+  defp token_hash(%{token: %{hash: hash}}), do: hash
 
   # who gets in (Hoodride.SessionStamp). Runs in the process that becomes
   # this socket's transport, so the stamp registered here lives exactly as

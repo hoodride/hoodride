@@ -5,14 +5,17 @@ defmodule HoodrideWeb.ResumingTest do
   # brief moment"). PageController.resuming; styles.css html.resuming.
   use HoodrideWeb.ConnCase, async: true
 
-  defp signed_in(conn, at \\ System.system_time(:millisecond)) do
-    init_test_session(conn, %{
-      "user_id" => 1,
-      "signed_in_at" => at,
-      "name" => "Ana",
-      "photo" => nil,
-      "provider" => "google"
-    })
+  # a real sign-in (Hoodride.SessionTokens), made `age` ms ago
+  defp signed_in(conn, age \\ 0) do
+    {:ok, u} =
+      Hoodride.Accounts.upsert_oauth_user(%{
+        provider: "google",
+        provider_id: "res-#{System.unique_integer([:positive])}",
+        name: "Ana"
+      })
+
+    session = Hoodride.TestHelpers.session_for(u.id)
+    init_test_session(conn, Hoodride.TestHelpers.age_sign_in(session, age))
   end
 
   defp html_tag(conn), do: Regex.run(~r/<html[^>]*>/, conn.resp_body) |> hd()
@@ -32,7 +35,7 @@ defmodule HoodrideWeb.ResumingTest do
   end
 
   test "signed out, or the sign-in expired: the sign-in screen, as before" do
-    expired = System.system_time(:millisecond) - 31 * 86_400_000
+    expired = 31 * 86_400_000
 
     for conn <- [build_conn(), build_conn() |> signed_in(expired)], path <- ["/", "/ja"] do
       conn = get(conn, path)

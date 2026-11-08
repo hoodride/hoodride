@@ -27,7 +27,7 @@ defmodule HoodrideWeb.WsFrameLimitTest do
       )
 
     {:ok, {_ip, port}} = ThousandIsland.listener_info(pid)
-    %{port: port, token: HoodrideWeb.Auth.socket_token(user)}
+    %{port: port, token: Hoodride.TestHelpers.socket_token_for(user.id)}
   end
 
   defp connect(port, token) do

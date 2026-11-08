@@ -601,13 +601,42 @@ Design notes:
   - **dev_login only from a genuinely local request**: loopback address AND a
     local host name AND no forwarding header (a tunnel forwards from
     127.0.0.1 — the address alone isn't enough). Off in prod.
-  - **Sessions checked on the server** (`HoodrideWeb.Auth`; OWASP: timeouts and
-    logout "must be enforced server-side" — Plug's cookie `max_age` is the
-    browser's only): a sign-in time in the session, ≤ 30 days, newer than the
-    account's `logged_out_at` (a column). Renewed at sign-in.
-  - **Logout signs out everywhere**: `logged_out_at` set, every socket of the
-    account closed (92 ms, live), every older session and socket token
-    refused. One live session per account already, so "everywhere" is right.
+  - **Sign-in tokens — Phoenix's own design (phx.gen.auth), since 2026-11-08**
+    (`Hoodride.SessionTokens`; OWASP: timeouts and logout "must be enforced
+    server-side"): signing in makes a random 32-byte token; the session
+    cookie holds it, the `user_tokens` table its SHA-256 (one row per
+    signed-in device). Valid 30 days; while the app is in use (/api/state,
+    /api/socket_token) a week-old token is REPLACED (the standard's reissue),
+    so you're signed out only after 30 days without opening the app — and a
+    stolen copy of an old cookie dies within 30 days even while you keep
+    using it. A year at most from the real sign-in (`authenticated_at`,
+    carried over). Read from MEMORY (`:session_tokens`, loaded before the
+    web server): no database read per request. Every change takes the
+    account's lock (`:global.trans`), database first, then memory — a
+    replacement can't slip in between a sign-out's two steps (race test).
+    Signing in again from the same browser replaces its token (the silent
+    Google refresh does, on every return). Everyone signed in once more at
+    the switch (owner: 3 accounts; it removed a whole changeover layer the
+    reviews kept finding races in).
+  - **The sign-out bug it closed**: a connection pass made DURING a sign-out
+    carried a later time than the sign-out and stayed valid for a day. A
+    pass now names its sign-in (the token's SHA-256 — the cookie's own value
+    never reaches page scripts); the sign-out deletes it. Checked at connect
+    AND at every join (`HoodrideWeb.SessionGate`: Phoenix subscribes a
+    socket to its "disconnect" only after connect/3, so a connect racing the
+    sign-out could miss it) AND before every user-channel action (a ✋
+    queued meanwhile left a ghost hand). The app, refused `signed_out`,
+    asks the server: really signed out → the sign-in screen; else a fresh
+    pass. Only Hood Ride's own JSON 401/403 reloads (not a proxy's page).
+    The first failed reconnect after being connected asks for a pass at once
+    (signed out elsewhere → the sign-in screen in seconds), later ones once a
+    minute. A Google refresh finishing after a sign-out everywhere doesn't
+    sign that device back in.
+  - **Logout signs out everywhere**: every sign-in token of the account
+    deleted (one transaction with `logged_out_at` and the `sign_outs` row,
+    still written so a rollback to the release before keeps refusing),
+    every socket of the account closed (92 ms, live). One live session per
+    account already, so "everywhere" is right.
     Off the map at once too (owner, 2026-10-31): the car offline (riders
     waiting on it declined, each told) and the ✋ down, before the sockets
     close — they used to stay up until the sweeper's ~5 min grace. Refused
@@ -620,8 +649,8 @@ Design notes:
     set inside `websocket:` Phoenix overwrote it with nil and every header
     connect was refused (caught live: ChannelTest skips the transport; now a
     test checks how the endpoint mounts it). `?token=` still works for scripts
-    (the monster, fixtures), same rules. Tokens carry `iat`, live a day, die
-    at sign-out; the app refetches after a failed connect.
+    (the monster, fixtures), same rules. Tokens name their sign-in, live a
+    day, die at sign-out; the app refetches after a failed connect.
   - **Out of the logs**: `token` (Phoenix logs every socket connect WITH its
     params at :info — prod's level; it was in the dev log) and chat `text`,
     with `lat`/`lng`.

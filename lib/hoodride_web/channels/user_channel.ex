@@ -118,8 +118,28 @@ defmodule HoodrideWeb.UserChannel do
 
   defp newer?(stamp, mine), do: is_integer(stamp) and is_integer(mine) and stamp > mine
 
+  # Every action first: is this connection's sign-in still there? Signed
+  # out (or the account deleted) a moment ago, its "disconnect" may not have
+  # landed yet — a ✋ or a message queued meanwhile must not go through (it
+  # left a ghost hand until the sweeper's grace). One memory lookup.
   @impl true
   def handle_in(name, payload, socket) do
+    if HoodrideWeb.Auth.signed_in?(socket.assigns.user_id, socket.assigns[:token_hash]),
+      do: budgeted(name, payload, socket),
+      else: signed_out(socket)
+  end
+
+  defp signed_out(socket) do
+    send(socket.transport_pid, %Phoenix.Socket.Broadcast{
+      topic: "user_socket:#{socket.assigns.user_id}",
+      event: "disconnect",
+      payload: %{}
+    })
+
+    {:reply, {:error, %{reason: "signed_out"}}, socket}
+  end
+
+  defp budgeted(name, payload, socket) do
     case Hoodride.RateBudget.spend(socket, :events, @events_per_minute, @events_burst) do
       {:ok, socket} -> event(name, payload, socket)
       {:deny, socket} when name in @noreply_events -> {:noreply, socket}

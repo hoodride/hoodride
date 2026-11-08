@@ -164,7 +164,13 @@ defmodule Hoodride.DeepAuditTest do
   test "a session pointing at a deleted/unknown user cannot connect at all" do
     assert :error =
              connect(HoodrideWeb.UserSocket, %{},
-               connect_info: %{session: Hoodride.TestHelpers.session_for(999_999)}
+               connect_info: %{
+                 session: %{
+                   "user_id" => 999_999,
+                   "user_token" => :crypto.strong_rand_bytes(32),
+                   "name" => "Nobody"
+                 }
+               }
              )
   end
 

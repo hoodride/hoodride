@@ -53,7 +53,7 @@ defmodule HoodrideWeb.RideFlowTest do
   end
 
   test "socket token auth: valid token connects, garbage doesn't", %{rider: rider} do
-    token = HoodrideWeb.Auth.socket_token(rider)
+    token = Hoodride.TestHelpers.socket_token_for(rider.id)
     assert {:ok, socket} = connect(HoodrideWeb.UserSocket, %{"token" => token})
     assert socket.assigns.user_id == rider.id
 

@@ -24,13 +24,7 @@ defmodule HoodrideWeb.CarTest do
   end
 
   defp signed_in(conn, u) do
-    init_test_session(conn, %{
-      user_id: u.id,
-      signed_in_at: System.system_time(:millisecond),
-      name: u.name,
-      photo: u.photo,
-      provider: u.provider
-    })
+    init_test_session(conn, Hoodride.TestHelpers.session_for(u.id))
   end
 
   defp set_car(conn, u, car), do: post(signed_in(conn, u), "/api/car", car)
@@ -118,10 +112,13 @@ defmodule HoodrideWeb.CarTest do
 
     test "the database can't answer: 503 (try again), never a half save", %{conn: conn} do
       u = user("car-f")
+      # signed in BEFORE the database goes away (signing in writes it)
+      again = signed_in(build_conn(), u)
+      conn = signed_in(conn, u)
       Hoodride.Repo.query!("ALTER TABLE users RENAME TO users_away")
-      assert json_response(set_car(conn, u, @civic), 503) == %{"error" => "busy"}
+      assert json_response(post(conn, "/api/car", @civic), 503) == %{"error" => "busy"}
 
-      assert json_response(get(signed_in(build_conn(), u), "/api/car"), 503) == %{
+      assert json_response(get(again, "/api/car"), 503) == %{
                "error" => "busy"
              }
     end

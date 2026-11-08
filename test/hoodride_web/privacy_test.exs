@@ -33,7 +33,7 @@ defmodule HoodrideWeb.PrivacyTest do
         Hoodride.Accounts.upsert_oauth_user(%{provider: "dev", provider_id: "pv-me", name: "Pv"})
 
       conn =
-        init_test_session(conn, %{user_id: u.id, signed_in_at: System.system_time(:millisecond)})
+        init_test_session(conn, Hoodride.TestHelpers.session_for(u.id))
 
       refute Map.has_key?(json_response(get(conn, "/api/me"), 200)["user"], "email")
       refute Map.has_key?(json_response(get(conn, "/api/state"), 200)["user"], "email")
@@ -89,7 +89,9 @@ defmodule HoodrideWeb.PrivacyTest do
     # "a few minutes up to 30 days" row read as "IPs kept 30 days". IPs live
     # only in memory (rate budgets, swept once full again; none in the logs);
     # sign-out records hold an account number and a time, for 30 days
-    # (Hoodride.SignOuts, the session's 30 days)
+    # (Hoodride.SignOuts, the session's 30 days). 6 since 2026-11-08: sign-in
+    # records (Hoodride.SessionTokens: one per signed-in device, 30 days after
+    # last use, a year at most)
     test "how long we keep it: plain kinds, each with a limit (owner's pick, 2026-10-28)", %{
       conn: conn
     } do
@@ -104,6 +106,10 @@ defmodule HoodrideWeb.PrivacyTest do
                ["Live info" <> _, live],
                ["IP addresses (to stop abuse)", "A few minutes, never saved"],
                ["Sign-out records (to keep signed-out sessions closed)", "30 days"],
+               [
+                 "Sign-in records (one per signed-in device, to keep you signed in)",
+                 "Until you sign out, or 30 days after you last use the app (at most a year)"
+               ],
                ["Error logs", "14 days"]
              ] = rows
 

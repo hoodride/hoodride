@@ -1016,6 +1016,42 @@ function onSessionMoved() {
 }
 const sessionMovedReply = (e) => !!e && e.reason === "session_moved";
 
+// A join refused "signed_out": the sign-in this connection was made from is
+// gone (signed out on another device, or the account deleted —
+// HoodrideWeb.SessionGate). Stop reconnecting, then ask the server: really
+// signed out → the sign-in screen; still signed in (the pass came from an
+// older sign-in) → connect again with a fresh pass. Never a reload loop.
+const signedOutReply = (e) => !!e && e.reason === "signed_out";
+let signedOutCheck = null;
+function onJoinSignedOut() {
+  if (signedOutCheck) return;
+  socket.disconnect();
+  signedOutCheck = (async () => {
+    try {
+      const res = await fetch("/api/socket_token");
+      if (await ownRefusal(res)) return location.reload();
+      if (res.ok) {
+        socketToken = (await res.json()).token;
+        socketTokenAt = performance.now();
+      }
+    } catch (_) {}
+    signedOutCheck = null;
+    socket.connect();
+  })();
+}
+
+// Hood Ride's OWN "not signed in" / "Terms first" answer — never just any
+// 401/403 (a proxy's challenge page must not reload the app)
+async function ownRefusal(res) {
+  if (res.status !== 401 && res.status !== 403) return false;
+  try {
+    const body = await res.json();
+    return !!body && (body.error === "unauthenticated" || body.error === "terms");
+  } catch (_) {
+    return false;
+  }
+}
+
 // browsers authenticate the socket with a signed token (session-cookie
 // websocket auth requires a CSRF token our static page doesn't have)
 // The socket's token: sent in the WebSocket protocol header (Phoenix
@@ -1024,6 +1060,8 @@ const sessionMovedReply = (e) => !!e && e.reason === "session_moved";
 // one is fetched (at most once a minute); "signed out" → back to the login.
 let socketToken = null;
 let socketTokenAt = -Infinity;
+// failed connects since the socket was last open (onError)
+let failsSinceOpen = 0;
 // {min, max} ms after the server says "restarting" (a deploy), until connected
 let restartNotice = null;
 
@@ -1031,9 +1069,9 @@ async function refreshSocketToken() {
   socketTokenAt = performance.now();
   try {
     const res = await fetch("/api/socket_token");
-    if (res.status === 401) return location.reload(); // signed out (here or elsewhere)
-    // new Terms of Use while the app was open: the reload asks for them
-    if (res.status === 403) return location.reload();
+    // signed out (here or elsewhere), or new Terms of Use while the app was
+    // open: the reload shows the sign-in screen or asks for the Terms
+    if (await ownRefusal(res)) return location.reload();
     if (res.ok) {
       const body = await res.json();
       socketToken = body.token;
@@ -1063,6 +1101,7 @@ async function connectSocket() {
   });
   // connected again: the restart (if any) is over
   socket.onOpen(() => {
+    failsSinceOpen = 0;
     restartNotice = null;
     connWatch.up();
   });
@@ -1071,10 +1110,15 @@ async function connectSocket() {
   socket.onMessage((m) => {
     if (HoodRehydrate.countsAsLive(m)) liveNews++;
   });
-  // a refused or dropped connect: the token may have expired or been revoked
+  // a refused or dropped connect: the token may have expired or been revoked.
+  // The FIRST failure after being connected asks at once (signed out on
+  // another device → the sign-in screen in seconds, not after a minute of
+  // "Reconnecting…"); after that at most once a minute (a server down for a
+  // while isn't asked by every phone every few seconds)
   socket.onError(() => {
     connWatch.down();
-    if (performance.now() - socketTokenAt > 60_000) refreshSocketToken();
+    const since = performance.now() - socketTokenAt;
+    if ((failsSinceOpen++ === 0 && since > 5_000) || since > 60_000) refreshSocketToken();
   });
   socket.connect();
   joinWorldChannel(); // its join callback runs the first subscription sync
@@ -1175,7 +1219,8 @@ async function connectSocket() {
       else reloadWhenHydrated = true; // the page's first hydrate is still to come
     })
     .receive("error", (e) => {
-      if (sessionMovedReply(e)) onSessionMoved();
+      if (signedOutReply(e)) onJoinSignedOut();
+      else if (sessionMovedReply(e)) onSessionMoved();
       else transientBanner(t("Connection problem — retrying"));
     });
 }
@@ -1529,7 +1574,8 @@ function joinWorldChannel() {
     if (reply && reply.role) onServerRole(reply.role, { rejoin: true });
     worldSync.onJoined();
   }).receive("error", (e) => {
-    if (sessionMovedReply(e)) onSessionMoved();
+    if (signedOutReply(e)) onJoinSignedOut();
+    else if (sessionMovedReply(e)) onSessionMoved();
   });
 }
 
@@ -2448,6 +2494,7 @@ function joinRideChannel() {
       if (!realEntries.get(state.ride.peer.id)) ensureRidePeerEntry(state.ride.peer);
     })
     .receive("error", (e) => {
+      if (signedOutReply(e)) return onJoinSignedOut();
       if (sessionMovedReply(e)) return onSessionMoved();
       // over the join budget: the ride is fine — Phoenix retries this join
       // by itself (HoodRehydrate.rideJoinLost)

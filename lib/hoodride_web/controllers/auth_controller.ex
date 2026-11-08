@@ -176,8 +176,25 @@ defmodule HoodrideWeb.AuthController do
           # an ACCOUNT, nothing else: a provider's error reply also comes back
           # as {:ok, response} (Req), and was once signed in — a crash (500)
           # instead of the friendly page when Google was down
+          # a REFRESH (the app still signed in when it left) completes only
+          # if that sign-in still exists: signed out everywhere meanwhile
+          # (another device), the refresh mustn't sign this one back in
+          {:ok, %Accounts.User{}} when refreshing and conn.assigns.current_user == nil ->
+            redirect(conn, to: "/")
+
           {:ok, %Accounts.User{} = user} ->
-            conn |> Auth.sign_in(user) |> redirect(to: "/")
+            case Auth.sign_in(conn, user) do
+              {:ok, conn} ->
+                redirect(conn, to: "/")
+
+              :error ->
+                failed(
+                  conn,
+                  refreshing,
+                  503,
+                  "#{@labels[p]} sign-in failed — go back and try again."
+                )
+            end
 
           # our database couldn't save you: the same friendly page, not a raw error
           :db_failed ->
@@ -382,8 +399,9 @@ defmodule HoodrideWeb.AuthController do
 
     with {:ok, user} <- Accounts.upsert_oauth_user(attrs),
          :ok <- if(agree?, do: Accounts.agree_to_terms(user.id), else: :ok),
-         %Accounts.User{} = user <- Accounts.profile(user.id) do
-      conn |> Auth.sign_in(user) |> json(%{ok: true})
+         %Accounts.User{} = user <- Accounts.profile(user.id),
+         {:ok, conn} <- Auth.sign_in(conn, user) do
+      json(conn, %{ok: true})
     else
       {:error, %Ecto.Changeset{}} -> conn |> put_status(400) |> json(%{error: "invalid"})
       _ -> conn |> put_status(503) |> json(%{error: "unavailable"})
@@ -418,6 +436,9 @@ defmodule HoodrideWeb.AuthController do
   # the database can't answer: 503, which the app retries (HoodBoot), never
   # a state with people missing.
   def state(conn, _params) do
+    # the app is in use: a week-old sign-in is replaced, the cookie renewed
+    conn = Auth.keep_signed_in(conn)
+
     with %{} = u <- conn.assigns.current_user do
       ride = ride_of(u.id)
       convos = Hoodride.Chat.conversations_for(u.id)
@@ -544,6 +565,10 @@ defmodule HoodrideWeb.AuthController do
 
   # GET /api/socket_token — signed token for websocket auth (session required)
   def socket_token(conn, _params) do
+    # an app kept open for days reconnects through here, not /api/state:
+    # it stays signed in too (the pass then names the new sign-in)
+    conn = Auth.keep_signed_in(conn)
+
     case conn.assigns.current_user do
       nil ->
         conn |> put_status(401) |> json(%{error: "unauthenticated"})
@@ -607,7 +632,9 @@ defmodule HoodrideWeb.AuthController do
       result ->
         if result == :ok do
           # off the map; going offline also declines every incoming
-          # request, each rider told (as AccountDeletion does)
+          # request, each rider told (as AccountDeletion does). A live
+          # connection can't put anything back meanwhile: its sign-in is
+          # already gone, and every action checks it (HoodrideWeb.UserChannel)
           Hoodride.Geo.driver_offline(user.id)
           Hoodride.Geo.hand_down(user.id)
           HoodrideWeb.Endpoint.broadcast("user_socket:#{user.id}", "disconnect", %{})

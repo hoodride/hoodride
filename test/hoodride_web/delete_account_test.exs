@@ -35,7 +35,7 @@ defmodule HoodrideWeb.DeleteAccountTest do
   defp me_map(u), do: %{id: u.id, name: u.name, photo: u.photo}
 
   defp signed_in(conn, u),
-    do: init_test_session(conn, %{user_id: u.id, signed_in_at: System.system_time(:millisecond)})
+    do: init_test_session(conn, Hoodride.TestHelpers.session_for(u.id))
 
   defp delete_account(conn, body \\ %{"confirm" => "DELETE"}),
     do: post(conn, "/api/account/delete", body)
@@ -43,14 +43,21 @@ defmodule HoodrideWeb.DeleteAccountTest do
   describe "deleting" do
     test "the account is gone; its old session and token are refused", %{conn: conn} do
       u = user("del-a")
-      token = Auth.socket_token(u)
+      token = Hoodride.TestHelpers.socket_token_for(u.id)
+      # another device's sign-in, made before the deletion
+      other = Hoodride.TestHelpers.session_for(u.id)
       before = System.system_time(:millisecond)
       Process.sleep(2)
       conn = delete_account(signed_in(conn, u))
       assert json_response(conn, 200) == %{"ok" => true}
 
       assert Accounts.get_user(u.id) == nil
-      assert json_response(get(signed_in(build_conn(), u), "/api/me"), 200)["user"] == nil
+      # its sign-ins went with it: memory, and the table (the cascade)
+      assert json_response(get(init_test_session(build_conn(), other), "/api/me"), 200)["user"] ==
+               nil
+
+      assert Hoodride.Repo.query!("SELECT count(*) FROM user_tokens WHERE user_id = ?", [u.id]).rows ==
+               [[0]]
 
       assert Phoenix.ChannelTest.connect(HoodrideWeb.UserSocket, %{},
                connect_info: %{auth_token: token}

@@ -11,13 +11,17 @@ defmodule HoodrideWeb.SignOutsTest do
   then). The token carries the name and photo the socket needs, so a
   connect is a signature check and one memory lookup. Loaded at start-up
   (after migrations, before the web server), written FIRST on sign-out.
+
+  Since 2026-11-08 a connection pass names its SIGN-IN (Hoodride.SessionTokens,
+  also in memory): signing out deletes the sign-ins, so the pass is refused —
+  still with no database read. The sign-out list stays written for the
+  release before (a rollback keeps refusing).
   """
   use HoodrideWeb.ConnCase, async: false
 
   require Phoenix.ChannelTest
 
   alias Hoodride.{Accounts, SignOuts}
-  alias HoodrideWeb.Auth
 
   @day_ms 86_400_000
 
@@ -72,7 +76,7 @@ defmodule HoodrideWeb.SignOutsTest do
   describe "a connect" do
     test "makes NO database query (signature + one memory lookup)" do
       u = user("so-noq")
-      token = Auth.socket_token(u)
+      token = Hoodride.TestHelpers.socket_token_for(u.id)
       {result, queries} = queries_during(fn -> connect(token) end)
       assert {:ok, _} = result
       assert queries == []
@@ -80,13 +84,13 @@ defmodule HoodrideWeb.SignOutsTest do
 
     test "carries the name and photo from the token to the socket (chat, ride requests use them)" do
       u = user("so-np", %{photo: "https://example.com/p.jpg"})
-      {:ok, socket} = connect(Auth.socket_token(u))
+      {:ok, socket} = connect(Hoodride.TestHelpers.socket_token_for(u.id))
       assert socket.assigns.user == %{id: u.id, name: "so-np", photo: "https://example.com/p.jpg"}
     end
 
     test "after a sign-out: the old token is refused, a new one works — still with no query" do
       u = user("so-out")
-      old = Auth.socket_token(u)
+      old = Hoodride.TestHelpers.socket_token_for(u.id)
       Process.sleep(2)
       :ok = Accounts.mark_logged_out(u.id)
 
@@ -95,7 +99,7 @@ defmodule HoodrideWeb.SignOutsTest do
       assert queries == []
 
       Process.sleep(2)
-      assert {:ok, _} = connect(Auth.socket_token(u))
+      assert {:ok, _} = connect(Hoodride.TestHelpers.socket_token_for(u.id))
     end
 
     test "a token issued in the same millisecond as the sign-out is refused (strictly after)" do
@@ -106,15 +110,18 @@ defmodule HoodrideWeb.SignOutsTest do
       assert SignOuts.allowed?(4_294_967_312, t), "never signed out: allowed"
     end
 
-    test "a token from before this change (no name/photo) still connects — via the database, sign-out included" do
+    # everyone signed in once more at the switch to sign-in tokens (owner,
+    # 2026-11-08): a pass naming no sign-in is no pass — the app fetches a
+    # new one, and a browser no longer signed in shows the sign-in screen
+    test "a pass from before the switch (no sign-in named) is refused, whatever it carries" do
       u = user("so-legacy")
-      legacy = Phoenix.Token.sign(HoodrideWeb.Endpoint, "user socket", %{u: u.id, iat: now_ms()})
-      assert {:ok, socket} = connect(legacy)
-      assert socket.assigns.user.name == "so-legacy"
 
-      Process.sleep(2)
-      :ok = Accounts.mark_logged_out(u.id)
-      assert connect(legacy) == :error
+      for old <- [
+            %{u: u.id, iat: now_ms()},
+            %{u: u.id, iat: now_ms(), n: "so-legacy", p: nil}
+          ] do
+        assert connect(Phoenix.Token.sign(HoodrideWeb.Endpoint, "user socket", old)) == :error
+      end
     end
   end
 
@@ -131,15 +138,17 @@ defmodule HoodrideWeb.SignOutsTest do
 
     test "sign-out writes it (and the database: a restart keeps it)" do
       u = user("so-db")
-      token = Auth.socket_token(u)
+      token = Hoodride.TestHelpers.socket_token_for(u.id)
       before = now_ms()
       Process.sleep(2)
       :ok = Accounts.mark_logged_out(u.id)
       refute SignOuts.allowed?(u.id, before)
 
-      # a restart: the table empties, the start-up load refills it
+      # a restart: the tables empty, the start-up loads refill them
       :ets.delete_all_objects(:sign_outs)
+      :ets.delete_all_objects(:session_tokens)
       assert SignOuts.load() == :ok
+      assert Hoodride.SessionTokens.load() == :ok
       assert connect(token) == :error
     end
 
@@ -233,7 +242,7 @@ defmodule HoodrideWeb.SignOutsTest do
       )
 
       try do
-        {:ok, _} = connect(Auth.socket_token(user("so-log")))
+        {:ok, _} = connect(Hoodride.TestHelpers.socket_token_for(user("so-log").id))
         assert_received {:log, :debug}
       after
         :telemetry.detach(id)

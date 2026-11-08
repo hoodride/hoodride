@@ -27,7 +27,7 @@ defmodule HoodrideWeb.LogoutOfflineTest do
   defp me_map(u), do: %{id: u.id, name: u.name, photo: u.photo}
 
   defp signed_in(conn, u),
-    do: init_test_session(conn, %{user_id: u.id, signed_in_at: System.system_time(:millisecond)})
+    do: init_test_session(conn, Hoodride.TestHelpers.session_for(u.id))
 
   defp logout(conn, u), do: post(signed_in(conn, u), "/api/logout")
 

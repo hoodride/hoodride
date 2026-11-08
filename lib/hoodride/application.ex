@@ -16,6 +16,7 @@ defmodule Hoodride.Application do
     HoodrideWeb.UserSocket.init_table()
     Hoodride.SessionStamp.init_table()
     Hoodride.SignOuts.init_table()
+    Hoodride.SessionTokens.init_table()
     # the build is fixed at boot: files edited later are the NEXT build
     HoodrideWeb.Build.current()
     # prod: the stamped page and sw.js too, once (HoodrideWeb.PageController.prepare/1)
@@ -35,6 +36,9 @@ defmodule Hoodride.Application do
       # the sign-outs a connect checks, loaded before the web server starts
       # (it blocks: no connection is accepted before the list is there)
       Hoodride.SignOuts,
+      # the sign-ins (Hoodride.SessionTokens): the same — every request and
+      # connect checks them in memory
+      Hoodride.SessionTokens,
       # profile photos: the folder exists, files nothing points to removed
       Hoodride.Avatars,
       {DNSCluster, query: Application.get_env(:hoodride, :dns_cluster_query) || :ignore},

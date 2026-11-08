@@ -330,6 +330,34 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     end
   end
 
+  # as if this account signed out on another device ("Sign out" is on all
+  # devices: every sign-in deleted, every connection told — as the app's
+  # own sign-out, HoodrideWeb.AuthController.logout)
+  defp server("sign_out_everywhere " <> id) do
+    user = String.to_integer(id)
+    :ok = Hoodride.Accounts.mark_logged_out(user)
+    HoodrideWeb.Endpoint.broadcast("user_socket:#{user}", "disconnect", %{})
+    "ok"
+  end
+
+  # as if `days` had passed since every sign-in of this account was made
+  # (and its real sign-in), in memory and the database
+  defp server("age_sign_ins " <> args) do
+    [id, days] = String.split(args)
+    {user, ms} = {String.to_integer(id), String.to_integer(days) * 86_400_000}
+
+    for {h, ^user, ins, auth} <- :ets.tab2list(:session_tokens) do
+      :ets.insert(:session_tokens, {h, user, ins - ms, auth - ms})
+    end
+
+    Hoodride.Repo.query!(
+      "UPDATE user_tokens SET inserted_at = inserted_at - ?, authenticated_at = authenticated_at - ? WHERE user_id = ?",
+      [ms, ms, user]
+    )
+
+    "ok"
+  end
+
   defp server(other), do: "unknown request: #{other}"
 
   defp older_device(socket) do

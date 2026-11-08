@@ -60,6 +60,8 @@ defmodule Hoodride.Sweeper do
     Hoodride.SignInFailures.sweep()
     # sign-outs past every session's lifetime revoke nothing any more
     Hoodride.SignOuts.sweep()
+    # sign-ins past their 30 days (or their year): gone from memory
+    Hoodride.SessionTokens.sweep()
     # session-stamp rows of accounts with no device connected for a day
     Hoodride.SessionStamp.prune()
     # the recount trusts membership: repair it first

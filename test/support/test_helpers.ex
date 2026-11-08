@@ -39,9 +39,46 @@ defmodule Hoodride.TestHelpers do
     end
   end
 
-  @doc "A signed-in session for `user_id` (HoodrideWeb.Auth needs the sign-in time)."
-  def session_for(user_id),
-    do: %{"user_id" => user_id, "signed_in_at" => System.system_time(:millisecond)}
+  @doc """
+  A signed-in session for `user_id`, as signing in makes it: a real sign-in
+  token (Hoodride.SessionTokens) and the name, photo, provider and Terms
+  version the session carries (HoodrideWeb.Auth reads no database).
+  """
+  def session_for(user_id) do
+    user = Hoodride.Accounts.get_user(user_id) || raise "no account #{user_id}"
+    {:ok, raw} = Hoodride.SessionTokens.create(user_id)
+
+    %{
+      "user_id" => user_id,
+      "user_token" => raw,
+      "name" => user.name,
+      "photo" => user.photo,
+      "provider" => user.provider,
+      "terms_version" => user.terms_version
+    }
+  end
+
+  @doc """
+  As if `session`'s sign-in were made `ms` ago (and its real sign-in too, or
+  `auth_ms` ago): in memory and the database alike.
+  """
+  def age_sign_in(%{"user_token" => raw} = session, ms, auth_ms \\ nil) do
+    import Ecto.Query
+    h = Hoodride.SessionTokens.hash(raw)
+    [{^h, uid, ins, auth}] = :ets.lookup(:session_tokens, h)
+    {ins, auth} = {ins - ms, auth - (auth_ms || ms)}
+    :ets.insert(:session_tokens, {h, uid, ins, auth})
+
+    from(t in "user_tokens", where: t.token_hash == ^h)
+    |> Hoodride.Repo.update_all(set: [inserted_at: ins, authenticated_at: auth])
+
+    session
+  end
+
+  @doc "A connection pass (socket token) for `user_id`, from a fresh sign-in."
+  def socket_token_for(user_id) do
+    session_for(user_id) |> HoodrideWeb.Auth.session_user() |> HoodrideWeb.Auth.socket_token()
+  end
 
   @doc """
   Put app settings back as they were (`[{key, value}]`, saved before a test

@@ -28,7 +28,7 @@ defmodule HoodrideWeb.ServerTruthTest do
 
   test "token auth: a signed token connects and owns its channel; garbage is refused",
        %{user: user} do
-    token = HoodrideWeb.Auth.socket_token(user)
+    token = Hoodride.TestHelpers.socket_token_for(user.id)
 
     {:ok, socket} = connect(HoodrideWeb.UserSocket, %{"token" => token})
     {:ok, _, _chan} = subscribe_and_join(socket, "user:#{user.id}", %{})

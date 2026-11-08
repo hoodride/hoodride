@@ -57,14 +57,7 @@ defmodule HoodrideWeb.AvatarServingTest do
   end
 
   defp signed_in(conn, u),
-    do:
-      init_test_session(conn, %{
-        user_id: u.id,
-        signed_in_at: System.system_time(:millisecond),
-        name: u.name,
-        photo: u.photo,
-        provider: u.provider
-      })
+    do: init_test_session(conn, Hoodride.TestHelpers.session_for(u.id))
 
   defp stored(dir, bytes) do
     name = Base.url_encode64(:crypto.strong_rand_bytes(16), padding: false) <> ".jpg"

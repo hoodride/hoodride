@@ -15,7 +15,6 @@ defmodule HoodrideWeb.RevocationTest do
   require Phoenix.ChannelTest
 
   alias Hoodride.{Accounts, Geo, Repo, SignOuts}
-  alias HoodrideWeb.Auth
 
   @cell "882a1072c7fffff"
   @day 86_400_000
@@ -31,12 +30,15 @@ defmodule HoodrideWeb.RevocationTest do
   end
 
   defp signed_in(conn, u),
-    do: init_test_session(conn, %{user_id: u.id, signed_in_at: System.system_time(:millisecond)})
+    do: init_test_session(conn, Hoodride.TestHelpers.session_for(u.id))
 
-  # what a restart does to the denylist: memory gone, refilled from the database
+  # what a restart does to the denylist and the sign-ins: memory gone,
+  # refilled from the database
   defp restart! do
     :ets.delete_all_objects(:sign_outs)
+    :ets.delete_all_objects(:session_tokens)
     :ok = SignOuts.load()
+    :ok = Hoodride.SessionTokens.load()
   end
 
   defp connects?(token),
@@ -50,7 +52,7 @@ defmodule HoodrideWeb.RevocationTest do
 
   test "a deleted account's old token stays refused after a restart", %{conn: conn} do
     u = user("rv-del")
-    token = Auth.socket_token(u)
+    token = Hoodride.TestHelpers.socket_token_for(u.id)
     Process.sleep(2)
 
     assert json_response(
@@ -65,7 +67,7 @@ defmodule HoodrideWeb.RevocationTest do
   test "a delete that can't reach the database changes NOTHING — and a retry works", %{conn: conn} do
     u = user("rv-fail")
     Geo.driver_update(%{id: u.id, name: u.name, photo: nil}, @cell, nil)
-    token = Auth.socket_token(u)
+    token = Hoodride.TestHelpers.socket_token_for(u.id)
     Process.sleep(2)
 
     # a real database failure: the revocation can't be saved
@@ -92,7 +94,7 @@ defmodule HoodrideWeb.RevocationTest do
   describe "signing out when the database can't" do
     test "NOTHING changes — still signed in everywhere — and a retry works", %{conn: conn} do
       u = user("rv-so")
-      token = Auth.socket_token(u)
+      token = Hoodride.TestHelpers.socket_token_for(u.id)
       Process.sleep(2)
       conn = signed_in(conn, u)
 
@@ -129,7 +131,7 @@ defmodule HoodrideWeb.RevocationTest do
 
   test "a sign-out survives a restart" do
     u = user("rv-out")
-    token = Auth.socket_token(u)
+    token = Hoodride.TestHelpers.socket_token_for(u.id)
     Process.sleep(2)
     :ok = Accounts.mark_logged_out(u.id)
 

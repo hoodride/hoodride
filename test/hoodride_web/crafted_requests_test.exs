@@ -47,8 +47,7 @@ defmodule HoodrideWeb.CraftedRequestsTest do
   end
 
   defp signed_in(conn, user),
-    do:
-      init_test_session(conn, %{user_id: user.id, signed_in_at: System.system_time(:millisecond)})
+    do: init_test_session(conn, Hoodride.TestHelpers.session_for(user.id))
 
   defp state_of(conn) do
     %URI{query: q} = URI.parse(redirected_to(conn, 302))

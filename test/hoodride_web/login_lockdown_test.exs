@@ -6,9 +6,9 @@ defmodule HoodrideWeb.LoginLockdownTest do
     127.0.0.1, so the address alone isn't enough — the host must be local
     and no forwarding header may be present.
   - Sessions are checked on the SERVER (OWASP: timeouts and logout "must be
-    enforced server-side"; Plug's cookie max_age is browser-side only): a
-    sign-in time in the session, at most 30 days old, and newer than the
-    account's `logged_out_at`.
+    enforced server-side"; Plug's cookie max_age is browser-side only): the
+    session's sign-in token must still exist (Hoodride.SessionTokens) and be
+    at most 30 days old.
   - Logout closes every socket of the account and refuses every older
     session and socket token.
   - Socket tokens travel in the WebSocket protocol header (Phoenix
@@ -47,8 +47,12 @@ defmodule HoodrideWeb.LoginLockdownTest do
 
   defp local(conn), do: %{conn | host: "localhost"}
 
-  defp signed_in(conn, user, at \\ nil),
-    do: init_test_session(conn, %{user_id: user.id, signed_in_at: at || now_ms()})
+  # a real sign-in (Hoodride.SessionTokens), made `age` ms ago
+  defp signed_in(conn, user, age \\ 0),
+    do: init_test_session(conn, session(user, age))
+
+  defp session(user, age \\ 0),
+    do: Hoodride.TestHelpers.session_for(user.id) |> Hoodride.TestHelpers.age_sign_in(age)
 
   defp me(conn), do: json_response(get(conn, "/api/me"), 200)["user"]
 
@@ -60,7 +64,7 @@ defmodule HoodrideWeb.LoginLockdownTest do
     } do
       conn = post(local(conn), "/api/dev_login", %{"name" => "Loc"})
       assert json_response(conn, 200) == %{"ok" => true}
-      assert is_integer(get_session(conn, :signed_in_at))
+      assert is_binary(get_session(conn, :user_token))
       assert %{"name" => "Loc"} = me(conn)
 
       v6 = %{build_conn() | host: "localhost", remote_ip: {0, 0, 0, 0, 0, 0, 0, 1}}
@@ -110,8 +114,8 @@ defmodule HoodrideWeb.LoginLockdownTest do
 
     test "a session older than 30 days is signed out", %{conn: conn} do
       u = user("ss-old")
-      assert me(signed_in(conn, u, now_ms() - 31 * @day_ms)) == nil
-      assert me(signed_in(build_conn(), u, now_ms() - 29 * @day_ms))
+      assert me(signed_in(conn, u, 31 * @day_ms)) == nil
+      assert me(signed_in(build_conn(), u, 29 * @day_ms))
     end
 
     test "a session without a sign-in time (older app) is signed out", %{conn: conn} do
@@ -121,11 +125,11 @@ defmodule HoodrideWeb.LoginLockdownTest do
 
     test "every endpoint uses the same check (state, socket_token)", %{conn: conn} do
       u = user("ss-ep")
-      old = signed_in(conn, u, now_ms() - 31 * @day_ms)
+      old = signed_in(conn, u, 31 * @day_ms)
       assert json_response(get(old, "/api/state"), 200)["user"] == nil
 
       assert json_response(
-               get(signed_in(build_conn(), u, now_ms() - 31 * @day_ms), "/api/socket_token"),
+               get(signed_in(build_conn(), u, 31 * @day_ms), "/api/socket_token"),
                401
              )
     end
@@ -136,15 +140,15 @@ defmodule HoodrideWeb.LoginLockdownTest do
   describe "logout" do
     test "records the time, and every older session stops working", %{conn: conn} do
       u = user("lo-a")
-      before = now_ms() - 1_000
+      # another device's sign-in (or a stolen copy of a cookie)
+      other = signed_in(build_conn(), u)
       conn = post(signed_in(conn, u), "/api/logout")
       assert json_response(conn, 200) == %{"ok" => true}
       assert is_integer(Accounts.get_user(u.id).logged_out_at)
 
-      # a copy of the old cookie (another device, or stolen)
-      assert me(signed_in(build_conn(), u, before)) == nil
+      assert me(other) == nil
       # a sign-in AFTER the logout works
-      assert me(signed_in(build_conn(), u, now_ms() + 1))
+      assert me(signed_in(build_conn(), u))
     end
 
     test "closes every socket of the account", %{conn: conn} do
@@ -250,8 +254,8 @@ defmodule HoodrideWeb.LoginLockdownTest do
 
     test "the session path follows the same rules", %{conn: _} do
       u = user("tk-s")
-      fresh = %{"user_id" => u.id, "signed_in_at" => now_ms()}
-      stale = %{"user_id" => u.id, "signed_in_at" => now_ms() - 31 * @day_ms}
+      fresh = session(u)
+      stale = session(u, 31 * @day_ms)
 
       assert {:ok, _} =
                Phoenix.ChannelTest.connect(HoodrideWeb.UserSocket, %{},
@@ -334,7 +338,7 @@ defmodule HoodrideWeb.LoginLockdownTest do
       assert_received {:token_request, form}
       assert form["code_verifier"] == verifier
       assert form["client_secret"] == "test-secret"
-      assert is_integer(get_session(conn, :signed_in_at))
+      assert is_binary(get_session(conn, :user_token))
       assert get_session(conn, :oauth_verifier) == nil
       assert %{"name" => "Gee", "provider" => "google"} = me(recycle(conn))
     end

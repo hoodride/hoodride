@@ -25,9 +25,12 @@ defmodule HoodrideWeb.TermsTest do
   # signed in the way the app is: Auth.sign_in (the session carries what
   # the account has agreed to)
   defp signed_in(u) do
-    build_conn()
-    |> init_test_session(%{})
-    |> HoodrideWeb.Auth.sign_in(Accounts.get_user(u.id))
+    {:ok, conn} =
+      build_conn()
+      |> init_test_session(%{})
+      |> HoodrideWeb.Auth.sign_in(Accounts.get_user(u.id))
+
+    conn
   end
 
   defp agree(conn), do: post(conn, "/api/terms/accept")

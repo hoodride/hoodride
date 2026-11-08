@@ -39,8 +39,7 @@ defmodule HoodrideWeb.SignInRefreshTest do
   end
 
   defp signed_in(conn, user),
-    do:
-      init_test_session(conn, %{user_id: user.id, signed_in_at: System.system_time(:millisecond)})
+    do: init_test_session(conn, Hoodride.TestHelpers.session_for(user.id))
 
   defp query(conn) do
     %URI{host: host, query: q} = URI.parse(redirected_to(conn, 302))

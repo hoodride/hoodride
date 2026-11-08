@@ -12,7 +12,9 @@ defmodule Hoodride.AccountDeletion do
        revoke first and delete the row last: a failed delete left them
        signed out, unable to retry, and the account came back at their
        next sign-in.)
-    2. the denylist in memory: every token and session refused from now;
+    2. its sign-in tokens went with the row (the database's cascade) — from
+       memory too (Hoodride.SessionTokens), and the denylist: every session
+       and connection pass refused from now, every live action too;
     3. live state: off the map (car and ✋), incoming requests declined
        (each rider told), chats closed (the partner told), presence and the
        session stamp forgotten;
@@ -66,6 +68,10 @@ defmodule Hoodride.AccountDeletion do
   end
 
   defp after_erase(user_id, now) do
+    # its sign-ins went with the row (the database's cascade): from memory
+    # too — FIRST, so a live connection can't put anything back on the map
+    # meanwhile (every action checks it: HoodrideWeb.UserChannel)
+    Hoodride.SessionTokens.forget(user_id)
     SignOuts.put(user_id, now)
 
     # off the map; going offline also declines every incoming request, each

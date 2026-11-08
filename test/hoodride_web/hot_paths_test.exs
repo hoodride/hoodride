@@ -5,10 +5,10 @@ defmodule HoodrideWeb.HotPathsTest do
 
     * WHO YOU ARE needs no database read: the session carries the name,
       photo and provider from sign-in (they change only at sign-in, which
-      always makes a new session), and whether you signed out or were
-      deleted since is the in-memory denylist (Hoodride.SignOuts — kept in
-      its own table, so it survives restarts). A session from before this
-      carried nothing: checked the old way, once.
+      always makes a new session), and whether you're still signed in is
+      the sign-in token in memory (Hoodride.SessionTokens — kept in its own
+      table, so it survives restarts). A session from before the switch to
+      sign-in tokens (2026-11-08) is simply signed out.
     * The people `/api/state` and reveal mention are looked up in ONE query,
       not one per person.
 
@@ -33,16 +33,23 @@ defmodule HoodrideWeb.HotPathsTest do
     u
   end
 
-  # what signing in puts in the session now (HoodrideWeb.Auth.sign_in/2)
-  defp signed_in(conn, u, at \\ System.system_time(:millisecond)) do
-    init_test_session(conn, %{
-      user_id: u.id,
-      signed_in_at: at,
-      name: u.name,
-      photo: u.photo,
-      provider: u.provider,
-      terms_version: Hoodride.Terms.version()
-    })
+  # what signing in puts in the session now (HoodrideWeb.Auth.sign_in/2),
+  # the sign-in made `age` ms ago
+  defp signed_in(conn, u, age \\ 0) do
+    session =
+      Hoodride.TestHelpers.session_for(u.id)
+      |> Map.put("terms_version", Hoodride.Terms.version())
+      |> Hoodride.TestHelpers.age_sign_in(age)
+
+    init_test_session(conn, session)
+  end
+
+  # what a restart does: memory gone, refilled from the database
+  defp restart! do
+    :ets.delete_all_objects(:sign_outs)
+    :ets.delete_all_objects(:session_tokens)
+    :ok = SignOuts.load()
+    :ok = Hoodride.SessionTokens.load()
   end
 
   # how many database queries `fun` makes (Ecto's telemetry)
@@ -92,7 +99,7 @@ defmodule HoodrideWeb.HotPathsTest do
     test "signing in puts name, photo and provider in the session" do
       u = user("hp-si", "/x.png")
 
-      conn =
+      {:ok, conn} =
         Phoenix.ConnTest.build_conn() |> init_test_session(%{}) |> HoodrideWeb.Auth.sign_in(u)
 
       assert get_session(conn, :name) == "hp-si"
@@ -110,8 +117,7 @@ defmodule HoodrideWeb.HotPathsTest do
       assert json_response(res, 200)["user"] == nil
       assert qs == []
 
-      :ets.delete_all_objects(:sign_outs)
-      :ok = SignOuts.load()
+      restart!()
       assert json_response(get(conn, "/api/me"), 200)["user"] == nil
     end
 
@@ -125,28 +131,39 @@ defmodule HoodrideWeb.HotPathsTest do
                200
              )
 
-      :ets.delete_all_objects(:sign_outs)
-      :ok = SignOuts.load()
+      restart!()
       assert json_response(get(session, "/api/me"), 200)["user"] == nil
     end
 
     test "older than 30 days: refused", %{conn: conn} do
       u = user("hp-old")
-      old = System.system_time(:millisecond) - 31 * 86_400_000
-      assert json_response(get(signed_in(conn, u, old), "/api/me"), 200)["user"] == nil
+
+      assert json_response(get(signed_in(conn, u, 31 * 86_400_000), "/api/me"), 200)["user"] ==
+               nil
     end
 
-    test "a session from before (no name in it) still works — the old way, one read", %{
-      conn: conn
-    } do
+    # everyone signed in once more at the switch to sign-in tokens (owner,
+    # 2026-11-08): a cookie from before is no sign-in — and costs no read
+    test "a session from before the switch (no sign-in token) is signed out — no database read",
+         %{conn: conn} do
       u = user("hp-legacy")
 
-      conn =
-        init_test_session(conn, %{user_id: u.id, signed_in_at: System.system_time(:millisecond)})
+      for old <- [
+            %{user_id: u.id, signed_in_at: System.system_time(:millisecond)},
+            %{
+              user_id: u.id,
+              signed_in_at: System.system_time(:millisecond),
+              name: u.name,
+              photo: nil,
+              provider: "dev"
+            }
+          ] do
+        {res, qs} = queries(fn -> get(init_test_session(build_conn(), old), "/api/me") end)
+        assert json_response(res, 200)["user"] == nil
+        assert qs == []
+      end
 
-      {res, qs} = queries(fn -> get(conn, "/api/me") end)
-      assert json_response(res, 200)["user"]["name"] == "hp-legacy"
-      assert length(qs) == 1
+      _ = conn
     end
   end
 
@@ -180,12 +197,8 @@ defmodule HoodrideWeb.HotPathsTest do
     test "not yet agreed to the Terms: the account's own lookup", %{conn: conn} do
       me = user("hp-terms")
 
-      conn =
-        init_test_session(conn, %{
-          user_id: me.id,
-          signed_in_at: System.system_time(:millisecond),
-          name: me.name
-        })
+      # (a real sign-in, not yet agreed: no Terms version in the session)
+      conn = init_test_session(conn, Hoodride.TestHelpers.session_for(me.id))
 
       {res, qs} = queries(fn -> get(conn, "/api/state") end)
       assert json_response(res, 200)["terms_agreed"] == false
@@ -238,8 +251,10 @@ defmodule HoodrideWeb.HotPathsTest do
       me = user("hp-me2")
       p = user("hp-p2")
       {:ok, _} = Chat.send_message(%{id: p.id, name: p.name, photo: nil}, me.id, "hi")
+      # signed in BEFORE the database goes away (signing in writes it)
+      conn = signed_in(conn, me)
       Repo.query!("ALTER TABLE users RENAME TO users_away")
-      res = get(signed_in(conn, me), "/api/state")
+      res = get(conn, "/api/state")
       assert json_response(res, 503) == %{"error" => "busy"}
     end
   end
