@@ -127,7 +127,11 @@ defmodule HoodrideWeb.HotPathsTest do
       Process.sleep(2)
 
       assert json_response(
-               post(signed_in(build_conn(), u), "/api/account/delete", %{"confirm" => "DELETE"}),
+               Hoodride.TestHelpers.post_json(
+                 signed_in(build_conn(), u),
+                 "/api/account/delete",
+                 %{"confirm" => "DELETE"}
+               ),
                200
              )
 

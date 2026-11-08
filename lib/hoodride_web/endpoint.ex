@@ -79,12 +79,21 @@ defmodule HoodrideWeb.Endpoint do
     event_prefix: [:phoenix, :endpoint],
     log: Application.compile_env(:hoodride, :request_log, :info)
 
+  # ONLY small JSON (server review, 2026-11-08): forms and file uploads up
+  # to 8 MB used to be read — uploads written to disk — on any address,
+  # before any limit. Nothing in Hood Ride sends either. Read in pieces and
+  # counted as it arrives: past 64 KB, 413 at once, the rest never read.
+  # Any other type is left unread (`pass`): a forged form fills in nothing,
+  # and the CSP reports' own type is read by their controller. (A form-
+  # posting callback added one day — e.g. Facebook's data deletion — needs
+  # its own parser on its own route.) No method override: nothing uses it.
   plug Plug.Parsers,
-    parsers: [:urlencoded, :multipart, :json],
+    parsers: [:json],
     pass: ["*/*"],
+    length: 64_000,
+    read_length: 64_000,
     json_decoder: Phoenix.json_library()
 
-  plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
   plug HoodrideWeb.Router

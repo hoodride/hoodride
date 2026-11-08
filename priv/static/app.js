@@ -894,7 +894,7 @@ $("btn-logout").addEventListener("click", async () => {
   // never reload into a half-signed-out app
   let res;
   try {
-    res = await fetch("/api/logout", { method: "POST" });
+    res = await fetch("/api/logout", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
   } catch (_) {
     return transientBanner(t("Couldn't reach Hood Ride — try again"));
   }
@@ -927,7 +927,7 @@ function agreeToTerms() {
       err.classList.add("hidden");
       let res = null;
       try {
-        res = await fetch("/api/terms/accept", { method: "POST" });
+        res = await fetch("/api/terms/accept", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
       } catch (_) {}
       if (res && res.status === 401) return location.reload(); // signed out meanwhile
       if (res && res.ok) {

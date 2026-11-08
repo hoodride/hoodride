@@ -75,6 +75,17 @@ defmodule Hoodride.TestHelpers do
     session
   end
 
+  @doc """
+  POST `body` as real JSON, as the app sends it (delete account and save car
+  take JSON only — HoodrideWeb.JsonBody). ConnTest's own `post(conn, path,
+  map)` sends a map as `multipart/mixed`.
+  """
+  def post_json(conn, path, body) do
+    conn
+    |> Plug.Conn.put_req_header("content-type", "application/json")
+    |> Phoenix.ConnTest.dispatch(HoodrideWeb.Endpoint, :post, path, Jason.encode!(body))
+  end
+
   @doc "A connection pass (socket token) for `user_id`, from a fresh sign-in."
   def socket_token_for(user_id) do
     session_for(user_id) |> HoodrideWeb.Auth.session_user() |> HoodrideWeb.Auth.socket_token()

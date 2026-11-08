@@ -644,6 +644,23 @@ Design notes:
     request waits, as deleting the account is: the app's disabled button is
     only the first guard (another tab, an old app, a tap racing an accept).
     `LogoutOfflineTest`; the `signout` journey.
+  - **Requests that change something come from Hood Ride's own pages only**
+    (`HoodrideWeb.CrossOrigin`, 2026-11-08 — Go's net/http
+    CrossOriginProtection rule, which OWASP points to): sign out, delete
+    account, agree to the Terms, save car, dev login. The browser's
+    `Sec-Fetch-Site` must be `same-origin` or `none`; without it, an
+    `Origin` must be the request's own scheme, host and port (hoodride.app
+    behind the tunnel — `force_ssl` rewrites to https/443 — and a phone on
+    home Wi-Fi alike); `null`, malformed or repeated: refused; neither:
+    allowed (not a modern browser). 403 `cross_site`, a warning by kind only.
+    Before, only the cookie's SameSite stood between another site and these.
+    Not the CSP reports (Safari sends them with `Origin: null`; they change
+    nothing). The `crosssite` journey: a hidden form on another page.
+  - **Only small JSON is read** (`Plug.Parsers [:json]`, 64 KB, counted as it
+    arrives — 413 past it): forms and file uploads up to 8 MB used to be read
+    on any address before any limit. Delete account and save car take JSON
+    only (415) and their fields from the BODY only (`HoodrideWeb.JsonBody` —
+    `?confirm=DELETE` used to count whatever the body said).
   - **Socket tokens in the WebSocket protocol header** (Phoenix `auth_token`),
     not the URL: never in a proxy's access log. A TOP-LEVEL socket option —
     set inside `websocket:` Phoenix overwrote it with nil and every header

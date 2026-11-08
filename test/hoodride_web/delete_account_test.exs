@@ -38,7 +38,7 @@ defmodule HoodrideWeb.DeleteAccountTest do
     do: init_test_session(conn, Hoodride.TestHelpers.session_for(u.id))
 
   defp delete_account(conn, body \\ %{"confirm" => "DELETE"}),
-    do: post(conn, "/api/account/delete", body)
+    do: Hoodride.TestHelpers.post_json(conn, "/api/account/delete", body)
 
   describe "deleting" do
     test "the account is gone; its old session and token are refused", %{conn: conn} do

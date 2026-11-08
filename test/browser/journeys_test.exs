@@ -74,6 +74,21 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     )
 
     on_exit(fn -> :telemetry.detach(handler) end)
+
+    # requests refused as coming from another site (HoodrideWeb.CrossOrigin):
+    # counted here, asked for by server("cross_site_refused")
+    refused = :counters.new(1, [])
+    refused_handler = "journeys-refused-#{System.unique_integer([:positive])}"
+
+    :telemetry.attach(
+      refused_handler,
+      [:hoodride, :cross_origin, :refused],
+      fn _, _, _, c -> :counters.add(c, 1, 1) end,
+      refused
+    )
+
+    on_exit(fn -> :telemetry.detach(refused_handler) end)
+    Process.put(:cross_site_refused, refused)
     %{server_log: log}
   end
 
@@ -356,6 +371,14 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     )
 
     "ok"
+  end
+
+  # "ok" once at least one request was refused as coming from another site
+  defp server("cross_site_refused") do
+    case :counters.get(Process.get(:cross_site_refused), 1) do
+      0 -> "nothing was refused as coming from another site"
+      _ -> "ok"
+    end
   end
 
   defp server(other), do: "unknown request: #{other}"

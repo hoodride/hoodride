@@ -19,8 +19,17 @@ defmodule HoodrideWeb.CarController do
 
   def show(conn, _params), do: unauthenticated(conn)
 
-  def update(%{assigns: %{current_user: %{id: id}}} = conn, params) do
-    case Accounts.set_car(id, params) do
+  # JSON only, its fields only from it — never the address
+  def update(%{assigns: %{current_user: %{id: id}}} = conn, _params) do
+    if HoodrideWeb.JsonBody.json?(conn),
+      do: save(conn, id, HoodrideWeb.JsonBody.object(conn)),
+      else: HoodrideWeb.JsonBody.refuse(conn)
+  end
+
+  def update(conn, _params), do: unauthenticated(conn)
+
+  defp save(conn, id, car) do
+    case Accounts.set_car(id, car) do
       {:ok, car} ->
         json(conn, %{car: car})
 
@@ -31,8 +40,6 @@ defmodule HoodrideWeb.CarController do
         busy(conn)
     end
   end
-
-  def update(conn, _params), do: unauthenticated(conn)
 
   defp unauthenticated(conn), do: conn |> put_status(401) |> json(%{error: "unauthenticated"})
 

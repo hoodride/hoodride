@@ -11,6 +11,13 @@ defmodule HoodrideWeb.Router do
     plug HoodrideWeb.HttpBudget
   end
 
+  # requests that change something: from Hood Ride's own pages only
+  # (HoodrideWeb.CrossOrigin) — after :api, so a refused one still spends
+  # its budget
+  pipeline :own_pages do
+    plug HoodrideWeb.CrossOrigin
+  end
+
   # sign-in (/auth/*): its OWN budget, so it can't use up the app's
   # (AuthController has the refresh and failed-code limits)
   pipeline :session do
@@ -33,19 +40,27 @@ defmodule HoodrideWeb.Router do
     get "/:name", AvatarController, :show
   end
 
+  # (matched before the scope below: its catch-all comes last)
+  scope "/api", HoodrideWeb do
+    pipe_through [:api, :own_pages]
+
+    post "/logout", AuthController, :logout
+    post "/terms/accept", AuthController, :accept_terms
+    post "/account/delete", AuthController, :delete_account
+    post "/car", CarController, :update
+    post "/dev_login", AuthController, :dev_login
+  end
+
   scope "/api", HoodrideWeb do
     pipe_through :api
 
     get "/me", AuthController, :me
     get "/state", AuthController, :state
     get "/socket_token", AuthController, :socket_token
-    post "/logout", AuthController, :logout
-    post "/terms/accept", AuthController, :accept_terms
-    post "/account/delete", AuthController, :delete_account
     get "/car", CarController, :show
-    post "/car", CarController, :update
-    post "/dev_login", AuthController, :dev_login
-    # what the Content-Security-Policy blocked (HoodrideWeb.CSP)
+    # what the Content-Security-Policy blocked (HoodrideWeb.CSP) — the
+    # browser sends these itself (Safari with `Origin: null`): not checked
+    # by :own_pages, and they change nothing
     post "/csp-report", CspReportController, :create
     match :*, "/*path", AuthController, :not_found
   end

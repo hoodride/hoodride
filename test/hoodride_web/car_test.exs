@@ -27,7 +27,8 @@ defmodule HoodrideWeb.CarTest do
     init_test_session(conn, Hoodride.TestHelpers.session_for(u.id))
   end
 
-  defp set_car(conn, u, car), do: post(signed_in(conn, u), "/api/car", car)
+  defp set_car(conn, u, car),
+    do: Hoodride.TestHelpers.post_json(signed_in(conn, u), "/api/car", car)
 
   @civic %{"color" => "Gray", "make" => "Honda", "model" => "Civic"}
 
@@ -106,7 +107,7 @@ defmodule HoodrideWeb.CarTest do
     end
 
     test "signed out: 401", %{conn: conn} do
-      assert json_response(post(conn, "/api/car", @civic), 401)
+      assert json_response(Hoodride.TestHelpers.post_json(conn, "/api/car", @civic), 401)
       assert json_response(get(build_conn(), "/api/car"), 401)
     end
 
@@ -116,7 +117,10 @@ defmodule HoodrideWeb.CarTest do
       again = signed_in(build_conn(), u)
       conn = signed_in(conn, u)
       Hoodride.Repo.query!("ALTER TABLE users RENAME TO users_away")
-      assert json_response(post(conn, "/api/car", @civic), 503) == %{"error" => "busy"}
+
+      assert json_response(Hoodride.TestHelpers.post_json(conn, "/api/car", @civic), 503) == %{
+               "error" => "busy"
+             }
 
       assert json_response(get(again, "/api/car"), 503) == %{
                "error" => "busy"
