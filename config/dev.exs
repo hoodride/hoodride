@@ -67,6 +67,7 @@ config :hoodride, dev_login: true
 # the monster runs hundreds of people from one address: no per-IP budgets
 config :hoodride, :http_budget, nil
 config :hoodride, :avatar_budget, nil
+config :hoodride, :chat_budget, nil
 config :hoodride, :sign_in_budget, nil
 config :hoodride, :sign_in_failures, nil
 

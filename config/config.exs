@@ -68,6 +68,10 @@ config :hoodride, :http_budget, per_minute: 60, burst: 120
 # (test/hoodride_web/avatar_serving_test.exs checks they stay in step)
 config :hoodride, :avatar_budget, per_minute: 120, burst: 40
 
+# opening a chat (GET /api/chat, light reload) has its OWN budget, per
+# account: tapping through chats can't use up what /api/state needs
+config :hoodride, :chat_budget, per_minute: 60, burst: 60
+
 # per-address budget on WebSocket handshakes, before the token is checked
 # (HoodrideWeb.UserSocket): the same numbers — a person connects ~once per page
 config :hoodride, :ws_budget, per_minute: 60, burst: 120

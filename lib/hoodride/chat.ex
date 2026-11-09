@@ -114,6 +114,91 @@ defmodule Hoodride.Chat do
     end
   end
 
+  @doc """
+  Light reload (owner, 2026-11-08): a conversation from conversations_for/1
+  as a SUMMARY for the chat list — no texts. `last`: the newest message's
+  id, time, whether it's mine, and a preview (preview/1); nil when there's
+  none yet (a ride's chat). `theirs`: the partner's messages' ids and
+  times, which is what unread counts. Both from the newest @max_history —
+  the same messages conversation_messages/2 gives (a send between its
+  insert and its trim can leave one more for a moment).
+  """
+  def summary(%{messages: messages} = c, user_id) do
+    kept = Enum.take(messages, -@max_history)
+
+    last =
+      case List.last(kept) do
+        nil -> nil
+        m -> %{id: m.id, ts: m.ts, mine: m.from == user_id, preview: preview(m.text)}
+      end
+
+    c
+    |> Map.delete(:messages)
+    |> Map.merge(%{
+      last: last,
+      theirs: for(m <- kept, m.from == c.peer_id, do: %{id: m.id, ts: m.ts})
+    })
+  end
+
+  @preview_chars 100
+  @preview_bytes 400
+
+  @doc """
+  The start of a message for the chat list: whole characters (graphemes —
+  never half an emoji), as many as fit in #{@preview_chars} characters AND
+  #{@preview_bytes} bytes (one "character" can be dozens of bytes). A first
+  character bigger than that on its own: "".
+  """
+  def preview(text), do: preview(text, 0, [])
+
+  defp preview(_rest, @preview_chars, acc), do: acc |> Enum.reverse() |> IO.iodata_to_binary()
+
+  defp preview(rest, n, acc) do
+    case String.next_grapheme(rest) do
+      nil ->
+        acc |> Enum.reverse() |> IO.iodata_to_binary()
+
+      {g, more} ->
+        if IO.iodata_length(acc) + byte_size(g) > @preview_bytes,
+          do: acc |> Enum.reverse() |> IO.iodata_to_binary(),
+          else: preview(more, n + 1, [g | acc])
+    end
+  end
+
+  @doc """
+  One conversation's messages, for its opening (`GET /api/chat`): `peer` is
+  the request's text, compared with the caller's own conversations' partner
+  ids as text — "012", "12abc" or a list never match. The newest
+  @max_history, oldest first, today's shape. `:none` for anything that
+  isn't the caller's conversation now (the index row and the conversation
+  itself are both checked: an index row can outlive its conversation for a
+  moment, see @by_user). No copy of any other conversation.
+  """
+  def conversation_messages(user_id, peer) when is_binary(peer) do
+    found =
+      for {{^user_id, {a, b} = key}} <- :ets.match_object(@by_user, {{user_id, :_}}),
+          Integer.to_string(if a == user_id, do: b, else: a) == peer,
+          do: key
+
+    case found do
+      [key] ->
+        if :ets.member(@conversations, key), do: {:ok, messages_of(key)}, else: :none
+
+      _ ->
+        :none
+    end
+  end
+
+  def conversation_messages(_user_id, _peer), do: :none
+
+  defp messages_of(key) do
+    @messages
+    |> :ets.lookup(key)
+    |> Enum.map(fn {_k, id, sender, text, ts} -> %{id: id, from: sender, text: text, ts: ts} end)
+    |> Enum.sort_by(& &1.id)
+    |> Enum.take(-@max_history)
+  end
+
   # the peer's latest block in this conversation, with its age — counted on
   # the SERVER's clock, so a phone's wrong clock can't skew it
   defp spot_of(key, sender) do

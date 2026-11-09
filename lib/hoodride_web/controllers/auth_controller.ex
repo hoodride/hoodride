@@ -435,9 +435,15 @@ defmodule HoodrideWeb.AuthController do
   # used to be one per person, on every app open and every reconnect. If
   # the database can't answer: 503, which the app retries (HoodBoot), never
   # a state with people missing.
-  def state(conn, _params) do
-    # the app is in use: a week-old sign-in is replaced, the cookie renewed
-    conn = Auth.keep_signed_in(conn)
+  #
+  # Light reload (owner, 2026-11-08): `chats=list` (exactly) — each chat as
+  # a summary (Hoodride.Chat.summary/2: no texts), and `open_peer=<id>` the
+  # one chat on screen in full, so a reconnect keeps its place. Without it:
+  # every chat in full, as before (older app copies).
+  def state(conn, params) do
+    # the app is in use: a week-old sign-in is replaced, the cookie renewed.
+    # Never stored by a browser or a proxy (chats, a ride, who you are).
+    conn = conn |> Auth.keep_signed_in() |> put_resp_header("cache-control", "no-store")
 
     with %{} = u <- conn.assigns.current_user do
       ride = ride_of(u.id)
@@ -460,7 +466,7 @@ defmodule HoodrideWeb.AuthController do
             # (and gets no connection token until then)
             terms_agreed: terms_agreed,
             ride: ride_state(ride, u.id, people),
-            conversations: conversation_state(convos, people),
+            conversations: conversation_state(convos, people, chats_wanted(params), u.id),
             open_request: open_request_state(open, people),
             pending_requests: pending_request_state(pending, people),
             # live map presence, so a reload RESUMES a raised hand or an
@@ -538,16 +544,57 @@ defmodule HoodrideWeb.AuthController do
     end
   end
 
-  defp conversation_state(convos, people) do
+  # :full (as before), or {:list, the open chat's partner id as text | nil}.
+  # Only the exact text: a list or a map (chats[]=…) is the full answer.
+  defp chats_wanted(%{"chats" => "list"} = params) do
+    {:list, if(is_binary(params["open_peer"]), do: params["open_peer"])}
+  end
+
+  defp chats_wanted(_params), do: :full
+
+  # a summary, unless it's the full answer or the chat on screen
+  defp summary?(:full, _peer_id), do: false
+  defp summary?({:list, open}, peer_id), do: open != Integer.to_string(peer_id)
+
+  defp conversation_state(convos, people, wanted, user_id) do
     for c <- convos, peer = people[c.peer_id], peer != nil do
       # the partner's latest block, if they shared one (not driving) — with
       # its age on the server's clock (ARCHITECTURE.md "Distances")
-      %{
-        peer: person(peer),
-        messages: c.messages,
-        last_activity: c.last_activity,
-        peer_spot: c.peer_spot
-      }
+      base = %{peer: person(peer), last_activity: c.last_activity, peer_spot: c.peer_spot}
+
+      if summary?(wanted, c.peer_id) do
+        s = Hoodride.Chat.summary(c, user_id)
+        Map.merge(base, %{last: s.last, theirs: s.theirs})
+      else
+        Map.put(base, :messages, c.messages)
+      end
+    end
+  end
+
+  # GET /api/chat?peer=<id> — one chat's messages, when it's opened (light
+  # reload). Signed out: 401; the Terms not yet agreed: 403, read from the
+  # session as socket_token (no database read here at all). Anything that
+  # isn't the caller's chat now: the same 404 "none" (nothing told about
+  # anyone else's). Not kept signed in from here (a reload or a reconnect
+  # does that). Its own budget (the :chat_api pipeline).
+  def chat(conn, params) do
+    conn = put_resp_header(conn, "cache-control", "no-store")
+
+    case conn.assigns.current_user do
+      nil ->
+        conn |> put_status(401) |> json(%{error: "unauthenticated"})
+
+      user ->
+        cond do
+          not Hoodride.Terms.agreed?(user) ->
+            conn |> put_status(403) |> json(%{error: "terms"})
+
+          true ->
+            case Hoodride.Chat.conversation_messages(user.id, params["peer"]) do
+              {:ok, messages} -> json(conn, %{messages: messages})
+              :none -> conn |> put_status(404) |> json(%{error: "none"})
+            end
+        end
     end
   end
 

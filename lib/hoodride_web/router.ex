@@ -29,6 +29,17 @@ defmodule HoodrideWeb.Router do
     plug HoodrideWeb.HttpBudget, config: :sign_in_budget, name: :sign_in
   end
 
+  # one chat's messages when it's opened (light reload): its OWN budget, so
+  # opening chats never uses up what /api/state needs; the tab's account
+  # checked (HoodrideWeb.SameUser)
+  pipeline :chat_api do
+    plug :accepts, ["json"]
+    plug :fetch_session
+    plug HoodrideWeb.CurrentUser
+    plug HoodrideWeb.HttpBudget, config: :chat_budget, name: :chat
+    plug HoodrideWeb.SameUser
+  end
+
   # profile photos (HoodrideWeb.AvatarController): signed-in only, with
   # their own budget
   pipeline :avatar do
@@ -52,6 +63,13 @@ defmodule HoodrideWeb.Router do
     post "/account/delete", AuthController, :delete_account
     post "/car", CarController, :update
     post "/dev_login", AuthController, :dev_login
+  end
+
+  # (matched before the scope below: its catch-all comes last)
+  scope "/api", HoodrideWeb do
+    pipe_through :chat_api
+
+    get "/chat", AuthController, :chat
   end
 
   scope "/api", HoodrideWeb do
