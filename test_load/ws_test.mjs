@@ -225,12 +225,17 @@ async function main() {
   ok("ride ended on both phones");
 
   // rehydration truth-check: server state agrees afterwards
-  const st = await (await fetch(`${BASE}/api/state`, { headers: { cookie: rider.cookie } })).json();
+  // (as the app asks: the chat list — light reload, 2026-11-08 — and the
+  // chat's messages when it's opened)
+  const st = await (await fetch(`${BASE}/api/state?chats=list`, { headers: { cookie: rider.cookie } })).json();
   if (st.ride === null) ok("post-ride /api/state shows no ride (death is deletion)");
   else fail("post-ride state clean", JSON.stringify(st.ride));
   const conv = st.conversations.find((c) => c.peer.id === driver.user.id);
-  if (conv && conv.messages.length >= 2) ok("conversation survived the ride with full history");
-  else fail("conversation survival", JSON.stringify(st.conversations));
+  if (conv && conv.last && !conv.messages) ok("the chat list: the conversation as a summary");
+  else fail("conversation summary", JSON.stringify(st.conversations));
+  const opened = await (await fetch(`${BASE}/api/chat?peer=${driver.user.id}`, { headers: { cookie: rider.cookie } })).json();
+  if (opened.messages && opened.messages.length >= 2) ok("conversation survived the ride with full history");
+  else fail("conversation survival", JSON.stringify(opened));
 
   R.ws.close();
   D.ws.close();

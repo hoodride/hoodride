@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "ਤੁਹਾਡਾ ਖਾਤਾ ਮਿਟਾਇਆ ਨਹੀਂ ਜਾ ਸਕਿਆ — ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "ਸੁਨੇਹੇ ਲੋਡ ਨਹੀਂ ਹੋ ਸਕੇ। ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Ride ਨਾਲ ਕਨੈਕਟ ਨਹੀਂ ਹੋ ਸਕਿਆ — ਆਪਣਾ ਕਨੈਕਸ਼ਨ ਜਾਂਚੋ ਅਤੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
 
@@ -395,6 +399,10 @@ msgstr "ਭਾਸ਼ਾ"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "ਡੈਮੋ ਤੋਂ ਬਾਹਰ ਜਾਓ"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "ਬਹੁਤ ਦੇਰ ਹੋ ਗਈ — ਬੇਨਤੀ ਵਾਪਸ �
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "ਤੁਹਾਡੇ ਨੈੱਟਵਰਕ ਤੋਂ ਬਹੁਤ ਸਾਰੀਆਂ ਸਾਈਨ-ਇਨ ਕੋਸ਼ਿਸ਼ਾਂ ਅਸਫਲ ਹੋਈਆਂ — ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"

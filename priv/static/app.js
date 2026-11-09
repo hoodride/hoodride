@@ -48,7 +48,7 @@ const auth = {
         body: JSON.stringify({ name: this.devName() }),
       });
       if (res.ok) {
-        const st = await (await apiFetch("/api/state")).json();
+        const st = await (await apiFetch("/api/state?chats=list")).json();
         if (st.user) return { real: true, state: st };
       }
     } catch (_) {}
@@ -222,7 +222,10 @@ function chatFor(peer) {
   if (!chats.has(peer)) {
     peer.chatClosed = false; // a chat with them again (chat_closed)
     const now = Date.now();
-    chats.set(peer, { msgs: [], unread: 0, replyIdx: 0, server: false, lastAt: now, emptyAt: now, draft: "" });
+    // loaded: its messages are here (a chat made on this phone always is;
+    // one a reload brought as a summary isn't until it's opened — light
+    // reload, owner 2026-11-08). summary: that summary {last, theirs}.
+    chats.set(peer, { msgs: [], unread: 0, replyIdx: 0, server: false, lastAt: now, emptyAt: now, draft: "", loaded: true, summary: null });
   }
   return chats.get(peer);
 }
@@ -1157,34 +1160,7 @@ async function connectSocket() {
     restartNotice = { min: min_ms, max: max_ms };
   });
 
-  userChannel.on("chat_closed", ({ peer_id }) => {
-    const peer = realPeersById.get(peer_id);
-    // on screen: their chat itself — not the list you went back to from it
-    // (that closed the whole list, other chats and all — owner, 2026-11-07)
-    const isOpen = !!peer && state.chatPeer === peer && !$("chat").classList.contains("hidden") && state.chatView !== "list";
-    const a = HoodBrowse.chatClosedActions({
-      hasChat: !!peer && chats.has(peer),
-      isOpen,
-      name: peer ? peer.name : "",
-    });
-    if (a.remove) {
-      chats.delete(peer);
-      // closed by the server — what a send failing afterwards needs to know
-      // (a chat missing after a reload isn't closed: unsay)
-      peer.chatClosed = true;
-    }
-    if (a.close) {
-      state.chatPeer = null;
-      closeChat();
-    } else if (state.chatView === "list" && !$("chat").classList.contains("hidden")) {
-      // the list: drawn again — or, nothing left in it, closed (not an empty
-      // "Chats" panel; a reload does the same — softReload)
-      if (chats.size) renderChat();
-      else closeChat();
-    }
-    if (a.banner) transientBanner(a.banner);
-    refreshControls();
-  });
+  userChannel.on("chat_closed", ({ peer_id }) => closeChatWith(realPeersById.get(peer_id)));
 
   userChannel.on("msg", (m) => {
     const peer = ensurePeer(m.from);
@@ -1338,6 +1314,67 @@ function showSessionMoved() {
 }
 
 // ===== Rehydration =====
+// the server deleted a conversation (the other person has been gone past
+// grace) — or a chat's opening found it gone (loadChat): cleared here too,
+// instead of leaving a chat that can't be used. `peer` may be unknown
+function closeChatWith(peer) {
+  // on screen: their chat itself — not the list you went back to from it
+  // (that closed the whole list, other chats and all — owner, 2026-11-07)
+  const isOpen = !!peer && state.chatPeer === peer && !$("chat").classList.contains("hidden") && state.chatView !== "list";
+  const a = HoodBrowse.chatClosedActions({
+    hasChat: !!peer && chats.has(peer),
+    isOpen,
+    name: peer ? peer.name : "",
+  });
+  if (a.remove) {
+    chats.delete(peer);
+    // closed by the server — what a send failing afterwards needs to know
+    // (a chat missing after a reload isn't closed: unsay)
+    peer.chatClosed = true;
+  }
+  if (a.close) {
+    state.chatPeer = null;
+    closeChat();
+  } else if (state.chatView === "list" && !$("chat").classList.contains("hidden")) {
+    // the list: drawn again — or, nothing left in it, closed (not an empty
+    // "Chats" panel; a reload does the same — softReload)
+    if (chats.size) renderChat();
+    else closeChat();
+  }
+  if (a.banner) transientBanner(a.banner);
+  refreshControls();
+}
+
+// a message from the server, as this app keeps it (a reload, and a chat's
+// messages when it's opened)
+function fromServer(m) {
+  return {
+    text: m.text,
+    mine: m.from === state.realUser.id,
+    at: HoodChatList.localAt(m.ts, chatSkew),
+    // the server's time and id: what "read up to" compares (HoodReadStore)
+    ts: m.ts,
+    id: m.id,
+  };
+}
+
+// a chat's place in the list: its last message's time and id — else, not
+// opened since a reload, its summary's last message — else when it began
+function settleLast(c) {
+  const last = c.msgs[c.msgs.length - 1];
+  const s = c.summary && c.summary.last;
+  if (last) {
+    c.lastAt = last.at;
+    c.lastId = last.id ?? null;
+  } else if (s) {
+    c.lastAt = HoodChatList.localAt(s.ts, chatSkew);
+    c.lastId = s.id;
+  } else {
+    c.lastAt = c.emptyAt;
+    c.lastId = null;
+  }
+}
+
 function hydrate(st) {
   loadStoredSpot();
   // the mode last picked on this device (HoodModeStore) — the server's
@@ -1353,20 +1390,22 @@ function hydrate(st) {
     const peer = ensurePeer(c.peer);
     const chat = chatFor(peer);
     chat.server = true;
-    chat.msgs = c.messages.map((m) => ({
-      text: m.text,
-      mine: m.from === state.realUser.id,
-      at: HoodChatList.localAt(m.ts, chatSkew),
-      // the server's time and id: what "read up to" compares (HoodReadStore)
-      ts: m.ts,
-      id: m.id,
-    }));
-    chat.lastAt = chat.msgs.length
-      ? chat.msgs[chat.msgs.length - 1].at
-      : HoodChatList.localAt(c.last_activity, chatSkew);
     chat.emptyAt = HoodChatList.localAt(c.last_activity, chatSkew);
-    // the last message's server id: which of two same-second chats is newer
-    chat.lastId = chat.msgs.length ? chat.msgs[chat.msgs.length - 1].id : null;
+    if (Array.isArray(c.messages)) {
+      // in full: the chat on screen (open_peer), or an older server
+      chat.msgs = c.messages.map(fromServer);
+      chat.loaded = true;
+      chat.summary = null;
+    } else {
+      // a summary (light reload): its messages come when it's opened
+      // (loadChat); meanwhile what arrives is held in msgs, not drawn
+      chat.msgs = [];
+      chat.loaded = false;
+      chat.summary = { last: c.last || null, theirs: c.theirs || [] };
+    }
+    // its place in the list: the last message's time and server id (which
+    // of two same-second chats is newer)
+    settleLast(chat);
     if (c.peer_spot) rememberShared(peer, c.peer_spot);
   });
   applyReadState();
@@ -1684,7 +1723,10 @@ async function softReload() {
       // the same verdict as opening the app (HoodBoot.classify): a failure
       // is a failure, never "signed out"
       fetchState: async () => {
-        const res = await apiFetch("/api/state");
+        // the chat list (light reload); the chat on screen comes in full, so
+        // it stays where you were reading (asked again on each try)
+        const onScreen = !$("chat").classList.contains("hidden") && state.chatView === "msgs" && state.chatPeer;
+        const res = await apiFetch("/api/state?chats=list" + (onScreen ? `&open_peer=${encodeURIComponent(onScreen.id)}` : ""));
         const body = await res.json().catch(() => null);
         const verdict = HoodBoot.classify({ status: res.status, body });
         if (verdict === "retry") throw new Error(`state ${res.status}`);
@@ -1713,6 +1755,8 @@ async function softReload() {
   // a chat on screen: where you were reading it — drawing it again sent you
   // to the newest, the "New messages" line and ↓ gone (owner, 2026-11-08)
   const reading = openChatPeerId && state.chatView !== "list" ? readingPlace() : null;
+  // …if it was drawn: one still loading has no reading place to keep
+  const wasLoaded = !!openChatPeerId && !!chats.get(state.chatPeer) && chats.get(state.chatPeer).loaded !== false;
   const openCardPeerId = !$("peer-card").classList.contains("hidden") && state.cardPeer ? state.cardPeer.id : null;
   // (a pile is remembered only while its list shows; the panel open with no
   // chat in it is the list)
@@ -1750,7 +1794,12 @@ async function softReload() {
   // nothing was sent in yet (the server decides at Send whether they can
   // be messaged); if it's the one on screen (not the list), it's read
   const reopen = openChatPeerId && realPeersById.get(openChatPeerId);
-  if (reopen) {
+  if (reopen && state.chatView !== "list" && !(wasLoaded && chatFor(reopen).loaded)) {
+    // on screen but not drawn before (it was still loading), or back only as
+    // a summary: opened as a tap opens it — "Loading…", then the line and
+    // read (or at once, if the reload brought it in full)
+    openChat(reopen);
+  } else if (reopen) {
     state.chatPeer = reopen;
     // read only if it's the one ON SCREEN: with the list showing (‹ from
     // that chat) its news was marked read unseen — no unread, and saved as
@@ -3165,6 +3214,16 @@ function renderChat() {
     // page still says it)
     // $("chat-note").classList.toggle("hidden", state.mode !== "rider");
     $("chat-form").classList.remove("hidden");
+    // not loaded yet: the header and the box, and "Loading…" (or Try again)
+    // where the messages go — what's arrived meanwhile isn't drawn until
+    // they come (loadChat). The test is "failed", never "loading": a failure
+    // is drawn while the load is still finishing up
+    if (chatFor(state.chatPeer).loaded === false) {
+      box.appendChild(chatLoadingNote(chatFor(state.chatPeer)));
+      chatStick.stuck = true;
+      hideChatJump();
+      return;
+    }
     // drawing: every bubble follows (none is "new below you")
     chatStick.stuck = true;
     chatFor(state.chatPeer).msgs.forEach((m) => {
@@ -3352,9 +3411,13 @@ setInterval(() => {
 // their messages from the server (not your own, not local notes like
 // "📩 requested a ride"): what unread counts
 function theirMsgs(peer) {
-  return chatFor(peer)
-    .msgs.filter((m) => !m.mine && m.id != null)
-    .map((m) => ({ ts: m.ts, id: m.id }));
+  const c = chatFor(peer);
+  const here = c.msgs.filter((m) => !m.mine && m.id != null).map((m) => ({ ts: m.ts, id: m.id }));
+  // not opened since a reload: the summary's (and what's come since)
+  const s = (c.summary && c.summary.theirs) || [];
+  if (!s.length) return here;
+  const ids = new Set(s.map((m) => m.id));
+  return [...s.map((m) => ({ ts: m.ts, id: m.id })), ...here.filter((m) => !ids.has(m.id))];
 }
 
 // after a rebuild (opening the app, a reconnect): unread = their messages
@@ -3384,6 +3447,17 @@ function openChat(peer) {
   updateChatCount();
   state.chatPeer = peer;
   state.chatView = "msgs";
+  // not loaded since a reload: "Loading…" while its messages come
+  // (loadChat) — nothing read, no line, until they're drawn
+  if (c.loaded === false) {
+    chatLineMsg = null;
+    c.failed = false;
+    $("chat").classList.remove("hidden");
+    renderChat();
+    refreshControls();
+    if (!c.loading) loadChat(peer, c);
+    return;
+  }
   // the line goes above the first of what's unread now (opening reads all)
   const first = HoodChatScroll.firstUnread(c.msgs, c.unread);
   chatLineMsg = first >= 0 ? c.msgs[first] : null;
@@ -3396,6 +3470,95 @@ function openChat(peer) {
   renderChat();
   openAtLine();
   refreshControls();
+}
+
+// ===== Light reload: a chat's messages when it's opened (owner, 2026-11-08) =====
+// A reload brings each chat as a summary; opening one asks for its messages
+// (GET /api/chat). What arrives meanwhile is held in it (receiveMsg) and put
+// together with the answer (HoodChatMerge). The marks are on the chat
+// object itself: a reload or a closed chat makes a new one, and an answer
+// for the old one is dropped. Given up after CHAT_LOAD_MS — the reading of
+// the answer included (a stalled download): "Couldn't load messages — try
+// again".
+const CHAT_LOAD_MS = 20000;
+// its chat on screen (not the list)
+const chatOnScreen = (peer) => !$("chat").classList.contains("hidden") && state.chatView === "msgs" && state.chatPeer === peer;
+const chatListShown = () => !$("chat").classList.contains("hidden") && state.chatView === "list";
+
+async function loadChat(peer, c) {
+  c.loading = true;
+  const stop = new AbortController();
+  const timer = setTimeout(() => stop.abort(), CHAT_LOAD_MS);
+  let outcome = "failed";
+  let body = null;
+  try {
+    const res = await apiFetch(`/api/chat?peer=${encodeURIComponent(peer.id)}`, { signal: stop.signal });
+    // signed out, or new Terms: the reload shows the sign-in or asks
+    if (chats.get(peer) === c && (await ownRefusal(res))) return location.reload();
+    if (res.ok) {
+      body = await res.json();
+      outcome = "ok";
+    } else if (res.status === 404) {
+      // the chat's gone — only Hood Ride's own "none" says so (a 404 from
+      // anything else, e.g. an older server, is a failure: try again)
+      const b = await res.json().catch(() => null);
+      if (b && b.error === "none") outcome = "none";
+    }
+  } catch (_) {
+    // the network, or given up (CHAT_LOAD_MS): a failure
+  } finally {
+    clearTimeout(timer);
+    c.loading = false;
+  }
+  // a reload or a closed chat since: this answer is for a chat that's gone
+  if (chats.get(peer) !== c) return;
+  if (outcome === "none") return closeChatWith(peer);
+  if (outcome !== "ok" || !body || !Array.isArray(body.messages)) {
+    c.failed = true;
+    if (chatOnScreen(peer)) renderChat();
+    return;
+  }
+  c.msgs = HoodChatMerge.merge(body.messages.map(fromServer), c.msgs);
+  c.loaded = true;
+  c.summary = null;
+  c.failed = false;
+  // its last item's time and id (today's rule)
+  settleLast(c);
+  if (chatOnScreen(peer)) {
+    // drawn as opening a chat does: the line above the first unread, read,
+    // drawn, then placed at the line (openAtLine looks for it on screen)
+    const first = HoodChatScroll.firstUnread(c.msgs, c.unread);
+    chatLineMsg = first >= 0 ? c.msgs[first] : null;
+    c.unread = 0;
+    markSeen(peer);
+    renderChat();
+    openAtLine();
+    refreshControls();
+  } else if (chatListShown()) {
+    renderChat();
+  }
+}
+
+// a chat that's loading (or couldn't load): its header as always, and in
+// place of the messages "Loading…" — or why not, with Try again (which
+// opens it again: one load at a time)
+function chatLoadingNote(c) {
+  const note = document.createElement("div");
+  note.className = "chat-loading muted";
+  if (!c.failed) {
+    note.textContent = t("Loading…");
+    return note;
+  }
+  const why = document.createElement("div");
+  why.textContent = t("Couldn't load messages — try again");
+  const again = document.createElement("button");
+  again.id = "chatRetry";
+  again.type = "button";
+  again.className = "btn btn-primary";
+  again.textContent = t("Try again");
+  again.addEventListener("click", () => state.chatPeer && openChat(state.chatPeer));
+  note.append(why, again);
+  return note;
 }
 
 // each message's bubble as drawn now (renderChat draws them all again): a
@@ -3528,13 +3691,23 @@ $("chat-messages").addEventListener(
 // local note like "📩 requested a ride")
 function receiveMsg(peer, text, meta) {
   const c = chatFor(peer);
+  const id = meta ? meta.id : null;
+  // already here — a message a reload or a chat's opening brought, heard
+  // live too: once (counted once, no banner). Local notes have no id: never
+  if (id != null && (c.msgs.some((m) => m.id === id) || ((c.summary && c.summary.theirs) || []).some((m) => m.id === id))) return;
   const at = meta ? HoodChatList.localAt(meta.ts, chatSkew) : Date.now();
   c.lastAt = at;
-  c.lastId = meta ? meta.id : null;
-  const msg = { text, mine: false, at, ts: meta ? meta.ts : null, id: meta ? meta.id : null };
+  c.lastId = id;
+  const msg = { text, mine: false, at, ts: meta ? meta.ts : null, id };
+  // not loaded yet: a note remembers what it came after, to go there when
+  // the messages come (HoodChatMerge)
+  if (c.loaded === false && id == null) msg.after = newestKnownId(c);
   c.msgs.push(msg);
   const chatOpen = !$("chat").classList.contains("hidden");
-  const viewingThis = chatOpen && state.chatView === "msgs" && state.chatPeer === peer;
+  const onScreen = chatOpen && state.chatView === "msgs" && state.chatPeer === peer;
+  // a chat still loading isn't drawn or read here: what came is drawn with
+  // its messages (and no banner — it's the chat you're on)
+  const viewingThis = onScreen && c.loaded !== false;
   if (viewingThis) {
     bubbleOf.set(msg, appendBubble(text, false));
     markSeen(peer);
@@ -3543,12 +3716,19 @@ function receiveMsg(peer, text, meta) {
     // mid-ride, only the ride partner may interrupt the ride banner —
     // everyone else ticks the unread badge quietly
     const inRide = state.ride && ["connected", "arrived"].includes(state.ride.status);
-    if (!inRide || state.ride.peer === peer) {
+    if (!onScreen && (!inRide || state.ride.peer === peer)) {
       transientBanner(["\u{1F4AC} ", { raw: `${peer.name}: ${text}` }]);
     }
     if (chatOpen && state.chatView === "list") renderChat();
   }
   refreshControls();
+}
+
+// the newest message id this chat knows: its last with one, else (not
+// opened since a reload) the summary's last, else none
+function newestKnownId(c) {
+  for (let i = c.msgs.length - 1; i >= 0; i--) if (c.msgs[i].id != null) return c.msgs[i].id;
+  return (c.summary && c.summary.last && c.summary.last.id) ?? null;
 }
 
 // the 500-character warning (HoodChatList.limit): from 400 what's left,
@@ -3580,6 +3760,9 @@ $("chat-form").addEventListener("submit", (e) => {
   const text = input.value.trim();
   const peer = state.chatPeer;
   if (!text || !peer) return;
+  // a chat still loading (or that couldn't load): Send does nothing yet and
+  // the text stays — it looks as always (owner, 2026-11-08: no greyed Send)
+  if (chats.get(peer)?.loaded === false) return;
   // over the limit: Send stays tappable (no greyed-out button), sends
   // nothing, keeps the text, and says why — announced at once
   if (HoodChatList.count(text) > HoodChatList.MAX_CHARS) {
@@ -3646,9 +3829,7 @@ $("chat-form").addEventListener("submit", (e) => {
       // one was the last then) — or, with none left, when it was started
       // (two refused in a row left the first's). The list, if it's
       // showing: drawn again (its order, and the draft)
-      const last = arr[arr.length - 1];
-      c.lastAt = last ? last.at : c.emptyAt;
-      c.lastId = last ? (last.id ?? null) : null;
+      settleLast(c);
       if (!$("chat").classList.contains("hidden") && state.chatView === "list") renderChat();
       transientBanner(why);
     };
@@ -4639,7 +4820,7 @@ window.addEventListener("pageshow", (e) => {
 // gets "retrying…" and the app's reconnect backoff (HoodBoot).
 const booting = HoodBoot.create({
   fetchState: async () => {
-    const res = await apiFetch("/api/state");
+    const res = await apiFetch("/api/state?chats=list");
     let body = null;
     try {
       body = await res.json();

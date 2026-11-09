@@ -141,14 +141,19 @@ defmodule HoodrideWeb.ChatRebuildTest do
   describe "4. unread across a reconnect or reopening the app" do
     test "messages keep the server's time and id (rebuild and live alike)" do
       h = body("hydrate")
-      assert h =~ "ts: m.ts,"
-      assert h =~ "id: m.id,"
+      # (one builder for a server message — a reload, and a chat's opening)
+      assert h =~ "chat.msgs = c.messages.map(fromServer);"
+      f = body("fromServer")
+      assert f =~ "ts: m.ts,"
+      assert f =~ "id: m.id,"
+      assert body("loadChat") =~ "body.messages.map(fromServer)"
       assert h =~ "chatSkew = HoodChatList.skew(st.now, Date.now());"
 
       assert @app =~ "receiveMsg(peer, m.text, { ts: m.ts, id: m.id });"
       r = body("receiveMsg")
+      assert r =~ "const id = meta ? meta.id : null;"
       assert r =~ "const at = meta ? HoodChatList.localAt(meta.ts, chatSkew) : Date.now();"
-      assert r =~ "ts: meta ? meta.ts : null, id: meta ? meta.id : null"
+      assert r =~ "ts: meta ? meta.ts : null, id };"
     end
 
     test "the rebuild counts unread from the bookmark (not the old counts)" do

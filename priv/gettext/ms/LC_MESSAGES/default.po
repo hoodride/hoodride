@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Tidak dapat memadamkan akaun anda — sila cuba lagi."
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "Mesej tidak dapat dimuatkan. Cuba lagi."
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Tidak dapat menghubungi Hood Ride — semak sambungan anda dan cuba lagi."
 
@@ -395,6 +399,10 @@ msgstr "Bahasa"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Keluar daripada demo"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "Memuatkan…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "Terlambat — permintaan telah ditarik balik"
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "Terlalu banyak log masuk yang gagal daripada rangkaian anda — cuba lagi nanti."
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "Cuba lagi"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"

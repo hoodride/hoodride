@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Δεν ήταν δυνατή η διαγραφή του λογαριασμού σου — δοκίμασε ξανά."
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "Δεν ήταν δυνατή η φόρτωση των μηνυμάτων. Δοκίμασε ξανά."
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Δεν ήταν δυνατή η σύνδεση με το Hood Ride — έλεγξε τη σύνδεσή σου και δοκίμασε ξανά."
 
@@ -395,6 +399,10 @@ msgstr "Γλώσσα"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Έξοδος από την επίδειξη"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "Φόρτωση…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "Πολύ αργά — το αίτημα ανακλήθηκε"
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "Πάρα πολλές αποτυχημένες συνδέσεις από το δίκτυό σου — δοκίμασε ξανά αργότερα."
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "Δοκίμασε ξανά"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"

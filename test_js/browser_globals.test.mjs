@@ -39,7 +39,7 @@ function page() {
 
 test("every shared file is found (none silently skipped)", () => {
   const all = shared.map((s) => s.file);
-  for (const f of ["i18n.js", "googlerefresh.js", "chatlist.js", "navlink.js", "ridepos.js", "sendfilter.js", "update.js"])
+  for (const f of ["i18n.js", "googlerefresh.js", "chatlist.js", "chatmerge.js", "navlink.js", "ridepos.js", "sendfilter.js", "update.js"])
     assert.ok(all.includes(f), `${f} not found among the page's shared scripts`);
   assert.ok(shared.length >= 22, `found ${shared.length}`);
 });

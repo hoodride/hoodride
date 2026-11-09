@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಅಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "ಸಂದೇಶಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Ride ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — ನಿಮ್ಮ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
 
@@ -395,6 +399,10 @@ msgstr "ಭಾಷೆ"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "ಡೆಮೊದಿಂದ ನಿರ್ಗಮಿಸಿ"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "ಲೋಡ್ ಆಗುತ್ತಿದೆ…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "ತುಂಬಾ ತಡವಾಯಿತು — ವಿನಂತಿಯನ್
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್‌ನಿಂದ ತುಂಬಾ ಸೈನ್ ಇನ್ ಪ್ರಯತ್ನಗಳು ವಿಫಲವಾಗಿವೆ — ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"

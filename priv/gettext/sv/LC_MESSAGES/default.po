@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Det gick inte att radera ditt konto. Försök igen."
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "Det gick inte att ladda meddelandena. Försök igen."
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Det gick inte att nå Hood Ride. Kontrollera anslutningen och försök igen."
 
@@ -395,6 +399,10 @@ msgstr "Språk"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Lämna demon"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "Laddar…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "För sent: förfrågan har återkallats"
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "För många misslyckade inloggningar från ditt nätverk. Försök igen senare."
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "Försök igen"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"

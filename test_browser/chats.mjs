@@ -323,7 +323,12 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   await send(dan);
   await dan.waitFor(`chatFor(realPeersById.get(${ritaId})).msgs.some(m => m.text === "reply while you were away")`, "Dan's reply shown as sent");
   await restoreAndWait(rita);
-  await rita.waitFor(`chatFor(realPeersById.get(${danId})).msgs.some(m => m.text === "reply while you were away")`, "Rita has the reply");
+  // (back as a summary — light reload: the reply is its last message's
+  // preview; not opened here, it must stay unread)
+  await rita.waitFor(
+    `(() => { const c = chatFor(realPeersById.get(${danId})); return c.msgs.some((m) => m.text === "reply while you were away") || (!!c.summary && !!c.summary.last && c.summary.last.preview === "reply while you were away"); })()`,
+    "Rita has the reply"
+  );
   check((await unreadFrom(rita, danId)) === 1, "1 unread from Dan", await unreadFrom(rita, danId));
   check((await shown(rita, "#btn-chat")) === "💬 Chat (1)", "💬 Chat (1)", await shown(rita, "#btn-chat"));
   check(await showsIcon(rita, "#btn-chat", "chat.svg"), "Chat: the speech-balloon picture");

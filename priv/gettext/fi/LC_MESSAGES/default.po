@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Tilin poistaminen epäonnistui. Yritä uudelleen."
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "Viestejä ei voitu ladata. Yritä uudelleen."
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Rideen ei saatu yhteyttä. Tarkista yhteytesi ja yritä uudelleen."
 
@@ -395,6 +399,10 @@ msgstr "Kieli"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Poistu demosta"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "Ladataan…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "Liian myöhään: pyyntö peruttiin"
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "Liian monta epäonnistunutta kirjautumista verkostasi. Yritä myöhemmin uudelleen."
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "Yritä uudelleen"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"

@@ -106,6 +106,8 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   check(JSON.stringify(top) === JSON.stringify({ name: "BT-Dora", unread: "1", line: "yes?" }), "Dora on top: 1 unread, 'yes?'", top);
   await sam.eval(`([...document.querySelectorAll("#chat-messages .chat-item")].find((r) => r.querySelector("strong").textContent === "BT-Dora").click(), true)`);
   await sam.waitFor(`state.chatView !== "list" && state.chatPeer && state.chatPeer.id === ${doraId}`, "her row opens her chat");
+  // (its messages loaded and read — light reload: one left mid-load stays unread)
+  await sam.waitFor(`chats.get(realPeersById.get(${doraId})).loaded === true && chats.get(realPeersById.get(${doraId})).unread === 0`, "her chat loaded and read");
 
   // a message Sam's live connection doesn't deliver: he gets it only from
   // the reload
@@ -125,6 +127,7 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   // mark his news read — Sam hasn't seen it
   step("‹ from Ed's chat to the list; Ed writes, Sam gets it only from a reload: Ed's row says 1 unread");
   await sam.eval(`openChat(realPeersById.get(${edId})), true`);
+  await sam.waitFor(`chats.get(realPeersById.get(${edId})).loaded !== false`, "Ed's chat loaded", 15000);
   await sam.click("chat-back");
   await sam.waitFor(`state.chatView === "list"`, "the list (from Ed's chat)");
   await unheard(ed, "you there?");
@@ -134,6 +137,7 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
 
   step("inside Ed's chat, his next message arrives only through a reload: read (it's on screen)");
   await sam.eval(`openChat(realPeersById.get(${edId})), true`);
+  await sam.waitFor(`chats.get(realPeersById.get(${edId})).loaded !== false`, "Ed's chat loaded", 15000);
   await sam.waitFor(`state.chatView !== "list" && state.chatPeer.id === ${edId}`, "Ed's chat open");
   await unheard(ed, "ok?");
   await reload(sam);
@@ -210,6 +214,7 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   // theirs are
   step("live: Sam writes Ed, then Dora writes Sam in the same second: Dora's on top");
   await sam.eval(`openChat(realPeersById.get(${edId})), true`);
+  await sam.waitFor(`chats.get(realPeersById.get(${edId})).loaded !== false`, "Ed's chat loaded", 15000);
   await sam.waitFor(`state.chatView !== "list" && state.chatPeer.id === ${edId}`, "Ed's chat open");
   let dorasLast = null;
   for (let tries = 1; tries <= 5 && !dorasLast; tries++) {
@@ -244,6 +249,7 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
     return true;
   })()`);
   await sam.eval(`openChat(realPeersById.get(${edId})), true`);
+  await sam.waitFor(`chats.get(realPeersById.get(${edId})).loaded !== false`, "Ed's chat loaded", 15000);
   await typeText(sam, "slow to Ed");
   await send(sam);
   await ed.waitFor(`chatFor(realPeersById.get(${samId})).msgs.some((m) => m.text === "slow to Ed")`, "Ed has it");
@@ -278,6 +284,7 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
     return true;
   })()`);
   await sam.eval(`openChat(realPeersById.get(${edId})), true`);
+  await sam.waitFor(`chats.get(realPeersById.get(${edId})).loaded !== false`, "Ed's chat loaded", 15000);
   await typeText(sam, refused);
   await send(sam);
   await sam.click("chat-back");
@@ -316,6 +323,7 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
 
   step("Sam writes Ed twice quickly, the second refused before the first's 'sent': the chat's time is the first's");
   await sam.eval(`openChat(realPeersById.get(${edId})), true`);
+  await sam.waitFor(`chats.get(realPeersById.get(${edId})).loaded !== false`, "Ed's chat loaded", 15000);
   await sam.waitFor(`state.chatView !== "list" && state.chatPeer.id === ${edId}`, "Ed's chat open");
   await sam.eval(`(window.__noMs = 1000, window.__lateOk = false, window.__lateNo = false), true`);
   await typeText(sam, "first of two");
@@ -353,6 +361,8 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   const edChatOpen = async () => {
     await sam.eval(`openChat(realPeersById.get(${edId})), true`);
     await sam.waitFor(`state.chatView !== "list" && state.chatPeer.id === ${edId}`, "Ed's chat open");
+    // (its messages loaded — light reload: Send waits until they are)
+    await sam.waitFor(`chats.get(realPeersById.get(${edId})).loaded !== false`, "Ed's chat loaded", 15000);
   };
   const clearBox = () => sam.eval(`(document.getElementById("chat-input").value = "", chatFor(realPeersById.get(${edId})).draft = ""), true`);
 
@@ -433,6 +443,7 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   const doraChatOpen = async () => {
     await sam.eval(`openChat(realPeersById.get(${doraId})), true`);
     await sam.waitFor(`state.chatView !== "list" && state.chatPeer.id === ${doraId}`, "Dora's chat open");
+    await sam.waitFor(`chats.get(realPeersById.get(${doraId})).loaded !== false`, "Dora's chat loaded", 15000);
   };
 
   // the chat drawn again before the answer (‹ and back): the refused
@@ -652,7 +663,7 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   // the chat is gone (closed by the server) before Sam's "sent" comes: no
   // error
   step("Sam's chat with Ed is closed before his 'sent' comes: no error");
-  await sam.eval(`openChat(realPeersById.get(${edId})), true`);
+  await edChatOpen();
   await sam.eval(`(() => { window.__errs = []; window.addEventListener("error", (e) => __errs.push(String(e.message))); window.__lateOk = false; return true; })()`);
   await typeText(sam, "one more");
   await send(sam);
@@ -668,6 +679,7 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   step("Sam's message to Dora fails after the server closed their chat: the chat stays gone");
   await sam.eval(`openChat(realPeersById.get(${doraId})), true`);
   await sam.waitFor(`state.chatView !== "list" && state.chatPeer && state.chatPeer.id === ${doraId}`, "Dora's chat open");
+  await sam.waitFor(`chats.get(realPeersById.get(${doraId})).loaded !== false`, "Dora's chat loaded", 15000);
   await sam.eval(`(window.__noMs = 4000, window.__lateNo = false), true`);
   await typeText(sam, refused);
   await send(sam);
@@ -692,6 +704,8 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   const quietId = await sam.waitFor(`(() => { const e = [...chats].find(([p]) => p.name === "BT-Quiet"); return e && e[1].msgs.length === 0 && e[0].id; })()`, "the quiet chat");
   const openedAt = await sam.eval(`fetch("/api/state").then((r) => r.json()).then((s) => HoodChatList.localAt(s.conversations.find((c) => c.peer.id === ${quietId}).last_activity, chatSkew))`);
   await sam.eval(`(window.__lateNo = false, openChat(realPeersById.get(${quietId}))), true`);
+  // (a ride's chat, no message yet: it still loads — Send waits until it has)
+  await sam.waitFor(`chats.get(realPeersById.get(${quietId})).loaded !== false`, "the quiet chat loaded", 15000);
   await typeText(sam, refused);
   await send(sam);
   await sam.waitFor(`window.__lateNo`, "the refusal came", 6000);

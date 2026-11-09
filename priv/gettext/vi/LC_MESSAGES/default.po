@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Không thể xóa tài khoản của bạn — vui lòng thử lại."
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "Không tải được tin nhắn. Hãy thử lại."
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Không kết nối được với Hood Ride — hãy kiểm tra kết nối mạng và thử lại."
 
@@ -395,6 +399,10 @@ msgstr "Ngôn ngữ"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Thoát bản demo"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "Đang tải…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "Quá muộn — yêu cầu đã bị rút lại"
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "Có quá nhiều lần đăng nhập không thành công từ mạng của bạn — hãy thử lại sau."
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "Thử lại"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"

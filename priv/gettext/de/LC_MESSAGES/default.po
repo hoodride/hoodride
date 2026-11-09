@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Dein Konto konnte nicht gelöscht werden. Bitte versuch es noch mal."
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "Nachrichten konnten nicht geladen werden. Versuch es noch mal."
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Ride war nicht erreichbar. Prüfe deine Verbindung und versuch es noch mal."
 
@@ -395,6 +399,10 @@ msgstr "Sprache"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Demo verlassen"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "Wird geladen…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "Zu spät – die Anfrage wurde zurückgezogen"
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "Zu viele fehlgeschlagene Anmeldungen aus deinem Netzwerk. Versuch es später noch mal."
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "Noch mal versuchen"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"

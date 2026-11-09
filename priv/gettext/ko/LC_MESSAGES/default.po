@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "계정을 삭제하지 못했어요. 다시 시도해 주세요."
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "메시지를 불러오지 못했어요. 다시 시도해 주세요."
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Ride에 연결하지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요."
 
@@ -395,6 +399,10 @@ msgstr "언어"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "데모 나가기"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "불러오는 중…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "너무 늦었어요. 요청이 취소됐어요"
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "사용 중인 네트워크에서 로그인 실패가 너무 많아요. 나중에 다시 시도해 주세요."
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "다시 시도"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"

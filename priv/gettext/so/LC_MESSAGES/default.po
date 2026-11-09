@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Akoonkaaga lama tirtiri karin — fadlan isku day mar kale."
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "Fariimaha lama soo rari karin. Isku day mar kale."
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Ride lama gaari karin — hubi xiriirkaaga oo isku day mar kale."
 
@@ -395,6 +399,10 @@ msgstr "Luuqad"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Ka bax tijaabada"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "Waa la soo raraa…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "Waa goor dambe — codsiga waa la laabtay"
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "Isku dayo gelitaan oo badan oo fashilmay ayaa ka yimid shabakaddaada — mar dambe isku day."
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "Isku day mar kale"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"

@@ -89,12 +89,17 @@
   }
 
   // a chat's line in the list: what you typed and didn't send over its last
-  // message — shown after "Draft", as WhatsApp (owner, 2026-11-07)
+  // message — shown after "Draft", as WhatsApp (owner, 2026-11-07). A chat
+  // the reload brought as a summary, not opened yet (light reload,
+  // 2026-11-08): its last message's preview — unless something newer
+  // came while it waits to load
   function preview(chat) {
     const draft = (chat.draft || "").trim();
     if (draft) return { draft: true, text: draft };
     const last = chat.msgs[chat.msgs.length - 1];
-    return { draft: false, text: last ? last.text : "" };
+    if (last) return { draft: false, text: last.text };
+    const s = chat.summary && chat.summary.last;
+    return { draft: false, text: s ? s.preview : "" };
   }
 
   // a rebuild (a reconnect, reopening the app) starts the chats over from

@@ -259,7 +259,8 @@ only what its **server-derived role** (`Hoodride.Roles`) allows:
   fixture ids. A taken id retries; a parallel first login of the same
   person returns that person (that race used to crash dev_login with a 500).
 - **The service worker caches only our own files**, never `/api/` or
-  `/auth/` (`/api/state` holds every message text and the email; cached, it
+  `/auth/` (`/api/state` held every message text and the email — now
+  previews, with the texts in `/api/chat`; cached, it
   outlived logout). Other sites (map tiles, style) are left to the browser's
   HTTP cache. MapLibre is vendored (npm sha512 verified) so the offline
   shell is complete without a CDN.
@@ -936,6 +937,22 @@ Everything live is in ETS / process state. **Every piece of state has a death ru
   runs first) says it for a ride. Chrome-verified across 6 restarts (hand,
   request, ride ×2, shift) and blips (hand, ride, a message missed while
   offline). A deploy still drops live rides and chats — now visibly.
+- **Light reload (2026-11-08/09).** A reload or reconnect used to bring
+  every chat's every message. Now the app asks for the chat LIST
+  (`/api/state?chats=list`): each chat as a summary (`Chat.summary/2`) — the
+  last message's preview (whole characters, at most 100 and 400 bytes) and
+  the partner's message ids for unread, no texts — plus the chat on screen
+  in full (`open_peer`), so a reconnect keeps your place. A chat's messages
+  load when it's opened (`GET /api/chat?peer=`, your own chats only, its own
+  budget, no database read): "Loading…", Send waits (it looks as always, the
+  text stays), "Couldn't load messages — try again" after a failure or 20 s.
+  What arrives meanwhile is held in the chat and put in place by
+  `HoodChatMerge` (chatmerge.js): the answer's messages, held ones newer than
+  its newest, this app's notes after what they came after. Every answer is
+  for that chat OBJECT or dropped (a reload or a closed chat makes a new
+  one). A chat left before it loads stays unread. Without `chats=list` the
+  server answers in full, as before (older app copies, a rollback). Journeys:
+  lightreload.mjs, lightreload2.mjs.
 - Conversations are created on **first message**, not on opening a chat window
   (no empty-chat rows — bug found and fixed in the mock, applies to backend too),
   or at **ride start** (2026-10-23), empty, so the ride's own chat is a

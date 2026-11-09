@@ -19,6 +19,16 @@ defmodule HoodrideWeb.ChatAndPinTest do
     b
   end
 
+  describe "light reload" do
+    test "chatmerge.js is loaded before app.js, cached offline, and served" do
+      {mod, _} = :binary.match(@html, ~s(src="chatmerge.js"))
+      {app, _} = :binary.match(@html, ~s(src="app.js"))
+      assert mod < app
+      assert @sw =~ ~s("chatmerge.js")
+      assert "chatmerge.js" in HoodrideWeb.static_paths()
+    end
+  end
+
   describe "chat scroll" do
     test "chatscroll.js is loaded before app.js, cached offline, and served" do
       {mod, _} = :binary.match(@html, ~s(src="chatscroll.js"))

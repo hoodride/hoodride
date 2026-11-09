@@ -432,6 +432,13 @@ function page(cdp, sessionId, name) {
     // the live connection: drop it (Phoenix doesn't retry after this) / back
     drop: () => p.eval("socket.disconnect(), true"),
     restore: () => p.eval("socket.connect(), true"),
+    // a slow connection: at most `bytesPerSec` each way (light reload: a big
+    // chat loading). Put back with offline(false) — a finally, so a failure
+    // doesn't leave the next step slow
+    async throttle(bytesPerSec) {
+      await send("Network.enable");
+      await send("Network.emulateNetworkConditions", { offline: false, latency: 0, downloadThroughput: bytesPerSec, uploadThroughput: bytesPerSec });
+    },
     // no network at all (every request fails) / back
     async offline(on) {
       await send("Network.enable");

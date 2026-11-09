@@ -278,7 +278,7 @@ if (process.argv[2] === "shard") {
           .then(() => {
             this.attempt = 0;
             this.notice = null;
-            return this.http("/api/state");
+            return this.http("/api/state?chats=list"); // the app's reload: the chat list
           })
           .catch((e) => {
             retryErrors.set(e.message, (retryErrors.get(e.message) || 0) + 1);

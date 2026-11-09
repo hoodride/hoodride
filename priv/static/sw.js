@@ -36,6 +36,7 @@ const ASSETS = [
   "icons.js",
   "avatar.js",
   "chatlist.js",
+  "chatmerge.js",
   "chatscroll.js",
   "navlink.js",
   "googlerefresh.js",
@@ -78,7 +79,8 @@ self.addEventListener("activate", (e) => {
 });
 
 // Only OUR OWN app files are cached, never /api/ or /auth/:
-// - /api/state carries every conversation with its message text and the
+// - /api/state (the chat list) and /api/chat (a chat's messages) carry
+//   message text — /api/state carried every conversation's, with the
 //   ride. Cached, it would outlive logout on a shared
 //   device and come back offline as stale "truth".
 // - other sites (map tiles, the map style) are left to the browser's own

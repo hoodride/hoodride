@@ -72,6 +72,9 @@ export async function openChatWith(p, id, type = "driver") {
   }
   await p.click("btn-msg");
   await p.waitFor(`!document.getElementById("chat").classList.contains("hidden") && state.chatPeer && state.chatPeer.id === ${id}`, `${p.name}: chat with #${id} open`);
+  // its messages loaded and drawn (light reload: a chat a reload brought as
+  // a summary loads when it's opened — read, and Send ready, only then)
+  await p.waitFor(`chats.get(state.chatPeer).loaded !== false`, `${p.name}: chat with #${id} loaded`, 15000);
 }
 
 export const typeText = (p, text) =>
@@ -86,9 +89,17 @@ export const chatOpenWith = (p) =>
 
 export const closeChatPanel = (p) => p.eval(`closeChat(), true`);
 
-// their messages in this person's copy of the chat with #id
-export const textsFrom = (p, id) =>
-  p.eval(`chats.has(realPeersById.get(${id})) ? chatFor(realPeersById.get(${id})).msgs.map(m => m.text) : []`);
+// their messages in this person's copy of the chat with #id. A chat a
+// reload brought as a summary has none until it's opened (light reload):
+// then it's opened (which reads it) and its messages waited for — a chat
+// already loaded is read as it is, never opened
+export async function textsFrom(p, id) {
+  if (await p.eval(`chats.has(realPeersById.get(${id})) && chatFor(realPeersById.get(${id})).loaded === false`)) {
+    await p.eval(`openChat(realPeersById.get(${id})), true`);
+    await p.waitFor(`chatFor(realPeersById.get(${id})).loaded !== false`, `${p.name}: chat with #${id} loaded`, 15000);
+  }
+  return p.eval(`chats.has(realPeersById.get(${id})) ? chatFor(realPeersById.get(${id})).msgs.map(m => m.text) : []`);
+}
 
 export const unreadFrom = (p, id) => p.eval(`chats.has(realPeersById.get(${id})) ? chatFor(realPeersById.get(${id})).unread : null`);
 

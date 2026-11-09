@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "మీ ఖాతాను తొలగించడం సాధ్యపడలేదు. దయచేసి మళ్లీ ట్రై చేయండి."
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "సందేశాలను లోడ్ చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి."
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Rideకు కనెక్ట్ కాలేకపోయింది. మీ కనెక్షన్‌ను చెక్ చేసి, మళ్లీ ట్రై చేయండి."
 
@@ -395,6 +399,10 @@ msgstr "భాష"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "డెమో నుండి నిష్క్రమించండి"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "లోడ్ అవుతోంది…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "ఆలస్యమైంది: రిక్వెస్ట్ వెన
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "మీ నెట్‌వర్క్ నుండి చాలా సైన్ ఇన్ ప్రయత్నాలు విఫలమయ్యాయి. తర్వాత మళ్లీ ట్రై చేయండి."
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "మళ్లీ ప్రయత్నించండి"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"

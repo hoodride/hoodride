@@ -133,3 +133,17 @@ test("a rebuild (reconnect, reopen) keeps every draft, and — while the chat wi
     { id: 3, draft: "for 3" },
   ]);
 });
+
+// light reload (owner, 2026-11-08): a chat the reload brought as a summary
+// has no messages until it's opened — its line is the summary's preview
+test("a chat not loaded yet: the summary's preview — a draft still first, then anything newer held", () => {
+  const summary = { last: { id: 9, ts: 1, mine: false, preview: "see you soon" }, theirs: [] };
+  assert.deepEqual(L.preview({ msgs: [], draft: "", summary }), { draft: false, text: "see you soon" });
+  assert.deepEqual(L.preview({ msgs: [], draft: "on my way", summary }), { draft: true, text: "on my way" });
+  // something came while it waits to load: that's newer
+  assert.deepEqual(L.preview({ msgs: [{ text: "here now" }], draft: "", summary }), { draft: false, text: "here now" });
+  // a ride's chat, nothing said yet
+  assert.deepEqual(L.preview({ msgs: [], draft: "", summary: { last: null, theirs: [] } }), { draft: false, text: "" });
+  // a loaded chat has no summary
+  assert.deepEqual(L.preview({ msgs: [], draft: "" }), { draft: false, text: "" });
+});

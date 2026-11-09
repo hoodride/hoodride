@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Не вдалося видалити обліковий запис. Спробуйте ще раз."
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "Не вдалося завантажити повідомлення. Спробуй ще раз."
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Не вдалося підключитися до Hood Ride. Перевірте інтернет і спробуйте ще раз."
 
@@ -395,6 +399,10 @@ msgstr "Мова"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Вийти з демо"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "Завантаження…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "Занадто пізно: запит відкликано"
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "Забагато невдалих спроб входу з вашої мережі. Спробуйте пізніше."
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "Спробувати ще раз"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"

@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Účet se nepodařilo smazat – zkus to prosím znovu."
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "Zprávy se nepodařilo načíst. Zkus to znovu."
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Nepodařilo se spojit s Hood Ride – zkontroluj připojení a zkus to znovu."
 
@@ -395,6 +399,10 @@ msgstr "Jazyk"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Ukončit demo"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "Načítání…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "Pozdě – žádost byla stažena"
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "Z tvé sítě bylo příliš mnoho neúspěšných pokusů o přihlášení – zkus to později."
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "Zkusit znovu"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"

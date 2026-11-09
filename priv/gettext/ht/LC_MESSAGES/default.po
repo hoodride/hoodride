@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Pa t ka efase kont ou — tanpri eseye ankò."
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "Nou pa t ka chaje mesaj yo. Eseye ankò."
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Pa t ka jwenn Hood Ride — verifye koneksyon ou epi eseye ankò."
 
@@ -395,6 +399,10 @@ msgstr "Lang"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Kite demo a"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "Ap chaje…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "Twò ta — demann lan te anile"
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "Twòp koneksyon ki echwe sou rezo ou — eseye ankò pita."
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "Eseye ankò"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"

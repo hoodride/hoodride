@@ -38,7 +38,7 @@ defmodule HoodrideWeb.BrowserJourneysTest do
 
     # every person and every reload comes from one address: no per-address
     # budgets here (as in dev)
-    for key <- [:http_budget, :ws_budget, :sign_in_budget, :avatar_budget] do
+    for key <- [:http_budget, :ws_budget, :sign_in_budget, :avatar_budget, :chat_budget] do
       old = Application.get_env(:hoodride, key)
       Application.put_env(:hoodride, key, nil)
       on_exit(fn -> Application.put_env(:hoodride, key, old) end)
@@ -273,6 +273,25 @@ defmodule HoodrideWeb.BrowserJourneysTest do
 
     for c <- Hoodride.Chat.conversations_for(user),
         do: Hoodride.Chat.delete_conversation(Hoodride.Chat.pair_key(user, c.peer_id))
+
+    "ok"
+  end
+
+  # `n` messages as big as a message can be (about 20 KB, under 2,000
+  # characters: each character two random emoji joined, 11 bytes), so a
+  # chat of 50 is about 1 MB. Random: the server compresses its answers
+  # (Bandit), and repeated text would shrink to a few KB. Sent at once, as
+  # many_msgs — a receiver who's connected hears them live too (light
+  # reload's journey reloads first, so the chat comes as a summary)
+  defp server("big_msgs " <> args) do
+    [from, to, n] = String.split(args)
+    sender = Hoodride.Accounts.get_user(String.to_integer(from))
+    emoji = fn -> <<0x1F300 + :rand.uniform(0x2FF)::utf8>> end
+
+    for i <- 1..String.to_integer(n) do
+      text = "#{i} " <> Enum.map_join(1..1_800, fn _ -> emoji.() <> "\u200D" <> emoji.() end)
+      {:ok, _} = Hoodride.Chat.send_message(sender, String.to_integer(to), text)
+    end
 
     "ok"
   end

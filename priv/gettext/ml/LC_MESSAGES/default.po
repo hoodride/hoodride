@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "നിങ്ങളുടെ അക്കൗണ്ട് ഇല്ലാതാക്കാനായില്ല — ദയവായി വീണ്ടും ശ്രമിക്കുക."
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "സന്ദേശങ്ങൾ ലോഡ് ചെയ്യാനായില്ല. വീണ്ടും ശ്രമിക്കുക."
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Ride-ലേക്ക് കണക്റ്റ് ചെയ്യാനായില്ല — നിങ്ങളുടെ കണക്ഷൻ പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക."
 
@@ -395,6 +399,10 @@ msgstr "ഭാഷ"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "ഡെമോയിൽ നിന്ന് പുറത്തുകടക്കുക"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "ലോഡ് ചെയ്യുന്നു…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "വൈകിപ്പോയി — അഭ്യർത്ഥന പിൻ
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "നിങ്ങളുടെ നെറ്റ്‌വർക്കിൽ നിന്ന് വളരെയധികം സൈൻ ഇൻ ശ്രമങ്ങൾ പരാജയപ്പെട്ടു — പിന്നീട് വീണ്ടും ശ്രമിക്കുക."
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "വീണ്ടും ശ്രമിക്കുക"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"

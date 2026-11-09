@@ -417,7 +417,8 @@ class Agent {
     try {
       // like the app: a snapshot that live news overtook is taken again
       st = await HoodRehydrate.freshState({
-        fetchState: async () => (await fetch(`${BASE}/api/state`, { headers: { cookie: this.cookie } })).json(),
+        // the app's reload: the chat list (light reload, 2026-11-08)
+        fetchState: async () => (await fetch(`${BASE}/api/state?chats=list`, { headers: { cookie: this.cookie } })).json(),
         liveCount: () => this.liveSeq,
       });
     } catch (_) {

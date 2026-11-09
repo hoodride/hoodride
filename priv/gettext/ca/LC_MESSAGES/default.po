@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "No s'ha pogut suprimir el teu compte. Torna-ho a provar."
 
 #: priv/static/app.js
+msgid "Couldn't load messages — try again"
+msgstr "No s'han pogut carregar els missatges. Torna-ho a provar."
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "No s'ha pogut connectar amb Hood Ride. Comprova la connexió i torna-ho a provar."
 
@@ -395,6 +399,10 @@ msgstr "Idioma"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Surt de la demo"
+
+#: priv/static/app.js
+msgid "Loading…"
+msgstr "S'està carregant…"
 
 #: priv/static/index.html
 msgid "Make"
@@ -704,6 +712,10 @@ msgstr "Massa tard: la sol·licitud s'ha retirat"
 #: lib/hoodride_web/controllers/auth_controller.ex
 msgid "Too many failed sign-ins from your network — try again later."
 msgstr "Massa intents d'inici de sessió fallits des de la teva xarxa. Torna-ho a provar més tard."
+
+#: priv/static/app.js
+msgid "Try again"
+msgstr "Torna-ho a provar"
 
 #: priv/static/index.html
 msgid "Type {word} to confirm"
