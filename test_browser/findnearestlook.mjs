@@ -1,14 +1,14 @@
-// Find the nearest on a slow connection: stopping looking while the late
-// answer is on its way (owner, 2026-11-08; split from findnearestlate.mjs —
+// Find the nearest on a slow connection: stopping looking while it waits at
+// a step for the answer (owner, 2026-11-08; split from findnearestlate.mjs —
 // together they came near a journey's time).
-// Find the nearest (owner, 2026-11-07): Go online, ✋ Need a ride, or the
-// locate button while either is on — the map centres on you and zooms out
-// just far enough to show the nearest person you're looking for (a rider:
-// cars; a driver: ✋), never closer than the usual zoom (14) and never wider
-// than people still show one by one. Nobody: it stays that wide and the
-// banner adds "nobody nearby yet" — until someone shows up on screen (the
-// map doesn't move). Any move of your own ends it.
-// The rules themselves (zooms, nearest, edges): test_js/nearby.test.mjs.
+// Find the nearest (owner, 2026-11-07; step by step 2026-11-09): Go online,
+// ✋ Need a ride, or the locate button while either is on — the map centres
+// on you at the usual zoom (14), then steps out half a level at a time,
+// waiting at each step for the server's answer however long it takes,
+// until someone you're looking for shows (a rider: cars; a driver: ✋), and
+// stays there. Nobody at the widest view that still shows people one by
+// one: "nobody nearby yet". Any move of your own ends it.
+// The rules themselves (steps, edges): test_js/nearby.test.mjs.
 import { journey, step, check, HOME, server } from "./cdp.mjs";
 import { goOnline, bannerIs } from "./app.mjs";
 
@@ -40,7 +40,6 @@ const slowMap = (p, ms) =>
   })()`);
 
 const RIDER = "✋ Nearby drivers can see you need a ride";
-const NOBODY = " · nobody nearby yet";
 
 await journey("findnearestlook: stopping looking while the late answer is on its way", async (browser) => {
   step("Dora goes online 2 km north; Lu (home) on a very slow connection (8 s from the first step on)");
@@ -88,7 +87,9 @@ await journey("findnearestlook: stopping looking while the late answer is on its
     await zoomInAlone();
     await lu.click("btn-hand");
     await lu.waitFor("state.handRaised", "Lu's ✋ up");
-    await bannerIs(lu, RIDER + NOBODY);
+    // waiting at a step for the slow answer: no "nobody" while it waits
+    await lu.waitFor(`nearLooking && !map.isMoving() && !worldSync.settled()`, "waiting at a step for the answer", 15000);
+    await bannerIs(lu, RIDER);
   };
   const doraBack = async () => {
     await dora.waitFor(`!state.ride && !state.online && !document.getElementById("btn-online").classList.contains("hidden")`, "Dora's GO ONLINE back");

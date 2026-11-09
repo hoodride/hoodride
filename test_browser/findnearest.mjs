@@ -1,11 +1,12 @@
-// Find the nearest (owner, 2026-11-07): Go online, ✋ Need a ride, or the
-// locate button while either is on — the map centres on you and zooms out
-// just far enough to show the nearest person you're looking for (a rider:
-// cars; a driver: ✋), never closer than the usual zoom (14) and never wider
-// than people still show one by one. Nobody: it stays that wide and the
-// banner adds "nobody nearby yet" — until someone shows up on screen (the
-// map doesn't move). Any move of your own ends it.
-// The rules themselves (zooms, nearest, edges): test_js/nearby.test.mjs.
+// Find the nearest (owner, 2026-11-07; step by step 2026-11-09): Go online,
+// ✋ Need a ride, or the locate button while either is on — the map centres
+// on you at the usual zoom (14), then steps out half a level at a time until
+// someone you're looking for shows (a rider: cars; a driver: ✋), and stays
+// there — no zooming back in. Never wider than people still show one by
+// one: nobody there, it stays that wide and the banner adds "nobody nearby
+// yet" — until someone shows up on screen (the map doesn't move). Any move
+// of your own ends it.
+// The rules themselves (steps, edges): test_js/nearby.test.mjs.
 import { journey, step, check, HOME } from "./cdp.mjs";
 import { goOnline, bannerIs } from "./app.mjs";
 
@@ -49,6 +50,19 @@ const slowMap = (p, ms) =>
       return later;
     };
     return true;
+  })()`);
+// the map stopped at the FIRST step that shows #id (clear of the banner
+// and buttons): on that step, and not on the step before it
+const firstStepShowing = (p, id) =>
+  p.eval(`(() => {
+    const size = mapSize();
+    const w = HoodNearby.widestMarkerZoom({ viewport: HoodViewport, h3, center: state.me, size, rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS, maxZoom: INTENT_ZOOM });
+    const steps = HoodNearby.zoomSteps(INTENT_ZOOM, w, NEAR_STEP);
+    const z = map.getZoom();
+    const i = steps.findIndex((s) => Math.abs(s - z) < 1e-6);
+    const pos = realEntries.get(${id}).peer.pos;
+    const fz = HoodNearby.fitZoom(state.me, pos, size, NEAR_PAD);
+    return { z, steps, i, ok: i > 0 && fz >= z - 1e-9 && fz < steps[i - 1] };
   })()`);
 const locate = async (p) => {
   await p.click("btn-locate");
@@ -126,14 +140,15 @@ await journey("findnearest: the map shows you the nearest", async (browser) => {
   await settled(sam);
   await bannerIs(sam, RIDER + NOBODY);
 
-  step("Dora goes online 2 km north: her map finds Sam's ✋ — zoomed out just enough");
+  step("Dora goes online 2 km north: her map steps out until Sam's ✋ shows, and stays there");
   const dora = await browser.person("BT-Dora", DORA);
   await dora.phone(390, 844);
   const [doraId, samId] = [await dora.id(), await sam.id()];
   await goOnline(dora);
   await settled(dora);
   v = await view(dora);
-  check(v.zoom < 14 && v.zoom > (await widest(dora)) + 0.05, "between the usual and the widest", v);
+  const doraStop = await firstStepShowing(dora, samId);
+  check(doraStop.ok, "the first step that shows Sam's ✋ — not a step wider, not zoomed back in", doraStop);
   check(await onYou(dora), "centred on Dora");
   check(await onScreen(dora, samId), "Sam's ✋ on her screen");
   await bannerIs(dora, ONLINE);
@@ -145,11 +160,12 @@ await journey("findnearest: the map shows you the nearest", async (browser) => {
   await bannerIs(sam, RIDER);
   check(JSON.stringify(await view(sam)) === JSON.stringify(before), "the map stayed put", await view(sam));
 
-  step("Sam's locate button: back on him, zoomed to show Dora's car");
+  step("Sam's locate button: back on him, stepped out to the first view with Dora's car");
   await drag(sam);
   await locate(sam);
   v = await view(sam);
-  check(v.zoom < 14 && v.zoom > samWide + 0.05, "zoomed to fit her", v);
+  const samStop = await firstStepShowing(sam, doraId);
+  check(samStop.ok, "the first step that shows her car", samStop);
   check(await onYou(sam), "centred on Sam");
   check(await onScreen(sam, doraId), "Dora's car on screen");
   await bannerIs(sam, RIDER);

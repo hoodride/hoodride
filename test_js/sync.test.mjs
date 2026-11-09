@@ -369,6 +369,28 @@ test("a PERMANENT refusal is not retried — not by backoff, not by the safety r
   }
 });
 
+test("refused(): the wish we want now was refused for good (find the nearest stops on it)", () => {
+  const { clock, ch, sync } = setup();
+  sync.setWanted(set("a"), set());
+  sync.onJoined();
+  assert.equal(sync.refused(), false, "asked, not answered");
+  ch.reply(ch.last(), "error", { reason: "watch_limit" });
+  assert.equal(sync.refused(), true);
+  assert.equal(sync.settled(), false, "(never settled: why the search needs this)");
+  // a passing failure isn't a refusal
+  const t = setup();
+  t.sync.setWanted(set("a"), set());
+  t.sync.onJoined();
+  t.ch.reply(t.ch.last(), "error", { reason: "something_new" });
+  assert.equal(t.sync.refused(), false);
+  // a changed wish isn't refused (yet)
+  sync.setWanted(set("b"), set());
+  assert.equal(sync.refused(), false);
+  clock.advance(S.SETTLE_MS);
+  ch.reply(ch.last(), "ok", {});
+  assert.equal(sync.refused(), false);
+});
+
 test("a permanent refusal is retried once after a rejoin (it may be a new server)", () => {
   const { ch, sync } = setup();
   sync.setWanted(set("a"), set());

@@ -278,6 +278,9 @@
       // — waits for this before it decides "nobody nearby yet")
       settled: () =>
         joined && !inFlight && !dirty && !retryPending && same(wantedGeo, heldGeo) && same(wantedAgg, heldAgg),
+      // what we want now was refused for good (watch_limit, read_only): it
+      // will never settle — find the nearest stops instead of waiting on it
+      refused: () => rejectedWish !== null && rejectedWish === wishKey(),
     };
   }
 

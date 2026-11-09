@@ -103,43 +103,83 @@ function at(m, deg) {
   return { lat: (lat * 180) / Math.PI, lng: (lng * 180) / Math.PI };
 }
 
-const decide = (people, size = PHONE) =>
-  N.decide({ me: NYC, people: people.map((pos, i) => ({ id: i, pos })), size, pad: PAD, widestZoom: widest(size), maxZoom: 14 });
+// Step by step (owner, 2026-11-09): from the usual view out, half a level at
+// a time, to the widest view that still shows people one by one; it stops
+// at the first step where anyone shows (clear of the banner and buttons)
+// and stays there — no zooming back in, so the others around show too.
+const steps = (size = PHONE) => N.zoomSteps(14, widest(size), 0.5);
+const anyoneAt = (people, zoom, size = PHONE) =>
+  N.anyoneAt({ me: NYC, people: people.map((pos) => ({ pos })), size, pad: PAD, zoom });
+// the step the search stops at: the first with anyone, else the last
+const stopsAt = (people, size = PHONE) => {
+  const zs = steps(size);
+  return zs.find((z) => anyoneAt(people, z, size)) ?? null;
+};
 
-test("nobody: the widest zoom, and nobody nearest", () => {
-  const d = decide([]);
-  assert.deepEqual(d, { zoom: widest(PHONE), nearest: null });
+test("the steps: the usual view, then half a level wider each time, ending exactly at the widest", () => {
+  for (const size of [PHONE, DESKTOP]) {
+    const zs = steps(size);
+    const w = widest(size);
+    assert.equal(zs[0], 14);
+    assert.equal(zs.at(-1), w);
+    for (let i = 1; i < zs.length - 1; i++) assert.equal(zs[i], 14 - 0.5 * i);
+    // the last step is never a sliver: at least half a step past the one
+    // before (a tiny last step is one more wait for the server, for nothing)
+    assert.ok(zs.at(-2) - w >= 0.25, JSON.stringify(zs));
+    assert.ok(zs.every((z, i) => i === 0 || z < zs[i - 1]), "always wider");
+  }
+  // a phone: a few steps, not dozens (each waits for the server)
+  assert.ok(steps(PHONE).length >= 3 && steps(PHONE).length <= 5, JSON.stringify(steps(PHONE)));
 });
 
-test("someone close: the usual zoom (never closer)", () => {
-  const d = decide([at(300, 90)]);
-  assert.equal(d.zoom, 14);
-  assert.equal(d.nearest.id, 0);
+test("the steps when the widest is the usual view (a huge screen): just that one", () => {
+  assert.deepEqual(N.zoomSteps(14, 14, 0.5), [14]);
 });
 
-test("someone a couple of miles off: zoomed out just enough to show them, clear of the edges", () => {
+test("the steps when the widest is just past a half step: no sliver step", () => {
+  assert.deepEqual(N.zoomSteps(14, 12.995, 0.5), [14, 13.5, 12.995]);
+  // a phone in New York: 12.47 is 0.03 past 12.5 — straight from 13
+  assert.deepEqual(N.zoomSteps(14, 12.47, 0.5), [14, 13.5, 13, 12.47]);
+  // exactly half a step past one: kept
+  assert.deepEqual(N.zoomSteps(14, 12.25, 0.5), [14, 13.5, 13, 12.5, 12.25]);
+});
+
+test("someone close: found at the usual view — it stops there", () => {
+  assert.equal(stopsAt([at(300, 90)]), 14);
+});
+
+test("someone a mile or so off: the first step that shows them, not a step wider", () => {
   const far = at(2500, 0); // about 1½ miles north
-  const d = decide([far]);
-  assert.ok(d.zoom < 14 && d.zoom > widest(PHONE), String(d.zoom));
-  const r = N.screenAt(NYC, d.zoom, PHONE);
-  assert.ok(far.lat <= r.n && far.lat > NYC.lat, "on screen");
-  // and just enough: a hair closer and they're under the banner
-  assert.ok(Math.abs(N.fitZoom(NYC, far, PHONE, PAD) - d.zoom) < 1e-9);
+  const z = stopsAt([far]);
+  assert.ok(z < 14 && z >= widest(PHONE), String(z));
+  // on that screen, clear of the banner…
+  assert.ok(N.fitZoom(NYC, far, PHONE, PAD) >= z);
+  // …and not on the step before (it would have stopped there)
+  const zs = steps();
+  assert.ok(N.fitZoom(NYC, far, PHONE, PAD) < zs[zs.indexOf(z) - 1]);
 });
 
-test("the nearest by distance — not the first in the list, not the one that fits a closer zoom", () => {
-  // east 1.5 km (a phone is narrow: needs a WIDER zoom) vs north 2 km
+test("it stops for whoever shows first — two people, the step showing either", () => {
+  // east 1.5 km (a phone is narrow) and north 2 km: whichever fits first
   const east = at(1500, 90);
   const north = at(2000, 0);
-  const d = decide([north, east]);
-  assert.equal(d.nearest.id, 1, "east is nearer");
-  assert.ok(N.fitZoom(NYC, north, PHONE, PAD) > N.fitZoom(NYC, east, PHONE, PAD), "the test's premise");
+  const first = Math.max(...[east, north].map((p) => stopsAt([p])));
+  assert.equal(stopsAt([east, north]), first);
 });
 
-test("someone beyond the widest view (off that screen) doesn't count: nobody nearby", () => {
-  const d = decide([at(9000, 90), at(12000, 180)]);
-  assert.equal(d.nearest, null);
-  assert.equal(d.zoom, widest(PHONE));
+test("under the banner or the buttons doesn't count: they're not on screen", () => {
+  const r = N.screenAt(NYC, 14, PHONE);
+  // just inside the screen's top edge, under the banner
+  const hidden = { lat: NYC.lat + (r.n - NYC.lat) * 0.95, lng: NYC.lng };
+  assert.ok(hidden.lat < r.n, "(on the screen itself)");
+  assert.equal(anyoneAt([hidden], 14), false);
+  // a step wider, they're in the clear
+  assert.ok(stopsAt([hidden]) < 14);
+});
+
+test("nobody, or only people beyond the widest view: no step shows anyone", () => {
+  assert.equal(stopsAt([]), null);
+  assert.equal(stopsAt([at(9000, 90), at(12000, 180)]), null);
 });
 
 test("who you're looking for: a rider with ✋ up — cars; a driver online — ✋; else nobody", () => {

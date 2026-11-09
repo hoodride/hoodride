@@ -53,7 +53,33 @@ defmodule HoodrideWeb.IntentZoomTest do
     assert body("initMap") =~ "if (!e.nearSearch) stopFindNearest();"
 
     assert body("findNearest") =~
-             "map.easeTo({ center: [at.lng, at.lat], zoom }, { nearSearch: seq })"
+             "map.easeTo({ center: [at.lng, at.lat], zoom, duration: NEAR_STEP_MS }, { nearSearch: seq })"
+  end
+
+  # step by step (owner, 2026-11-09): out half a level at a time, waiting
+  # at each step for the answer however long it takes, stopping at the first
+  # step with anyone and staying there (no zooming back in)
+  test "step by step: wait for each answer (no timer), stop at the first with anyone" do
+    f = body("findNearest")
+    assert f =~ "HoodNearby.zoomSteps(INTENT_ZOOM, widestZoom, NEAR_STEP)"
+    assert @app =~ "const NEAR_STEP = 0.5;"
+    assert f =~ "if (map.isMoving() || !answered()) return setTimeout(check, 100);"
+    # no deadline anywhere: a slow answer is waited for
+    refute f =~ "performance.now()"
+    refute @app =~ "NEAR_WAIT_MS"
+    refute @app =~ "NEAR_LATE_MS"
+    # found: it stops where it is
+    assert f =~ ~r/if \(anyone\(steps\[i\]\)\) \{
+      nearLooking = false;
+      return;
+    \}/
+    # the last step and nobody: "nobody nearby yet"
+    assert f =~ "if (i === steps.length - 1) {"
+    assert f =~ "return setNobodyNear(true);"
+    # otherwise one step wider
+    assert f =~ "camera(steps[++i]);"
+    # a view refused for good ends it (it would never be answered)
+    assert f =~ "if (!DEMO && worldSync.refused()) return stopFindNearest();"
   end
 
   test "nearby.js loads before app.js, is cached offline, and served" do

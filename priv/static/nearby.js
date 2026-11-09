@@ -86,25 +86,23 @@
     return 2 * EARTH_M * Math.asin(Math.min(1, Math.sqrt(h)));
   }
 
-  // Where to put the camera, centred on `me`: `people` [{pos}] are those
-  // the map has (each at the block it shows them in). Of those who'd be
-  // on screen at the widest zoom, the nearest: the zoom showing them, never
-  // closer than `maxZoom` (the usual view). None: the widest zoom, and
-  // nearest null ("nobody nearby yet").
-  function decide({ me, people, size, pad, widestZoom, maxZoom }) {
-    let best = null;
-    let bestM = Infinity;
-    people.forEach((p) => {
-      if (fitZoom(me, p.pos, size, pad) < widestZoom) return; // off that screen
-      const m = metersBetween(me, p.pos);
-      if (m < bestM) {
-        best = p;
-        bestM = m;
-      }
-    });
-    if (!best) return { zoom: widestZoom, nearest: null };
-    const z = Math.min(maxZoom, Math.max(widestZoom, fitZoom(me, best.pos, size, pad)));
-    return { zoom: z, nearest: best };
+  // The zooms the search steps through (owner, 2026-11-09): the usual view
+  // first, then `step` wider each time (half a level: twice the ground),
+  // ending exactly at the widest view that still shows people one by one.
+  // A step less than half a step short of the widest is left out: a sliver
+  // of a last step would be one more wait for the server, for nothing.
+  function zoomSteps(maxZoom, widestZoom, step) {
+    const zs = [maxZoom];
+    for (let z = maxZoom - step; z >= widestZoom + step / 2 - 1e-9; z -= step) zs.push(Math.round(z * 100) / 100);
+    if (widestZoom < maxZoom) zs.push(widestZoom);
+    return zs;
+  }
+
+  // Anyone you're looking for on a screen centred on `me` at `zoom`, clear
+  // of what covers its edges (`pad`: the banner, the buttons). `people`
+  // [{pos}] are those the map has, each where the map shows them.
+  function anyoneAt({ me, people, size, pad, zoom }) {
+    return people.some((p) => fitZoom(me, p.pos, size, pad) >= zoom - 1e-9);
   }
 
   // who you're looking for: a rider with ✋ up, cars; a driver online, ✋;
@@ -116,5 +114,5 @@
     return null;
   }
 
-  return { screenAt, showsMarkers, widestMarkerZoom, fitZoom, metersBetween, decide, lookingFor };
+  return { screenAt, showsMarkers, widestMarkerZoom, fitZoom, metersBetween, zoomSteps, anyoneAt, lookingFor };
 });

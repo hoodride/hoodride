@@ -3985,22 +3985,24 @@ $("btn-hand").addEventListener("click", () => {
 // drivers see the hands around them and riders the cars around them
 const INTENT_ZOOM = 14;
 
-// ===== Find the nearest (nearby.js; owner, 2026-11-07) =====
+// ===== Find the nearest (nearby.js; owner, 2026-11-07, step by step 2026-11-09) =====
 // Go online, ✋ up, or the locate button while either is on: centred on
-// you, the map looks as wide as it still shows people one by one, waits for
-// the server's answer for that view, then zooms back in just far enough to
-// show the nearest — never closer than INTENT_ZOOM. Nobody: it stays wide
-// and the banner adds "nobody nearby yet" until someone shows up on screen.
-// Only what the map already shows is used (no "nearest" question to the
-// server). Any other move of the map — yours, or the app's — ends it.
+// you at the usual view (INTENT_ZOOM), then out half a level at a time —
+// waiting at each step for the server's answer for that view, however long
+// it takes (a reconnect too) — until anyone you're looking for shows,
+// clear of the banner and buttons. It stays there: no zooming back in, so
+// the others around show too. Nobody even at the widest view that still
+// shows people one by one: it stays there and the banner adds "nobody
+// nearby yet" until someone shows up on screen. Only what the map already
+// shows is used (no "nearest" question to the server). Any other move of
+// the map — yours, or the app's — ends it; so does a view the server
+// refuses for good (it would never be answered).
 // what covers the map's edges (px): the banner on top, the buttons below
 const NEAR_PAD = { top: 130, bottom: 120, left: 40, right: 40 };
-const NEAR_WAIT_MS = 3000; // the longest it waits for the server's answer
-// …then it decides with what it has, and keeps listening this long: a
-// slow connection's answer still brings the view a fast one would have
-const NEAR_LATE_MS = 30000;
+const NEAR_STEP = 0.5; // each step: half a zoom level wider (twice the ground)
+const NEAR_STEP_MS = 300; // each step's zoom: quick, the steps read as one move
 let nearSeq = 0; // the search under way; a newer number ends an older one
-let nearLooking = false; // looking (between the zoom out and the answer)
+let nearLooking = false; // looking (stepping out, waiting for answers)
 let nobodyNear = false; // looked: nobody — the banner says so
 
 function mapSize() {
@@ -4045,47 +4047,37 @@ function findNearest(at) {
     budget: MAX_WATCHED_CELLS,
     maxZoom: INTENT_ZOOM,
   });
-  const decide = () =>
-    HoodNearby.decide({ me: at, people: peopleOnMap(type), size, pad: NEAR_PAD, widestZoom, maxZoom: INTENT_ZOOM });
+  const steps = HoodNearby.zoomSteps(INTENT_ZOOM, widestZoom, NEAR_STEP);
+  const anyone = (zoom) => HoodNearby.anyoneAt({ me: at, people: peopleOnMap(type), size, pad: NEAR_PAD, zoom });
   // the camera's own moves carry the search's number (the movestart
   // listener: any other move ends the search)
-  const camera = (zoom) => map.easeTo({ center: [at.lng, at.lat], zoom }, { nearSearch: seq });
-
-  // someone close on the map already: the usual view, no need to look wider
-  const now = decide();
-  if (now.nearest && now.zoom === INTENT_ZOOM) return camera(INTENT_ZOOM);
-
-  nearLooking = true;
-  camera(widestZoom);
-  // the server answers for the view the map watches once it stops moving,
-  // as the role you're looking as (an online driver: ✋)
+  const camera = (zoom) => map.easeTo({ center: [at.lng, at.lat], zoom, duration: NEAR_STEP_MS }, { nearSearch: seq });
+  // the server has answered for the view the map watches once it stopped
+  // moving, as the role you're looking as (an online driver: ✋)
   const role = type === "driver" ? "viewer" : "driver";
-  const until = performance.now() + NEAR_WAIT_MS;
   const answered = () => DEMO || (worldSync.settled() && serverRole === role);
-  const show = (d) => {
-    if (d.zoom !== map.getZoom()) camera(d.zoom);
-    setNobodyNear(!d.nearest);
-  };
+  let i = 0;
+  nearLooking = true;
+  camera(steps[0]);
   const check = () => {
     if (seq !== nearSeq) return;
+    // stopped looking meanwhile: ✋ down and going offline end the search
+    // themselves (a newer nearSeq) — a ride starting or ending, a request,
+    // switching between rider and driver don't: this does
     if (HoodNearby.lookingFor(state) !== type) return stopFindNearest();
-    const done = answered();
-    if ((map.isMoving() || !done) && performance.now() < until) return setTimeout(check, 100);
-    nearLooking = false;
-    show(decide());
-    // no answer yet (a slow connection): decided with what there was —
-    // decide again once it comes, unless the map was moved meanwhile
-    if (!done) setTimeout(late, 200);
-  };
-  const lateUntil = until + NEAR_LATE_MS;
-  // stopped looking meanwhile: ✋ down and going offline end the search
-  // themselves (a newer nearSeq) — a ride starting or ending, a request,
-  // switching between rider and driver don't: this does (findnearest.mjs)
-  const late = () => {
-    if (seq !== nearSeq) return;
-    if (HoodNearby.lookingFor(state) !== type) return stopFindNearest();
-    if (answered()) return show(decide());
-    if (performance.now() < lateUntil) setTimeout(late, 200);
+    // a view the server refused for good is never answered
+    if (!DEMO && worldSync.refused()) return stopFindNearest();
+    if (map.isMoving() || !answered()) return setTimeout(check, 100);
+    if (anyone(steps[i])) {
+      nearLooking = false;
+      return;
+    }
+    if (i === steps.length - 1) {
+      nearLooking = false;
+      return setNobodyNear(true);
+    }
+    camera(steps[++i]);
+    setTimeout(check, 100);
   };
   setTimeout(check, 100);
 }

@@ -41,8 +41,9 @@ await journey("chatback: ‹ opens the list; drafts stay with their chat", async
   await sees(sam, edId);
 
   step("Ray's ✋ on Dora's map and Dora's car on Sam's: the same yellow edge (owner, 2026-11-08)");
+  // (the marker is drawn a moment after the person is on the map: waited for)
   const edge = (p, type, id) =>
-    p.eval(`(() => { for (const pm of pileMarkers.values()) if (pm.type === ${JSON.stringify(type)} && pm.ids.includes(${id})) return getComputedStyle(pm.el).borderTopColor; return null; })()`);
+    p.waitFor(`(() => { for (const pm of pileMarkers.values()) if (pm.type === ${JSON.stringify(type)} && pm.ids.includes(${id})) return getComputedStyle(pm.el).borderTopColor; return null; })()`, `${p.name}: #${id}'s marker drawn`);
   check((await edge(dora, "hand", rayId)) === YELLOW, "the ✋ has the yellow edge", await edge(dora, "hand", rayId));
   check((await edge(sam, "driver", doraId)) === YELLOW, "the car has the yellow edge", await edge(sam, "driver", doraId));
 

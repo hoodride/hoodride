@@ -1,14 +1,16 @@
 // Find the nearest on a slow connection (owner, 2026-11-07; split from
-// findnearest.mjs, 2026-11-08 — together they ran past a journey's time):
-// the late answer, and stopping looking while it's on its way.
-// Find the nearest (owner, 2026-11-07): Go online, ✋ Need a ride, or the
-// locate button while either is on — the map centres on you and zooms out
-// just far enough to show the nearest person you're looking for (a rider:
-// cars; a driver: ✋), never closer than the usual zoom (14) and never wider
-// than people still show one by one. Nobody: it stays that wide and the
-// banner adds "nobody nearby yet" — until someone shows up on screen (the
-// map doesn't move). Any move of your own ends it.
-// The rules themselves (zooms, nearest, edges): test_js/nearby.test.mjs.
+// findnearest.mjs, 2026-11-08 — together they ran past a journey's time;
+// no deadline, 2026-11-09): it waits at each step for the slow answer,
+// never says "nobody nearby yet" while it waits, and a swipe or ✋ down
+// while it waits ends it — the answer then moves nothing.
+// Find the nearest (owner, 2026-11-07; step by step 2026-11-09): Go online,
+// ✋ Need a ride, or the locate button while either is on — the map centres
+// on you at the usual zoom (14), then steps out half a level at a time,
+// waiting at each step for the server's answer however long it takes,
+// until someone you're looking for shows (a rider: cars; a driver: ✋), and
+// stays there. Nobody at the widest view that still shows people one by
+// one: "nobody nearby yet". Any move of your own ends it.
+// The rules themselves (steps, edges): test_js/nearby.test.mjs.
 import { journey, step, check, HOME } from "./cdp.mjs";
 import { goOnline, bannerIs } from "./app.mjs";
 
@@ -53,10 +55,23 @@ const slowMap = (p, ms) =>
     return true;
   })()`);
 
-const RIDER = "✋ Nearby drivers can see you need a ride";
-const NOBODY = " · nobody nearby yet";
+// the map stopped at the FIRST step that shows #id (clear of the banner
+// and buttons): on that step, and not on the step before it
+const firstStepShowing = (p, id) =>
+  p.eval(`(() => {
+    const size = mapSize();
+    const w = HoodNearby.widestMarkerZoom({ viewport: HoodViewport, h3, center: state.me, size, rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS, maxZoom: INTENT_ZOOM });
+    const steps = HoodNearby.zoomSteps(INTENT_ZOOM, w, NEAR_STEP);
+    const z = map.getZoom();
+    const i = steps.findIndex((s) => Math.abs(s - z) < 1e-6);
+    const e = realEntries.get(${id});
+    const fz = e ? HoodNearby.fitZoom(state.me, e.peer.pos, size, NEAR_PAD) : null;
+    return { z, steps, i, fz, ok: !!e && i > 0 && fz >= z - 1e-9 && fz < steps[i - 1] };
+  })()`);
 
-await journey("findnearestlate: the late answer on a slow connection", async (browser) => {
+const RIDER = "✋ Nearby drivers can see you need a ride";
+
+await journey("findnearestlate: a slow connection — it waits at each step, and a swipe ends it", async (browser) => {
   step("Dora goes online 2 km north");
   const dora = await browser.person("BT-Dora", DORA);
   await dora.phone(390, 844);
@@ -64,33 +79,45 @@ await journey("findnearestlate: the late answer on a slow connection", async (br
   await goOnline(dora);
   await settled(dora);
 
-  // longer than the search waits (3 s): it decides "nobody" with what it
-  // has, then the late answer brings the view a fast one would have
-  step("Lu (home) on a very slow connection (5 s) raises ✋: 'nobody' at first, then the late answer zooms in to Dora's car");
+  // a slow answer at each step: the search waits for it (no deadline) and
+  // never says "nobody nearby yet" while it waits — that's only for a
+  // widest view really answered and empty (owner, 2026-11-09)
+  step("Lu (home) on a slow connection (5 s per answer) raises ✋: it waits at each step, never 'nobody', and stops at the step with Dora's car");
   const lu = await browser.person("BT-Lu");
   await lu.phone(390, 844);
   await lu.open();
   await lu.waitFor(`worldChannel && worldChannel.state === "joined" && worldSync.settled()`, "Lu's map loaded");
   // zoomed right in first: Dora's block is outside what Lu's map watches,
-  // so only the wide look (the slow answer) can find her
+  // so only the steps out (the slow answers) can find her
   await lu.eval(`map.jumpTo({ center: [state.me.lng, state.me.lat], zoom: 17 }), true`);
   await lu.waitFor(`!map.isMoving() && worldSync.settled() && !realEntries.has(${doraId})`, "Lu zoomed in, Dora not on his map");
   await slowMap(lu, 5000);
+  // every line the banner shows from here on
+  await lu.eval(`(() => {
+    window.__lines = [];
+    const b = document.getElementById("banner");
+    new MutationObserver(() => window.__lines.push(b.textContent)).observe(b, { childList: true, characterData: true, subtree: true });
+    return true;
+  })()`);
   await lu.click("btn-hand");
   await lu.waitFor("state.handRaised", "Lu's ✋ up");
-  await bannerIs(lu, RIDER + NOBODY);
-  const luWide = await widest(lu);
-  await lu.waitFor(`!map.isMoving() && map.getZoom() < 14 && map.getZoom() > ${luWide + 0.05}`, "Lu's map zoomed in to fit", 15000);
+  await lu.waitFor(`nearLooking && map.getZoom() <= 14`, "looking, from the usual view");
+  await new Promise((r) => setTimeout(r, 6000)); // past the old 3 s give-up
+  check(await lu.eval("nearLooking"), "still waiting (no deadline)");
+  await lu.waitFor(`!nearLooking && !map.isMoving()`, "the search over", 40000);
+  const luStop = await firstStepShowing(lu, doraId);
+  check(luStop.ok, "the first step that shows Dora's car", luStop);
   check(await onYou(lu), "centred on Lu");
-  check(await onScreen(lu, doraId), "Dora's car on screen");
   await bannerIs(lu, RIDER);
+  const lines = await lu.eval("window.__lines");
+  check(!lines.some((l) => l.includes("nobody nearby yet")), "never 'nobody nearby yet' while it waited", lines);
   const luId = await lu.id();
   await lu.click("btn-hand");
   await lu.waitFor("!state.handRaised", "Lu's ✋ down");
 
-  // waiting for the late answer, Lu moves the map himself: when it comes,
-  // it leaves the map where he put it
-  step("Lu again, and drags the map while the late answer is on its way: it never pulls the map back");
+  // waiting at a step, Lu moves the map himself: the search is over — when
+  // the answer comes, it leaves the map where he put it (no step further)
+  step("Lu again, and swipes the map while it waits at a step: it never moves the map again");
   const zoomIn = async () => {
     await lu.eval(`map.jumpTo({ center: [state.me.lng, state.me.lat], zoom: 17 }), true`);
     await lu.waitFor(`!map.isMoving() && worldSync.settled() && !realEntries.has(${doraId})`, "Lu zoomed in, Dora not on his map", 30000);
@@ -98,25 +125,25 @@ await journey("findnearestlate: the late answer on a slow connection", async (br
   await zoomIn();
   await lu.click("btn-hand");
   await lu.waitFor("state.handRaised", "Lu's ✋ up");
-  await bannerIs(lu, RIDER + NOBODY);
+  await lu.waitFor(`nearLooking && !map.isMoving() && !worldSync.settled()`, "waiting at a step for the answer", 15000);
   await drag(lu);
+  check(!(await lu.eval("nearLooking")), "the swipe ended the search");
   await bannerIs(lu, RIDER);
   let held = await view(lu);
-  await new Promise((r) => setTimeout(r, 4000)); // past the late answer (5 s)
-  await lu.waitFor(`worldSync.settled()`, "the late answer in", 10000);
-  await new Promise((r) => setTimeout(r, 1000)); // time to act on it (it checks every 0.2 s)
+  await lu.waitFor(`worldSync.settled()`, "the answer in", 15000);
+  await new Promise((r) => setTimeout(r, 1500)); // time to act on it (it checks every 0.1 s)
   check(JSON.stringify(await view(lu)) === JSON.stringify(held), "the map stayed where Lu put it", { held, now: await view(lu) });
   await lu.click("btn-hand");
   await lu.waitFor("!state.handRaised", "Lu's ✋ down");
 
-  step("Lu again, and puts ✋ down while the late answer is on its way: it does nothing");
+  step("Lu again, and puts ✋ down while it waits at a step: it does nothing");
   await zoomIn();
   await lu.click("btn-hand");
   await lu.waitFor("state.handRaised", "Lu's ✋ up");
-  await bannerIs(lu, RIDER + NOBODY);
-  held = await view(lu);
+  await lu.waitFor(`nearLooking && !map.isMoving() && !worldSync.settled()`, "waiting at a step for the answer", 15000);
   await lu.click("btn-hand");
-  await lu.waitFor("!state.handRaised", "Lu's ✋ down");
+  await lu.waitFor("!state.handRaised && !map.isMoving()", "Lu's ✋ down");
+  held = await view(lu);
   await new Promise((r) => setTimeout(r, 4000));
   await lu.waitFor(`worldSync.settled()`, "the late answer in", 10000);
   await new Promise((r) => setTimeout(r, 1000)); // time to act on it (it checks every 0.2 s)
