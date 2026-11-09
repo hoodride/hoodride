@@ -11,6 +11,12 @@ app's **Unix socket** `/run/hoodride/app.sock`.
 - No ~28,000-connection ceiling: a socket connection uses no port number.
 - Cloudflare does see the traffic decrypted, so name it in your privacy
   policy (Hood Ride's does).
+- Request size limits live in the app, not at Cloudflare: only JSON is read,
+  at most 64 KB per request and per live-connection message
+  (`lib/hoodride_web/endpoint.ex`); anything bigger is refused with 413 at
+  once. Nothing to set in Cloudflare — its free plan can't add a smaller
+  edge limit (the "request body size" rule field needs an Enterprise plan;
+  the free plan's own cap is a fixed 100 MB).
 
 This is exactly how [hoodride.app](https://hoodride.app) runs. The files are
 in `deploy/`, tested under systemd on Ubuntu 24.04.
