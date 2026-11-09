@@ -33,8 +33,9 @@ const F = require("../priv/static/sendfilter.js");
 const HoodSync = require("../priv/static/sync.js");
 const HoodRehydrate = require("../priv/static/rehydrate.js");
 
-const BASE = "http://127.0.0.1:4000";
-const WS = "ws://127.0.0.1:4000/socket/websocket?vsn=2.0.0";
+// (MONSTER_BASE: another server — e.g. a second dev copy on another port)
+const BASE = process.env.MONSTER_BASE || "http://127.0.0.1:4000";
+const WS = BASE.replace(/^http/, "ws") + "/socket/websocket?vsn=2.0.0";
 const N = Number(process.argv[2] || 150);
 const SECONDS = Number(process.argv[3] || 150);
 const WAVES = Number(process.argv[4] || 2);
@@ -106,7 +107,7 @@ const pct = (xs, p) => {
 function serverMB() {
   return new Promise((res) =>
     exec(
-      'powershell -NoProfile -Command "(Get-Process -Id (Get-NetTCPConnection -LocalPort 4000 -State Listen).OwningProcess).WorkingSet64"',
+      `powershell -NoProfile -Command "(Get-Process -Id (Get-NetTCPConnection -LocalPort ${new URL(BASE).port || 80} -State Listen).OwningProcess).WorkingSet64"`,
       (err, out) => res(err ? NaN : Number(String(out).trim()) / 1048576)
     )
   );
