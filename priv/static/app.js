@@ -41,14 +41,14 @@ const auth = {
       return new Promise(() => {}); // leaving the page
     }
     try {
-      const res = await fetch("/api/dev_login", {
+      const res = await apiFetch("/api/dev_login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // no photo: a test account looks like anyone without one (avatar.js)
         body: JSON.stringify({ name: this.devName() }),
       });
       if (res.ok) {
-        const st = await (await fetch("/api/state")).json();
+        const st = await (await apiFetch("/api/state")).json();
         if (st.user) return { real: true, state: st };
       }
     } catch (_) {}
@@ -501,6 +501,8 @@ let awayFromApp = false;
 let googleRefreshing = false;
 function tryGoogleRefresh() {
   if (DEMO || !state.realUser || googleRefreshing) return;
+  // stepped aside: Google's answer would come back as a new page load
+  if (steppedAside()) return;
   const view = {
     mode: state.mode,
     online: state.online,
@@ -597,7 +599,7 @@ async function deleteAccount() {
   };
   let res;
   try {
-    res = await fetch("/api/account/delete", {
+    res = await apiFetch("/api/account/delete", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ confirm: $("delete-typed").value }),
@@ -693,7 +695,7 @@ function closeSettings(e) {
 // undefined = not read yet, null = none set.
 async function loadMyCar() {
   try {
-    const res = await fetch("/api/car");
+    const res = await apiFetch("/api/car");
     if (!res.ok) return false;
     state.myCar = (await res.json()).car;
     return true;
@@ -768,7 +770,7 @@ async function saveCar(e) {
   $("car-save").disabled = true;
   let res;
   try {
-    res = await fetch("/api/car", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(car) });
+    res = await apiFetch("/api/car", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(car) });
   } catch (_) {
     $("car-save").disabled = false;
     return carError(t("Couldn't reach Hood Ride — check your connection and try again."));
@@ -894,7 +896,7 @@ $("btn-logout").addEventListener("click", async () => {
   // never reload into a half-signed-out app
   let res;
   try {
-    res = await fetch("/api/logout", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
+    res = await apiFetch("/api/logout", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
   } catch (_) {
     return transientBanner(t("Couldn't reach Hood Ride — try again"));
   }
@@ -927,7 +929,7 @@ function agreeToTerms() {
       err.classList.add("hidden");
       let res = null;
       try {
-        res = await fetch("/api/terms/accept", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
+        res = await apiFetch("/api/terms/accept", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
       } catch (_) {}
       if (res && res.status === 401) return location.reload(); // signed out meanwhile
       if (res && res.ok) {
@@ -1011,8 +1013,32 @@ function tabStorage() {
 // Told live on the user channel, or as the answer to any join of a socket
 // that came back after a newer choice.
 function onSessionMoved() {
-  socket.disconnect();
+  if (socket) socket.disconnect();
   showSessionMoved();
+}
+// the "Use here" cover is up: this tab stepped aside — nothing reloads or
+// navigates on its own until the person taps "Use here"
+const steppedAside = () => !!document.getElementById("session-moved");
+
+// One account per tab (owner, 2026-11-08). Every tab of a browser shares one
+// sign-in: when the browser becomes another account (another tab signed out
+// and in…) while this tab still shows the first, its requests used to act on
+// the other one — delete account, save car, sign out — and draw its data as
+// this one's. Every /api request now says which account this tab shows
+// (HoodrideWeb.SameUser); another account signed in → refused, nothing done,
+// and this tab steps aside under the "Use here" cover IN PLACE (no reload:
+// "Use here" reloads as whoever is really signed in). Checked on the HEADER —
+// logout's own 409s carry a body its caller reads. The answer never comes
+// (the caller shows no error, and builds no socket). window.fetch looked up
+// at each call: the journeys wrap it.
+function apiFetch(url, opts = {}) {
+  const headers = new Headers(opts.headers || {});
+  if (state.realUser) headers.set("x-hood-user", String(state.realUser.id));
+  return window.fetch(url, { ...opts, headers }).then((res) => {
+    if (res.headers.get("x-hood-other-account") !== "1") return res;
+    onSessionMoved();
+    return new Promise(() => {});
+  });
 }
 const sessionMovedReply = (e) => !!e && e.reason === "session_moved";
 
@@ -1028,7 +1054,7 @@ function onJoinSignedOut() {
   socket.disconnect();
   signedOutCheck = (async () => {
     try {
-      const res = await fetch("/api/socket_token");
+      const res = await apiFetch("/api/socket_token");
       if (await ownRefusal(res)) return location.reload();
       if (res.ok) {
         socketToken = (await res.json()).token;
@@ -1068,7 +1094,7 @@ let restartNotice = null;
 async function refreshSocketToken() {
   socketTokenAt = performance.now();
   try {
-    const res = await fetch("/api/socket_token");
+    const res = await apiFetch("/api/socket_token");
     // signed out (here or elsewhere), or new Terms of Use while the app was
     // open: the reload shows the sign-in screen or asks for the Terms
     if (await ownRefusal(res)) return location.reload();
@@ -1221,6 +1247,9 @@ async function connectSocket() {
     .receive("error", (e) => {
       if (signedOutReply(e)) onJoinSignedOut();
       else if (sessionMovedReply(e)) onSessionMoved();
+      // this browser signed in as another account meanwhile: step aside
+      // (one account per tab — the "retrying" loop it used to be)
+      else if (e && e.reason === "not_yours") onSessionMoved();
       else transientBanner(t("Connection problem — retrying"));
     });
 }
@@ -1255,12 +1284,19 @@ function checkForUpdate() {
 // let the browser fetch the new service worker first, then reload (the
 // worker is network-first, so the page and its files come fresh anyway)
 function reloadForUpdate() {
+  // stepped aside ("Use here"): no reload of its own — checked again just
+  // before reloading, the cover may have come up while the worker updated
+  if (steppedAside()) return;
   // not a choice: the reloaded page keeps this tab's stamp (session.js)
   HoodSession.noteQuietReload(tabStorage(), sessionStamp);
   const sw = "serviceWorker" in navigator ? navigator.serviceWorker.getRegistration() : Promise.resolve(null);
   sw.then((r) => r && r.update())
     .catch(() => {})
-    .finally(() => location.reload());
+    .finally(() => {
+      if (!steppedAside()) return location.reload();
+      // no stamp left behind for a later page load
+      HoodSession.takeQuietReload(tabStorage());
+    });
 }
 
 // The server runs a newer build, or speaks a newer wire protocol, than this
@@ -1648,7 +1684,7 @@ async function softReload() {
       // the same verdict as opening the app (HoodBoot.classify): a failure
       // is a failure, never "signed out"
       fetchState: async () => {
-        const res = await fetch("/api/state");
+        const res = await apiFetch("/api/state");
         const body = await res.json().catch(() => null);
         const verdict = HoodBoot.classify({ status: res.status, body });
         if (verdict === "retry") throw new Error(`state ${res.status}`);
@@ -2737,6 +2773,7 @@ const loc = HoodLocator.create({
     // back from Settings after "blocked": the open page keeps the browser's
     // "no" — a quiet reload (this tab's session kept, everything restored)
     reload: () => {
+      if (steppedAside()) return; // "Use here" is the person's own choice
       HoodSession.noteQuietReload(tabStorage(), sessionStamp);
       location.reload();
     },
@@ -4610,7 +4647,7 @@ window.addEventListener("pageshow", (e) => {
 // gets "retrying…" and the app's reconnect backoff (HoodBoot).
 const booting = HoodBoot.create({
   fetchState: async () => {
-    const res = await fetch("/api/state");
+    const res = await apiFetch("/api/state");
     let body = null;
     try {
       body = await res.json();

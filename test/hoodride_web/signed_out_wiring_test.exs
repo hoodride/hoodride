@@ -21,7 +21,7 @@ defmodule HoodrideWeb.SignedOutWiringTest do
   test "the user, map and ride joins all handle signed_out FIRST" do
     user =
       handler(
-        ~r/\.receive\("error", \(e\) => \{\n      if \(signedOutReply\(e\)\) onJoinSignedOut\(\);\n      else if \(sessionMovedReply\(e\)\) onSessionMoved\(\);\n      else transientBanner/
+        ~r/\.receive\("error", \(e\) => \{\n      if \(signedOutReply\(e\)\) onJoinSignedOut\(\);\n      else if \(sessionMovedReply\(e\)\) onSessionMoved\(\);\n(?:      \/\/.*\n)*      else if \(e && e\.reason === "not_yours"\) onSessionMoved\(\);\n      else transientBanner/
       )
 
     world =
@@ -41,7 +41,7 @@ defmodule HoodrideWeb.SignedOutWiringTest do
     [f] = Regex.run(~r/function onJoinSignedOut\(\) \{.*?\n\}\n/s, @app)
     assert f =~ "if (signedOutCheck) return;"
     assert f =~ "socket.disconnect();"
-    assert f =~ ~s[const res = await fetch("/api/socket_token");]
+    assert f =~ ~s[const res = await apiFetch("/api/socket_token");]
     assert f =~ "if (await ownRefusal(res)) return location.reload();"
     assert f =~ "socket.connect();"
   end

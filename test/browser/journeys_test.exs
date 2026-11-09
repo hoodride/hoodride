@@ -177,6 +177,15 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     "ok"
   end
 
+  # this person has no car saved (one account per tab: a refused save left
+  # it alone)
+  defp server("no_car " <> id) do
+    case Hoodride.Accounts.car_of(String.to_integer(id)) do
+      {:ok, nil} -> "ok"
+      other -> "has a car: #{inspect(other)}"
+    end
+  end
+
   # as if new Terms of Use were published: open apps are asked again
   defp server("terms_new") do
     Application.put_env(:hoodride, :terms_version, "2099-01-01")

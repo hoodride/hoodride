@@ -9,6 +9,9 @@ defmodule HoodrideWeb.Router do
     plug :fetch_session
     plug HoodrideWeb.CurrentUser
     plug HoodrideWeb.HttpBudget
+    # the tab shows the account signed in (HoodrideWeb.SameUser) — after the
+    # budget, so a refused request still spends it
+    plug HoodrideWeb.SameUser
   end
 
   # requests that change something: from Hood Ride's own pages only

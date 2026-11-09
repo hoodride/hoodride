@@ -206,6 +206,22 @@ export async function launch() {
         const { targetInfos } = await cdp.send("Target.getTargets");
         if (targetInfos.some((t) => t.targetId === targetId)) throw new Error(`${name}: the page didn't close`);
       };
+      // another tab of this same browser profile — the same cookies and
+      // storage, so the same sign-in (one account per tab, 2026-11-08).
+      // Closed on its own; p.close() closes the whole profile, both tabs.
+      p.openSameProfileTab = async (tabName = `${name} (tab 2)`, where = at) => {
+        const t = await cdp.send("Target.createTarget", { url: "about:blank", browserContextId });
+        const s = await cdp.send("Target.attachToTarget", { targetId: t.targetId, flatten: true });
+        const q = page(cdp, s.sessionId, tabName);
+        q.locationPermission = p.locationPermission;
+        await cdp.send("Page.enable", {}, s.sessionId);
+        await cdp.send("Runtime.enable", {}, s.sessionId);
+        if (where) await q.locate(where);
+        else await q.noSignal();
+        q.close = () => cdp.send("Target.closeTarget", { targetId: t.targetId });
+        people.push(q);
+        return q;
+      };
       people.push(p);
       return p;
     },
