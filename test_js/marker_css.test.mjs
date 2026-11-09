@@ -80,3 +80,17 @@ test("the check sees a marker's own element, not its children", () => {
   assert.ok(MARKER_ROOT.test(".marker-bubble:not(.pile)"));
   assert.ok(!MARKER_ROOT.test(".marker-bubble .pile-more"));
 });
+
+// One border colour on the map (owner, 2026-11-08): hands and cars alike
+// have the app's yellow edge (--accent). The hands kept a green one
+// (.marker-bubble.hand) after the switch back to yellow.
+test("no marker overrides the yellow border (hands look like cars)", () => {
+  const offenders = [];
+  for (const [, selectors, body] of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
+    if (!/(^|;)\s*border(-color|-top-color|-right-color|-bottom-color|-left-color)?\s*:/.test(body)) continue;
+    for (const sel of selectors.split(",").map((s) => s.trim()))
+      if (/^\.marker-bubble(\.[\w-]+|:[\w-]+)+$/.test(sel)) offenders.push(`${sel} { ${body.trim()} }`);
+  }
+  assert.deepEqual(offenders, []);
+  assert.match(css, /\.marker-bubble\s*\{[^}]*border:\s*2px solid var\(--accent\)/);
+});

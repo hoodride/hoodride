@@ -517,7 +517,6 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
-.marker-bubble.hand { border-color: #50b86c; }
 /* click-through insides: the pressed element is always the marker itself.
    Its icons are redrawn as cars/hands update; a redraw between button-down
    and button-up replaced the pressed icon and the click was dropped

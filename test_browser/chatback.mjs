@@ -5,7 +5,7 @@
 // What's typed stays with its chat ("Draft" in the list, as WhatsApp).
 // Both directions: a driver writing to a ✋, a rider writing to a car.
 import { journey, step, check, server } from "./cdp.mjs";
-import { goOnline, sees, openChatWith, typeText, box, send, chatOpenWith, closeChatPanel, bannerIs } from "./app.mjs";
+import { goOnline, sees, openChatWith, typeText, box, send, chatOpenWith, closeChatPanel, bannerIs, YELLOW } from "./app.mjs";
 
 // the chat window: open? the list or a chat — whose?
 const where = (p) =>
@@ -39,6 +39,12 @@ await journey("chatback: ‹ opens the list; drafts stay with their chat", async
   await sees(dora, rayId, "(Ray's ✋)");
   await sees(sam, doraId);
   await sees(sam, edId);
+
+  step("Ray's ✋ on Dora's map and Dora's car on Sam's: the same yellow edge (owner, 2026-11-08)");
+  const edge = (p, type, id) =>
+    p.eval(`(() => { for (const pm of pileMarkers.values()) if (pm.type === ${JSON.stringify(type)} && pm.ids.includes(${id})) return getComputedStyle(pm.el).borderTopColor; return null; })()`);
+  check((await edge(dora, "hand", rayId)) === YELLOW, "the ✋ has the yellow edge", await edge(dora, "hand", rayId));
+  check((await edge(sam, "driver", doraId)) === YELLOW, "the car has the yellow edge", await edge(sam, "driver", doraId));
 
   step("driver: Dora taps Ray's ✋ → Message; Sam writes to her meanwhile: ‹ 1");
   await openChatWith(dora, rayId, "hand");
