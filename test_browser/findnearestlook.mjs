@@ -8,7 +8,7 @@
 // until someone you're looking for shows (a rider: cars; a driver: ✋), and
 // stays there. Nobody at the widest view that still shows people one by
 // one: "nobody nearby yet". Any move of your own ends it.
-// The rules themselves (steps, edges): test_js/nearby.test.mjs.
+// The rules themselves (the steps, the box rule): test_js/nearby.test.mjs.
 import { journey, step, check, HOME, server } from "./cdp.mjs";
 import { goOnline, bannerIs } from "./app.mjs";
 

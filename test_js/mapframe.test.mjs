@@ -108,3 +108,26 @@ test("a draw that throws doesn't stop later frames", () => {
   f.tick();
   assert.equal(draws, 2);
 });
+
+// find-the-nearest counts only what's DRAWN (owner, 2026-11-09): after the
+// server answers, the markers are drawn on the next frame — the search
+// waits for that draw, so it can ask whether one is still to come
+test("pending(): a draw asked for and not yet done — then not", () => {
+  const f = frames();
+  let draws = 0;
+  const schedule = createFrameRender(() => draws++, f.request);
+  assert.equal(schedule.pending(), false, "nothing asked");
+  schedule();
+  assert.equal(schedule.pending(), true, "asked, frame not come");
+  schedule();
+  assert.equal(schedule.pending(), true);
+  f.tick();
+  assert.equal(schedule.pending(), false, "drawn");
+  assert.equal(draws, 1);
+  // pending is false while the draw itself runs (a draw that asks again: true)
+  let seenInside = null;
+  const again = createFrameRender(() => { seenInside = again.pending(); }, f.request);
+  again();
+  f.tick();
+  assert.equal(seenInside, false);
+});

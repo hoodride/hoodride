@@ -179,6 +179,37 @@ defmodule HoodrideWeb.WorldChannelTest do
     assert [{_, _}] = subscribers("home")
   end
 
+  # the app must always hear its role change — find the nearest waits for
+  # the role it looks as before deciding anything, and the app drops the
+  # old layer's markers only on hearing it. The race: a sync already queued
+  # when the driver goes online is handled FIRST (it re-derives the role),
+  # then the "changed" ping finds the role already switched. The channel is
+  # paused to line the two up exactly that way.
+  test "a sync that picks up a new role tells the app (the ping right after must not find it 'already said')",
+       %{world: world} do
+    assert {:ok, _} = sync(world, %{"geo" => ["c1"]})
+    user_id = world.assigns.user_id
+    :sys.suspend(world.channel_pid)
+    ref = push(world, "sync", %{"geo" => ["c1"]})
+    # going online: the role table first, then the "changed" ping — queued
+    # behind the sync
+    Geo.driver_update(%{id: user_id, name: "WC", photo: nil}, "c9", nil)
+    :sys.resume(world.channel_pid)
+    assert_reply ref, :ok, _
+    assert_push "role", %{role: "driver"}
+  end
+
+  # find the nearest (owner, 2026-11-09): a search steps out up to ~8 times,
+  # one sync each, each a new set of cells (the map moved) — two searches
+  # back to back (a tap, then a look-again) must never be refused. Sent here
+  # all at once: faster than any real search (each step waits for its answer)
+  test "two find-the-nearest searches back to back — 16 syncs of 110 new cells each, at once: none refused",
+       %{world: world} do
+    results = for s <- 1..16, do: sync(world, %{"geo" => cells("s#{s}-", 110)})
+    refused = Enum.reject(results, &match?({:ok, _}, &1))
+    assert refused == [], "a search's step refused: #{inspect(Enum.take(refused, 1))}"
+  end
+
   test "rate_limited carries an accurate retry_ms", %{world: world} do
     for _ <- 1..21, do: sync(world, %{})
     assert {:error, %{reason: "rate_limited", retry_ms: wait}} = sync(world, %{})

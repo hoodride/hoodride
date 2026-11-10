@@ -10,9 +10,10 @@
 // until someone you're looking for shows (a rider: cars; a driver: ✋), and
 // stays there. Nobody at the widest view that still shows people one by
 // one: "nobody nearby yet". Any move of your own ends it.
-// The rules themselves (steps, edges): test_js/nearby.test.mjs.
+// The rules themselves (the steps, the box rule): test_js/nearby.test.mjs.
 import { journey, step, check, HOME } from "./cdp.mjs";
 import { goOnline, bannerIs } from "./app.mjs";
+import { firstStepShowing } from "./cover.mjs";
 
 // `km` north and east of home
 const near = (north, east = 0) => ({
@@ -25,7 +26,7 @@ const DORA = near(2); // about 1¼ miles north of Lu: further than the usual vie
 const settled = (p) => p.waitFor(`!nearLooking && !map.isMoving()`, `${p.name}: the map settled`);
 // the widest zoom that still shows people one by one, around you
 const widest = (p) =>
-  p.eval(`HoodNearby.widestMarkerZoom({ viewport: HoodViewport, h3, center: state.me, size: mapSize(), rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS, maxZoom: INTENT_ZOOM })`);
+  p.eval(`HoodNearby.widestMarkerZoom({ viewport: HoodViewport, h3, center: state.me, size: { w: mapSize().w + 2 * NEAR_EDGE_PX, h: mapSize().h + 2 * NEAR_EDGE_PX }, rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS, maxZoom: INTENT_ZOOM })`);
 const view = (p) =>
   p.eval(`(() => { const c = map.getCenter(); return { lng: c.lng, lat: c.lat, zoom: map.getZoom(), cars: map.getZoom() > 0 && HoodViewport.planWatch(h3, screenRect(), [H3_RES, ...AGG_RESES], MAX_WATCHED_CELLS)?.res === H3_RES }; })()`);
 // centred on where you are
@@ -55,19 +56,6 @@ const slowMap = (p, ms) =>
     return true;
   })()`);
 
-// the map stopped at the FIRST step that shows #id (clear of the banner
-// and buttons): on that step, and not on the step before it
-const firstStepShowing = (p, id) =>
-  p.eval(`(() => {
-    const size = mapSize();
-    const w = HoodNearby.widestMarkerZoom({ viewport: HoodViewport, h3, center: state.me, size, rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS, maxZoom: INTENT_ZOOM });
-    const steps = HoodNearby.zoomSteps(INTENT_ZOOM, w, NEAR_STEP);
-    const z = map.getZoom();
-    const i = steps.findIndex((s) => Math.abs(s - z) < 1e-6);
-    const e = realEntries.get(${id});
-    const fz = e ? HoodNearby.fitZoom(state.me, e.peer.pos, size, NEAR_PAD) : null;
-    return { z, steps, i, fz, ok: !!e && i > 0 && fz >= z - 1e-9 && fz < steps[i - 1] };
-  })()`);
 
 const RIDER = "✋ Nearby drivers can see you need a ride";
 

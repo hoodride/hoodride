@@ -202,6 +202,18 @@ html.resuming #screen-login .boot-status {
    2026-10-30). The standard fix: touch-action on html and body */
 html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 
+/* the phone's safe-area insets, read by find the nearest (nearCovers): its
+   padding IS them — never seen, never touched */
+#safe-probe {
+  position: fixed;
+  top: 0;
+  inset-inline-start: 0;
+  width: 0;
+  height: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  visibility: hidden;
+  pointer-events: none;
+}
 #map {
   position: absolute;
   inset: 0;
@@ -280,8 +292,10 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 /* right to left: it slides in from the right (its shadow on the left) */
 [dir="rtl"] .drawer { transform: translateX(105%); box-shadow: -4px 0 20px rgba(0,0,0,0.5); }
 .drawer.open { transform: none; visibility: visible; transition: transform 0.2s ease, visibility 0s; }
+/* reduce motion: no slide, no fade — opening too (the open state's own
+   rule above is more specific than .drawer: named here as well) */
 @media (prefers-reduced-motion: reduce) {
-  .drawer, .drawer-backdrop { transition: none; }
+  .drawer, .drawer-backdrop, .drawer.open, .drawer-backdrop.open { transition: none; }
 }
 .drawer-close { top: calc(12px + env(safe-area-inset-top)); inset-inline-end: 12px; font-size: 18px; }
 .drawer-me { display: flex; align-items: center; gap: 12px; padding: 8px 0 16px; padding-inline: 4px 36px; min-width: 0; border-bottom: 1px solid #333; }
@@ -611,7 +625,9 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 }
 .avatar-card { width: 52px; height: 52px; flex-shrink: 0; }
 .peer-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-.peer-info strong { font-size: 16px; }
+/* a long name cut with "…" — never past the card's edge (over the map: find
+   the nearest counts only the card's box) */
+.peer-info strong { font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* who they are, then where: a line each. The car is how a rider finds the
    right driver, so it's never cut — it wraps on a narrow phone; the
    distance stays one line */

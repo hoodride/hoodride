@@ -327,6 +327,22 @@ function page(cdp, sessionId, name) {
         setTimeout(() => send("Fetch.continueRequest", { requestId: msg.params.requestId }).catch(() => {}), ms);
       });
     },
+    // a recording: every frame as Chrome paints it (JPEG bytes, and its time
+    // in seconds) to `onFrame`, until the function this returns is called —
+    // for videos of the app (screenshots are too slow to catch a zoom)
+    async screencast(onFrame) {
+      let on = true;
+      cdp.on((msg) => {
+        if (!on || msg.sessionId !== sessionId || msg.method !== "Page.screencastFrame") return;
+        onFrame(Buffer.from(msg.params.data, "base64"), msg.params.metadata.timestamp);
+        send("Page.screencastFrameAck", { sessionId: msg.params.sessionId }).catch(() => {});
+      });
+      await send("Page.startScreencast", { format: "jpeg", quality: 90, everyNthFrame: 1 });
+      return async () => {
+        on = false;
+        await send("Page.stopScreencast", {});
+      };
+    },
     // the page as a PNG (bytes)
     async screenshot() {
       const { data } = await send("Page.captureScreenshot", { format: "png" });
@@ -351,13 +367,20 @@ function page(cdp, sessionId, name) {
         await sleep(50);
       }
     },
-    async locate({ latitude, longitude }) {
-      await send("Emulation.setGeolocationOverride", { latitude, longitude, accuracy: 10 });
+    async locate({ latitude, longitude, accuracy = 10 }) {
+      await send("Emulation.setGeolocationOverride", { latitude, longitude, accuracy });
     },
     // no position (no GPS signal: "position unavailable") — a waiting tap
     // keeps waiting until locate() gives one again
     async noSignal() {
       await send("Emulation.setGeolocationOverride", {});
+    },
+    // an error this test caused on purpose: it must have been logged (the
+    // app reports it, never hides it) — then it isn't a failure
+    async expectError(text) {
+      const i = p.errors.findIndex((e) => e.includes(text));
+      check(i >= 0, `${name}: the expected error logged ("${text}")`, p.errors);
+      p.errors.splice(i, 1);
     },
     // the phone's "Reduce motion" setting on / off
     async reduceMotion(on) {
@@ -432,6 +455,13 @@ function page(cdp, sessionId, name) {
     // the live connection: drop it (Phoenix doesn't retry after this) / back
     drop: () => p.eval("socket.disconnect(), true"),
     restore: () => p.eval("socket.connect(), true"),
+    // a phone's notch and home bar: the safe-area insets the page's
+    // env(safe-area-inset-*) reads (the page has viewport-fit=cover), in px
+    async safeArea({ top = 0, bottom = 0, left = 0, right = 0 }) {
+      await send("Emulation.setSafeAreaInsetsOverride", {
+        insets: { top, topMax: top, bottom, bottomMax: bottom, left, leftMax: left, right, rightMax: right },
+      });
+    },
     // a slow connection: at most `bytesPerSec` each way (light reload: a big
     // chat loading). Put back with offline(false) — a finally, so a failure
     // doesn't leave the next step slow

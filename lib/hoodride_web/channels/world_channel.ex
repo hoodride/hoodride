@@ -351,9 +351,12 @@ defmodule HoodrideWeb.WorldChannel do
     if MapSet.size(want_geo) + MapSet.size(want_agg) > @max_watch do
       {:reply, {:error, %{reason: "watch_limit"}}, socket}
     else
-      # the role is re-derived on every sync (a lost ping heals here)
+      # the role is re-derived on every sync (a lost ping heals here) — and
+      # a change found here is TOLD, as the ping would tell it (the ping
+      # coming right after finds the role already switched and says
+      # nothing: the app would never hear it — find the nearest waits on it)
       role = Roles.of(socket.assigns.user_id)
-      socket = assign(socket, role: role)
+      socket = apply_role(socket, role)
       want = topics(want_geo, want_agg, role)
       held = socket.assigns.held
 

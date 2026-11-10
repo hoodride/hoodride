@@ -625,3 +625,43 @@ test("every reading redraws the banner and refreshes the screen", () => {
   p.fix(500);
   assert.ok(p.did("redraw").length >= 1 && p.did("refresh").length >= 1, JSON.stringify(p.log.map((e) => e[0])));
 });
+
+// a ◎ tap that got no reading is over (owner, 2026-11-10): a reading coming
+// later — ✋ up, going online, a watch — isn't its answer, and must never
+// move the map back, maybe minutes on
+test("◎ with no reading, then it times out or location is off: a later reading doesn't centre the map", () => {
+  for (const code of [3, 2]) {
+    const p = phone({ mode: "driver" });
+    assert.equal(p.loc.tapLocate(), false);
+    p.lookups[0].err({ code });
+    p.loc.tapOnline();
+    p.fix(12);
+    assert.deepEqual(p.did("reading")[0][2], { first: true, centre: false }, `after error ${code}: not the tap's answer`);
+  }
+});
+
+test("◎ with no reading, then you move the map yourself (cancelCentre): its reading doesn't move the map back", () => {
+  const p = phone();
+  assert.equal(p.loc.tapLocate(), false);
+  p.loc.cancelCentre();
+  p.lookups[0].ok(p.reading(30));
+  assert.deepEqual(p.did("reading")[0][2], { first: true, centre: false });
+  // …while untouched, it still does (the tap's own answer)
+  const q = phone();
+  q.loc.tapLocate();
+  q.lookups[0].ok(q.reading(30));
+  assert.deepEqual(q.did("reading")[0][2], { first: true, centre: true });
+});
+
+// only the ◎ tap's OWN request failing ends the tap: the live watch (on
+// duty, indoors) timing out every 15 s meanwhile is not the tap failing —
+// the tap's reading, when it comes, still centres the map
+test("◎ waiting while the live watch times out: the tap still centres when its own reading comes", () => {
+  const p = phone({ mode: "driver" });
+  p.loc.tapOnline();
+  assert.equal(p.watches.size, 1, "(the live watch on)");
+  assert.equal(p.loc.tapLocate(), false, "(no reading yet: the tap waits)");
+  [...p.watches.values()][0].err({ code: 3 });
+  p.lookups[p.lookups.length - 1].ok(p.reading(30));
+  assert.deepEqual(p.did("reading")[0][2], { first: true, centre: true }, "the watch's timeout didn't end the tap");
+});

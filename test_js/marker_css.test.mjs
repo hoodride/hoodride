@@ -94,3 +94,38 @@ test("no marker overrides the yellow border (hands look like cars)", () => {
   assert.deepEqual(offenders, []);
   assert.match(css, /\.marker-bubble\s*\{[^}]*border:\s*2px solid var\(--accent\)/);
 });
+
+// find the nearest measures a marker by its element's box and its parts'
+// (app.js markerReach): anything drawn OUTSIDE those boxes, or changing them
+// mid-search, would make "in sight" disagree with what you see — so no
+// marker style may scale/move/animate it, draw a pseudo-element, a filter
+// shadow, an outline or a solid ring (a soft shadow is fine: the map shows
+// through it) — and its size stays tied to NEAR_HALF (22 px: a 44 px bubble)
+test("no marker style draws outside its boxes or changes them (find the nearest measures the boxes)", () => {
+  const offenders = [];
+  for (const [, selectors, body] of css.matchAll(/([^{}]+)\{([^}]*)\}/g)) {
+    for (const sel of selectors.split(",").map((s) => s.trim())) {
+      if (!/^\.marker-bubble\b/.test(sel)) continue;
+      if (/::?(before|after)\b/.test(sel)) offenders.push(`${sel}: a pseudo-element`);
+      const transform = /(^|;)\s*transform\s*:\s*([^;]+)/.exec(body);
+      if (transform && !(sel === ".marker-bubble .pile-icon" && /^translate\(-50%,\s*-50%\)$/.test(transform[2].trim())))
+        offenders.push(`${sel}: transform ${transform[2].trim()}`);
+      for (const prop of ["animation", "transition", "filter", "outline"])
+        if (new RegExp(`(^|;)\s*${prop}(-[a-z-]+)?\s*:`).test(body)) offenders.push(`${sel}: ${prop}`);
+      const shadow = /(^|;)\s*box-shadow\s*:\s*([^;]+)/.exec(body);
+      // a spread with no blur is a solid ring (ringReach): it would draw past the box
+      if (shadow && /(^|,)\s*(rgba?\([^)]*\)|#\w+|\w+)?\s*-?\d+(px)?\s+-?\d+(px)?\s+0(px)?\s+[1-9]/.test(shadow[2])) offenders.push(`${sel}: a solid ring`);
+    }
+  }
+  assert.deepEqual(offenders, []);
+});
+
+test("a marker's size stays what find the nearest assumes: a 44 px bubble (NEAR_HALF 22), a 74 px group", () => {
+  const m = /(^|[}\s])\.marker-bubble\s*\{([^}]*)\}/.exec(css);
+  const bubble = m ? m[2] : "";
+  assert.match(bubble, /width:\s*44px/);
+  assert.match(bubble, /height:\s*44px/);
+  const app = readFileSync(new URL("../priv/static/app.js", import.meta.url), "utf8");
+  assert.match(app, /^const NEAR_HALF = \{ x: 22, y: 22 \};$/m);
+  assert.match(css, /\.marker-bubble\.pile\s*\{[^}]*width:\s*74px/);
+});

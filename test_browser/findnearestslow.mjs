@@ -8,6 +8,7 @@
 // (findnearestlate.mjs, findnearestlook.mjs).
 import { journey, step, check } from "./cdp.mjs";
 import { goOnline, bannerIs } from "./app.mjs";
+import { inSightNow } from "./cover.mjs";
 import { HOME } from "./cdp.mjs";
 
 const RIDER = "✋ Nearby drivers can see you need a ride";
@@ -54,8 +55,8 @@ await journey("findnearestslow: a very slow answer is waited for, and the search
   const z = await kim.eval(`map.getZoom()`);
   check(z < 14, "stepped out", z);
   check(
-    await kim.eval(`realEntries.has(${doraId}) && HoodNearby.fitZoom(state.me, realEntries.get(${doraId}).peer.pos, mapSize(), NEAR_PAD) >= map.getZoom() - 1e-9`),
-    "Dora's car on screen, clear of the banner and buttons"
+    await inSightNow(kim, doraId),
+    "Dora's car in sight, clear of everything over the map"
   );
   await bannerIs(kim, RIDER);
   const lines = await kim.eval("window.__lines");

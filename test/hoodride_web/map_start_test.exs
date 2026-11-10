@@ -48,10 +48,12 @@ defmodule HoodrideWeb.MapStartTest do
              ~r/map\.on\("movestart", \(e\) => \{\s*if \(e\.originalEvent\) movedByYou = true;/
   end
 
-  test "the first reading centres on you at INTENT_ZOOM, unless you moved the map" do
+  # (the usual view: INTENT_ZOOM — closer in on a screen so big it shows
+  # counts there, owner 2026-11-09: usualZoom, near_covers_test.exs)
+  test "the first reading centres on you at the usual view, unless you moved the map" do
     # (online or ✋ up: the nearest found too — intent_zoom_test.exs)
     assert @app =~
-             "if (first && !centre && !movedByYou) {\n        if (HoodNearby.lookingFor(state)) findNearest(pos);\n        else map.easeTo({ center: [pos.lng, pos.lat], zoom: INTENT_ZOOM });"
+             "if (first && !centre && !movedByYou) {\n        if (HoodNearby.lookingFor(state)) findNearest(pos);\n        else map.easeTo({ center: [pos.lng, pos.lat], zoom: usualZoom(pos) });"
   end
 
   test "signing out (here, elsewhere, or deleting the account) forgets it" do

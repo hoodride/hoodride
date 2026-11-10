@@ -4,11 +4,12 @@
 // someone you're looking for shows (a rider: cars; a driver: ✋), and stays
 // there — no zooming back in. Never wider than people still show one by
 // one: nobody there, it stays that wide and the banner adds "nobody nearby
-// yet" — until someone shows up on screen (the map doesn't move). Any move
+// yet" — until someone comes into sight (the map doesn't move). Any move
 // of your own ends it.
-// The rules themselves (steps, edges): test_js/nearby.test.mjs.
+// The rules themselves (the steps, the box rule): test_js/nearby.test.mjs.
 import { journey, step, check, HOME } from "./cdp.mjs";
 import { goOnline, bannerIs } from "./app.mjs";
+import { firstStepShowing } from "./cover.mjs";
 
 // `km` north and east of home
 const near = (north, east = 0) => ({
@@ -22,7 +23,7 @@ const ED = near(0, 0.2); // a block or two from Sam
 const settled = (p) => p.waitFor(`!nearLooking && !map.isMoving()`, `${p.name}: the map settled`);
 // the widest zoom that still shows people one by one, around you
 const widest = (p) =>
-  p.eval(`HoodNearby.widestMarkerZoom({ viewport: HoodViewport, h3, center: state.me, size: mapSize(), rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS, maxZoom: INTENT_ZOOM })`);
+  p.eval(`HoodNearby.widestMarkerZoom({ viewport: HoodViewport, h3, center: state.me, size: { w: mapSize().w + 2 * NEAR_EDGE_PX, h: mapSize().h + 2 * NEAR_EDGE_PX }, rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS, maxZoom: INTENT_ZOOM })`);
 const view = (p) =>
   p.eval(`(() => { const c = map.getCenter(); return { lng: c.lng, lat: c.lat, zoom: map.getZoom(), cars: map.getZoom() > 0 && HoodViewport.planWatch(h3, screenRect(), [H3_RES, ...AGG_RESES], MAX_WATCHED_CELLS)?.res === H3_RES }; })()`);
 // centred on where you are
@@ -50,19 +51,6 @@ const slowMap = (p, ms) =>
       return later;
     };
     return true;
-  })()`);
-// the map stopped at the FIRST step that shows #id (clear of the banner
-// and buttons): on that step, and not on the step before it
-const firstStepShowing = (p, id) =>
-  p.eval(`(() => {
-    const size = mapSize();
-    const w = HoodNearby.widestMarkerZoom({ viewport: HoodViewport, h3, center: state.me, size, rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS, maxZoom: INTENT_ZOOM });
-    const steps = HoodNearby.zoomSteps(INTENT_ZOOM, w, NEAR_STEP);
-    const z = map.getZoom();
-    const i = steps.findIndex((s) => Math.abs(s - z) < 1e-6);
-    const pos = realEntries.get(${id}).peer.pos;
-    const fz = HoodNearby.fitZoom(state.me, pos, size, NEAR_PAD);
-    return { z, steps, i, ok: i > 0 && fz >= z - 1e-9 && fz < steps[i - 1] };
   })()`);
 const locate = async (p) => {
   await p.click("btn-locate");
@@ -100,9 +88,12 @@ await journey("findnearest: the map shows you the nearest", async (browser) => {
   await goOnline(top, { color: "Green", make: "Fiat", model: "500" });
   const topId = await top.id();
   await sam.waitFor(`realEntries.has(${topId})`, "Top's car on Sam's map", 15000);
-  await new Promise((r) => setTimeout(r, 500));
-  const topAt = await sam.eval(`(() => { const p = realEntries.get(${topId}).peer.pos; const pt = map.project([p.lng, p.lat]); return { y: Math.round(pt.y), inBounds: map.getBounds().contains([p.lng, p.lat]) }; })()`);
-  check(topAt.inBounds && topAt.y < 130, "(Top's car on the map, under the banner)", topAt);
+  await sam.waitFor(`[...pileMarkers.values()].some((pm) => pm.ids.includes(${topId}))`, "Top's car drawn on Sam's map", 15000);
+  const topAt = await sam.eval(`(() => { const pm = [...pileMarkers.values()].find((pm) => pm.ids.includes(${topId})); const c = pm.el.getBoundingClientRect(), b = document.getElementById("banner").getBoundingClientRect(); return { overlap: c.left < b.right && c.right > b.left && c.top < b.bottom && c.bottom > b.top, car: [c.top, c.bottom], banner: [b.top, b.bottom] }; })()`);
+  check(topAt.overlap, "(Top's car drawn under the banner)", topAt);
+  // two of the once-a-second looks with it drawn there: the line stays
+  await new Promise((r) => setTimeout(r, 2200));
+  check(await sam.eval(`nobodyNear`), "(still 'nobody nearby yet' after two looks)");
   await bannerIs(sam, RIDER + NOBODY);
   check(JSON.stringify(await view(sam)) === JSON.stringify(held0), "the map stayed put", { held0, now: await view(sam) });
 
@@ -113,9 +104,11 @@ await journey("findnearest: the map shows you the nearest", async (browser) => {
   await goOnline(bottom, { color: "Black", make: "Ford", model: "Ka" });
   const bottomId = await bottom.id();
   await sam.waitFor(`realEntries.has(${bottomId})`, "Bottom's car on Sam's map", 15000);
-  await new Promise((r) => setTimeout(r, 500));
-  const bottomAt = await sam.eval(`(() => { const p = realEntries.get(${bottomId}).peer.pos; const pt = map.project([p.lng, p.lat]); return { y: Math.round(pt.y), h: mapSize().h, inBounds: map.getBounds().contains([p.lng, p.lat]) }; })()`);
-  check(bottomAt.inBounds && bottomAt.y > bottomAt.h - 120, "(Bottom's car on the map, under the buttons)", bottomAt);
+  await sam.waitFor(`[...pileMarkers.values()].some((pm) => pm.ids.includes(${bottomId}))`, "Bottom's car drawn on Sam's map", 15000);
+  const bottomAt = await sam.eval(`(() => { const pm = [...pileMarkers.values()].find((pm) => pm.ids.includes(${bottomId})); const c = pm.el.getBoundingClientRect(); const hit = [...document.querySelectorAll("#bottom-controls > *")].filter((e) => !e.closest(".hidden")).map((e) => e.getBoundingClientRect()).some((b) => b.width && c.left < b.right && c.right > b.left && c.top < b.bottom && c.bottom > b.top); return { hit, car: [c.top, c.bottom] }; })()`);
+  check(bottomAt.hit, "(Bottom's car drawn under one of the buttons)", bottomAt);
+  await new Promise((r) => setTimeout(r, 2200));
+  check(await sam.eval(`nobodyNear`), "(still 'nobody nearby yet' after two looks)");
   await bannerIs(sam, RIDER + NOBODY);
   check(JSON.stringify(await view(sam)) === JSON.stringify(held0), "the map stayed put", { held0, now: await view(sam) });
   await bottom.click("btn-online");
@@ -206,7 +199,10 @@ await journey("findnearest: the map shows you the nearest", async (browser) => {
   await sam.waitFor("!state.handRaised", "Sam's ✋ down");
   await dora.waitFor(`!realEntries.has(${samId})`, "Sam's ✋ gone from Dora's map", 15000);
   // (a short message is up meanwhile: "nobody nearby yet" waits for it)
-  await dora.eval(`transientBanner("a short message", 8000), true`);
+  // (60 s, not 8: it must outlast a whole real search out to the widest
+  // view — each step waits for the server, longer on a loaded machine; the
+  // search itself is no slower — a timing flake, removed 2026-11-09)
+  await dora.eval(`transientBanner("a short message", 60000), true`);
   await locate(dora);
   v = await view(dora);
   check(Math.abs(v.zoom - (await widest(dora))) < 1e-6, "the widest zoom", v);
@@ -235,10 +231,14 @@ await journey("findnearest: the map shows you the nearest", async (browser) => {
   await sam.click("btn-hand");
   await sam.waitFor("!state.handRaised", "Sam's ✋ down");
   await drag(sam);
+  // (new searches counted as they start — the search number also moves when
+  // something merely stops one, as the tap's own map move does)
+  await sam.eval(`(() => { window.__fn = 0; window.__fn0 = findNearest; findNearest = (...a) => (window.__fn++, window.__fn0(...a)); return true; })()`);
   await locate(sam);
   v = await view(sam);
   check(v.zoom >= 15, "zoom 15 or closer", v);
   check(await onYou(sam), "centred on Sam");
-  check(await sam.eval("nearSeq > 0 && !nearLooking && !nobodyNear"), "no search");
+  check(await sam.eval(`window.__fn === 0 && !nearLooking && !nobodyNear`), "no search (none started by this tap)", await sam.eval("window.__fn"));
+  await sam.eval(`(findNearest = window.__fn0, true)`);
 });
 

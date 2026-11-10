@@ -328,7 +328,9 @@ function situationBanner() {
         : t("Picking up {name} · tap 🧭 to navigate", { name: peer.name });
   }
   // looked around you, nobody yet (findNearest) — until someone shows up
-  const nobody = nobodyNear && !!HoodNearby.lookingFor(state);
+  // (only about whom you look for NOW: a reconnect can make a rider who was
+  // told "nobody" an online driver — that line was about cars)
+  const nobody = nobodyNear && nobodyType === HoodNearby.lookingFor(state);
   if (state.mode === "driver" && state.online)
     return nobody ? t("🟢 You're online · nobody nearby yet") : t("🟢 You're online");
   if (state.mode === "rider" && state.handRaised)
@@ -1016,6 +1018,8 @@ function tabStorage() {
 // Told live on the user channel, or as the answer to any join of a socket
 // that came back after a newer choice.
 function onSessionMoved() {
+  // (nothing looks on behind the cover)
+  stopFindNearest();
   if (socket) socket.disconnect();
   showSessionMoved();
 }
@@ -2690,7 +2694,25 @@ function rememberView() {
   HoodViewStore.save(storageOrNull(), state.realUser.id, { lng: c.lng, lat: c.lat, zoom: map.getZoom() });
 }
 
+// your blue dot on the map, drawn UNDER everyone else's marker (owner,
+// 2026-11-09): markers stack in the order they're added, and the dot comes
+// with your first reading — after cars already drawn; so it goes in first,
+// straight after the map's own picture. A car right by you is never hidden
+// by it (find the nearest counts what you can see).
+function showMe() {
+  meMarker.addTo(map);
+  map.getCanvas().after(meMarker.getElement());
+}
+
 function initMap() {
+  // the phone's own edges the page is drawn under (find the nearest counts
+  // them as covers — nearCovers): read from this element's padding
+  if (!document.getElementById("safe-probe")) {
+    const probe = document.createElement("div");
+    probe.id = "safe-probe";
+    probe.setAttribute("aria-hidden", "true");
+    document.body.appendChild(probe);
+  }
   // where it opens: the area you last used here, else the placeholder (a
   // location reading then centres it on you — onReading)
   const start = HoodViewStore.startView(
@@ -2732,7 +2754,7 @@ function initMap() {
   // your blue dot appears only once a real reading says where you are —
   // never at the placeholder (it would claim you're in Manhattan)
   meMarker = new maplibregl.Marker({ element: el }).setLngLat([state.me.lng, state.me.lat]);
-  if (DEMO) meMarker.addTo(map);
+  if (DEMO) showMe();
 
   map.on("click", (e) => {
     if (state.pinArmed) placePin({ lat: e.lngLat.lat, lng: e.lngLat.lng });
@@ -2747,9 +2769,12 @@ function initMap() {
   // only gestures carry an originalEvent (a camera move of the app's doesn't)
   map.on("movestart", (e) => {
     if (e.originalEvent) movedByYou = true;
+    // (a ◎ tap still waiting for its reading: your own drag or pinch cancels
+    // it — the app's own moves, a resize, don't)
+    if (e.originalEvent && !DEMO) loc.cancelCentre();
     // any move but find-the-nearest's own ends it (and its "nobody nearby
     // yet": what's on screen no longer says who's near you)
-    if (!e.nearSearch) stopFindNearest();
+    if (!e.nearSearch) movedByHand();
   });
 
   if (DEMO) {
@@ -2792,19 +2817,21 @@ const loc = HoodLocator.create({
     state: () => state,
     onReading(pos, { first, centre }) {
       meMarker.setLngLat([pos.lng, pos.lat]);
-      if (first) meMarker.addTo(map);
+      if (first) showMe();
       if (centre) centreOnYou(pos);
       // the first reading (allowed already at load, a resumed shift, a tap):
       // the map comes to you — unless you've moved it yourself (online or
       // ✋ up: the nearest found too)
       if (first && !centre && !movedByYou) {
         if (HoodNearby.lookingFor(state)) findNearest(pos);
-        else map.easeTo({ center: [pos.lng, pos.lat], zoom: INTENT_ZOOM });
+        else map.easeTo({ center: [pos.lng, pos.lat], zoom: usualZoom(pos) });
       }
     },
     onGood(pos) {
       state.me = pos;
       state.haveFix = true;
+      goodSeen = true;
+      nearbyMoved(pos);
       pushDriverUpdate();
       pushRidePos();
     },
@@ -3120,6 +3147,9 @@ function openChatList() {
 
 function closeChat() {
   $("chat").classList.add("hidden");
+  // the keyboard goes with it: its text box no longer focused (find the
+  // nearest counts the keyboard's area only while you type — nearCovers)
+  if (document.activeElement === $("chat-input")) $("chat-input").blur();
   pruneEmptyChats();
   refreshControls();
 }
@@ -4166,24 +4196,143 @@ $("btn-hand").addEventListener("click", () => {
 // drivers see the hands around them and riders the cars around them
 const INTENT_ZOOM = 14;
 
-// ===== Find the nearest (nearby.js; owner, 2026-11-07, step by step 2026-11-09) =====
+// ===== Find the nearest (nearby.js; owner, 2026-11-07, step by step and the box rule 2026-11-09) =====
 // Go online, ✋ up, or the locate button while either is on: centred on
-// you at the usual view (INTENT_ZOOM), then out half a level at a time —
-// waiting at each step for the server's answer for that view, however long
-// it takes (a reconnect too) — until anyone you're looking for shows,
-// clear of the banner and buttons. It stays there: no zooming back in, so
-// the others around show too. Nobody even at the widest view that still
-// shows people one by one: it stays there and the banner adds "nobody
-// nearby yet" until someone shows up on screen. Only what the map already
-// shows is used (no "nearest" question to the server). Any other move of
-// the map — yours, or the app's — ends it; so does a view the server
-// refuses for good (it would never be answered).
-// what covers the map's edges (px): the banner on top, the buttons below
-const NEAR_PAD = { top: 130, bottom: 120, left: 40, right: 40 };
+// you at the usual view (INTENT_ZOOM — closer in on a screen so big it
+// shows counts there: markerStartZoom; no search at all on one that shows
+// counts at every zoom), then out half a level at a time — waiting at each
+// step for the server's answer for that view, drawn, however long it takes
+// (a reconnect too), and while a drawer or form hides the map — until
+// anyone you're looking for is in sight: their whole marker on the screen,
+// under nothing drawn over the map (the box rule, HoodNearby.inSight). No
+// zooming back in, so the others around show too. Nobody even at the widest
+// view that still shows people one by one: the banner adds "nobody nearby
+// yet" until someone comes into sight. What it said stays true over time:
+// someone it found gone a while (the back-off: 5, 10, 20… s, ±20%), or
+// you moved 500 m — it looks again, outward from the zoom the map is at:
+// the map never zooms in by itself, only your tap gives a fresh close-up
+// (owner, 2026-11-10; coming back to the app searches nothing). Only what the map already shows is used (no "nearest"
+// question to the server). Any other move of the map — yours, or the app's
+// — ends it; so does a view the server refuses for good, or the screen
+// changing size mid-search.
+// What covers the map (owner, 2026-11-09: "if you can see it on the map, it
+// counts" — the box rule, HoodNearby.inSight): everything that can sit over
+// the map while you look — a code test checks this list against the page
+// and against what the app adds itself. Only what's showing counts; each is
+// its box, measured where it is now. Each entry is what you SEE: the bottom
+// bar is a see-through row across the screen — its buttons are the covers,
+// one by one, not the row. The map's own controls (its credits) cover too.
+// Your own blue dot doesn't: it's drawn under everyone (showMe — an 18 px
+// dot under a 44 px car: the car is in plain sight). A solid ring drawn
+// round a cover (the raised ✋'s yellow ring, a focus outline) is part of
+// it: its box grows by the ring (HoodNearby.ringReach).
+const NEAR_COVERS = [
+  "#btn-account",
+  ".topbar-title",
+  "#btn-mode",
+  "#banner",
+  "#update-available",
+  "#btn-locate",
+  "#bottom-controls > *",
+  "#share-location",
+  "#peer-card",
+  "#pile-sheet",
+  "#chat",
+  ".maplibregl-ctrl",
+];
+// a single marker's half-size (a group's is measured: it's wider)
+const NEAR_HALF = { x: 22, y: 22 };
+// the phone's safe-area insets (px): the padding of #safe-probe, which is
+// env(safe-area-inset-*) (styles.css) — made at start (initMap)
+function safeInsets() {
+  const el = document.getElementById("safe-probe");
+  if (!el) return { top: 0, bottom: 0, left: 0, right: 0 };
+  const cs = getComputedStyle(el);
+  return { top: parseFloat(cs.paddingTop) || 0, bottom: parseFloat(cs.paddingBottom) || 0, left: parseFloat(cs.paddingLeft) || 0, right: parseFloat(cs.paddingRight) || 0 };
+}
+function nearCovers() {
+  const m = $("map").getBoundingClientRect();
+  const covers = [];
+  for (const sel of NEAR_COVERS)
+    for (const el of document.querySelectorAll(sel)) {
+      if (el.closest(".hidden")) continue;
+      const b = el.getBoundingClientRect();
+      if (!b.width || !b.height) continue;
+      const g = HoodNearby.ringReach(getComputedStyle(el));
+      covers.push({ top: b.top - m.top - g, bottom: b.bottom - m.top + g, left: b.left - m.left - g, right: b.right - m.left + g });
+    }
+  // the phone's own edges the page is drawn under (viewport-fit=cover: the
+  // notch, the status bar, the home bar — #safe-probe's padding is them)
+  const inset = safeInsets();
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  const strip = (top, bottom, left, right) => covers.push({ top: top - m.top, bottom: bottom - m.top, left: left - m.left, right: right - m.left });
+  if (inset.top) strip(0, inset.top, 0, W);
+  if (inset.bottom) strip(H - inset.bottom, H, 0, W);
+  if (inset.left) strip(0, H, 0, inset.left);
+  if (inset.right) strip(0, H, W - inset.right, W);
+  // what the visible area leaves out (the on-screen keyboard over the
+  // bottom, on a phone that doesn't shrink the page for it) — only while
+  // you type (the keyboard is up only then: iOS 26 can report a leftover
+  // keyboard area after it closes), or the page pinched in
+  const vv = window.visualViewport;
+  const field = document.activeElement;
+  // (a text box in something closed doesn't count — a browser can leave
+  // the focus there)
+  const typing = !!field && !field.closest(".hidden") && field.matches("input, textarea, select, [contenteditable]:not([contenteditable='false'])");
+  if (vv && (typing || vv.scale > 1.01)) {
+    if (vv.offsetTop > 0.5) strip(0, vv.offsetTop, 0, W);
+    if (vv.offsetTop + vv.height < H - 0.5) strip(vv.offsetTop + vv.height, H, 0, W);
+    // (the page pinched sideways on a desktop trackpad: its sides too)
+    if (vv.offsetLeft > 0.5) strip(0, H, 0, vv.offsetLeft);
+    if (vv.offsetLeft + vv.width < W - 0.5) strip(0, H, vv.offsetLeft + vv.width, W);
+  }
+  return covers;
+}
+// the map out of sight: a drawer or a form over all of it, or the "Use
+// here" cover — nobody can be seen on it then
+function mapOutOfSight() {
+  // (one that's gone from the page is simply not open — never an error)
+  const shown = (id, open) => {
+    const el = document.getElementById(id);
+    return !!el && (open ? el.classList.contains("open") : !el.classList.contains("hidden"));
+  };
+  const onScreen = (id) => {
+    const el = document.getElementById(id);
+    if (!el || getComputedStyle(el).visibility === "hidden") return false;
+    const b = el.getBoundingClientRect();
+    return b.right > 0.5 && b.left < window.innerWidth - 0.5 && b.width > 0;
+  };
+  // Settings: open, or still sliding away over the map (0.2 s) — the map
+  // isn't back until it's gone
+  if (shown("settings-sheet", true) || onScreen("settings-sheet") || document.getElementById("session-moved")) return true;
+  return ["car-sheet", "nav-sheet", "lang-sheet"].some((id) => shown(id, false));
+}
 const NEAR_STEP = 0.5; // each step: half a zoom level wider (twice the ground)
 const NEAR_STEP_MS = 300; // each step's zoom: quick, the steps read as one move
+// what the search said stays true over time (owner, 2026-11-09): about where
+// you are now, not where it once looked —
+// you've moved this far from where it looked ("nobody nearby yet", or it
+// found someone): looked again from here
+const NEAR_MOVED_M = 500;
+// a search waiting behind a drawer or a form: how often it looks (ms)
+const NEAR_HIDDEN_MS = 250;
+// the widest step worked out for a screen this much bigger on each side
+// (px): the map's real view may be a pixel wider than measured
+const NEAR_EDGE_PX = 2;
+// (everyone it found gone from sight a while, the map as it left it: looked
+// again — 5 s the first time, longer each time it keeps happening, with
+// jitter: HoodNearby.researchWait, stillSeen)
+// …and someone found in sight this long without a break: the back-off
+// starts over (owner, 2026-11-09)
+const NEAR_SETTLED_MS = 60000;
+// …"without a break": the watch looks once a second — longer than this
+// between two looks (a phone locked: its timers frozen; a laptop asleep),
+// nobody was watching: the minute starts over
+const NEAR_LOOK_GAP_MS = 3000;
 let nearSeq = 0; // the search under way; a newer number ends an older one
-let nearLooking = false; // looking (stepping out, waiting for answers)
+let nearLooking = false; // looking (stepping out, waiting for answers) — what the tests watch (test_browser/findnearest*.mjs)
+let nearOutward = false; // …and the search under way only steps OUT from where the map was (a look-again)
 let nobodyNear = false; // looked: nobody — the banner says so
 
 function mapSize() {
@@ -4191,18 +4340,76 @@ function mapSize() {
   return { w: c.clientWidth, h: c.clientHeight };
 }
 
-// who the map has now, of the kind you're looking for: where it shows them
+// the markers the map has DRAWN now, of the kind you're looking for (only
+// what's drawn can be seen): where each is drawn, and how far it reaches
+// each side — a group is wider, its "+N" badge pokes out of one corner
 function peopleOnMap(type) {
+  const drawn = (marker) => {
+    const el = marker.getElement();
+    if (!el.isConnected) return [];
+    const at = marker.getLngLat();
+    return [{ pos: { lat: at.lat, lng: at.lng }, half: lazyReach(el) }];
+  };
   if (DEMO) {
-    if (type === "driver") return drivers.map((d) => ({ pos: d.pos }));
-    return mockHand ? [{ pos: mockHand.pos }] : [];
+    if (type === "driver") return drivers.filter((d) => d.visible).flatMap((d) => drawn(d.marker));
+    return mockHand && mockHand.visible ? drawn(mockHand.marker) : [];
   }
-  return [...realEntries.values()].filter((e) => e.type === type).map((e) => ({ pos: e.peer.pos }));
+  const out = [];
+  pileMarkers.forEach((pm) => {
+    if (pm.type === type) out.push(...drawn(pm.marker));
+  });
+  return out;
+}
+// its reach, measured only when asked for (once): the rule asks only for a
+// marker whose middle is on the screen — a crowd far off costs nothing
+function lazyReach(el) {
+  let m = null;
+  const get = (k, xy) => {
+    m = m || markerReach(el);
+    return m[k] ?? m[xy];
+  };
+  // (["t"]: written so, a plain t() reads as the translation helper)
+  return {
+    get l() { return get("l", "x"); },
+    get r() { return get("r", "x"); },
+    get ["t"]() { return get("t", "y"); },
+    get b() { return get("b", "y"); },
+  };
+}
+// a drawn marker's reach from its middle, each side, everything it draws
+// included (HoodNearby.markerReach); not laid out: a single marker's
+function markerReach(el) {
+  const b = el.getBoundingClientRect();
+  // (not laid out: nothing of it can be seen — never counts as in sight)
+  if (!b.width || !b.height) return { x: NaN, y: NaN };
+  return HoodNearby.markerReach(b, [...el.querySelectorAll("*")].map((k) => k.getBoundingClientRect()));
 }
 
+// while "nobody nearby yet" shows, looked at again once a second (nearbyArrived):
+// a card or the chat closing, the banner shrinking, a drawer closing, can
+// show someone who was there all along
+let nobodyCheck = null;
+let nearAt = null; // where the search looked from
+let nobodyAt = null; // …when it said "nobody nearby yet"
+// now, on both clocks: the steady one (stops while a phone sleeps) and the
+// wall one (can be set back) — time passed is whichever says more
+const clocks = () => ({ p: performance.now(), d: Date.now() });
+let foundWatch = null; // { type, goneAt, seenAt, lookedAt, wait }: it found someone; watched while the map stays as it left it
+let foundCheck = null;
+let goodSeen = false; // a good reading came at least once (state.me is real)
+let researches = 0; // looked again (everyone found gone) this many times running
+// [0, 1): the jitter's random (a test can pin it)
+let nearRand = () => Math.random();
+// what "nobody nearby yet" is about: cars or ✋ (a reload can change what
+// you look for without ending the search's line — then it clears)
+let nobodyType = null;
 function setNobodyNear(on) {
   if (nobodyNear === on) return;
   nobodyNear = on;
+  nobodyType = on ? HoodNearby.lookingFor(state) : null;
+  nobodyAt = on ? nearAt : null;
+  clearInterval(nobodyCheck);
+  nobodyCheck = on ? setInterval(nearbyArrived, 1000) : null;
   if (!bannerTimer) setBanner(contextBanner());
 }
 
@@ -4210,46 +4417,208 @@ function setNobodyNear(on) {
 function stopFindNearest() {
   nearSeq++;
   nearLooking = false;
+  foundWatch = null;
+  clearInterval(foundCheck);
+  foundCheck = null;
   setNobodyNear(false);
 }
 
-function findNearest(at) {
+// where to look again from: where you are, if a good reading says so —
+// else where the search last looked (never the placeholder the app starts
+// with before any good reading: that's nowhere near you)
+const nearFrom = () => (goodSeen ? state.me : nearAt);
+
+// you've moved on (a driver driving) since the search answered — "nobody
+// nearby yet", or it found someone — or while it's still looking (its
+// first, rough reading far off a good one): looked again from where you
+// are now (it was about the place it looked from). After an answer, from
+// the zoom the map is at, outward — never zooming in by itself (owner,
+// 2026-11-10: a driver's map doesn't jump in and out every 500 m); a new
+// place: the back-off afresh. Still looking: it starts again as it was
+// asked — a fresh search (your tap) from the start, a look-again outward.
+function nearbyMoved(pos) {
+  const from = nobodyNear ? nobodyAt : foundWatch || nearLooking ? nearAt : null;
+  if (!from) return;
+  if (HoodNearby.metersBetween(from, pos) <= NEAR_MOVED_M) return;
+  if (nearLooking && !nearOutward) return findNearest(pos);
+  researches = 0;
+  findNearest(pos, { outFrom: map.getZoom() });
+}
+
+// a part of the map under a panel you opened (the chat, a card, a group's
+// list): what's under it isn't "gone" — the watch's count starts over
+function panelOpen() {
+  return ["chat", "peer-card", "pile-sheet"].some((id) => { const el = document.getElementById(id); return !!el && !el.classList.contains("hidden"); });
+}
+
+// the search found someone: while the map stays as it left it, everyone it
+// could find gone from sight a while (researchWait — they went offline, drove
+// off) — it looks again. Any move of yours ends the watch (stopFindNearest).
+// Someone found in sight a whole minute without a break: the back-off
+// starts over (NEAR_SETTLED_MS).
+function stillSeen() {
+  if (!foundWatch || nearLooking) return;
+  // a gap since the last look (NEAR_LOOK_GAP_MS): not watched meanwhile
+  const now = clocks();
+  if (foundWatch.lookedAt && HoodNearby.elapsed(foundWatch.lookedAt, now) > NEAR_LOOK_GAP_MS) foundWatch.seenAt = null;
+  foundWatch.lookedAt = now;
+  if (HoodNearby.lookingFor(state) !== foundWatch.type) return stopFindNearest();
+  if (mapOutOfSight() || panelOpen()) return void (foundWatch.goneAt = foundWatch.seenAt = null);
+  // a view the server refused for good: never answered — the watch ends (as
+  // the search does)
+  if (!DEMO && worldSync.refused()) return stopFindNearest();
+  // the app in the background, or the server not answered yet (its regular
+  // resync, a reconnect: the markers come back after it; as the role you
+  // look as), or its answer not drawn yet (a car just arrived: drawn on the
+  // next frame) — this look is skipped, the count kept (a resync every
+  // minute must not start it over — nor the minute in sight below). In the
+  // background, nobody's seen: the minute in sight is over.
+  const role = foundWatch.type === "driver" ? "viewer" : "driver";
+  if (document.hidden) return void (foundWatch.seenAt = null);
+  if (!DEMO && (!worldSync.settled() || serverRole !== role || renderMarkersSoon.pending())) return;
+  // a message up a while over the top of the map: what's under it isn't
+  // "gone" — counted afresh after it
+  if (bannerTimer) return void (foundWatch.goneAt = foundWatch.seenAt = null);
+  const size = mapSize();
+  const covers = nearCovers();
+  if (peopleOnMap(foundWatch.type).some((p) => HoodNearby.inSight(map.project([p.pos.lng, p.pos.lat]), p.half || NEAR_HALF, size, covers))) {
+    foundWatch.goneAt = null;
+    foundWatch.seenAt = foundWatch.seenAt || clocks();
+    // in sight a whole minute without a break: whatever came and went before
+    // has settled — the back-off starts over (5 s next time, not 40)
+    if (researches && HoodNearby.elapsed(foundWatch.seenAt, clocks()) >= NEAR_SETTLED_MS) {
+      researches = 0;
+      foundWatch.wait = HoodNearby.researchWait(0, nearRand());
+    }
+    return;
+  }
+  foundWatch.seenAt = null;
+  foundWatch.goneAt = foundWatch.goneAt || clocks();
+  // (longer each time it keeps happening — a car at the edge, coming and
+  // going — with jitter: HoodNearby.researchWait)
+  if (HoodNearby.elapsed(foundWatch.goneAt, clocks()) < foundWatch.wait) return;
+  const again = researches + 1;
+  // from the zoom the map is at, outward: never zooming back in
+  findNearest(nearFrom(), { outFrom: map.getZoom() });
+  researches = again;
+}
+
+// watched from now: everyone of `type` gone from sight a while — looked again
+function watchFound(type) {
+  foundWatch = { type, goneAt: null, seenAt: null, lookedAt: null, wait: HoodNearby.researchWait(researches, nearRand()) };
+  clearInterval(foundCheck);
+  foundCheck = setInterval(watchLook, 1000);
+}
+
+// the watch's once-a-second look: anything thrown ends it cleanly (never
+// the same failure once a second for ever)
+function watchLook() {
+  try {
+    stillSeen();
+  } catch (e) {
+    stopFindNearest();
+    console.error("find the nearest (watch):", e);
+  }
+}
+
+// any move of the map but the search's own (a drag, a pinch, a zoom of
+// yours — or the app's own moves, a resize): the search and its watch end,
+// and the next time starts afresh (no back-off carried over)
+function movedByHand() {
+  researches = 0;
   stopFindNearest();
+}
+
+// `outFrom`: looking again from the zoom the map is at — only its steps
+// that wide or wider (a found watch's look again: never zooming back in);
+// any other search starts the back-off afresh
+function findNearest(at, { outFrom = null } = {}) {
+  stopFindNearest();
+  if (outFrom === null) researches = 0;
+  nearOutward = outFrom !== null;
   const type = HoodNearby.lookingFor(state);
   if (!type || !map) return;
   const seq = nearSeq;
+  nearAt = at;
   const size = mapSize();
-  const widestZoom = HoodNearby.widestMarkerZoom({
-    viewport: HoodViewport,
-    h3,
-    center: at,
-    size,
-    rungs: [H3_RES, ...AGG_RESES],
-    budget: MAX_WATCHED_CELLS,
-    maxZoom: INTENT_ZOOM,
-  });
-  const steps = HoodNearby.zoomSteps(INTENT_ZOOM, widestZoom, NEAR_STEP);
-  const anyone = (zoom) => HoodNearby.anyoneAt({ me: at, people: peopleOnMap(type), size, pad: NEAR_PAD, zoom });
+  // (the zooms are worked out for a screen NEAR_EDGE_PX bigger each side:
+  // the map's real view can be a pixel wider than the whole-pixel size —
+  // at the first and the widest step it must still show people one by
+  // one, never tip over into counts)
+  const ladder = { viewport: HoodViewport, h3, center: at, size: { w: size.w + 2 * NEAR_EDGE_PX, h: size.h + 2 * NEAR_EDGE_PX }, rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS };
+  // the usual view — or, on a screen so big it shows counts there (a
+  // 2560×1440 monitor), the first zoom closer in that shows people one by one
+  const startZoom = HoodNearby.markerStartZoom({ ...ladder, maxZoom: INTENT_ZOOM });
+  // a screen that can't show people one by one at any zoom (counts even
+  // fully in — an 8K monitor at 100%): no search, nothing said — the map
+  // still comes to you (as closer in as it goes)
+  if (!HoodNearby.showsMarkers(HoodViewport, h3, HoodNearby.screenAt(at, startZoom, ladder.size), ladder.rungs, ladder.budget)) {
+    map.easeTo({ center: [at.lng, at.lat], zoom: startZoom });
+    return;
+  }
+  const widestZoom = HoodNearby.widestMarkerZoom({ ...ladder, maxZoom: startZoom });
+  const all = HoodNearby.zoomSteps(startZoom, widestZoom, NEAR_STEP);
+  const steps = outFrom === null ? all : HoodNearby.stepsFrom(all, outFrom);
+  // the screen and what covers it, measured now (a banner may have grown,
+  // the phone turned, the address bar slid)
+  const anyone = (zoom) => HoodNearby.anyoneAt({ me: at, people: peopleOnMap(type), size: mapSize(), covers: nearCovers(), zoom, half: NEAR_HALF });
   // the camera's own moves carry the search's number (the movestart
   // listener: any other move ends the search)
   const camera = (zoom) => map.easeTo({ center: [at.lng, at.lat], zoom, duration: NEAR_STEP_MS }, { nearSearch: seq });
   // the server has answered for the view the map watches once it stopped
   // moving, as the role you're looking as (an online driver: ✋)
   const role = type === "driver" ? "viewer" : "driver";
-  const answered = () => DEMO || (worldSync.settled() && serverRole === role);
+  // — and its answer DRAWN (the markers are drawn on the next frame: only
+  // what's drawn counts)
+  const answered = () => DEMO || (worldSync.settled() && serverRole === role && !renderMarkersSoon.pending());
   let i = 0;
   nearLooking = true;
-  camera(steps[0]);
+  // (its first move too: anything thrown — the search ends cleanly)
+  try {
+    camera(steps[0]);
+  } catch (e) {
+    stopFindNearest();
+    console.error("find the nearest:", e);
+    return;
+  }
+  // anything thrown in a look (a marker gone mid-measure…): the search ends
+  // cleanly — never left "looking" for ever
   const check = () => {
+    try {
+      look();
+    } catch (e) {
+      if (seq === nearSeq) stopFindNearest();
+      console.error("find the nearest:", e);
+    }
+  };
+  const look = () => {
     if (seq !== nearSeq) return;
+    // the screen changed size (turned, a window resized) mid-search: its
+    // steps were worked out for the old size — it ends, as the map's own
+    // resize ends it when the map is still (a "move" not its own)
+    const now = mapSize();
+    if (now.w !== size.w || now.h !== size.h) return stopFindNearest();
     // stopped looking meanwhile: ✋ down and going offline end the search
     // themselves (a newer nearSeq) — a ride starting or ending, a request,
     // switching between rider and driver don't: this does
     if (HoodNearby.lookingFor(state) !== type) return stopFindNearest();
     // a view the server refused for good is never answered
     if (!DEMO && worldSync.refused()) return stopFindNearest();
+    // a drawer or a form over the whole map (Settings, the car form…): the
+    // search waits, where it is, until the map is back in sight — nobody
+    // behind it can be seen (owner, 2026-11-09)
+    // (behind a drawer or a form: looked at 4 times a second, not 10 —
+    // battery; it carries on within a quarter second of the map's return)
+    if (mapOutOfSight()) return setTimeout(check, NEAR_HIDDEN_MS);
     if (map.isMoving() || !answered()) return setTimeout(check, 100);
     if (anyone(steps[i])) {
+      nearLooking = false;
+      return watchFound(type);
+    }
+    // the map showing counts here, not people one by one (it tipped over
+    // anyway): nobody can be told from counts — it ends there, saying
+    // nothing (never "nobody nearby yet" over counts that show people)
+    if (!DEMO && worldSync.wantedAggSize() > 0 && worldSync.wantedGeoSize() === 0) {
       nearLooking = false;
       return;
     }
@@ -4263,21 +4632,38 @@ function findNearest(at) {
   setTimeout(check, 100);
 }
 
-// "nobody nearby yet" holds until someone shows up on screen (the map
-// stays where it is)
+// "nobody nearby yet" holds until someone comes into sight (the map stays
+// where it is) — then they're watched as a find is; coming back to the app
+// after a while is no different (owner, 2026-11-10: the map never zooms in
+// by itself — only your tap gives a fresh close-up). (It looks again by
+// itself when you've moved 500 m — nearbyMoved.)
+// It checks less than the watch does (no waiting for the server, the
+// drawing, the background or a message): it only ever CLEARS the line, and
+// only for someone drawn in sight — were that marker stale, the watch that
+// starts then corrects it.
 function nearbyArrived() {
   if (!nobodyNear) return;
+  // (what you look for changed — a ride, offline, the other mode: the line
+  // is over, cleared even in the background: nothing stale kept)
   const type = HoodNearby.lookingFor(state);
-  if (!type) return setNobodyNear(false);
-  // on screen = clear of the banner and the buttons (NEAR_PAD), as the
-  // search itself counts: someone under the banner cleared the line while
-  // the map stayed wide and they stayed hidden (owner, 2026-11-08)
-  const { w, h } = mapSize();
-  const clear = (p) => {
-    const pt = map.project([p.pos.lng, p.pos.lat]);
-    return pt.x >= NEAR_PAD.left && pt.x <= w - NEAR_PAD.right && pt.y >= NEAR_PAD.top && pt.y <= h - NEAR_PAD.bottom;
-  };
-  if (peopleOnMap(type).some(clear)) setNobodyNear(false);
+  if (!type || type !== nobodyType) return setNobodyNear(false);
+  // (the app in the background: nobody's looking — battery; once shown,
+  // looked at again within a second)
+  if (document.hidden) return;
+  // (the map out of sight — a drawer, a form: nobody's seen; once a second
+  // it's looked at again)
+  if (mapOutOfSight()) return;
+  // in sight as the search itself counts (HoodNearby.inSight, the same
+  // boxes): someone under the banner never cleared the line (owner,
+  // 2026-11-08)
+  const size = mapSize();
+  const covers = nearCovers();
+  const clear = (p) => HoodNearby.inSight(map.project([p.pos.lng, p.pos.lat]), p.half || NEAR_HALF, size, covers);
+  if (!peopleOnMap(type).some(clear)) return;
+  setNobodyNear(false);
+  // someone came into sight: watched as a find is (gone again a while —
+  // looked again)
+  watchFound(type);
 }
 
 function setHand(up) {
@@ -4651,15 +5037,25 @@ $("btn-arrived").addEventListener("click", declareArrived);
 // ===== Locate =====
 $("btn-locate").addEventListener("click", () => {
   if (DEMO) return centreOnYou(state.me);
-  // centre on your last reading now (with none yet, the reading centres
-  // the map when it arrives)
-  if (loc.tapLocate()) centreOnYou(loc.best);
+  // centre on where you are now (with none yet, the reading centres the map
+  // when it arrives). Looking for someone: from your last GOOD reading if
+  // there was one — never a rough one after it (indoors: the search would
+  // look from kilometres off). Looking for nobody: where your blue dot is
+  // (the latest reading) — the map always shows the dot
+  if (loc.tapLocate()) centreOnYou(HoodNearby.lookingFor(state) && goodSeen ? state.me : loc.best);
 });
 
 // online or ✋ up: the nearest found too (findNearest); else up close
 function centreOnYou(at) {
   if (HoodNearby.lookingFor(state)) findNearest(at);
-  else map.easeTo({ center: [at.lng, at.lat], zoom: Math.max(map.getZoom(), 15) });
+  else map.easeTo({ center: [at.lng, at.lat], zoom: Math.max(map.getZoom(), 15, usualZoom(at)) });
+}
+
+// the usual view here (INTENT_ZOOM) — closer in on a screen so big it shows
+// counts there (a 2560×1440 monitor): the first zoom that shows people one
+// by one (owner, 2026-11-09)
+function usualZoom(at) {
+  return HoodNearby.markerStartZoom({ viewport: HoodViewport, h3, center: at, size: mapSize(), rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS, maxZoom: INTENT_ZOOM });
 }
 
 // ===== Chat button =====

@@ -153,7 +153,11 @@ await journey("lightreload2: reconnects, failures, a refused message, a ride, a 
     await sam.offline(false);
   }
   check(!(await sam.eval(`${chatOf(annId)}.failed`)), "never failed");
-  const size = await sam.eval(`(() => { const e = performance.getEntriesByType("resource").filter((r) => r.name.includes("/api/chat")).at(-1); return e ? e.transferSize : null; })()`);
-  check(size > 300 * 1024, "a big answer really came (over 300 KB on the wire)", size);
+  const got = await sam.eval(`(() => { const e = performance.getEntriesByType("resource").filter((r) => r.name.includes("/api/chat")).at(-1); return e ? { size: e.transferSize, ms: e.responseEnd - e.requestStart } : null; })()`);
+  const size = got && got.size;
+  check(size > 300 * 1024, "a big answer really came (over 300 KB on the wire)", got);
+  // …and the connection really was slow: it took about as long as ~200 KB/s
+  // needs (the slowing proven to have worked, not assumed)
+  check(got.ms >= (size / 204800) * 1000 * 0.7, "it came at the slow speed (the slowing really on)", got);
   await ann.close();
 });

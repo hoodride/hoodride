@@ -681,3 +681,24 @@ test("connection: up while up says nothing; LOST_AFTER_MS is a couple of seconds
   assert.deepEqual(changes, []);
   assert.ok(S.LOST_AFTER_MS >= 1000 && S.LOST_AFTER_MS <= 5000);
 });
+
+// find the nearest waits on settled() and stops on refused(): "slow down"
+// (rate_limited — after a group's list asked for many names, say) must make
+// it WAIT, never stop — and it carries on once the retry is answered
+test("rate_limited: not settled (the search waits), not refused (the search doesn't end) — settled once the retry is answered", () => {
+  const { clock, ch, sync } = setup();
+  sync.onJoined();
+  ch.reply(ch.last(), "ok", {});
+  sync.setWanted(set("a", "b"), set());
+  clock.advance(S.SETTLE_MS);
+  ch.reply(ch.last(), "error", { reason: "rate_limited", retry_ms: 997 });
+  assert.equal(sync.settled(), false, "slowed down: not answered yet — the search waits");
+  assert.equal(sync.refused(), false, "slowed down: not refused — the search carries on");
+  const asked = ch.pushes.length;
+  clock.advance(2000);
+  assert.ok(ch.pushes.length > asked, "asked again after the wait");
+  assert.deepEqual(ch.last().payload.geo.slice().sort(), ["a", "b"], "the same view asked for again");
+  ch.reply(ch.last(), "ok", {});
+  assert.equal(sync.settled(), true, "answered: settled");
+  assert.equal(sync.refused(), false);
+});

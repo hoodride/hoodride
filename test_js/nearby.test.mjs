@@ -16,8 +16,14 @@ const BUDGET = 110; // app.js: MAX_WATCHED_CELLS
 const NYC = { lat: 40.7154, lng: -74.0086 };
 const PHONE = { w: 390, h: 844 };
 const DESKTOP = { w: 1348, h: 851 };
-const NO_PAD = { top: 0, bottom: 0, left: 0, right: 0 };
-const PAD = { top: 130, bottom: 120, left: 40, right: 40 };
+// (step tests' covers: two simple boxes — a banner-sized one across the top,
+// a band across the bottom — standing in for whatever covers the map; the
+// box rule itself, with the app's real shapes: the in-sight tests below)
+const COVERS = [
+  { top: 0, bottom: 130, left: 0, right: PHONE.w },
+  { top: PHONE.h - 120, bottom: PHONE.h, left: 0, right: PHONE.w },
+];
+const HALF = { x: 22, y: 22 };
 
 const widest = (size, center = NYC) =>
   N.widestMarkerZoom({ viewport: V, h3, center, size, rungs: RUNGS, budget: BUDGET, maxZoom: 14 });
@@ -65,34 +71,6 @@ test("a screen that can't show markers even at the usual zoom: stays at it (neve
   assert.equal(widest(huge), 14);
 });
 
-test("fitZoom: a person exactly at the screen's edge fits at exactly that zoom", () => {
-  for (const z of [11.3, 12.5, 14]) {
-    const r = N.screenAt(NYC, z, PHONE);
-    for (const target of [
-      { lat: NYC.lat, lng: r.e },
-      { lat: NYC.lat, lng: r.w },
-      { lat: r.n, lng: NYC.lng },
-      { lat: r.s, lng: NYC.lng },
-    ])
-      assert.ok(Math.abs(N.fitZoom(NYC, target, PHONE, NO_PAD) - z) < 1e-9, `${z} ${JSON.stringify(target)}`);
-  }
-  assert.equal(N.fitZoom(NYC, NYC, PHONE, NO_PAD), Infinity, "the same spot");
-});
-
-test("fitZoom keeps them clear of the banner (top) and the buttons (bottom)", () => {
-  const z = 12;
-  const r = N.screenAt(NYC, z, PHONE);
-  // a person right at the bottom edge: with the buttons' 120 px, the map
-  // must zoom out to bring them up past the buttons
-  const bottom = { lat: r.s, lng: NYC.lng };
-  const top = { lat: r.n, lng: NYC.lng };
-  const zb = N.fitZoom(NYC, bottom, PHONE, PAD);
-  const zt = N.fitZoom(NYC, top, PHONE, PAD);
-  assert.ok(Math.abs(zb - (z + Math.log2((PHONE.h / 2 - 120) / (PHONE.h / 2)))) < 1e-6, String(zb));
-  assert.ok(Math.abs(zt - (z + Math.log2((PHONE.h / 2 - 130) / (PHONE.h / 2)))) < 1e-6, String(zt));
-  assert.ok(zt < zb, "the top's cover is bigger");
-});
-
 // someone `m` metres from NYC, `deg` degrees clockwise from north
 function at(m, deg) {
   const d = m / 6371008.8;
@@ -105,11 +83,12 @@ function at(m, deg) {
 
 // Step by step (owner, 2026-11-09): from the usual view out, half a level at
 // a time, to the widest view that still shows people one by one; it stops
-// at the first step where anyone shows (clear of the banner and buttons)
+// at the first step where anyone is in sight (their whole marker, under no
+// cover)
 // and stays there — no zooming back in, so the others around show too.
 const steps = (size = PHONE) => N.zoomSteps(14, widest(size), 0.5);
 const anyoneAt = (people, zoom, size = PHONE) =>
-  N.anyoneAt({ me: NYC, people: people.map((pos) => ({ pos })), size, pad: PAD, zoom });
+  N.anyoneAt({ me: NYC, people: people.map((pos) => ({ pos })), size, covers: COVERS, zoom, half: HALF });
 // the step the search stops at: the first with anyone, else the last
 const stopsAt = (people, size = PHONE) => {
   const zs = steps(size);
@@ -152,11 +131,11 @@ test("someone a mile or so off: the first step that shows them, not a step wider
   const far = at(2500, 0); // about 1½ miles north
   const z = stopsAt([far]);
   assert.ok(z < 14 && z >= widest(PHONE), String(z));
-  // on that screen, clear of the banner…
-  assert.ok(N.fitZoom(NYC, far, PHONE, PAD) >= z);
+  // in sight on that step…
+  assert.equal(anyoneAt([far], z), true);
   // …and not on the step before (it would have stopped there)
   const zs = steps();
-  assert.ok(N.fitZoom(NYC, far, PHONE, PAD) < zs[zs.indexOf(z) - 1]);
+  assert.equal(anyoneAt([far], zs[zs.indexOf(z) - 1]), false);
 });
 
 test("it stops for whoever shows first — two people, the step showing either", () => {
@@ -167,7 +146,7 @@ test("it stops for whoever shows first — two people, the step showing either",
   assert.equal(stopsAt([east, north]), first);
 });
 
-test("under the banner or the buttons doesn't count: they're not on screen", () => {
+test("under the banner or the buttons doesn't count: on the screen, but under a cover", () => {
   const r = N.screenAt(NYC, 14, PHONE);
   // just inside the screen's top edge, under the banner
   const hidden = { lat: NYC.lat + (r.n - NYC.lat) * 0.95, lng: NYC.lng };
@@ -190,4 +169,521 @@ test("who you're looking for: a rider with ✋ up — cars; a driver online — 
   assert.equal(L({ mode: "driver" }), null, "offline");
   assert.equal(L({ handRaised: true, ride: { status: "requested" } }), null, "in a ride");
   assert.equal(L({ mode: "driver", online: true, ride: { status: "connected" } }), null);
+});
+
+
+// "If you can see it on the map, it counts" (owner, 2026-11-09 — the box
+// rule): everything over the map is a box, measured where it is; each person
+// is the box of their marker (44×44; a group 74×44). They count when their
+// WHOLE marker is on the screen and overlaps no cover. Touching an edge is
+// fine; one pixel over isn't.
+const ONE = { x: 22, y: 22 }; // a single marker's half-size
+const GROUP = { x: 37, y: 22 }; // a group marker's
+const cover = (top, bottom, left, right) => ({ top, bottom, left, right });
+const sight = (pt, covers = [], half = ONE, size = PHONE) => N.inSight(pt, half, size, covers);
+
+test("screenPoint: me in the middle; a spot at the screen's edge lands on that edge", () => {
+  assert.deepEqual(N.screenPoint(NYC, NYC, 14, PHONE), { x: PHONE.w / 2, y: PHONE.h / 2 });
+  const r = N.screenAt(NYC, 14, PHONE);
+  const east = N.screenPoint(NYC, { lat: NYC.lat, lng: r.e }, 14, PHONE);
+  const north = N.screenPoint(NYC, { lat: r.n, lng: NYC.lng }, 14, PHONE);
+  assert.ok(Math.abs(east.x - PHONE.w) < 1e-6 && Math.abs(east.y - PHONE.h / 2) < 1e-6, JSON.stringify(east));
+  assert.ok(Math.abs(north.y) < 1e-6 && Math.abs(north.x - PHONE.w / 2) < 1e-6, JSON.stringify(north));
+  // a level wider: half as far from the middle
+  const east13 = N.screenPoint(NYC, { lat: NYC.lat, lng: r.e }, 13, PHONE);
+  assert.ok(Math.abs(east13.x - (PHONE.w / 2 + PHONE.w / 4)) < 1e-6);
+});
+
+test("in sight: the whole marker on the screen — touching an edge counts, one pixel over doesn't", () => {
+  assert.equal(sight({ x: 22, y: 400 }), true, "touching the left edge");
+  assert.equal(sight({ x: 21, y: 400 }), false, "a pixel over it");
+  assert.equal(sight({ x: PHONE.w - 22, y: 400 }), true);
+  assert.equal(sight({ x: PHONE.w - 21, y: 400 }), false);
+  assert.equal(sight({ x: 200, y: 22 }), true);
+  assert.equal(sight({ x: 200, y: 21 }), false);
+  assert.equal(sight({ x: 200, y: PHONE.h - 22 }), true);
+  assert.equal(sight({ x: 200, y: PHONE.h - 21 }), false);
+});
+
+test("in sight: overlapping a cover — even a corner of it — doesn't count; touching it does", () => {
+  const banner = cover(62, 101, 16, 374);
+  assert.equal(sight({ x: 200, y: 101 + 22 }, [banner]), true, "touching the banner's bottom");
+  assert.equal(sight({ x: 200, y: 101 + 21 }, [banner]), false, "a pixel under it");
+  // only the marker's corner under the banner's corner
+  assert.equal(sight({ x: 374 + 21, y: 101 + 21 }, [banner], ONE, { w: 500, h: 844 }), false);
+  assert.equal(sight({ x: 374 + 22, y: 101 + 21 }, [banner], ONE, { w: 500, h: 844 }), true, "beside it");
+});
+
+test("in sight: beside a cover counts — the box rule's point (the old strips ignored these)", () => {
+  // the locate button: a 48 px box in the corner
+  const locate = cover(PHONE.h - 144, PHONE.h - 96, 328, 376);
+  assert.equal(sight({ x: 300, y: PHONE.h - 120 }, [locate]), true, "level with it, beside it");
+  assert.equal(sight({ x: 340, y: PHONE.h - 120 }, [locate]), false, "under it");
+  // a desktop's chat: 640 px, centred at the bottom
+  const DESK = { w: 1280, h: 700 };
+  const chat = cover(700 - 336, 700, 320, 960);
+  assert.equal(sight({ x: 200, y: 600 }, [chat], ONE, DESK), true, "beside the chat");
+  assert.equal(sight({ x: 640, y: 600 }, [chat], ONE, DESK), false, "under it");
+});
+
+test("in sight: the chat open past the middle (a shorter phone) — the top half still counts", () => {
+  const chat = cover(400, PHONE.h, 0, PHONE.w);
+  assert.ok(chat.top < PHONE.h / 2, "(it reaches past the middle)");
+  assert.equal(sight({ x: 195, y: 300 }, [chat]), true, "above it");
+  assert.equal(sight({ x: 195, y: PHONE.h / 2 }, [chat]), false, "where I am, under it");
+});
+
+test("in sight: a group marker is wider — a group a pixel too close to a cover doesn't count", () => {
+  const card = cover(500, 800, 100, 290);
+  assert.equal(sight({ x: 100 - 22, y: 600 }, [card], ONE), true, "one car touching the card's left");
+  assert.equal(sight({ x: 100 - 22, y: 600 }, [card], GROUP), false, "a group there overlaps it");
+  assert.equal(sight({ x: 100 - 37, y: 600 }, [card], GROUP), true);
+});
+
+test("anyoneAt: anyone among several — each with their own marker size; the hidden ones don't count", () => {
+  const r = N.screenAt(NYC, 14, PHONE);
+  // a spot `y` px from the screen's top, straight above or below me (Mercator)
+  const atY = (y) => {
+    const merc = (lat) => Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360));
+    const m = merc(r.n) + (merc(r.s) - merc(r.n)) * (y / PHONE.h);
+    return { lat: (Math.atan(Math.sinh(m)) * 180) / Math.PI, lng: NYC.lng };
+  };
+  const banner = cover(62, 101, 16, 374);
+  const bar = cover(PHONE.h - 68, PHONE.h - 10, 0, PHONE.w);
+  const covers = [banner, bar];
+  const at = (people) => N.anyoneAt({ me: NYC, people, size: PHONE, covers, zoom: 14, half: ONE });
+  const underBanner = { pos: atY(110) };
+  const underBar = { pos: atY(PHONE.h - 40) };
+  const clear = { pos: atY(300) };
+  assert.equal(at([underBanner, underBar]), false);
+  assert.equal(at([underBanner, underBar, clear]), true);
+  // their own size: a group just clear for one car but not for its width
+  // each person's own marker size: beside a cover ending 23 px left of
+  // them, one car is clear — a group (74 px wide) overlaps it
+  const side = [cover(0, PHONE.h, 0, PHONE.w / 2 - 23)];
+  const beside = (half) => N.anyoneAt({ me: NYC, people: [{ pos: atY(300), half }], size: PHONE, covers: side, zoom: 14, half: ONE });
+  assert.equal(beside(ONE), true, "one car beside it");
+  assert.equal(beside(GROUP), false, "a group there overlaps it");
+  assert.equal(beside(undefined), true, "no size given: a single marker's");
+  assert.equal(at([{ pos: atY(PHONE.h - 68 - 22), half: ONE }]), true, "one car touching the bar");
+  assert.equal(at([{ pos: atY(PHONE.h - 68 - 21), half: ONE }]), false);
+});
+
+test("the old fixed numbers are gone: spots they got wrong, the box rule gets right", () => {
+  const OLD = { top: 130, bottom: 120, left: 40, right: 40 };
+  const oldSays = (pt) => pt.x >= OLD.left && pt.x <= PHONE.w - OLD.right && pt.y >= OLD.top && pt.y <= PHONE.h - OLD.bottom;
+  const banner = cover(62, 101, 16, 374);
+  const locate = cover(PHONE.h - 144, PHONE.h - 96, 328, 376);
+  const covers = [banner, locate];
+  for (const [pt, want] of [
+    [{ x: 200, y: 125 }, true], // just clear below a one-line banner: old said no
+    [{ x: 300, y: PHONE.h - 110 }, true], // beside the locate button, low: old said no
+    [{ x: 340, y: PHONE.h - 160 }, false], // the marker's bottom under the locate button: old said yes
+    [{ x: 30, y: 400 }, true], // near the side, wholly on screen: old said no
+  ]) {
+    assert.equal(sight(pt, covers), want, JSON.stringify(pt));
+    assert.notEqual(oldSays(pt), want, `(the old numbers got ${JSON.stringify(pt)} wrong)`);
+  }
+});
+
+test("broken data never counts as seen: a position that isn't a number, a missing size", () => {
+  assert.equal(sight({ x: NaN, y: 400 }), false);
+  assert.equal(sight({ x: 200, y: NaN }), false);
+  assert.equal(sight({ x: 200, y: 400 }, [], { x: NaN, y: 22 }), false);
+  assert.equal(sight({ x: 200, y: 400 }, [cover(NaN, NaN, NaN, NaN)]), false, "a cover that can't be measured: assume it covers");
+  assert.equal(N.anyoneAt({ me: NYC, people: [{ pos: { lat: NaN, lng: NYC.lng } }], size: PHONE, covers: [], zoom: 14, half: ONE }), false);
+  assert.equal(N.anyoneAt({ me: NYC, people: [{ pos: { lat: NYC.lat, lng: undefined } }], size: PHONE, covers: [], zoom: 14, half: ONE }), false);
+});
+
+test("screenPoint: known answers worked out by hand, not with the module's own maths", () => {
+  // the whole world on one 512 px tile at zoom 0: its corner at the edge
+  const W = { w: 512, h: 512 };
+  // (179.9°, not 180°: 180° east and west are the same line)
+  const c = N.screenPoint({ lat: 0, lng: 0 }, { lat: 85.0511287798, lng: 179.9 }, 0, W);
+  assert.ok(Math.abs(c.x - (256 + (179.9 / 360) * 512)) < 1e-6 && Math.abs(c.y - 0) < 1e-3, JSON.stringify(c));
+  // Oslo (59.91°N) at zoom 12.47, a spot 0.01° north and 0.02° west: the
+  // textbook web-Mercator pixel, 256·2^z·(1 − ln(tan(π/4 + φ/2))/π), per 512 tile
+  const me = { lat: 59.91, lng: 10.75 };
+  const pos = { lat: 59.92, lng: 10.73 };
+  const z = 12.47;
+  const py = (lat) => 512 * 2 ** z * (1 - Math.log(Math.tan(Math.PI / 4 + (lat * Math.PI) / 360)) / Math.PI) / 2;
+  const px = (lng) => 512 * 2 ** z * ((lng + 180) / 360);
+  const got = N.screenPoint(me, pos, z, PHONE);
+  assert.ok(Math.abs(got.x - (PHONE.w / 2 + px(pos.lng) - px(me.lng))) < 1e-6, JSON.stringify(got));
+  assert.ok(Math.abs(got.y - (PHONE.h / 2 + py(pos.lat) - py(me.lat))) < 1e-6, JSON.stringify(got));
+  assert.ok(got.x < PHONE.w / 2 && got.y < PHONE.h / 2, "west is left, north is up");
+  // a fractional zoom, south-west: half a level wider — 1/√2 as far
+  const r = N.screenAt(NYC, 13.5, PHONE);
+  const sw = N.screenPoint(NYC, { lat: NYC.lat, lng: r.w }, 13, PHONE);
+  assert.ok(Math.abs(sw.x - (PHONE.w / 2 - PHONE.w / 2 / 2 ** 0.5)) < 1e-6, JSON.stringify(sw));
+});
+
+test("across the 180° line: someone 400 m away on the other side is beside you, not a world away", () => {
+  const me = { lat: -16.8, lng: 179.998 };
+  const pos = { lat: -16.8, lng: -179.998 }; // 0.004° east of me
+  const got = N.screenPoint(me, pos, 14, PHONE);
+  const want = PHONE.w / 2 + (0.004 / 360) * 512 * 2 ** 14;
+  assert.ok(Math.abs(got.x - want) < 1e-3, JSON.stringify(got));
+  assert.equal(N.anyoneAt({ me, people: [{ pos }], size: PHONE, covers: [], zoom: 14, half: ONE }), true);
+  // and the other way
+  const back = N.screenPoint(pos, me, 14, PHONE);
+  assert.ok(Math.abs(back.x - (PHONE.w / 2 - (0.004 / 360) * 512 * 2 ** 14)) < 1e-3, JSON.stringify(back));
+});
+
+test("in sight: a group's height is its own (not its width) — and every side of a cover", () => {
+  const banner = cover(62, 101, 16, 374);
+  assert.equal(sight({ x: 200, y: 101 + 22 }, [banner], GROUP), true, "a group touching the banner's bottom");
+  assert.equal(sight({ x: 200, y: 101 + 21 }, [banner], GROUP), false);
+  const box = cover(300, 400, 100, 200);
+  const W = { w: 500, h: 844 };
+  for (const [pt, want, side] of [
+    [{ x: 100 - 22, y: 350 }, true, "touching its left"],
+    [{ x: 100 - 21, y: 350 }, false, "a pixel into its left"],
+    [{ x: 200 + 22, y: 350 }, true, "touching its right"],
+    [{ x: 200 + 21, y: 350 }, false, "a pixel into its right"],
+    [{ x: 150, y: 300 - 22 }, true, "touching its top"],
+    [{ x: 150, y: 300 - 21 }, false, "a pixel into its top"],
+    [{ x: 150, y: 400 + 22 }, true, "touching its bottom"],
+    [{ x: 150, y: 400 + 21 }, false, "a pixel into its bottom"],
+    [{ x: 150, y: 350 }, false, "inside it"],
+  ])
+    assert.equal(sight(pt, [box], ONE, W), want, side);
+});
+
+test("in sight: odd boxes — partly off the screen, a cover holding the whole marker, a marker bigger than the screen", () => {
+  const offTop = cover(-50, 30, -10, 400);
+  assert.equal(sight({ x: 200, y: 30 + 21 }, [offTop]), false);
+  assert.equal(sight({ x: 200, y: 30 + 22 }, [offTop]), true);
+  assert.equal(sight({ x: 200, y: 400 }, [cover(0, PHONE.h, 0, PHONE.w)]), false, "a cover over everything");
+  assert.equal(sight({ x: 20, y: 20 }, [], { x: 30, y: 30 }, { w: 40, h: 40 }), false, "bigger than the screen");
+  // a cover of no width through the marker's middle still counts as covering
+  // (the cautious side; nearCovers leaves those out before they get here)
+  assert.equal(sight({ x: 200, y: 400 }, [cover(390, 410, 200, 200)]), false, "a zero-width line through it");
+});
+
+test("steps everywhere: a desktop, people due south and due west, a city far north", () => {
+  const DESK = { w: 1280, h: 700 };
+  const stop = (me, people, size) => {
+    const zs = N.zoomSteps(14, widest(size, me), 0.5);
+    return zs.find((z) => N.anyoneAt({ me, people: people.map((pos) => ({ pos })), size, covers: [], zoom: z, half: ONE })) ?? null;
+  };
+  // each: found at a middle step, and the step before shows them not
+  for (const [me, deg, m, size] of [
+    [NYC, 180, 2500, PHONE],
+    [NYC, 270, 1500, PHONE], // a phone is narrow: 1.5 km fits its widest view
+    [NYC, 0, 1800, DESK], // a desktop shows more blocks: its widest view is closer in
+    [{ lat: 69.65, lng: 18.96 }, 0, 1800, PHONE], // Tromsø
+  ]) {
+    const at2 = (() => {
+      const d = m / 6371008.8;
+      const b = (deg * Math.PI) / 180;
+      const la = (me.lat * Math.PI) / 180;
+      const lat = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(b));
+      const lng = (me.lng * Math.PI) / 180 + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * Math.sin(lat));
+      return { lat: (lat * 180) / Math.PI, lng: (lng * 180) / Math.PI };
+    })();
+    const z = stop(me, [at2], size);
+    assert.ok(z !== null && z < 14, `${deg}° ${m} m: ${z}`);
+    const zs = N.zoomSteps(14, widest(size, me), 0.5);
+    const before = zs[zs.indexOf(z) - 1];
+    assert.equal(N.anyoneAt({ me, people: [{ pos: at2 }], size, covers: [], zoom: before, half: ONE }), false, `${deg}°: not a step sooner`);
+  }
+});
+
+// A marker's reach from its middle, each side on its own (a group's "+N"
+// badge pokes out of ONE corner: top-right; top-left right-to-left).
+test("markerReach: a single marker — the same each way", () => {
+  const el = { left: 100, right: 144, top: 200, bottom: 244 };
+  assert.deepEqual(N.markerReach(el, []), { l: 22, r: 22, t: 22, b: 22 });
+});
+
+test("markerReach: a group with its +N badge top-right (8 px out) — only top and right reach further", () => {
+  const el = { left: 100, right: 174, top: 200, bottom: 244 }; // 74×44
+  const badge = { left: 174 + 8 - 30, right: 174 + 8, top: 200 - 8, bottom: 200 - 8 + 22 };
+  assert.deepEqual(N.markerReach(el, [badge]), { l: 37, r: 45, t: 30, b: 22 });
+  // right-to-left: the badge top-left
+  const rtl = { left: 100 - 8, right: 100 - 8 + 30, top: 192, bottom: 214 };
+  assert.deepEqual(N.markerReach(el, [rtl]), { l: 45, r: 37, t: 30, b: 22 });
+  // an empty box (not laid out) changes nothing
+  assert.deepEqual(N.markerReach(el, [{ left: 0, right: 0, top: 0, bottom: 0 }]), { l: 37, r: 37, t: 22, b: 22 });
+});
+
+test("in sight: each side its own reach — a group's badge-free side can touch what its badge side can't", () => {
+  const reach = { l: 37, r: 45, t: 30, b: 22 };
+  const W = { w: 500, h: 844 };
+  // the screen's left edge: the badge-free side touching it counts
+  assert.equal(sight({ x: 37, y: 400 }, [], reach, W), true);
+  assert.equal(sight({ x: 36, y: 400 }, [], reach, W), false);
+  // the right edge: the badge side needs 45
+  assert.equal(sight({ x: 500 - 45, y: 400 }, [], reach, W), true);
+  assert.equal(sight({ x: 500 - 44, y: 400 }, [], reach, W), false);
+  // a cover below: only the bottom's 22; above: the badge's 30
+  const below = cover(422, 500, 0, 500);
+  assert.equal(sight({ x: 200, y: 400 }, [below], reach, W), true, "bottom 422 touching");
+  assert.equal(sight({ x: 200, y: 401 }, [below], reach, W), false);
+  const above = cover(300, 370, 0, 500);
+  assert.equal(sight({ x: 200, y: 400 }, [above], reach, W), true, "top 370 touching");
+  assert.equal(sight({ x: 200, y: 399 }, [above], reach, W), false);
+  // a cover to the left: 37; to the right: 45
+  const leftC = cover(0, 844, 0, 163);
+  assert.equal(sight({ x: 200, y: 400 }, [leftC], reach, W), true);
+  assert.equal(sight({ x: 199, y: 400 }, [leftC], reach, W), false);
+  const rightC = cover(0, 844, 245, 500);
+  assert.equal(sight({ x: 200, y: 400 }, [rightC], reach, W), true);
+  assert.equal(sight({ x: 201, y: 400 }, [rightC], reach, W), false);
+  // a half-size {x, y} still works (the same each way)
+  assert.equal(sight({ x: 22, y: 400 }, [], { x: 22, y: 22 }, W), true);
+  assert.equal(sight({ x: 21, y: 400 }, [], { x: 22, y: 22 }, W), false);
+});
+
+test("anyoneAt: each person's own reach", () => {
+  const W = { w: 390, h: 844 };
+  const leftC = [cover(0, 844, 0, W.w / 2 - 38)]; // 38 px left of the middle: clear for 37, not for 45
+  const at = (half) => N.anyoneAt({ me: NYC, people: [{ pos: NYC, half }], size: W, covers: leftC, zoom: 14, half: ONE });
+  assert.equal(at({ l: 37, r: 45, t: 30, b: 22 }), true, "badge on the right: clear");
+  assert.equal(at({ l: 45, r: 37, t: 30, b: 22 }), false, "badge on the left: overlaps");
+});
+
+test("markerReach: a part with no height (or no width), however far out, changes nothing", () => {
+  const el = { left: 100, right: 174, top: 200, bottom: 244 };
+  assert.deepEqual(N.markerReach(el, [{ left: 0, right: 300, top: 222, bottom: 222 }]), { l: 37, r: 37, t: 22, b: 22 }, "flat");
+  assert.deepEqual(N.markerReach(el, [{ left: 500, right: 500, top: 0, bottom: 400 }]), { l: 37, r: 37, t: 22, b: 22 }, "thin");
+});
+
+// Big screens (owner, 2026-11-09): a 2560×1440 monitor at 100% already
+// shows counts, not people one by one, at the usual view (the 110-block
+// limit) — the search starts at the first zoom that does show them.
+const startZoom = (size, center = NYC) =>
+  N.markerStartZoom({ viewport: V, h3, center, size, rungs: RUNGS, budget: BUDGET, maxZoom: 14 });
+
+test("markerStartZoom: a phone, a laptop, a 1080p screen — the usual view (people one by one there)", () => {
+  for (const size of [PHONE, { w: 1366, h: 768 }, { w: 1920, h: 1080 }]) {
+    assert.equal(markersAt(NYC, 14, size), true, JSON.stringify(size));
+    assert.equal(startZoom(size), 14, JSON.stringify(size));
+  }
+});
+
+test("markerStartZoom: a 2560×1440 and a 4K monitor — the first zoom closer in that shows people one by one, to a hundredth", () => {
+  for (const size of [{ w: 2560, h: 1440 }, { w: 3840, h: 2160 }]) {
+    assert.equal(markersAt(NYC, 14, size), false, `(counts at the usual view: ${JSON.stringify(size)})`);
+    const z = startZoom(size);
+    assert.ok(z > 14 && z <= 18, String(z));
+    assert.equal(markersAt(NYC, z, size), true, `one by one at ${z}`);
+    assert.equal(markersAt(NYC, z - 0.01, size), false, `not a hundredth wider (${z - 0.01})`);
+    assert.equal(Math.round(z * 100) / 100, z, "a hundredth");
+  }
+  assert.ok(startZoom({ w: 3840, h: 2160 }) > startZoom({ w: 2560, h: 1440 }), "bigger screen: closer in");
+});
+
+test("big screens: the search's steps start there and step out to the widest view from there", () => {
+  const size = { w: 2560, h: 1440 };
+  const z0 = startZoom(size);
+  const w = N.widestMarkerZoom({ viewport: V, h3, center: NYC, size, rungs: RUNGS, budget: BUDGET, maxZoom: z0 });
+  assert.equal(w, z0, "(at most where it starts: closer in, it only ever shows more one by one)");
+  const zs = N.zoomSteps(z0, w, 0.5);
+  assert.deepEqual(zs, [z0], "(one step: the only view that shows people one by one)");
+});
+
+test("in sight: a marker whose MIDDLE is off the screen isn't measured at all (its size is only asked for when it could be seen)", () => {
+  let asked = 0;
+  const lazy = { get l() { asked++; return 22; }, get r() { asked++; return 22; }, get t() { asked++; return 22; }, get b() { asked++; return 22; } };
+  for (const pt of [{ x: -1, y: 400 }, { x: PHONE.w + 1, y: 400 }, { x: 200, y: -1 }, { x: 200, y: PHONE.h + 1 }, { x: NaN, y: 400 }])
+    assert.equal(N.inSight(pt, lazy, PHONE, []), false, JSON.stringify(pt));
+  assert.equal(asked, 0, "never measured");
+  assert.equal(N.inSight({ x: 200, y: 400 }, lazy, PHONE, []), true);
+  assert.ok(asked > 0, "measured when its middle is on the screen");
+});
+
+test("markerStartZoom, all over the world and on every big screen: exactly the first hundredth that shows people one by one — and a single step", () => {
+  let big = 0;
+  for (let lat = 0; lat <= 70; lat += 10)
+    for (const lng of [-74, 0.1, 103.8, 151.2])
+      for (const size of [{ w: 2400, h: 1350 }, { w: 2560, h: 1440 }, { w: 3000, h: 1600 }, { w: 3840, h: 2160 }, { w: 1440, h: 2560 }]) {
+        const c = { lat, lng };
+        if (markersAt(c, 14, size)) continue;
+        big++;
+        const z = N.markerStartZoom({ viewport: V, h3, center: c, size, rungs: RUNGS, budget: BUDGET, maxZoom: 14 });
+        const at = JSON.stringify({ lat, lng, size, z });
+        assert.equal(markersAt(c, z, size), true, `shows people one by one: ${at}`);
+        assert.equal(markersAt(c, Math.round((z - 0.01) * 100) / 100, size), false, `a hundredth wider shows counts: ${at}`);
+        const w = N.widestMarkerZoom({ viewport: V, h3, center: c, size, rungs: RUNGS, budget: BUDGET, maxZoom: z });
+        assert.deepEqual(N.zoomSteps(z, w, 0.5), [z], `one step, no sliver: ${at} widest ${w}`);
+      }
+  assert.ok(big > 50, `(enough big-screen cases: ${big})`);
+});
+
+test("markerStartZoom: a screen that shows counts even fully in (an 8K monitor) — the limit, and showsMarkers says no there", () => {
+  const countsOnly = { planWatch: () => ({ res: 7, cells: [] }) };
+  const z = N.markerStartZoom({ viewport: countsOnly, h3, center: NYC, size: { w: 7680, h: 4320 }, rungs: RUNGS, budget: BUDGET, maxZoom: 14 });
+  assert.equal(z, 18);
+  assert.equal(N.showsMarkers(countsOnly, h3, N.screenAt(NYC, z, { w: 7680, h: 4320 }), RUNGS, BUDGET), false, "(the app asks this, and skips the search)");
+  // the real ladder on a real 8K screen at 100%
+  const real = { w: 7680, h: 4320 };
+  const zr = N.markerStartZoom({ viewport: V, h3, center: NYC, size: real, rungs: RUNGS, budget: BUDGET, maxZoom: 14 });
+  assert.ok(zr > 14, String(zr));
+});
+
+test("markerReach: an empty part (an icon still loading) before the badge — the badge still counts", () => {
+  const el = { left: 100, right: 174, top: 200, bottom: 244 };
+  const loading = { left: 120, right: 150, top: 222, bottom: 222 };
+  const badge = { left: 152, right: 182, top: 192, bottom: 214 };
+  assert.deepEqual(N.markerReach(el, [loading, loading, badge]), { l: 37, r: 45, t: 30, b: 22 });
+});
+
+test("markerReach: a part reaching below the marker (a label under it) — reaches further down", () => {
+  const el = { left: 100, right: 144, top: 200, bottom: 244 };
+  assert.deepEqual(N.markerReach(el, [{ left: 110, right: 134, top: 240, bottom: 254 }]), { l: 22, r: 22, t: 22, b: 32 });
+});
+
+// A found result watched over time (owner, 2026-11-09): when everyone it
+// found has gone, it looks again — 5 s, then longer each time it keeps
+// happening (10, 20, … up to 60 s), each ±20% at random (phones that lose
+// the same car don't all ask at once) — the jitter as the heartbeat's
+test("researchWait: 5 s, doubling each time, at most 60 s — the middle of the jitter exactly that", () => {
+  const mid = (n) => N.researchWait(n, 0.5);
+  assert.deepEqual([0, 1, 2, 3, 4, 5, 9].map(mid), [5000, 10000, 20000, 40000, 60000, 60000, 60000]);
+});
+
+test("researchWait: ±20% at random — the ends of the range, and never outside it", () => {
+  assert.equal(N.researchWait(0, 0), 4000);
+  assert.equal(N.researchWait(0, 1), 6000);
+  assert.equal(N.researchWait(4, 0), 48000);
+  assert.equal(N.researchWait(4, 1), 72000);
+  for (let i = 0; i < 2000; i++) {
+    const n = i % 7;
+    const w = N.researchWait(n, Math.random());
+    const base = Math.min(5000 * 2 ** n, 60000);
+    assert.ok(w >= base * 0.8 - 1e-9 && w <= base * 1.2 + 1e-9, `${n}: ${w}`);
+  }
+  assert.equal(N.researchWait(-1, 0.5), 5000, "(never below the first)");
+});
+
+test("stepsFrom: a search looking again starts from the zoom it's at — never closer in", () => {
+  const zs = [14, 13.5, 13, 12.5, 12.47];
+  assert.deepEqual(N.stepsFrom(zs, 13), [13, 12.5, 12.47]);
+  assert.deepEqual(N.stepsFrom(zs, 13.2), [13, 12.5, 12.47], "between steps: the next one out");
+  assert.deepEqual(N.stepsFrom(zs, 15), zs, "closer in than the start: all of them");
+  assert.deepEqual(N.stepsFrom(zs, 12.47), [12.47]);
+  assert.deepEqual(N.stepsFrom(zs, 11), [12.47], "wider than the widest: the widest");
+});
+
+// Time away (owner, 2026-11-09): a phone asleep stops the steady clock
+// (performance.now) — the wall clock (Date.now) goes on; a clock set back
+// stops the wall clock — the steady one goes on. Time passed: whichever
+// says more.
+test("elapsed: whichever clock says more — asleep an hour (the steady clock stopped), or the phone's clock set back", () => {
+  const at = { p: 1000, d: 1_700_000_000_000 };
+  assert.equal(N.elapsed(at, { p: 3000, d: 1_700_000_002_000 }), 2000, "both agree");
+  assert.equal(N.elapsed(at, { p: 1500, d: 1_700_003_600_000 }), 3_600_000, "asleep an hour: the wall clock's hour");
+  assert.equal(N.elapsed(at, { p: 61_000, d: 1_699_999_000_000 }), 60_000, "clock set back: the steady clock's minute");
+  assert.equal(N.elapsed(at, at), 0);
+});
+
+// a solid ring round a cover is part of what you see (the raised ✋'s
+// yellow ring: styles.css .btn-ask.on — the browser's own computed form)
+test("ringReach: the raised ✋'s yellow ring — 3 px past its box; its soft shadow doesn't count", () => {
+  const style = { boxShadow: "rgb(255, 204, 0) 0px 0px 0px 3px, rgba(0, 0, 0, 0.4) 0px 2px 10px 0px", outlineStyle: "none", outlineWidth: "0px", outlineOffset: "0px" };
+  assert.equal(N.ringReach(style), 3);
+  assert.equal(N.ringReach({ ...style, boxShadow: "rgba(0, 0, 0, 0.4) 0px 2px 10px 0px" }), 0, "a soft shadow only: nothing");
+  assert.equal(N.ringReach({ ...style, boxShadow: "none" }), 0);
+  assert.equal(N.ringReach({ ...style, boxShadow: "" }), 0);
+  assert.equal(N.ringReach({}), 0, "nothing known: nothing");
+});
+
+test("ringReach: a ring offset or blurred is soft — only a spread with no offset and no blur; inside rings don't reach out", () => {
+  const ring = (boxShadow) => N.ringReach({ boxShadow, outlineStyle: "none", outlineWidth: "0px", outlineOffset: "0px" });
+  assert.equal(ring("rgb(1, 2, 3) 0px 0px 0px 2.5px"), 2.5, "fractional");
+  assert.equal(ring("rgb(1, 2, 3) 0px 0px 4px 3px"), 0, "blurred");
+  assert.equal(ring("rgb(1, 2, 3) 1px 0px 0px 3px"), 0, "offset");
+  assert.equal(ring("rgb(1, 2, 3) 0px 0px 0px 3px inset"), 0, "inset: inside the box");
+  assert.equal(ring("rgb(1, 2, 3) 0px 0px 0px 0px"), 0, "no spread");
+  assert.equal(ring("rgb(1, 2, 3) 0px 0px 0px -2px"), 0, "a negative spread");
+  assert.equal(ring("rgb(1, 2, 3) 0px 0px 0px 2px, rgb(4, 5, 6) 0px 0px 0px 6px"), 6, "two rings: the wider");
+  assert.equal(ring("#fff 0px 0px 0px 4px"), 4, "a colour written otherwise");
+});
+
+test("ringReach: an outline — its width and offset (the account button's focus ring: 3 px, 2 px out); none or zero — nothing", () => {
+  const base = { boxShadow: "none" };
+  assert.equal(N.ringReach({ ...base, outlineStyle: "solid", outlineWidth: "3px", outlineOffset: "2px" }), 5);
+  assert.equal(N.ringReach({ ...base, outlineStyle: "solid", outlineWidth: "3px", outlineOffset: "-3px" }), 0, "drawn inside");
+  assert.equal(N.ringReach({ ...base, outlineStyle: "none", outlineWidth: "3px", outlineOffset: "0px" }), 0, "no outline");
+  assert.equal(N.ringReach({ ...base, outlineStyle: "solid", outlineWidth: "0px", outlineOffset: "4px" }), 0, "zero width");
+  assert.equal(N.ringReach({ boxShadow: "rgb(1, 2, 3) 0px 0px 0px 4px", outlineStyle: "solid", outlineWidth: "1px", outlineOffset: "1px" }), 4, "both: the wider");
+});
+
+test("ringReach: every engine's written form — WebKit/Gecko/Chromium alike, and newer colour forms", () => {
+  const ring = (boxShadow) => N.ringReach({ boxShadow, outlineStyle: "none", outlineWidth: "0px", outlineOffset: "0px" });
+  assert.equal(ring("rgb(255, 204, 0) 0px 0px 0px 3px, rgba(0, 0, 0, 0.4) 0px 2px 10px 0px"), 3, "Safari / Firefox / Chrome");
+  assert.equal(ring("oklch(0.8 0.17 90) 0px 0px 0px 3px"), 3, "oklch");
+  assert.equal(ring("color(display-p3 1 0.8 0) 0px 0px 0px 3px"), 3, "display-p3");
+  assert.equal(ring("rgb(255 204 0) 0px 0px 0px 3px"), 3, "space-separated rgb");
+  assert.equal(ring("rgb(255 204 0 / 0.5) 0px 0px 0px 3px"), 3, "half see-through: still seen");
+});
+
+test("ringReach: a ring you can't see draws nothing — alpha 0, transparent", () => {
+  const ring = (boxShadow) => N.ringReach({ boxShadow, outlineStyle: "none", outlineWidth: "0px", outlineOffset: "0px" });
+  assert.equal(ring("rgba(0, 0, 0, 0) 0px 0px 0px 3px"), 0);
+  assert.equal(ring("rgb(0 0 0 / 0) 0px 0px 0px 3px"), 0);
+  assert.equal(ring("rgb(0 0 0 / 0%) 0px 0px 0px 3px"), 0);
+  assert.equal(ring("transparent 0px 0px 0px 3px"), 0);
+  assert.equal(ring("rgba(0, 0, 0, 0) 0px 0px 0px 3px, rgb(1, 2, 3) 0px 0px 0px 2px"), 2, "the seen one of two");
+  assert.equal(ring("rgba(0, 0, 0, 0.05) 0px 0px 0px 3px"), 3, "faint but there: counted (errs safe)");
+  assert.equal(ring("rgb(255, 204, 0) 0px 0px 0px 3px"), 3, "a colour ending in 0 (yellow) is no alpha: seen");
+  assert.equal(ring("rgba(255, 204, 0, 1) 0px 0px 0px 3px"), 3);
+  assert.equal(ring("rgb(255 204 0) 0px 0px 0px 3px"), 3, "space-separated, ending in 0: seen");
+  assert.equal(ring("rgba(255, 204, 0, 0.0) 0px 0px 0px 3px"), 0, "alpha 0.0");
+});
+
+// the app works the widest step out for a screen NEAR_EDGE_PX (2) bigger on
+// each side (app.js): the map's real view can be a pixel or so wider than
+// the whole-pixel size measured — and at that step it must still show
+// people one by one, never tip over into counts
+test("the widest step, worked out 2 px bigger each side: the real view up to 2 px wider each side still shows people one by one", () => {
+  const EDGE = 2;
+  const sizes = [PHONE, DESKTOP, { w: 320, h: 568 }, { w: 412, h: 915 }, { w: 844, h: 390 }, { w: 1280, h: 720 }, { w: 1920, h: 1080 }, { w: 260, h: 563 }];
+  const places = [NYC, { lat: 51.5072, lng: -0.1276 }, { lat: -33.8688, lng: 151.2093 }, { lat: 1.29, lng: 103.85 }, { lat: 69.6492, lng: 18.9553 }, { lat: -16.78, lng: 179.9995 }];
+  let tight = 0;
+  for (const size of sizes)
+    for (const center of places) {
+      // (as the app: the start — closer in on a big screen — and the
+      // widest, both for the bigger screen)
+      const big = { w: size.w + 2 * EDGE, h: size.h + 2 * EDGE };
+      const plan = { viewport: V, h3, center, size: big, rungs: RUNGS, budget: BUDGET };
+      const start = N.markerStartZoom({ ...plan, maxZoom: 14 });
+      if (!N.showsMarkers(V, h3, N.screenAt(center, start, big), RUNGS, BUDGET)) continue;
+      const z = N.widestMarkerZoom({ ...plan, maxZoom: start });
+      for (const grow of [0, 0.5, 1, 1.5, 2])
+        assert.ok(markersAt(center, start, { w: size.w + 2 * grow, h: size.h + 2 * grow }), `${size.w}×${size.h} at ${JSON.stringify(center)}: counts at the START ${start} when the view is ${grow} px wider each side`);
+      for (const grow of [0, 0.5, 1, 1.5, 2]) {
+        const real = { w: size.w + 2 * grow, h: size.h + 2 * grow };
+        assert.ok(markersAt(center, z, real), `${size.w}×${size.h} at ${JSON.stringify(center)}: counts at ${z} when the view is ${grow} px wider each side`);
+      }
+      // (and the margin matters: worked out for the measured size alone, a
+      // view 2 px wider tips over somewhere — else the test proves nothing)
+      const s0 = N.markerStartZoom({ ...plan, size, maxZoom: 14 });
+      const z0 = N.widestMarkerZoom({ ...plan, size, maxZoom: s0 });
+      if (!markersAt(center, z0, big) || !markersAt(center, s0, big)) tight++;
+    }
+  assert.ok(tight > 0, "no screen tips over without the margin — the case isn't exercised");
+});
+
+// exact: the "moved 500 m" rule measures real ground in every direction
+// (east–west shrinks with latitude: without it 300 m east reads as ~400)
+test("metersBetween: exact in every direction (1 km north, east, south-west — within a metre)", () => {
+  for (const deg of [0, 90, 225]) assert.ok(Math.abs(N.metersBetween(NYC, at(1000, deg)) - 1000) < 1, `${deg}°: ${N.metersBetween(NYC, at(1000, deg))}`);
+  assert.ok(Math.abs(N.metersBetween(NYC, at(500, 90)) - 500) < 0.5);
+});
+
+// exact: half a level at a time, the widest last — a gap under half a step
+// to the widest is merged into it (never a tiny extra step)
+test("zoomSteps: exact steps — the last gap under half a step merged into the widest", () => {
+  assert.deepEqual(N.zoomSteps(14, 12.3, 0.5), [14, 13.5, 13, 12.3]);
+  assert.deepEqual(N.zoomSteps(14, 12.6, 0.5), [14, 13.5, 13, 12.6]);
+  assert.deepEqual(N.zoomSteps(14, 12.76, 0.5), [14, 13.5, 12.76]);
+});
+
+test("ringReach: a shadow moved down (or sideways) isn't a ring round it — only an unmoved spread is", () => {
+  const ring = (boxShadow) => N.ringReach({ boxShadow, outlineStyle: "none", outlineWidth: "0px", outlineOffset: "0px" });
+  assert.equal(ring("rgb(1, 2, 3) 0px 2px 0px 3px"), 0, "moved down");
+  assert.equal(ring("rgb(1, 2, 3) 2px 0px 0px 3px"), 0, "moved sideways");
 });

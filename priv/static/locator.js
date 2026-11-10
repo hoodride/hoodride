@@ -159,6 +159,12 @@
         },
         (e) => {
           if (!quiet) onError(e, ctx);
+          // the ◎ tap's OWN request failed (timed out, location off): the
+          // tap is over — a reading coming later (✋ up, going online, a
+          // watch) is not its answer, so it isn't centred as one (owner,
+          // 2026-11-10). (The live watch timing out meanwhile — every 15 s
+          // indoors — is not this tap failing: it keeps waiting.)
+          if (ctx === "locate" && (e.code === 2 || e.code === 3)) s.wantsCentre = false;
         },
         { enableHighAccuracy: ctx !== "locate", maximumAge: 60000, timeout: 15000 }
       );
@@ -277,6 +283,11 @@
         if (s.status === "denied" || s.status === "unavailable") s.status = s.watchId !== null ? "watching" : "idle";
         locateOnce("locate");
         return now_;
+      },
+      // the map moved by YOU (a drag, a pinch) since a ◎ tap still waiting:
+      // its reading, when it comes, isn't centred as the tap's answer
+      cancelCentre() {
+        s.wantsCentre = false;
       },
       // at "Request ride": checks location on the tap, never holds it up
       requestCheck: () => locateOnce("request"),

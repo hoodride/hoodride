@@ -34,23 +34,30 @@ defmodule HoodrideWeb.IntentZoomTest do
     end
   end
 
-  test "never closer than the shared zoom; never wider than people one by one" do
+  # (owner, 2026-11-09: on a screen so big the shared zoom shows counts — a
+  # 2560×1440 monitor — it starts at the first zoom closer in that shows
+  # people one by one; test_js/nearby.test.mjs, near_covers_test.exs)
+  test "starts at the shared zoom (closer in only where that shows counts); never wider than people one by one" do
     f = body("findNearest")
-    assert f =~ "maxZoom: INTENT_ZOOM,"
+    assert f =~ "HoodNearby.markerStartZoom({ ...ladder, maxZoom: INTENT_ZOOM })"
+    assert f =~ "HoodNearby.widestMarkerZoom({ ...ladder, maxZoom: startZoom })"
     assert f =~ "rungs: [H3_RES, ...AGG_RESES],"
-    assert f =~ "budget: MAX_WATCHED_CELLS,"
+    assert f =~ "budget: MAX_WATCHED_CELLS"
   end
 
+  # (closer still on a screen so big 15 shows counts: usualZoom — owner,
+  # 2026-11-09; near_covers_test.exs)
   test "the locate button: the nearest too while online or ✋ up, else up close as before" do
     c = body("centreOnYou")
     assert c =~ "if (HoodNearby.lookingFor(state)) findNearest(at);"
 
     assert c =~
-             "else map.easeTo({ center: [at.lng, at.lat], zoom: Math.max(map.getZoom(), 15) });"
+             "else map.easeTo({ center: [at.lng, at.lat], zoom: Math.max(map.getZoom(), 15, usualZoom(at)) });"
   end
 
   test "any move but its own ends it" do
-    assert body("initMap") =~ "if (!e.nearSearch) stopFindNearest();"
+    # (a move of yours: movedByHand — the search ends, near_covers_test.exs)
+    assert body("initMap") =~ "if (!e.nearSearch) movedByHand();"
 
     assert body("findNearest") =~
              "map.easeTo({ center: [at.lng, at.lat], zoom, duration: NEAR_STEP_MS }, { nearSearch: seq })"
@@ -61,17 +68,18 @@ defmodule HoodrideWeb.IntentZoomTest do
   # step with anyone and staying there (no zooming back in)
   test "step by step: wait for each answer (no timer), stop at the first with anyone" do
     f = body("findNearest")
-    assert f =~ "HoodNearby.zoomSteps(INTENT_ZOOM, widestZoom, NEAR_STEP)"
+    assert f =~ "HoodNearby.zoomSteps(startZoom, widestZoom, NEAR_STEP)"
     assert @app =~ "const NEAR_STEP = 0.5;"
     assert f =~ "if (map.isMoving() || !answered()) return setTimeout(check, 100);"
     # no deadline anywhere: a slow answer is waited for
     refute f =~ "performance.now()"
     refute @app =~ "NEAR_WAIT_MS"
     refute @app =~ "NEAR_LATE_MS"
-    # found: it stops where it is
+    # found: it stops where it is (and keeps an eye on it — stillSeen,
+    # near_covers_test.exs)
     assert f =~ ~r/if \(anyone\(steps\[i\]\)\) \{
       nearLooking = false;
-      return;
+      return watchFound\(type\);
     \}/
     # the last step and nobody: "nobody nearby yet"
     assert f =~ "if (i === steps.length - 1) {"

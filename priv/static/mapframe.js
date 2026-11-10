@@ -26,16 +26,20 @@
   }
 
   // schedule(): draw on the next frame — once, however often it's called
+  // schedule.pending(): a draw asked for, its frame not come yet (find the
+  // nearest waits for it: it counts only what's drawn)
   function createFrameRender(draw, requestFrame) {
     let pending = false;
-    return function schedule() {
+    function schedule() {
       if (pending) return;
       pending = true;
       requestFrame(() => {
         pending = false;
         draw();
       });
-    };
+    }
+    schedule.pending = () => pending;
+    return schedule;
   }
 
   return { unbatch, createFrameRender };
