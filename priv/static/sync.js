@@ -127,6 +127,9 @@
     // what the server holds for us, as of its last ok reply
     let heldGeo = new Set();
     let heldAgg = new Set();
+    // cells released while still wanted: their data kept, not held (dropReleased)
+    const keptGeo = new Set();
+    const keptAgg = new Set();
     let joined = false;
     let inFlight = false;
     let dirty = false;
@@ -134,6 +137,12 @@
     let retryTimer = null;
     let retryPending = false;
     let failures = 0; // consecutive retriable failures → backoff attempt
+    // a sync timed out: the server may have handled it (its snapshots lost
+    // on the way) — the next asks for every wanted cell's snapshot afresh
+    let wantFresh = false;
+    // the connection a sync was sent on: a reply or timeout from before a
+    // rejoin (its timer still runs) must not touch the new one's state
+    let conn = 0;
     let rejectedWish = null; // key of a wish the server permanently refused
 
     const same = (want, have) => want.size === have.size && [...want].every((c) => have.has(c));
@@ -147,6 +156,17 @@
       wantedAgg.clear();
       geo.forEach((cell) => wantedGeo.add(cell));
       agg.forEach((cell) => wantedAgg.add(cell));
+      // a kept cell (the server let it go while we wanted it) no longer
+      // wanted: nobody holds it — its data goes now, not at the next reply
+      const unkeep = (kept, wanted, drop) =>
+        [...kept].forEach((cell) => {
+          if (!wanted.has(cell)) {
+            kept.delete(cell);
+            drop(cell);
+          }
+        });
+      unkeep(keptGeo, wantedGeo, deps.onDropGeo);
+      unkeep(keptAgg, wantedAgg, deps.onDropAgg);
       deps.clearTimeout(settleTimer);
       settleTimer = deps.setTimeout(flush, SETTLE_MS);
       return true;
@@ -178,37 +198,60 @@
       inFlight = true;
       dirty = false;
       const sentGeo = new Set(wantedGeo);
+      const fresh = wantFresh;
       const sentAgg = new Set(wantedAgg);
+      const gen = conn;
 
       deps
-        .push("sync", { geo: [...sentGeo], agg: [...sentAgg] })
+        .push("sync", fresh ? { geo: [...sentGeo], agg: [...sentAgg], fresh: true } : { geo: [...sentGeo], agg: [...sentAgg] })
         .receive("ok", (snap) => {
+          if (gen !== conn) return;
           inFlight = false;
           failures = 0;
+          if (fresh) wantFresh = false;
           // the server now holds exactly what we sent: anything it let go
           // (and we don't want back meanwhile) is gone for us too
           dropReleased(sentGeo, sentAgg);
-          // the view may have moved on while this sync was in flight
+          // every cell it sent a snapshot for, it holds now — kept even if
+          // the view moved on meanwhile: thrown away, it would never come
+          // again (the view back before the next sync asks for what the
+          // server already holds) and parked cars there would never show.
+          // Really let go, the next sync releases it and dropReleased takes
+          // its markers off then.
           deps.onSnapshot({
-            geo: ((snap && snap.geo) || []).filter((s) => wantedGeo.has(s.cell)),
-            agg: ((snap && snap.agg) || []).filter((c) => wantedAgg.has(c.cell)),
+            geo: ((snap && snap.geo) || []).filter((s) => sentGeo.has(s.cell)),
+            agg: ((snap && snap.agg) || []).filter((c) => sentAgg.has(c.cell)),
           });
           if (dirty) flush();
         })
         .receive("error", (e) => {
+          if (gen !== conn) return;
           inFlight = false;
           const reason = e && e.reason;
           if (reason === "rate_limited" && e.retry_ms) {
             retryIn(e.retry_ms + RETRY_SLACK_MS + random() * RETRY_JITTER_MS);
           } else if (PERMANENT.has(reason)) {
             rejectedWish = key;
+            // refused for good: nobody will ever send the kept cells (the
+            // server let them go) — their old data goes, never drawn stale
+            keptGeo.forEach((cell) => deps.onDropGeo(cell));
+            keptAgg.forEach((cell) => deps.onDropAgg(cell));
+            keptGeo.clear();
+            keptAgg.clear();
             if (dirty) flush(); // the wish already moved on: send that
           } else {
             backOff();
           }
         })
         .receive("timeout", () => {
+          if (gen !== conn) return;
           inFlight = false;
+          wantFresh = true;
+          // the server may have handled it: what was sent is possibly held
+          // — its live updates may come in and be drawn, so a later move
+          // away must take them off (dropReleased walks what's held)
+          heldGeo = new Set([...heldGeo, ...sentGeo]);
+          heldAgg = new Set([...heldAgg, ...sentAgg]);
           backOff();
         });
     }
@@ -217,6 +260,8 @@
     // now. A rejoin may be a new server version, so a refusal is retried
     // once per connection rather than remembered forever.
     function onJoined() {
+      conn += 1;
+      wantFresh = false; // a new channel snapshots everything anyway
       joined = true;
       inFlight = false;
       failures = 0;
@@ -230,12 +275,22 @@
     // the server holds `geo`/`agg` now: drop the cells it released that we
     // don't want (any more), then record what it holds
     function dropReleased(geo, agg) {
-      heldGeo.forEach((cell) => {
-        if (!geo.has(cell) && !wantedGeo.has(cell)) deps.onDropGeo(cell);
-      });
-      heldAgg.forEach((cell) => {
-        if (!agg.has(cell) && !wantedAgg.has(cell)) deps.onDropAgg(cell);
-      });
+      // a cell the server let go while we still wanted it keeps its data
+      // (it's asked for again): remembered, so that if the view leaves it
+      // before the server holds it again, its data still goes — else it
+      // stayed forever (found by the model-based test, 2026-11-10)
+      const walk = (held, kept, now, wanted, drop) => {
+        new Set([...held, ...kept]).forEach((cell) => {
+          if (now.has(cell)) kept.delete(cell);
+          else if (wanted.has(cell)) kept.add(cell);
+          else {
+            kept.delete(cell);
+            drop(cell);
+          }
+        });
+      };
+      walk(heldGeo, keptGeo, geo, wantedGeo, deps.onDropGeo);
+      walk(heldAgg, keptAgg, agg, wantedAgg, deps.onDropAgg);
       heldGeo = geo;
       heldAgg = agg;
     }
@@ -271,13 +326,18 @@
       // still sends (its markers stay up until it lets go)
       wantsGeo: (cell) => wantedGeo.has(cell) || heldGeo.has(cell),
       wantsAgg: (cell) => wantedAgg.has(cell) || heldAgg.has(cell),
+      // wanted by the view RIGHT NOW (what's drawn): a cell the server still
+      // holds but the view has left keeps its data, not its drawing
+      wantedGeoHas: (cell) => wantedGeo.has(cell),
+      wantedAggHas: (cell) => wantedAgg.has(cell),
       wantedGeoSize: () => wantedGeo.size,
       wantedAggSize: () => wantedAgg.size,
       // the server has answered for what we want, and nothing is on its
-      // way: the map shows all there is in view (find the nearest — nearby.js
+      // way (nor owed: a timed-out sync's snapshots are, until a fresh one
+      // is answered): the map shows all there is in view (find the nearest — nearby.js
       // — waits for this before it decides "nobody nearby yet")
       settled: () =>
-        joined && !inFlight && !dirty && !retryPending && same(wantedGeo, heldGeo) && same(wantedAgg, heldAgg),
+        joined && !inFlight && !dirty && !retryPending && !wantFresh && same(wantedGeo, heldGeo) && same(wantedAgg, heldAgg),
       // what we want now was refused for good (watch_limit, read_only): it
       // will never settle — find the nearest stops instead of waiting on it
       refused: () => rejectedWish !== null && rejectedWish === wishKey(),

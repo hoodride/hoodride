@@ -251,6 +251,145 @@ defmodule Hoodride.SweeperAndGuardsTest do
     assert Hoodride.Geo.agg_counts_for("c7P") == %{drivers: 1, hands: 0}
   end
 
+  # a reap changes the map like any writer: the apps watching must HEAR it
+  # (the left, the count, the role ping) — else a reaped car stays on their
+  # maps, counted, and find the nearest calls it found
+  test "reaps tell the watchers: the left, the count, the role" do
+    alias Phoenix.Socket.Broadcast
+
+    for t <- ~w(geo:d:cell8r agg:d:c7R geo:h:cell8s agg:h:c7S),
+        do: HoodrideWeb.Endpoint.subscribe(t)
+
+    roles = Hoodride.Roles.topic(91)
+    HoodrideWeb.Endpoint.subscribe(roles)
+    Geo.driver_update(%{id: 91, name: "G", photo: nil}, "cell8r", nil, ["c7R"])
+    Geo.hand_up(92, "cell8s", nil, ["c7S"])
+    # (their own update broadcasts: out of the way)
+    assert_receive %Broadcast{topic: "geo:d:cell8r", event: "driver_update"}
+    assert_receive %Broadcast{topic: "geo:h:cell8s", event: "hand_update"}
+    assert_receive %Broadcast{topic: "agg:d:c7R", payload: %{drivers: 1}}
+    assert_receive %Broadcast{topic: "agg:h:c7S", payload: %{hands: 1}}
+    # (going online's own role ping: taken, so the next is the reap's)
+    assert_receive %Broadcast{topic: ^roles, event: "changed"}
+
+    # neither connected: past grace, both reaped
+    Sweeper.sweep_now()
+
+    assert_receive %Broadcast{topic: "geo:d:cell8r", event: "driver_left", payload: %{id: 91}}
+    assert_receive %Broadcast{topic: "agg:d:c7R", event: "agg_update", payload: %{drivers: 0}}
+    assert_receive %Broadcast{topic: ^roles, event: "changed"}
+    assert_receive %Broadcast{topic: "geo:h:cell8s", event: "hand_left", payload: %{id: 92}}
+    assert_receive %Broadcast{topic: "agg:h:c7S", event: "agg_update", payload: %{hands: 0}}
+  end
+
+  # a shard that died mid-move (the row moved, the index and messages not):
+  # the repair must TELL the watchers, as the move would have — else the
+  # old cell's watchers keep a ghost and the new cell's never see them
+  test "the cell-index repair tells both cells' watchers (car and hand)" do
+    alias Phoenix.Socket.Broadcast
+    for t <- ~w(geo:d:rxA geo:d:rxB geo:h:rxC geo:h:rxD), do: HoodrideWeb.Endpoint.subscribe(t)
+    Geo.driver_update(%{id: 93, name: "X", photo: nil}, "rxA", "rxA-s", [])
+    Geo.hand_up(94, "rxC", "rxC-s", [])
+    assert_receive %Broadcast{topic: "geo:d:rxA", event: "driver_update"}
+    assert_receive %Broadcast{topic: "geo:h:rxC", event: "hand_update"}
+
+    # the crash: rows moved, index and messages not
+    [{_, _, _, ts}] = :ets.lookup(:geo_drivers, 93)
+    :ets.insert(:geo_drivers, {93, "rxB", "rxB-s", ts})
+    :ets.insert(:geo_hands, {94, "rxD", "rxD-s"})
+    Geo.reindex_user(93)
+    Geo.reindex_user(94)
+
+    # IN ORDER: the "left" first — a "left" names only the id: sent after
+    # the update, it would wipe the car that just arrived (a watcher of both)
+    assert_receive %Broadcast{topic: "geo:d:" <> _} = first
+    assert first.event == "driver_left", "the repair's first message: #{first.event}"
+    assert_receive %Broadcast{topic: "geo:h:" <> _} = first_h
+    assert first_h.event == "hand_left", "the ✋ repair's first message: #{first_h.event}"
+    # (those two, put back for the exact checks below)
+    send(self(), first)
+    send(self(), first_h)
+
+    assert_receive %Broadcast{topic: "geo:d:rxA", event: "driver_left", payload: rep_left}
+    assert_receive %Broadcast{topic: "geo:d:rxB", event: "driver_update", payload: rep_up}
+    assert Map.delete(rep_left, :json) == %{id: 93}
+    assert Map.delete(rep_up, :json) == %{id: 93, cell: "rxB", spot: "rxB-s"}
+    assert_receive %Broadcast{topic: "geo:h:rxC", event: "hand_left", payload: %{id: 94}}
+
+    assert_receive %Broadcast{
+      topic: "geo:h:rxD",
+      event: "hand_update",
+      payload: %{id: 94, cell: "rxD", spot: "rxD-s"}
+    }
+
+    # exactly the normal shapes (an app of any version reads them as an
+    # ordinary move): nothing more, the json the same update encoded
+    send(self(), :mark)
+    Geo.driver_update(%{id: 93, name: "X", photo: nil}, "rxA", "rxA-s", [])
+    Geo.driver_update(%{id: 93, name: "X", photo: nil}, "rxB", "rxB-s", [])
+    assert_receive :mark
+    assert_receive %Broadcast{topic: "geo:d:rxA", event: "driver_update", payload: normal_up}
+    assert_receive %Broadcast{topic: "geo:d:rxA", event: "driver_left", payload: normal_left}
+    assert Map.keys(normal_left) |> Enum.sort() == [:id, :json]
+    assert Map.keys(normal_up) |> Enum.sort() == [:cell, :id, :json, :spot]
+    assert Jason.decode!(normal_left.json) == %{"id" => 93}
+    # (the rxB side of those two moves: taken too)
+    assert_receive %Broadcast{topic: "geo:d:rxB", event: "driver_left"}
+    assert_receive %Broadcast{topic: "geo:d:rxB", event: "driver_update"}
+    # an index already right: a repair says nothing
+    Geo.reindex_user(93)
+    Geo.reindex_user(94)
+    refute_receive %Broadcast{topic: "geo:" <> _}, 100
+  end
+
+  # a ghost index row BESIDE an intact one (a shard died after indexing the
+  # new cell, before un-indexing the old): the repair's "left" for the ghost
+  # cell names only the id — an app watching both cells would delete the car
+  # by id though it's really there. So the repair re-announces where they
+  # are, after the "left": the app ends with the car, in its real cell.
+  test "a ghost index row beside the real one: after the repair's 'left', the car is announced again where it is" do
+    alias Phoenix.Socket.Broadcast
+    for t <- ~w(geo:d:ghA geo:d:ghB), do: HoodrideWeb.Endpoint.subscribe(t)
+    Geo.driver_update(%{id: 99, name: "Gh", photo: nil}, "ghB", "ghB-s", [])
+    assert_receive %Broadcast{topic: "geo:d:ghB", event: "driver_update"}
+    # the ghost: indexed in A too
+    :ets.insert(:geo_by_cell, {{"ghA", 99}, :driver})
+    Geo.reindex_user(99)
+    assert_receive %Broadcast{topic: "geo:d:ghA", event: "driver_left", payload: %{id: 99}}
+    assert_receive %Broadcast{topic: "geo:d:ghB", event: "driver_update", payload: up}
+    assert Map.delete(up, :json) == %{id: 99, cell: "ghB", spot: "ghB-s"}
+    refute :ets.member(:geo_by_cell, {"ghA", 99})
+  end
+
+  # the repair announces only what the normal path would: never someone in
+  # a ride (a claimed seat — their own "offline" follows), never a car whose
+  # position went silent (reaped next) — but the index is still repaired
+  test "the index repair announces no one in a ride, and no silent car" do
+    alias Phoenix.Socket.Broadcast
+    for t <- ~w(geo:d:rpA geo:h:rpH geo:d:rpS), do: HoodrideWeb.Endpoint.subscribe(t)
+    now = System.system_time(:second)
+    # in a ride (seat claimed), the index row missing
+    :ets.insert(:geo_drivers, {95, "rpA", "rpA-s", now})
+    :ets.insert(:geo_hands, {96, "rpH", "rpH-s"})
+    :ets.insert(:rides_by_user, {95, :pending})
+    :ets.insert(:rides_by_user, {96, :pending})
+    # silent for 4 minutes, not in a ride
+    :ets.insert(:geo_drivers, {97, "rpS", "rpS-s", now - 4 * 60})
+    for id <- [95, 96, 97], do: Geo.reindex_user(id)
+
+    refute_receive %Broadcast{topic: "geo:" <> _}, 200
+    # the limit is the reap's 3 minutes: a car quiet for less (170 s) is
+    # still on the map — the repair announces it
+    HoodrideWeb.Endpoint.subscribe("geo:d:rpF")
+    :ets.insert(:geo_drivers, {98, "rpF", "rpF-s", now - 170})
+    Geo.reindex_user(98)
+    assert_receive %Broadcast{topic: "geo:d:rpF", event: "driver_update"}
+    assert :ets.member(:geo_by_cell, {"rpA", 95})
+    assert :ets.member(:geo_by_cell, {"rpH", 96})
+    assert :ets.member(:geo_by_cell, {"rpS", 97})
+    for id <- [95, 96], do: :ets.delete(:rides_by_user, id)
+  end
+
   test "the timer wiring itself sweeps (handle_info, not just sweep_now)" do
     # a reaped-looking driver: on map, no presence → one :sweep message reaps him
     Hoodride.Geo.driver_update(%{id: 81, name: "T81", photo: nil}, "cell8t", nil, ["c7T"])

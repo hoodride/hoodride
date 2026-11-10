@@ -42,6 +42,13 @@ await journey("ride: request, accept, a dropped connection, end", async (browser
   // Dan's rider on his map at her real spot: the person-raising-a-hand
   // picture (icons.js) — not the ✋ of someone nearby, and not the emoji
   await dan.waitFor(`(() => { const e = realEntries.get(${ritaId}); return !!e && e.type === "ridepeer" && !!e.marker.getElement().querySelector('img[src^="person.svg"]') && !e.marker.getElement().textContent.includes("\u{1F64B}"); })()`, "Dan's map: his rider, the person picture");
+  // a late map update about Dan (his car's block) arriving mid-ride must
+  // change nothing of the partner's: his exact ride position, his marker
+  await rita.waitFor(`(() => { const e = realEntries.get(${danId}); return !!e && e.type === "ridepeer" && e.peer.posExact; })()`, "Rita has Dan's exact ride position", 15000);
+  const before = await rita.eval(`(() => { const p = realEntries.get(${danId}).peer; return { lat: p.pos.lat, lng: p.pos.lng, exact: p.posExact }; })()`);
+  await rita.eval(`(upsertBrowseEntry({ id: ${danId}, cell: "882a1072c7fffff", spot: "892a1072c63ffff" }, "driver"), true)`);
+  const after = await rita.eval(`(() => { const e = realEntries.get(${danId}); const p = e.peer; return { type: e.type, lat: p.pos.lat, lng: p.pos.lng, exact: p.posExact }; })()`);
+  check(after.type === "ridepeer" && after.exact && after.lat === before.lat && after.lng === before.lng, "a late map update mid-ride: Dan's exact position untouched", { before, after });
   await rita.eval(`closeChat(), true`);
   // (then the distance: "· 0.5 mi away")
   await bannerLike(rita, "BT-Dan is on the way · Blue Toyota Prius");

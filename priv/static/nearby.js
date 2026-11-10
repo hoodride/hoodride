@@ -69,23 +69,22 @@
   }
 
   // The widest zoom (the smallest number) at which a screen centred here
-  // still shows people one by one — at most `maxZoom`. Halving the range
-  // until it's under a hundredth of a zoom level, then the answer is
-  // checked as it is: a step in on any edge case, never one out.
+  // still shows people one by one — at most `maxZoom`. Halving over whole
+  // hundredths (as markerStartZoom): the answer is always one that was
+  // checked to fit, and the work is bounded (~12 checks) whatever the
+  // planner answers — never a hundredth-by-hundredth walk.
   function widestMarkerZoom({ viewport, h3, center, size, rungs, budget, maxZoom }) {
     const fits = (z) => showsMarkers(viewport, h3, screenAt(center, z, size), rungs, budget);
     if (!fits(maxZoom)) return maxZoom;
-    let lo = 1; // too wide (the whole world: counts, or nothing)
-    let hi = maxZoom; // fits
-    if (fits(lo)) return lo;
-    while (hi - lo > 0.005) {
-      const mid = (lo + hi) / 2;
-      if (fits(mid)) hi = mid;
+    let lo = 100; // too wide (the whole world: counts, or nothing)
+    let hi = Math.round(maxZoom * 100); // fits
+    if (fits(lo / 100)) return lo / 100;
+    while (hi - lo > 1) {
+      const mid = Math.floor((lo + hi) / 2);
+      if (fits(mid / 100)) hi = mid;
       else lo = mid;
     }
-    let z = Math.ceil(hi * 100) / 100;
-    while (z < maxZoom && !fits(z)) z = Math.min(maxZoom, Math.round((z + 0.01) * 100) / 100);
-    return z;
+    return hi / 100;
   }
 
   // Where `pos` lands on a screen of `size` CSS px centred on `me` at `zoom`

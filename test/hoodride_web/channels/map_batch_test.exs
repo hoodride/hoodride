@@ -100,6 +100,84 @@ defmodule HoodrideWeb.MapBatchTest do
     |> Enum.filter(fn {e, _} -> e in ~w(driver_update driver_left) end)
   end
 
+  # find the nearest counts only who's on the map: a "left" about an area
+  # the app no longer watches must never reach it. The race: the app moves
+  # its view X → Y while a car crosses X → Y. "left X" is queued for this
+  # channel BEFORE it stops watching X; "arrived in Y" goes out before it
+  # starts watching Y (missed: Y's snapshot has the car). The stale "left X"
+  # would then delete the car — by id — from the map: a parked car gone for
+  # good. The channel is paused to line it up exactly so.
+  for ms <- [0, 500] do
+    test "a 'left' for an area no longer watched never reaches the app (view moved X → Y as a car crossed; batch #{ms} ms)" do
+      batching(unquote(ms))
+      rider = TestClient.start(:rider, user("mb-stale-r#{unquote(ms)}"))
+      driver = TestClient.start(:driver, user("mb-stale-d#{unquote(ms)}"))
+      assert {:ok, _} = sync(rider, %{"geo" => [@cell]})
+      drive(driver, @cell, @spot)
+      _ = flushed(rider)
+      pid = TestClient.channel_pid(rider)
+      :sys.suspend(pid)
+      # the view moves to Y (queued behind nothing; handled on resume) …
+      send(rider.pid, {:push, self(), "world", "sync", %{"geo" => [@cell2]}})
+      name = rider.name
+      assert_receive {^name, :pushed, _}
+      # … and the car crosses X → Y: "left X" queued behind the sync
+      drive(driver, @cell2, @spot2)
+      :sys.resume(pid)
+      frames = flushed(rider)
+
+      refute Enum.any?(car_items(frames), &match?({"driver_left", _}, &1)),
+             "a stale 'left' reached the app: #{inspect(frames)}"
+    end
+  end
+
+  # the ✋ mirror: an online driver watches X; a rider's ✋ moves X → Y as
+  # the driver's view moves X → Y — the stale "hand_left X" must never
+  # reach the app (it would delete that ✋ from Y, by id)
+  for ms <- [0, 500] do
+    test "a ✋ 'left' for an area no longer watched never reaches the driver (batch #{ms} ms)" do
+      batching(unquote(ms))
+      driver = TestClient.start(:hdriver, user("mb-hstale-d#{unquote(ms)}"))
+      rider = TestClient.start(:hrider, user("mb-hstale-r#{unquote(ms)}"))
+      drive(driver, @cell, @spot)
+      assert {:ok, _} = sync(driver, %{"geo" => [@cell]})
+      hand(rider, @cell, @spot)
+      frames0 = flushed(driver)
+
+      assert Enum.any?(hand_items(frames0), &match?({"hand_update", _}, &1)),
+             "(the ✋ seen in X first: #{inspect(frames0)})"
+
+      pid = TestClient.channel_pid(driver)
+      :sys.suspend(pid)
+      send(driver.pid, {:push, self(), "world", "sync", %{"geo" => [@cell2]}})
+      name = driver.name
+      assert_receive {^name, :pushed, _}
+      hand(rider, @cell2, @spot2)
+      :sys.resume(pid)
+      frames = flushed(driver)
+
+      refute Enum.any?(hand_items(frames), &match?({"hand_left", _}, &1)),
+             "a stale ✋ 'left' reached the app: #{inspect(frames)}"
+    end
+  end
+
+  defp hand(rider, cell, spot) do
+    topic = "user:#{rider.user.id}"
+    send(rider.pid, {:push, self(), topic, "hand_up", %{"cell" => cell, "spot" => spot}})
+    name = rider.name
+    assert_receive {^name, :pushed, _}
+    _ = request(rider, topic, "__barrier__", %{})
+    :ok
+  end
+
+  defp hand_items(frames) do
+    Enum.flat_map(frames, fn
+      {"batch", %{items: items}} -> for [e, p] <- items, do: {e, p}
+      frame -> [frame]
+    end)
+    |> Enum.filter(fn {e, _} -> e in ~w(hand_update hand_left) end)
+  end
+
   describe "off (0)" do
     test "every update is its own message, at once — exactly as before" do
       batching(0)

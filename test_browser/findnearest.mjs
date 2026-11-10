@@ -32,9 +32,9 @@ const onYou = async (p) => {
   const me = await p.eval(`({ lat: state.me.lat, lng: state.me.lng })`);
   return Math.abs(v.lat - me.lat) < 1e-4 && Math.abs(v.lng - me.lng) < 1e-4;
 };
-// their marker is on this person's screen
+// their marker is on this person's screen (drawn: a pile holding them, inside the view)
 const onScreen = (p, id) =>
-  p.eval(`realEntries.has(${id}) && map.getBounds().contains([realEntries.get(${id}).peer.pos.lng, realEntries.get(${id}).peer.pos.lat])`);
+  p.eval(`(() => { for (const pm of pileMarkers.values()) if (pm.ids.includes(${id})) return map.getBounds().contains(pm.marker.getLngLat()); return false; })()`);
 // a gesture of yours: a drag (it carries the pointer's event, as a real one)
 const drag = (p) => p.eval(`map.panBy([0, 300], { duration: 0 }, { originalEvent: new MouseEvent("mousedown") }), true`);
 // a slow connection: this person's map asks the server who's in view, and

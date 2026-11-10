@@ -333,6 +333,10 @@ defmodule Hoodride.Geo do
   # repairs run in the USER's own writer shard, so they are serialized with
   # that user's live updates and can't race them; anything in flight when the
   # sweeper looked is simply re-derived fresh here
+  # (a car silent this long is frozen: the sweeper reaps it — the repair
+  # never brings it back on watchers' maps meanwhile; = Sweeper's limit)
+  @repair_fresh_s 3 * 60
+
   def reindex_user(user_id), do: Hoodride.GeoWriter.exec(user_id, {:reindex, user_id})
 
   @doc false
@@ -348,8 +352,51 @@ defmodule Hoodride.Geo do
         end
 
     actual = :ets.match_object(@by_cell, {{:_, user_id}, :_})
-    Enum.each(actual -- expected, fn {key, _} -> :ets.delete(@by_cell, key) end)
-    Enum.each(expected -- actual, &:ets.insert(@by_cell, &1))
+    stale = actual -- expected
+    missing = expected -- actual
+    Enum.each(stale, fn {key, _} -> :ets.delete(@by_cell, key) end)
+    Enum.each(missing, &:ets.insert(@by_cell, &1))
+
+    # the repair TELLS the watchers, as the interrupted move would have:
+    # the old cell's "left" (else a ghost stays on their maps), the new
+    # cell's update (else they never see them arrive) — "left" first
+    Enum.each(stale, fn
+      {{cell, _}, :driver} -> broadcast(:drivers, cell, "driver_left", %{id: user_id})
+      {{cell, _}, :hand} -> broadcast(:hands, cell, "hand_left", %{id: user_id})
+    end)
+
+    # — but never announces what the normal path wouldn't: someone in a
+    # ride (claimed seats count: the car's own "offline" is on its way), or
+    # a car whose position went silent (the next sweep reaps it)
+    # a "left" names only the id: an app watching the ghost cell AND the
+    # real one would delete them by id — so after any "left", where they
+    # really are is announced again (not only newly indexed cells)
+    announce = if stale == [], do: missing, else: expected
+
+    if Hoodride.Rides.ride_id_of_user(user_id) == nil do
+      now = System.system_time(:second)
+
+      Enum.each(announce, fn
+        {{cell, _}, :driver} ->
+          case :ets.lookup(@drivers, user_id) do
+            [{_, ^cell, spot, ts}] when now - ts <= @repair_fresh_s ->
+              broadcast(:drivers, cell, "driver_update", %{id: user_id, cell: cell, spot: spot})
+
+            _ ->
+              :ok
+          end
+
+        {{cell, _}, :hand} ->
+          case :ets.lookup(@hands, user_id) do
+            [{_, ^cell, spot}] ->
+              broadcast(:hands, cell, "hand_update", %{id: user_id, cell: cell, spot: spot})
+
+            _ ->
+              :ok
+          end
+      end)
+    end
+
     :ok
   end
 
@@ -773,20 +820,74 @@ defmodule Hoodride.Geo do
   # Publishes ONLY the sides that changed, each to its own audience. Sending
   # the other side too — even an unchanged number — would tell riders WHEN
   # hands come and go (and drivers when cars do): a timing leak.
-  defp settle_and_broadcast(_cell, []), do: :ok
+  # (public only for its tests: two shards' interleavings are set up directly)
+  @doc false
+  def settle_and_broadcast(_cell, []), do: :ok
 
-  defp settle_and_broadcast(cell, sides) do
+  def settle_and_broadcast(cell, sides) do
     # atomic compare-and-delete: only an exactly-zero row dies, so another
     # shard's concurrent increment on the same hex can never be lost
-    if :ets.select_delete(@agg, [{{cell, 0, 0}, [], [true]}]) == 1 do
-      broadcast_agg(cell, sides, 0, 0)
-    else
-      case :ets.lookup(@agg, cell) do
-        [{_, d, h}] -> broadcast_agg(cell, sides, d, h)
-        [] -> :ok
+    sent =
+      if :ets.select_delete(@agg, [{{cell, 0, 0}, [], [true]}]) == 1 do
+        broadcast_agg(cell, sides, 0, 0)
+        {0, 0}
+      else
+        case :ets.lookup(@agg, cell) do
+          [{_, d, h}] ->
+            broadcast_agg(cell, sides, d, h)
+            {d, h}
+
+          # gone: another shard took it to 0/0 and deleted it — its own
+          # side it announced; OURS moved too, so ours is said (0), or its
+          # watchers keep the old count until the hex next changes
+          [] ->
+            broadcast_agg(cell, sides, 0, 0)
+            {0, 0}
+        end
       end
+
+    reconfirm_agg(cell, sides, sent, 3)
+  end
+
+  # Another shard counting the same hex sends the number IT read — and two
+  # senders' messages land in either order: its older number could arrive
+  # after ours and leave watchers on it until the hex next changed. So the
+  # count is read again AFTER sending: moved meanwhile, it's sent again. The
+  # last number any watcher gets was then read after the last change
+  # (bounded: a hex that keeps changing has its own next send coming).
+  # (`read` is the count's reader — the table; a test passes one whose
+  # count never settles, to pin the bound)
+  @doc false
+  def reconfirm_agg(cell, sides, sent, tries, read \\ &read_agg/1)
+
+  def reconfirm_agg(_cell, _sides, _sent, 0, _read), do: :ok
+
+  def reconfirm_agg(cell, sides, sent, tries, read) do
+    now = read.(cell)
+
+    # per SIDE: a side is sent again only if ITS count moved — never
+    # because the other side did (a repeat of the car count would tell
+    # riders a hand went up or down there: the privacy law)
+    moved = Enum.filter(Enum.uniq(sides), &(side_count(now, &1) != side_count(sent, &1)))
+
+    if moved == [] do
+      :ok
+    else
+      {d, h} = now
+      broadcast_agg(cell, moved, d, h)
+      reconfirm_agg(cell, sides, now, tries - 1, read)
     end
   end
+
+  defp read_agg(cell) do
+    case :ets.lookup(@agg, cell) do
+      [{_, d, h}] -> {d, h}
+      [] -> {0, 0}
+    end
+  end
+
+  defp side_count({d, _h}, :drivers), do: d
+  defp side_count({_d, h}, :hands), do: h
 
   defp cell_deltas(nil, _cells, _sign), do: %{}
 

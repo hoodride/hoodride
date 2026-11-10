@@ -370,8 +370,12 @@ defmodule HoodrideWeb.WorldChannel do
 
       # snapshots are taken AFTER subscribing: any update landing meanwhile
       # is queued in this process and delivered after the reply. Each one
-      # carries only its own layer.
-      {:reply, {:ok, snapshots(new)}, assign(socket, geo: want_geo, agg: want_agg, held: want)}
+      # carries only its own layer. "fresh" (the app's last reply never
+      # reached it — timed out there): every wanted topic's snapshot again,
+      # not only the new ones (already-held cells' parked cars would never
+      # show: they send no update of their own)
+      snap = if is_map(payload) and payload["fresh"] == true, do: Enum.sort(want), else: new
+      {:reply, {:ok, snapshots(snap)}, assign(socket, geo: want_geo, agg: want_agg, held: want)}
     end
   end
 
@@ -418,13 +422,30 @@ defmodule HoodrideWeb.WorldChannel do
     {:noreply, apply_role(socket, Roles.of(socket.assigns.user_id))}
   end
 
-  # a watched topic's broadcast arrives in OUR mailbox — forward it on, but
-  # only if the LIVE role still allows its layer (a message queued before a
-  # role ping must not slip through)
-  def handle_info(
-        %Phoenix.Socket.Broadcast{topic: topic, event: event, payload: payload},
-        %{assigns: %{batch_ms: 0}} = socket
-      ) do
+  # a broadcast for a topic no longer watched: dropped. It was queued before
+  # a sync stopped watching it (the view moved X → Y as a car crossed X → Y:
+  # "left X" waited in our mailbox) — passed on, the app would delete by id a
+  # car Y's snapshot just showed (find the nearest: "nobody" with a car right
+  # there, for good if it's parked). Watched: passed to the map's own
+  # handling (map_update).
+  def handle_info(%Phoenix.Socket.Broadcast{topic: topic} = msg, socket) do
+    if MapSet.member?(socket.assigns.held, topic),
+      do: map_update(msg, socket),
+      else: {:noreply, socket}
+  end
+
+  def handle_info(:flush_map, socket),
+    do: {:noreply, flush(%{socket | assigns: %{socket.assigns | flush_timer: nil}})}
+
+  def handle_info(_other, socket), do: {:noreply, socket}
+
+  # a watched topic's broadcast — forward it on, but only if the LIVE role
+  # still allows its layer (a message queued before a role ping must not
+  # slip through)
+  defp map_update(
+         %Phoenix.Socket.Broadcast{topic: topic, event: event, payload: payload},
+         %{assigns: %{batch_ms: 0}} = socket
+       ) do
     role = Roles.of(socket.assigns.user_id)
 
     if Roles.layer(role) == layer_of(topic) do
@@ -438,7 +459,7 @@ defmodule HoodrideWeb.WorldChannel do
 
   # batching on: held for its layer if that's the layer this channel holds
   # (the LIVE role is checked once, when the batch is sent)
-  def handle_info(%Phoenix.Socket.Broadcast{topic: topic, event: event, payload: payload}, socket) do
+  defp map_update(%Phoenix.Socket.Broadcast{topic: topic, event: event, payload: payload}, socket) do
     layer = layer_of(topic)
 
     if layer == Roles.layer(socket.assigns.role) do
@@ -447,11 +468,6 @@ defmodule HoodrideWeb.WorldChannel do
       {:noreply, apply_role(socket, Roles.of(socket.assigns.user_id))}
     end
   end
-
-  def handle_info(:flush_map, socket),
-    do: {:noreply, flush(%{socket | assigns: %{socket.assigns | flush_timer: nil}})}
-
-  def handle_info(_other, socket), do: {:noreply, socket}
 
   # the user channel on the same socket asking before a cold contact: "is
   # this topic on your screen right now?" (HoodrideWeb.Reach). Never calls back.

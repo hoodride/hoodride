@@ -38,6 +38,26 @@
     return stale;
   }
 
+  // A map message about one person, applied to what the app holds for them
+  // (`entry`: {type, cell} or none): "upsert" | "remove" | "keep".
+  //   - an update in an area the app watches: upsert;
+  //   - an update in an area it DOESN'T watch: what it had of them is stale
+  //     — they're elsewhere now — so it goes (a batch keeps only a person's
+  //     newest message: their "left" was folded into this update, and
+  //     ignoring the update would leave a ghost where they were);
+  //   - a "left": the server sends only the person's id (its privacy rule:
+  //     each message carries exactly itself), so it's applied by id — a
+  //     stale one for an area no longer watched is dropped by the server
+  //     (world_channel's held check). Should a "left" ever name its area,
+  //     it's applied only where the app has them.
+  function mapMessageAction(entry, kind, msg, type, wanted) {
+    const mine = !!entry && entry.type === type;
+    if (kind === "update") return wanted ? "upsert" : mine ? "remove" : "keep";
+    if (!mine) return "keep";
+    if (msg && msg.cell && entry.cell && entry.cell !== msg.cell) return "keep";
+    return "remove";
+  }
+
   // An empty chat the app may drop: one opened from a card and never sent
   // (it exists only here). A chat the server holds — a ride's, which
   // exists from ride start even if nobody types — stays, so a silent ride's
@@ -116,6 +136,7 @@
   }
 
   return {
+    mapMessageAction,
     staleInSnapshot,
     chatPrunable,
     chatClosedActions,

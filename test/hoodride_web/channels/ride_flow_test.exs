@@ -172,6 +172,38 @@ defmodule HoodrideWeb.RideFlowTest do
     _ = ref
   end
 
+  # accepting lowers the rider's ✋: every OTHER online driver watching
+  # that block must hear it go (the ✋ and its count) — else it stays on
+  # their maps, counted, and their find the nearest calls it found
+  test "an accepted ride: other drivers watching hear the rider's ✋ go, and its count drop", %{
+    rider: rider,
+    driver: driver
+  } do
+    alias Phoenix.Socket.Broadcast
+    rsock = connect_as(rider)
+    dsock = connect_as(driver)
+    {:ok, _, rchan} = subscribe_and_join(rsock, "user:#{rider.id}", %{})
+    {:ok, _, dchan} = subscribe_and_join(dsock, "user:#{driver.id}", %{})
+    # (another driver's map: the ✋ layer of this block and its count)
+    HoodrideWeb.Endpoint.subscribe(Hoodride.Geo.geo_topic(:hands, @cell))
+    HoodrideWeb.Endpoint.subscribe(Hoodride.Geo.agg_topic(:hands, "c7-acc"))
+
+    push(dchan, "driver_update", %{"cell" => @cell, "spot" => "spot9car"})
+    push(rchan, "hand_up", %{"cell" => @cell, "spot" => "spot9abc", "parents" => ["c7-acc"]})
+    assert_receive %Broadcast{topic: "geo:h:" <> _, event: "hand_update", payload: %{id: rid}}
+    assert rid == rider.id
+    assert_receive %Broadcast{topic: "agg:h:c7-acc", payload: %{hands: 1}}
+
+    _ = watch(rsock, @cell)
+    ref = push(rchan, "request_ride", %{"to" => driver.id})
+    assert_reply ref, :ok
+    ref = push(dchan, "accept_request", %{"rider_id" => rider.id})
+    assert_reply ref, :ok
+
+    assert_receive %Broadcast{topic: "geo:h:" <> _, event: "hand_left", payload: %{id: ^rid}}
+    assert_receive %Broadcast{topic: "agg:h:c7-acc", payload: %{hands: 0}}
+  end
+
   test "cancel-vs-accept race: first action wins", %{rider: rider, driver: driver} do
     rsock = connect_as(rider)
     dsock = connect_as(driver)

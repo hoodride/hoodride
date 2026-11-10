@@ -5,7 +5,7 @@
 // What's typed stays with its chat ("Draft" in the list, as WhatsApp).
 // Both directions: a driver writing to a ✋, a rider writing to a car.
 import { journey, step, check, server } from "./cdp.mjs";
-import { goOnline, sees, openChatWith, typeText, box, send, chatOpenWith, closeChatPanel, bannerIs, YELLOW } from "./app.mjs";
+import { DRAWN, goOnline, sees, openChatWith, typeText, box, send, chatOpenWith, closeChatPanel, bannerIs, YELLOW } from "./app.mjs";
 
 // the chat window: open? the list or a chat — whose?
 const where = (p) =>
@@ -141,4 +141,41 @@ await journey("chatback: ‹ opens the list; drafts stay with their chat", async
   await typeText(sam, "still on?");
   await send(sam);
   await dora.waitFor(`chatFor(realPeersById.get(${samId})).msgs.some((m) => m.text === "still on?")`, "Dora gets it: someone you already talk to costs nothing");
+
+  // the map's messages, from a DRIVER's side (owner, 2026-11-10): an update
+  // for a cell Dora doesn't watch takes Ray's stale ✋ off (the server folded
+  // his "left" into it); a ✋ "left" takes it off; a car's "left" on Sam's
+  // map takes that car off — each message, each type, through the app's
+  // real handlers. Sent and read in one go (a real update can't slip in).
+  step("Dora's map (driver): a ✋ update elsewhere takes Ray's stale ✋ off; a ✋ 'left' too; Sam's map: a car's 'left' takes Ed's off");
+  await closeChatPanel(dora);
+  await sees(dora, rayId, "(Ray's ✋, drawn)");
+  const inject = (p, event, payload, id) =>
+    p.eval(`new Promise((ok) => {
+      worldChannel.trigger("batch", { items: [[${JSON.stringify(event)}, ${JSON.stringify(payload)}]] });
+      const gone = !realEntries.has(${id});
+      requestAnimationFrame(() => requestAnimationFrame(() => ok({ gone, drawn: ${DRAWN(id)} })));
+    })`);
+  const far = await dora.eval(`h3.latLngToCell(state.me.lat + 0.3, state.me.lng, H3_RES)`);
+  let r = await inject(dora, "hand_update", { id: rayId, cell: far, spot: far }, rayId);
+  check(r.gone && !r.drawn, "a ✋ update for a cell Dora doesn't watch: Ray's stale ✋ gone", r);
+  // (the server still has it here: a fresh look brings it back)
+  const v = await dora.eval(`(() => { const c = map.getCenter(); return { lng: c.lng, lat: c.lat, zoom: map.getZoom() }; })()`);
+  await dora.eval(`map.jumpTo({ zoom: 11 }), true`);
+  await dora.waitFor(`worldSync.settled() && !map.isMoving()`, "Dora zoomed out");
+  await dora.eval(`map.jumpTo({ center: [${v.lng}, ${v.lat}], zoom: ${v.zoom} }), true`);
+  await sees(dora, rayId, "(Ray's ✋ back)");
+  r = await inject(dora, "hand_left", { id: rayId }, rayId);
+  check(r.gone && !r.drawn, "a ✋ 'left': Ray's ✋ gone", r);
+  await sees(sam, edId, "(Ed's car, drawn)");
+  r = await inject(sam, "driver_left", { id: edId }, edId);
+  check(r.gone && !r.drawn, "a car's 'left': Ed's car gone from Sam's map", r);
+  // and a car's message never touches a ✋ (nor the reverse): Sam's map
+  // has no ✋ of Ray's to touch — Dora's map, Dora's own ✋-less car layer
+  await dora.eval(`map.jumpTo({ zoom: 11 }), true`);
+  await dora.waitFor(`worldSync.settled() && !map.isMoving()`, "Dora zoomed out");
+  await dora.eval(`map.jumpTo({ center: [${v.lng}, ${v.lat}], zoom: ${v.zoom} }), true`);
+  await sees(dora, rayId, "(Ray's ✋ back again)");
+  r = await inject(dora, "driver_left", { id: rayId }, rayId);
+  check(!r.gone && r.drawn, "a CAR's 'left' with Ray's id: his ✋ stays", r);
 });

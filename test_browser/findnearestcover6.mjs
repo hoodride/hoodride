@@ -23,27 +23,10 @@
 // findnearestnobody.mjs, findnearestovertime/backoff/driving/
 // settle/faults/away/dot.mjs.
 import { journey, step, check, HOME } from "./cdp.mjs";
-import { goOnline, sees, openChatWith } from "./app.mjs";
+import { goOnline, sees, openChatWith, holdAnswers, letAnswersGo } from "./app.mjs";
 import { oracle, tapLocate, tapEl, looksNoMore, sleep } from "./cover.mjs";
 
 const BLOCK = { latitude: HOME.latitude + 0.004, longitude: HOME.longitude + 0.003 };
-
-// the map's questions held back — sent only when the test lets them go (no
-// clock: however slow the steps in between)
-const holdAnswers = (p) =>
-  p.eval(`(() => {
-    window.__push = window.__push || worldChannel.push.bind(worldChannel);
-    window.__heldAsks = [];
-    worldChannel.push = (event, ...rest) => {
-      if (event !== "sync") return window.__push(event, ...rest);
-      const cbs = [];
-      const later = { receive(status, cb) { cbs.push([status, cb]); return later; } };
-      window.__heldAsks.push(() => cbs.reduce((q, [status, cb]) => q.receive(status, cb), window.__push(event, ...rest)));
-      return later;
-    };
-    return true;
-  })()`);
-const letAnswersGo = (p) => p.eval(`(window.__push && (worldChannel.push = window.__push), (window.__heldAsks || []).splice(0).forEach((f) => f()), true)`);
 
 // a search that waits at its first step: the map moved off first, so the
 // search's own move asks the server again — and that answer is held back

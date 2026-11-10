@@ -687,3 +687,69 @@ test("ringReach: a shadow moved down (or sideways) isn't a ring round it — onl
   assert.equal(ring("rgb(1, 2, 3) 0px 2px 0px 3px"), 0, "moved down");
   assert.equal(ring("rgb(1, 2, 3) 2px 0px 0px 3px"), 0, "moved sideways");
 });
+
+// the work a search start costs (owner, 2026-11-10): each "does this zoom
+// show people one by one?" asks the map planner (planWatch: an H3 fill of up
+// to ~110 cells) — counted, so a slowdown fails here, not on a phone. And
+// it stays BOUNDED whatever the planner answers (a planner that says yes,
+// no, yes… at random zooms must never make it loop for ever)
+test("the zooms a search starts with: a bounded number of planner calls — on a phone, a big screen, and with a planner that answers inconsistently", () => {
+  const counting = (inner) => {
+    const v = { calls: 0, planWatch: (...a) => (v.calls++, inner(...a)) };
+    return v;
+  };
+  const plan = (viewport, size, center = NYC) => {
+    const base = { viewport, h3, center, size, rungs: RUNGS, budget: BUDGET };
+    const start = N.markerStartZoom({ ...base, maxZoom: 14 });
+    const widest = N.widestMarkerZoom({ ...base, maxZoom: start });
+    return { start, widest };
+  };
+  const phone = counting(V.planWatch);
+  plan(phone, PHONE);
+  assert.ok(phone.calls <= 20, `a phone: ${phone.calls} planner calls`);
+  const big = counting(V.planWatch);
+  plan(big, { w: 2560, h: 1440 });
+  assert.ok(big.calls <= 40, `a big screen: ${big.calls} planner calls`);
+  // a planner that, past its first answers, says "fits" to every halving
+  // step and then "doesn't" to everything after — the shape that would make
+  // a step-by-step search walk a hundredth at a time all the way in
+  let n = 0;
+  const odd = { calls: 0, planWatch: () => { odd.calls++; n++; const yes = n === 1 || (n > 2 && n <= 14); return { res: yes ? RUNGS[0] : RUNGS[1] }; } };
+  const r = { widest: N.widestMarkerZoom({ viewport: odd, h3, center: NYC, size: PHONE, rungs: RUNGS, budget: BUDGET, maxZoom: 14 }), start: 14 };
+  assert.ok(odd.calls <= 40, `an inconsistent planner: ${odd.calls} calls — bounded`);
+  assert.ok(r.widest >= 1 && r.widest <= r.start && r.start <= 18, JSON.stringify(r));
+});
+
+// edges a future edit could break unnoticed (a unit-boundary review,
+// 2026-11-10)
+test("widestMarkerZoom: exact to a hundredth — a hundredth wider shows counts; a whole hundredth itself", () => {
+  for (const size of [PHONE, DESKTOP])
+    for (const center of [NYC, { lat: 51.5072, lng: -0.1276 }]) {
+      const z = widest(size, center);
+      assert.equal(Math.round(z * 100) / 100, z, `${z}: a whole hundredth`);
+      assert.ok(!markersAt(center, Math.round((z - 0.01) * 100) / 100, size), `${z}: a hundredth wider still shows people`);
+    }
+});
+
+test("widestMarkerZoom / showsMarkers: even the whole world shows people → 1; a planner with no plan → not people", () => {
+  assert.equal(N.widestMarkerZoom({ viewport: { planWatch: () => ({ res: RUNGS[0] }) }, h3, center: NYC, size: PHONE, rungs: RUNGS, budget: BUDGET, maxZoom: 14 }), 1);
+  assert.equal(N.showsMarkers({ planWatch: () => null }, h3, N.screenAt(NYC, 14, PHONE), RUNGS, BUDGET), false);
+});
+
+test("zoomSteps from a fractional start (a big screen's); stepsFrom with the map's float zoom a hair under a step", () => {
+  assert.deepEqual(N.zoomSteps(14.37, 13.1, 0.5), [14.37, 13.87, 13.37, 13.1]);
+  const zs = [14, 13.5, 13, 12.5, 12.47];
+  assert.deepEqual(N.stepsFrom(zs, 13 - 1e-7), [13, 12.5, 12.47]);
+});
+
+test("metersBetween: across the 180° line, to the far side of the earth, and to itself", () => {
+  assert.ok(Math.abs(N.metersBetween({ lat: 0, lng: 179.999 }, { lat: 0, lng: -179.999 }) - 222.4) < 1);
+  assert.ok(Math.abs(N.metersBetween({ lat: 0, lng: 0 }, { lat: 0, lng: 180 }) - Math.PI * 6371008.8) < 1);
+  assert.equal(N.metersBetween(NYC, NYC), 0);
+});
+
+test("screenPoint: a longitude a whole turn off lands in the same place; inSight with a zero reach; markerReach skips a part it can't measure", () => {
+  assert.ok(Math.abs(N.screenPoint(NYC, { lat: NYC.lat, lng: NYC.lng + 360 }, 14, PHONE).x - PHONE.w / 2) < 1e-6);
+  assert.equal(N.inSight({ x: 0, y: 400 }, { l: 0, r: 0, t: 0, b: 0 }, PHONE, []), true);
+  assert.deepEqual(N.markerReach({ left: 100, right: 144, top: 200, bottom: 244 }, [{ left: NaN, right: NaN, top: NaN, bottom: NaN }]), { l: 22, r: 22, t: 22, b: 22 });
+});

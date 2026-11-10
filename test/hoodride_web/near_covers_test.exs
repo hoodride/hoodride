@@ -786,10 +786,12 @@ defmodule HoodrideWeb.NearCoversTest do
         "if (foundWatch.lookedAt && HoodNearby.elapsed(foundWatch.lookedAt, now) > NEAR_LOOK_GAP_MS) foundWatch.seenAt = null;",
         "foundWatch.lookedAt = now;",
         "if (HoodNearby.lookingFor(state) !== foundWatch.type) return stopFindNearest();",
+        # in the background: checked BEFORE the page is measured (battery) —
+        # and before the panel check, so the count of "gone" is kept
+        "if (document.hidden) return void (foundWatch.seenAt = null);",
         "if (mapOutOfSight() || panelOpen()) return void (foundWatch.goneAt = foundWatch.seenAt = null);",
         "if (!DEMO && worldSync.refused()) return stopFindNearest();",
         "const role = foundWatch.type === \"driver\" ? \"viewer\" : \"driver\";",
-        "if (document.hidden) return void (foundWatch.seenAt = null);",
         "if (!DEMO && (!worldSync.settled() || serverRole !== role || renderMarkersSoon.pending())) return;",
         "if (bannerTimer) return void (foundWatch.goneAt = foundWatch.seenAt = null);",
         "const size = mapSize();",

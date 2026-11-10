@@ -1586,6 +1586,9 @@ const worldSync = HoodSync.createWorldSync({
 
 function setWanted(geo, agg) {
   worldSync.setWanted(geo, agg);
+  // (only what the view wants now is drawn: redrawn as the wish changes)
+  renderMarkersSoon();
+  renderAggSoon();
 }
 
 // an update for a cell we no longer want (e.g. still in flight from before
@@ -1609,25 +1612,20 @@ function joinWorldChannel() {
   // live updates change the data at once and draw on the next screen frame
   // (HoodMapFrame): one redraw however many arrive. A server "batch" feeds
   // its items, in order, to these same handlers.
+  // (who's where: HoodBrowse.mapMessageAction — an update elsewhere takes
+  // the stale entry off; a "left" only where the app has them)
+  const applyMapMessage = (kind, msg, type, wanted) => {
+    const act = HoodBrowse.mapMessageAction(realEntries.get(msg.id), kind, msg, type, wanted);
+    if (act === "keep") return;
+    if (act === "upsert") upsertBrowseEntry(msg, type, { render: false });
+    else removeBrowseEntry(msg.id, type, { render: false });
+    renderMarkersSoon();
+  };
   const mapHandlers = {
-    driver_update: (d) => {
-      if (!wantsDriverAt(d)) return;
-      upsertBrowseEntry(d, "driver", { render: false });
-      renderMarkersSoon();
-    },
-    driver_left: ({ id }) => {
-      removeBrowseEntry(id, "driver", { render: false });
-      renderMarkersSoon();
-    },
-    hand_update: (h) => {
-      if (!worldSync.wantsGeo(h.cell)) return;
-      upsertBrowseEntry(h, "hand", { render: false });
-      renderMarkersSoon();
-    },
-    hand_left: ({ id }) => {
-      removeBrowseEntry(id, "hand", { render: false });
-      renderMarkersSoon();
-    },
+    driver_update: (d) => applyMapMessage("update", d, "driver", wantsDriverAt(d)),
+    driver_left: (d) => applyMapMessage("left", d, "driver", true),
+    hand_update: (h) => applyMapMessage("update", h, "hand", worldSync.wantsGeo(h.cell)),
+    hand_left: (h) => applyMapMessage("left", h, "hand", true),
     agg_update: (p) => {
       if (!worldSync.wantsAgg(p.cell)) return;
       aggData.set(p.cell, p);
@@ -1957,6 +1955,10 @@ function renderAggLayer() {
     const count =
       state.mode === "rider" ? p.drivers || 0 : state.online ? p.hands || 0 : 0;
     if (count <= 0) return; // a hex never renders a zero — or an impossible negative
+    // a hex the view no longer wants (its counts kept while the server
+    // holds it): not drawn — never count hexes over the markers of a view
+    // zoomed in meanwhile
+    if (!DEMO && !worldSync.wantedAggHas(cell)) return;
     hexes.push({
       type: "Feature",
       geometry: { type: "Polygon", coordinates: [h3.cellToBoundary(cell, true)] },
@@ -1978,6 +1980,12 @@ function renderAggLayer() {
 // `render: false` when the caller redraws once for a whole batch.
 function upsertBrowseEntry(data, type, { render = true } = {}) {
   if (state.realUser && data.id === state.realUser.id) return;
+  // mid-ride, the partner is EXACT (their ride position): a late map update
+  // must change nothing of theirs — checked before anything is touched (it
+  // used to set their block centre first: their marker vanished, "on the
+  // way" measured from the block)
+  const entry = realEntries.get(data.id);
+  if (entry && entry.type === "ridepeer") return;
 
   const peer = ensurePeer(data);
   peer.kind = type === "driver" ? "driver" : "rider";
@@ -1986,8 +1994,6 @@ function upsertBrowseEntry(data, type, { render = true } = {}) {
   peer.pos = { lat, lng };
   peer.posExact = false; // a block centre, never someone's position
 
-  const entry = realEntries.get(data.id);
-  if (entry && entry.type === "ridepeer") return; // mid-ride: the partner is exact
   realEntries.set(data.id, { peer, type, cell: data.cell, spot });
   if (render) renderRealMarkers();
 }
@@ -2067,7 +2073,10 @@ function renderRealMarkers() {
   });
 
   // everyone else: one marker per pile (same type, same spot)
-  const shown = new Map([...realEntries].filter(([, e]) => e.type !== "ridepeer" && browseVisible(e.type)));
+  // (only cells the view wants now: one it left keeps its people's data
+  // while the server holds it, not their markers — never markers under
+  // the count hexes of a view zoomed out meanwhile)
+  const shown = new Map([...realEntries].filter(([, e]) => e.type !== "ridepeer" && browseVisible(e.type) && worldSync.wantedGeoHas(e.cell)));
   const live = new Set();
   HoodBrowse.groupMarkers(shown).forEach((g) => {
     live.add(g.key);
@@ -4463,6 +4472,9 @@ function stillSeen() {
   if (foundWatch.lookedAt && HoodNearby.elapsed(foundWatch.lookedAt, now) > NEAR_LOOK_GAP_MS) foundWatch.seenAt = null;
   foundWatch.lookedAt = now;
   if (HoodNearby.lookingFor(state) !== foundWatch.type) return stopFindNearest();
+  // in the background, nobody's seen: the minute in sight is over — and no
+  // more of the page is measured (battery); the count of "gone" is kept
+  if (document.hidden) return void (foundWatch.seenAt = null);
   if (mapOutOfSight() || panelOpen()) return void (foundWatch.goneAt = foundWatch.seenAt = null);
   // a view the server refused for good: never answered — the watch ends (as
   // the search does)
@@ -4471,10 +4483,8 @@ function stillSeen() {
   // resync, a reconnect: the markers come back after it; as the role you
   // look as), or its answer not drawn yet (a car just arrived: drawn on the
   // next frame) — this look is skipped, the count kept (a resync every
-  // minute must not start it over — nor the minute in sight below). In the
-  // background, nobody's seen: the minute in sight is over.
+  // minute must not start it over — nor the minute in sight below)
   const role = foundWatch.type === "driver" ? "viewer" : "driver";
-  if (document.hidden) return void (foundWatch.seenAt = null);
   if (!DEMO && (!worldSync.settled() || serverRole !== role || renderMarkersSoon.pending())) return;
   // a message up a while over the top of the map: what's under it isn't
   // "gone" — counted afresh after it

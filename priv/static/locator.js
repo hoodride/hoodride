@@ -159,12 +159,12 @@
         },
         (e) => {
           if (!quiet) onError(e, ctx);
-          // the ◎ tap's OWN request failed (timed out, location off): the
+          // the ◎ tap's OWN request failed (refused, timed out, location off): the
           // tap is over — a reading coming later (✋ up, going online, a
           // watch) is not its answer, so it isn't centred as one (owner,
           // 2026-11-10). (The live watch timing out meanwhile — every 15 s
           // indoors — is not this tap failing: it keeps waiting.)
-          if (ctx === "locate" && (e.code === 2 || e.code === 3)) s.wantsCentre = false;
+          if (ctx === "locate" && (e.code === 1 || e.code === 2 || e.code === 3)) s.wantsCentre = false;
         },
         { enableHighAccuracy: ctx !== "locate", maximumAge: 60000, timeout: 15000 }
       );

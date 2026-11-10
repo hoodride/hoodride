@@ -179,6 +179,59 @@ defmodule HoodrideWeb.WorldChannelTest do
     assert [{_, _}] = subscribers("home")
   end
 
+  # a sync whose reply never reached the app (it timed out there) — the app
+  # asks again with "fresh": every wanted cell's snapshot comes again, even
+  # those already held (else parked cars there never show: they send no
+  # update of their own). Without it, only newly watched cells snapshot.
+  test "a 'fresh' sync gets every wanted cell's snapshot — even cells already held", %{
+    world: world
+  } do
+    Geo.driver_update(%{id: 7_700_001, name: "Parked", photo: nil}, "fr1", nil)
+    assert {:ok, %{geo: [%{cell: "fr1"} | _]}} = sync(world, %{"geo" => ["fr1"]})
+    # asked again, the same: already held — no snapshot
+    assert {:ok, %{geo: []}} = sync(world, %{"geo" => ["fr1"]})
+    # asked afresh: its snapshot again, with the parked car
+    assert {:ok, %{geo: [%{cell: "fr1"} = snap]}} =
+             sync(world, %{"geo" => ["fr1"], "fresh" => true})
+
+    assert inspect(snap) =~ "7700001"
+  end
+
+  test "'fresh' is strict: only `true` asks afresh (\"true\", 1 — no)", %{world: world} do
+    assert {:ok, %{geo: [_]}} = sync(world, %{"geo" => ["fs1"]})
+
+    for v <- ["true", 1, "yes", nil, false],
+        do: assert({:ok, %{geo: []}} = sync(world, %{"geo" => ["fs1"], "fresh" => v}))
+  end
+
+  # a malformed sync (not a map) is refused like any bad request — it must
+  # never crash the channel (the "fresh" check must not read it first)
+  test "a sync whose payload isn't a map: the channel stays up", %{world: world} do
+    for bad <- [["fresh"], "fresh", 1] do
+      ref = push(world, "sync", bad)
+      assert_reply ref, _status
+    end
+
+    assert Process.alive?(world.channel_pid)
+    assert {:ok, _} = sync(world, %{"geo" => ["ok1"]})
+  end
+
+  test "a 'fresh' sync re-sends the count cells too — and only the asker's own layer", %{
+    world: world
+  } do
+    Geo.driver_update(%{id: 7_700_002, name: "C", photo: nil}, "fa-car", nil, ["fa7"])
+    Geo.hand_up(7_700_003, "fa-hand", nil, ["fa7"])
+    assert {:ok, %{agg: [_]}} = sync(world, %{"geo" => ["fa-car"], "agg" => ["fa7"]})
+    assert {:ok, %{agg: [], geo: []}} = sync(world, %{"geo" => ["fa-car"], "agg" => ["fa7"]})
+
+    assert {:ok, %{agg: [agg], geo: [geo]}} =
+             sync(world, %{"geo" => ["fa-car"], "agg" => ["fa7"], "fresh" => true})
+
+    # a rider: cars only — the hand's count and the hand never in a snapshot
+    assert agg == %{cell: "fa7", drivers: 1}
+    assert Map.keys(geo) |> Enum.sort() == [:cell, :drivers]
+  end
+
   # the app must always hear its role change — find the nearest waits for
   # the role it looks as before deciding anything, and the app drops the
   # old layer's markers only on hearing it. The race: a sync already queued

@@ -412,4 +412,293 @@ defmodule Hoodride.AggregatesTest do
     assert Geo.agg_counts_for("c7E") == %{drivers: 1, hands: 0}
     assert Geo.agg_counts_for("c5E") == %{drivers: 1, hands: 0}
   end
+
+  # two writer shards counting the same hex each broadcast the number they
+  # read — and their messages can land in either order (two senders, no
+  # order between them): a watcher could be left on a stale count until
+  # the hex next changed (owner, 2026-11-10). After sending, the count is
+  # read again and sent again if it moved: the LAST number a watcher gets
+  # is always one read after the last change.
+  test "many people joining and leaving one hex at once: the last count a watcher hears is the true count" do
+    hex = "c7-stress"
+    HoodrideWeb.Endpoint.subscribe(Geo.agg_topic(:drivers, hex))
+    people = for i <- 1..48, do: profile(9_100_000 + i)
+
+    for round <- 1..30 do
+      on = Enum.take_random(people, 32)
+
+      Task.async_stream(on, &Geo.driver_update(&1, "c9-#{&1.id}", nil, [hex]),
+        max_concurrency: 32,
+        timeout: :infinity
+      )
+      |> Stream.run()
+
+      Task.async_stream(Enum.take_random(on, 16), &Geo.driver_offline(&1.id),
+        max_concurrency: 16,
+        timeout: :infinity
+      )
+      |> Stream.run()
+
+      last = last_count(hex, nil)
+      truth = Geo.agg_counts_for(hex).drivers
+      assert truth == 16, "(round #{round}: 16 left on)"
+
+      assert last == truth,
+             "round #{round}: watcher left on #{inspect(last)}, the hex holds #{truth}"
+
+      for p <- on, do: Geo.driver_offline(p.id)
+      _ = last_count(hex, nil)
+    end
+  end
+
+  # the re-check after sending must never repeat one side's count because
+  # the OTHER side moved: a rider hearing the same car count twice would
+  # learn a hand went up or down there (the privacy law: a side is sent
+  # only when it changed). One car comes and goes while many hands churn
+  # the same hex: the car count heard must alternate 1, 0, 1, 0 — never
+  # repeat.
+  test "the count re-check never repeats a side because the other side moved" do
+    hex = "c7-xside"
+    HoodrideWeb.Endpoint.subscribe(Geo.agg_topic(:drivers, hex))
+    car = profile(9_200_000)
+    hands = for i <- 1..40, do: 9_200_000 + i
+
+    heard =
+      for _round <- 1..40, reduce: [] do
+        acc ->
+          churn =
+            Task.async(fn ->
+              Task.async_stream(hands, &Geo.hand_up(&1, "c9-h#{&1}", nil, [hex]),
+                max_concurrency: 40,
+                timeout: :infinity
+              )
+              |> Stream.run()
+
+              Task.async_stream(hands, &Geo.hand_down(&1),
+                max_concurrency: 40,
+                timeout: :infinity
+              )
+              |> Stream.run()
+            end)
+
+          Geo.driver_update(car, "c9-car", nil, [hex])
+          Geo.driver_offline(car.id)
+          Task.await(churn, :infinity)
+          acc ++ drivers_heard(hex, [])
+      end
+
+    # exactly: 1, 0 per round — no repeat (a hand's move leaked), none missing
+    assert heard == List.flatten(List.duplicate([1, 0], 40)),
+           "car counts heard (a repeat = a hand's move leaked): #{inspect(heard)}"
+  end
+
+  # the last car and the last hand of a hex leave at the same moment, from
+  # two writer shards: the second to finish finds the row already deleted
+  # (it went 0/0, and the other deleted it) — it must still say ITS side is
+  # 0, or riders keep seeing a car there until the hex next changes. (Two
+  # real shards rarely interleave there: the state is set up directly.)
+  test "a count whose row another shard already deleted still announces its own side as 0" do
+    hex = "c7-zero"
+    HoodrideWeb.Endpoint.subscribe(Geo.agg_topic(:drivers, hex))
+    HoodrideWeb.Endpoint.subscribe(Geo.agg_topic(:hands, hex))
+    :ets.delete(:geo_agg, hex)
+    Geo.settle_and_broadcast(hex, [:drivers])
+    assert side_heard(hex, %{}) == %{drivers: 0}, "riders must hear 0 — and drivers nothing"
+  end
+
+  defp side_heard(hex, acc) do
+    receive do
+      %Phoenix.Socket.Broadcast{topic: "agg:d:" <> ^hex, payload: p} ->
+        side_heard(hex, Map.put(acc, :drivers, p.drivers))
+
+      %Phoenix.Socket.Broadcast{topic: "agg:h:" <> ^hex, payload: p} ->
+        side_heard(hex, Map.put(acc, :hands, p.hands))
+    after
+      100 -> acc
+    end
+  end
+
+  # the mirror (owner, 2026-11-10): a repeated ✋ count would tell drivers
+  # when CARS come and go there
+  test "the count re-check never repeats the hands side because cars moved" do
+    hex = "c7-xside-h"
+    HoodrideWeb.Endpoint.subscribe(Geo.agg_topic(:hands, hex))
+    hand = 9_400_000
+    cars = for i <- 1..40, do: profile(9_400_000 + i)
+
+    heard =
+      for _round <- 1..40, reduce: [] do
+        acc ->
+          churn =
+            Task.async(fn ->
+              Task.async_stream(cars, &Geo.driver_update(&1, "c9-c#{&1.id}", nil, [hex]),
+                max_concurrency: 40,
+                timeout: :infinity
+              )
+              |> Stream.run()
+
+              Task.async_stream(cars, &Geo.driver_offline(&1.id),
+                max_concurrency: 40,
+                timeout: :infinity
+              )
+              |> Stream.run()
+            end)
+
+          Geo.hand_up(hand, "c9-hand", nil, [hex])
+          Geo.hand_down(hand)
+          Task.await(churn, :infinity)
+          acc ++ hands_heard(hex, [])
+      end
+
+    assert heard == List.flatten(List.duplicate([1, 0], 40)),
+           "hand counts heard (a repeat = a car's move leaked): #{inspect(heard)}"
+  end
+
+  test "a ✋ count whose row another shard already deleted still announces 0 — to drivers only" do
+    hex = "c7-zero-h"
+    HoodrideWeb.Endpoint.subscribe(Geo.agg_topic(:drivers, hex))
+    HoodrideWeb.Endpoint.subscribe(Geo.agg_topic(:hands, hex))
+    :ets.delete(:geo_agg, hex)
+    Geo.settle_and_broadcast(hex, [:hands])
+    assert side_heard(hex, %{}) == %{hands: 0}
+  end
+
+  test "many hands up and down in one hex at once: the last ✋ count a driver hears is the true count" do
+    hex = "c7-stress-h"
+    HoodrideWeb.Endpoint.subscribe(Geo.agg_topic(:hands, hex))
+    people = for i <- 1..48, do: 9_500_000 + i
+
+    for round <- 1..30 do
+      on = Enum.take_random(people, 32)
+
+      Task.async_stream(on, &Geo.hand_up(&1, "c9-#{&1}", nil, [hex]),
+        max_concurrency: 32,
+        timeout: :infinity
+      )
+      |> Stream.run()
+
+      Task.async_stream(Enum.take_random(on, 16), &Geo.hand_down/1,
+        max_concurrency: 16,
+        timeout: :infinity
+      )
+      |> Stream.run()
+
+      truth = Geo.agg_counts_for(hex).hands
+      assert truth == 16
+      assert hands_last(hex, nil) == truth, "round #{round}"
+      for p <- on, do: Geo.hand_down(p)
+      _ = hands_last(hex, nil)
+    end
+  end
+
+  defp hands_heard(hex, acc) do
+    receive do
+      %Phoenix.Socket.Broadcast{topic: "agg:h:" <> ^hex, payload: p} ->
+        hands_heard(hex, [p.hands | acc])
+    after
+      100 -> Enum.reverse(acc)
+    end
+  end
+
+  defp hands_last(hex, acc) do
+    receive do
+      %Phoenix.Socket.Broadcast{topic: "agg:h:" <> ^hex, payload: p} -> hands_last(hex, p.hands)
+    after
+      200 -> acc
+    end
+  end
+
+  # load bounds (owner, 2026-11-10): one writer crossing into a hex is ONE
+  # count message per side — the re-check adds nothing when nobody else
+  # wrote; a heartbeat inside the same hexes adds none at all
+  test "one car crossing into a hex: exactly one count message; a heartbeat in place: none" do
+    hex = "c7-load"
+    HoodrideWeb.Endpoint.subscribe(Geo.agg_topic(:drivers, hex))
+    HoodrideWeb.Endpoint.subscribe(Geo.agg_topic(:hands, hex))
+    car = profile(9_600_000)
+    Geo.driver_update(car, "c9-l1", nil, [hex])
+    assert_receive %Phoenix.Socket.Broadcast{topic: "agg:d:" <> ^hex, payload: %{drivers: 1}}
+    refute_receive %Phoenix.Socket.Broadcast{topic: "agg:" <> _}, 100
+    Geo.driver_update(car, "c9-l1", nil, [hex])
+    Geo.driver_update(car, "c9-l2", nil, [hex])
+    refute_receive %Phoenix.Socket.Broadcast{topic: "agg:" <> _}, 100
+  end
+
+  # a rider with a ✋ up switches to driving: the car replaces the ✋ — the
+  # drivers watching must HEAR the ✋ go (and its count drop), and riders
+  # hear the car arrive; each on its own topic only
+  test "a ✋ replaced by a car: drivers hear the ✋ leave and its count drop; riders hear the car" do
+    alias Phoenix.Socket.Broadcast
+    hex = "c7-swap"
+
+    for t <- [
+          "geo:h:c9-sw",
+          "geo:d:c9-sw",
+          Geo.agg_topic(:hands, hex),
+          Geo.agg_topic(:drivers, hex)
+        ],
+        do: HoodrideWeb.Endpoint.subscribe(t)
+
+    Geo.hand_up(9_700_001, "c9-sw", nil, [hex])
+    assert_receive %Broadcast{topic: "geo:h:c9-sw", event: "hand_update"}
+    assert_receive %Broadcast{topic: "agg:h:" <> ^hex, payload: %{hands: 1}}
+
+    Geo.driver_update(profile(9_700_001), "c9-sw", nil, [hex])
+    assert_receive %Broadcast{topic: "geo:h:c9-sw", event: "hand_left", payload: %{id: 9_700_001}}
+    assert_receive %Broadcast{topic: "agg:h:" <> ^hex, payload: %{hands: 0} = h}
+
+    assert_receive %Broadcast{
+      topic: "geo:d:c9-sw",
+      event: "driver_update",
+      payload: %{id: 9_700_001}
+    }
+
+    assert_receive %Broadcast{topic: "agg:d:" <> ^hex, payload: %{drivers: 1} = d}
+    # each count carries only its own side
+    refute Map.has_key?(h, :drivers)
+    refute Map.has_key?(d, :hands)
+  end
+
+  # the re-check is bounded: a hex that never stops changing gets at most
+  # 3 extra sends from one settle (its own next writes carry on from there)
+  # the re-check is bounded: a hex that never stops changing gets at most
+  # 3 extra sends from one settle (its own next writes carry on from there).
+  # A reader whose count moves on EVERY read: exactly 3, then it stops.
+  test "the count re-check is bounded: 3 extra sends at most, however the count keeps moving" do
+    hex = "c7-churn"
+    HoodrideWeb.Endpoint.subscribe(Geo.agg_topic(:drivers, hex))
+    counter = :counters.new(1, [])
+
+    ever_new = fn _cell ->
+      :counters.add(counter, 1, 1)
+      {:counters.get(counter, 1), 0}
+    end
+
+    Geo.reconfirm_agg(hex, [:drivers], {0, 0}, 3, ever_new)
+    assert drivers_heard(hex, []) == [1, 2, 3]
+    # and a count that doesn't move: nothing sent at all
+    Geo.reconfirm_agg(hex, [:drivers], {5, 0}, 3, fn _ -> {5, 9} end)
+    assert drivers_heard(hex, []) == []
+    # a count that moved ONCE, then holds: sent once — the next re-check
+    # compares with what was just sent (not the first number): no repeat
+    Geo.reconfirm_agg(hex, [:drivers], {0, 0}, 3, fn _ -> {1, 0} end)
+    assert drivers_heard(hex, []) == [1]
+  end
+
+  defp drivers_heard(hex, acc) do
+    receive do
+      %Phoenix.Socket.Broadcast{topic: "agg:d:" <> ^hex, payload: p} ->
+        drivers_heard(hex, [p.drivers | acc])
+    after
+      100 -> Enum.reverse(acc)
+    end
+  end
+
+  defp last_count(hex, acc) do
+    receive do
+      %Phoenix.Socket.Broadcast{topic: "agg:d:" <> ^hex, payload: p} -> last_count(hex, p.drivers)
+    after
+      200 -> acc
+    end
+  end
 end

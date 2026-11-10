@@ -629,8 +629,8 @@ test("every reading redraws the banner and refreshes the screen", () => {
 // a ◎ tap that got no reading is over (owner, 2026-11-10): a reading coming
 // later — ✋ up, going online, a watch — isn't its answer, and must never
 // move the map back, maybe minutes on
-test("◎ with no reading, then it times out or location is off: a later reading doesn't centre the map", () => {
-  for (const code of [3, 2]) {
+test("◎ with no reading, then it times out, location is off, or it's refused: a later reading doesn't centre the map", () => {
+  for (const code of [3, 2, 1]) {
     const p = phone({ mode: "driver" });
     assert.equal(p.loc.tapLocate(), false);
     p.lookups[0].err({ code });

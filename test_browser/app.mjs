@@ -45,9 +45,16 @@ export async function goOnline(p, car = { color: "Blue", make: "Toyota", model: 
   check((await fill(p, "btn-online")) === DARK, `${p.name}: GO OFFLINE is dark`, await fill(p, "btn-online"));
 }
 
-// someone's marker is on this person's map (the server sent it)
+// someone's marker is DRAWN on this person's map (the server sent it, and
+// it's in a pile on screen). Not just known: the app keeps people's data
+// for cells it no longer draws (2026-11-10) — "has their data" ≠ "sees".
+export const DRAWN = (id) => `[...pileMarkers.values()].some((pm) => pm.ids.includes(${id}))`;
 export async function sees(p, id, what = "on the map") {
-  await p.waitFor(`realPeersById.has(${id}) && realEntries.has(${id})`, `${p.name} sees #${id} ${what}`, 15000);
+  await p.waitFor(`realPeersById.has(${id}) && realEntries.has(${id}) && ${DRAWN(id)}`, `${p.name} sees #${id} ${what}`, 15000);
+}
+// the app has their data (drawn or not): for checks that need only that
+export async function knows(p, id, what = "known") {
+  await p.waitFor(`realPeersById.has(${id}) && realEntries.has(${id})`, `${p.name} knows #${id} ${what}`, 15000);
 }
 
 // tap their marker, then Message: the chat with them is open
@@ -191,3 +198,20 @@ export async function bannerLike(p, start, end = "", what) {
     throw new Error(`${e.message.split(" — last:")[0]} — on screen: ${q(await p.banner())}`);
   }
 }
+
+// the map's questions held back — sent only when the test lets them go (no
+// clock: however slow the steps in between)
+export const holdAnswers = (p) =>
+  p.eval(`(() => {
+    window.__push = window.__push || worldChannel.push.bind(worldChannel);
+    window.__heldAsks = [];
+    worldChannel.push = (event, ...rest) => {
+      if (event !== "sync") return window.__push(event, ...rest);
+      const cbs = [];
+      const later = { receive(status, cb) { cbs.push([status, cb]); return later; } };
+      window.__heldAsks.push(() => cbs.reduce((q, [status, cb]) => q.receive(status, cb), window.__push(event, ...rest)));
+      return later;
+    };
+    return true;
+  })()`);
+export const letAnswersGo = (p) => p.eval(`(window.__push && (worldChannel.push = window.__push), (window.__heldAsks || []).splice(0).forEach((f) => f()), true)`);

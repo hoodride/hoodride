@@ -151,3 +151,47 @@ test("demo counts: someone without a position isn't counted", () => {
   const counts = B.demoCounts(h3, [{ kind: "driver", pos: null }, { kind: "driver", pos: near(0, 0) }], res, new Set([here]));
   assert.deepEqual(counts, [{ cell: here, drivers: 1, hands: 0 }]);
 });
+
+// a map message applied to what the app holds for that person (owner,
+// 2026-11-10): find the nearest counts what's on the map — a ghost "finds"
+// someone gone, a wrong delete says "nobody" with someone right there
+test("mapMessageAction: an update in a watched area upserts; in an unwatched one it takes the stale entry off (a batch folded their 'left' into it)", () => {
+  const car = { type: "driver", cell: "A" };
+  assert.equal(B.mapMessageAction(car, "update", { id: 1, cell: "B" }, "driver", true), "upsert");
+  assert.equal(B.mapMessageAction(undefined, "update", { id: 1, cell: "B" }, "driver", true), "upsert");
+  assert.equal(B.mapMessageAction(car, "update", { id: 1, cell: "B" }, "driver", false), "remove", "now somewhere unwatched: the old entry goes — never a ghost in A");
+  assert.equal(B.mapMessageAction(undefined, "update", { id: 1, cell: "B" }, "driver", false), "keep");
+  assert.equal(B.mapMessageAction({ type: "hand", cell: "A" }, "update", { id: 1, cell: "B" }, "driver", false), "keep", "another kind of entry: not this message's");
+});
+
+test("mapMessageAction: a 'left' only where the app has them — a late 'left' for an area they've left again keeps them; an old server's (no area) still applies", () => {
+  const car = { type: "driver", cell: "B" };
+  assert.equal(B.mapMessageAction(car, "left", { id: 1, cell: "B" }, "driver", true), "remove");
+  assert.equal(B.mapMessageAction(car, "left", { id: 1, cell: "A" }, "driver", true), "keep", "left A — but the app has them in B: kept");
+  assert.equal(B.mapMessageAction(car, "left", { id: 1 }, "driver", true), "remove", "no area named: as before");
+  assert.equal(B.mapMessageAction(undefined, "left", { id: 1, cell: "B" }, "driver", true), "keep");
+  assert.equal(B.mapMessageAction({ type: "ridepeer", cell: "B" }, "left", { id: 1, cell: "B" }, "driver", true), "keep", "the ride partner: never a map entry's to drop");
+});
+
+// the ride partner: an update about them in a watched cell says "upsert" —
+// upsertBrowseEntry is what keeps their exact ride position (checked first
+// there; test_browser/ride.mjs). Pinned so a change here is seen.
+test("mapMessageAction: the ride partner — an update upserts (guarded in upsertBrowseEntry), a left keeps", () => {
+  assert.equal(B.mapMessageAction({ type: "ridepeer", cell: "B" }, "update", { id: 1, cell: "B" }, "driver", true), "upsert");
+  assert.equal(B.mapMessageAction({ type: "ridepeer", cell: "B" }, "update", { id: 1, cell: "Z" }, "driver", false), "keep");
+  assert.equal(B.mapMessageAction({ type: "ridepeer", cell: "B" }, "left", { id: 1 }, "driver", true), "keep");
+});
+
+test("mapMessageAction, hands: the same rules as cars", () => {
+  const hand = { type: "hand", cell: "A" };
+  assert.equal(B.mapMessageAction(hand, "update", { id: 1, cell: "A" }, "hand", true), "upsert");
+  assert.equal(B.mapMessageAction(hand, "update", { id: 1, cell: "Z" }, "hand", false), "remove", "an update elsewhere: the stale ✋ goes");
+  assert.equal(B.mapMessageAction(undefined, "update", { id: 1, cell: "Z" }, "hand", false), "keep");
+  assert.equal(B.mapMessageAction(hand, "left", { id: 1 }, "hand", true), "remove");
+  // a car's message never touches a ✋ entry, nor the reverse
+  assert.equal(B.mapMessageAction(hand, "left", { id: 1 }, "driver", true), "keep");
+  assert.equal(B.mapMessageAction({ type: "driver", cell: "A" }, "update", { id: 1, cell: "Z" }, "hand", false), "keep");
+  // the ride partner (a rider): never removed by a ✋ message
+  assert.equal(B.mapMessageAction({ type: "ridepeer", cell: "A" }, "update", { id: 1, cell: "Z" }, "hand", false), "keep");
+  assert.equal(B.mapMessageAction({ type: "ridepeer", cell: "A" }, "left", { id: 1 }, "hand", true), "keep");
+});
