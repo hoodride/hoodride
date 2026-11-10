@@ -183,9 +183,69 @@
   // The steps of a search that looks again from where the map is (`from`):
   // only those as wide or wider — never zooming back in (nobody in sight
   // here means nobody closer in either); wider than the widest: the widest
+  // One look of the found watch (app.js stillSeen, once a second), pure:
+  // `w` {goneAt, seenAt, lookedAt, wait, away}; `researches` the looks-again
+  // so far; `now` {p, d} (clocks); `o` what the page says — each a value or a
+  // function asked only when needed (the page isn't measured in the
+  // background): stop, hidden, covered, refused, ready, message, inSight;
+  // gapMs, settledMs. Returns {w, researches, act: "none"|"stop"|"relook"}.
+  //   - a gap with no looks (> gapMs): the minute in sight is broken;
+  //   - in the background: nobody's seen, nothing measured;
+  //   - back from the background (w.away: set by the app the moment the page
+  //     is hidden — its timers may not run there at all): someone already
+  //     gone has their wait start again NOW — coming back to the app never
+  //     searches at once (owner, 2026-11-10). A gap alone keeps the count;
+  //   - a panel or the map out of sight, a message over the map: counted
+  //     afresh after; the server not answered yet: this look skipped;
+  //   - in sight a whole minute without a break: the back-off starts over;
+  //   - gone for the wait: look again (outward — the app's findNearest).
+  function watchLook(w, researches, now, o, rand) {
+    const v = (x) => (typeof x === "function" ? x() : x);
+    w = { ...w };
+    const gap = !!w.lookedAt && elapsed(w.lookedAt, now) > o.gapMs;
+    if (gap) w.seenAt = null;
+    // (each stored time its OWN copy: one shifted never moves another)
+    const stamp = () => ({ ...now });
+    w.lookedAt = stamp();
+    const done = (act = "none") => ({ w, researches, act });
+    if (v(o.stop)) return done("stop");
+    if (v(o.hidden)) {
+      w.seenAt = null;
+      w.away = true;
+      return done();
+    }
+    if (w.away && w.goneAt) w.goneAt = stamp();
+    w.away = false;
+    if (v(o.covered)) {
+      w.goneAt = w.seenAt = null;
+      return done();
+    }
+    if (v(o.refused)) return done("stop");
+    if (!v(o.ready)) return done();
+    if (v(o.message)) {
+      w.goneAt = w.seenAt = null;
+      return done();
+    }
+    if (v(o.inSight)) {
+      w.goneAt = null;
+      w.seenAt = w.seenAt || stamp();
+      if (researches && elapsed(w.seenAt, now) >= o.settledMs) {
+        researches = 0;
+        w.wait = researchWait(0, rand());
+      }
+      return done();
+    }
+    w.seenAt = null;
+    w.goneAt = w.goneAt || stamp();
+    if (elapsed(w.goneAt, now) < w.wait) return done();
+    return { w, researches: researches + 1, act: "relook" };
+  }
+
+  // the steps a look-again takes: only those no closer in than the map is
+  // (owner, 2026-11-10: the map NEVER zooms in by itself — only a tap gives a
+  // close-up). Wider than the widest step: none — nowhere further out to go.
   function stepsFrom(steps, from) {
-    const out = steps.filter((z) => z <= from + 1e-6);
-    return out.length ? out : steps.slice(-1);
+    return steps.filter((z) => z <= from + 1e-6);
   }
 
   // Anyone in sight on a screen of `size` centred on `me` at `zoom` (the
@@ -253,5 +313,5 @@
     return null;
   }
 
-  return { ringReach, researchWait, stepsFrom, elapsed, screenAt, showsMarkers, markerStartZoom, widestMarkerZoom, screenPoint, markerReach, inSight, metersBetween, zoomSteps, anyoneAt, lookingFor };
+  return { watchLook, ringReach, researchWait, stepsFrom, elapsed, screenAt, showsMarkers, markerStartZoom, widestMarkerZoom, screenPoint, markerReach, inSight, metersBetween, zoomSteps, anyoneAt, lookingFor };
 });

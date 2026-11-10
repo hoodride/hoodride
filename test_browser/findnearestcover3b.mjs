@@ -129,7 +129,31 @@ await journey("findnearestcover3b: laptops, desktops, a big monitor, a counts-on
   await sleep(600);
   const co = await cz.eval(`({ z: map.getZoom(), trace: __trace.slice(), looking: nearLooking, nobody: nobodyNear, seq: nearSeq })`);
   check(Math.abs(co.z - 18) < 1e-6 && co.trace.length === 0 && !co.looking && !co.nobody, "on you, as close as it goes; no search taken, nothing said", co);
+  // a LOOK-AGAIN (not a tap) on such a screen: never closer in than the map
+  // is (owner, 2026-11-10: only a tap gives a close-up)
+  await cz.eval(`(map.jumpTo({ center: [state.me.lng + 0.02, state.me.lat], zoom: 12 }), true)`);
+  await cz.waitFor(`!map.isMoving()`, "moved off again");
+  await cz.eval(`(findNearest(state.me, { outFrom: map.getZoom() }), true)`);
+  await sleep(1500);
+  await cz.waitFor(`!map.isMoving()`, "settled");
+  const la = await cz.eval(`({ z: map.getZoom() })`);
+  check(la.z <= 12 + 1e-6, "a look-again: never zoomed in", la);
   await cz.close();
+
+  step("a look-again from WIDER than the widest step (the map zoomed out past it): nowhere further out — it stays, never zooms in");
+  const wd = await demo(browser, "BT-WideOut", { w: 390, h: 844, scale: 2 });
+  await freeze(wd);
+  await riderLooking(wd);
+  await wd.eval(`(map.jumpTo({ center: [state.me.lng, state.me.lat], zoom: 8 }), true)`);
+  await wd.waitFor(`!map.isMoving()`, "zoomed far out");
+  await wd.eval(`(__trace.length = 0, findNearest(state.me, { outFrom: map.getZoom() }), true)`);
+  await sleep(1500);
+  await wd.waitFor(`!map.isMoving()`, "settled");
+  const wz = await wd.eval(`({ z: map.getZoom(), looking: nearLooking, nobody: nobodyNear, steps: __trace.length })`);
+  check(wz.z <= 8 + 1e-6, "never zoomed in from wider than the widest", wz);
+  // and it ENDED: no search left looking, nothing said, not a step taken
+  check(!wz.looking && !wz.nobody && wz.steps === 0, "ended quietly: not looking, nothing said, no step", wz);
+  await wd.close();
 
   step("a screen so short the covers leave no room (390×260, a 3-line banner): nobody can be seen — 'nobody nearby yet', and it stays");
   const p = await demo(browser, "BT-short", { w: 390, h: 260, scale: 2 });

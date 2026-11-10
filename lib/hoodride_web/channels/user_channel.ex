@@ -204,6 +204,11 @@ defmodule HoodrideWeb.UserChannel do
       Regex.match?(@stacked_marks, text) ->
         {:reply, {:error, %{reason: "stacked_marks"}}, socket}
 
+      # the same message again (the app's retry: its reply was lost): the
+      # same receipt — never delivered twice, never counted twice
+      (receipt = Hoodride.Chat.sent_receipt(socket.assigns.user_id, client_id(payload))) != nil ->
+        {:reply, {:ok, receipt}, socket}
+
       true ->
         me = socket.assigns.user_id
 
@@ -217,6 +222,7 @@ defmodule HoodrideWeb.UserChannel do
                ]) do
           spot = shareable_spot(socket, payload)
           {:ok, receipt} = Hoodride.Chat.send_message(socket.assigns.user, to_id, text, spot)
+          Hoodride.Chat.remember_sent(me, client_id(payload), receipt)
           # it went: only now are the allowances spent
           Hoodride.Throttle.sent_message(me, to_id)
           if cold?, do: Hoodride.Throttle.started_conversation(me)
@@ -370,4 +376,8 @@ defmodule HoodrideWeb.UserChannel do
   end
 
   defp valid_parents(_), do: []
+
+  # a message's client id: a short string, else none (then each send is new)
+  defp client_id(%{"cid" => cid}) when is_binary(cid) and byte_size(cid) in 1..64, do: cid
+  defp client_id(_), do: nil
 end

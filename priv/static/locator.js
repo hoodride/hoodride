@@ -80,7 +80,12 @@
       return s.trusted && s.watchId !== null && s.goodAt >= s.watchStartedAt;
     }
 
-    function onFix(fix) {
+    // `complete`: may this reading complete a waiting tap (GO ONLINE, ✋)?
+    // Only one taken for it — the live watch's — never a one-shot lookup's
+    // (◎, the quiet one at open), which may hand back a remembered answer up
+    // to 60 s old: a car put a block behind where the driver is (owner,
+    // 2026-11-10)
+    function onFix(fix, { complete = true } = {}) {
       const pos = { lat: fix.coords.latitude, lng: fix.coords.longitude, accuracy: fix.coords.accuracy };
       const quality = rules.readingQuality(pos.accuracy, h3);
       const first = !s.best;
@@ -96,7 +101,7 @@
         s.trusted = true;
         s.goodAt = now();
         app.onGood(pos);
-        completePending();
+        if (complete) completePending();
       }
       app.redrawBanner();
       app.refresh();
@@ -153,7 +158,7 @@
       s.askedAt = s.askedAt || now();
       geolocation.getCurrentPosition(
         (fix) => {
-          onFix(fix);
+          onFix(fix, { complete: false });
           if (ctx !== "locate" && s.quality === "approximate")
             app.message(message({ status: "searching", quality: "approximate", context: ctx }));
         },

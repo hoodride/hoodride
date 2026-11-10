@@ -33,6 +33,10 @@ defmodule Hoodride.Chat do
   # with the conversation; a stray from a send racing a delete goes at the
   # sweeper's repair pass (heal_index).
   @spots :chat_spots
+  # {{sender, cid}, receipt, at}: a message the app may send again (its reply
+  # lost) — the same id gets the same receipt, never a second delivery
+  @sent_ids :chat_sent_ids
+  @sent_id_ttl 600
 
   # retained history per conversation — delivery is never capped, only what
   # the server remembers; old messages fall off the back (ephemeral by nature)
@@ -43,12 +47,39 @@ defmodule Hoodride.Chat do
     Hoodride.ETS.new(@messages, [:named_table, :public, :duplicate_bag])
     Hoodride.ETS.new(@by_user, [:named_table, :public, :ordered_set])
     Hoodride.ETS.new(@spots, [:named_table, :public, :set])
+    Hoodride.ETS.new(@sent_ids, [:named_table, :public, :set])
     :ok
   end
 
   def pair_key(a, b), do: {min(a, b), max(a, b)}
 
   def exists?(a, b), do: :ets.member(@conversations, pair_key(a, b))
+
+  @doc """
+  The receipt of a message this sender already sent with this client id (a
+  retry after its reply was lost), or nil. Ids live 10 minutes.
+  """
+  def sent_receipt(_from_id, nil), do: nil
+
+  def sent_receipt(from_id, cid) do
+    case :ets.lookup(@sent_ids, {from_id, cid}) do
+      [{_, receipt, at}] -> if System.system_time(:second) - at <= @sent_id_ttl, do: receipt
+      [] -> nil
+    end
+  end
+
+  @doc "Remember a sent message's client id (see sent_receipt/2)."
+  def remember_sent(_from_id, nil, _receipt), do: :ok
+
+  def remember_sent(from_id, cid, receipt),
+    do: :ets.insert(@sent_ids, {{from_id, cid}, receipt, System.system_time(:second)})
+
+  @doc "Forget client ids past their 10 minutes (the sweeper)."
+  def sweep_sent_ids do
+    cutoff = System.system_time(:second) - @sent_id_ttl
+    :ets.select_delete(@sent_ids, [{{:_, :_, :"$1"}, [{:<, :"$1", cutoff}], [true]}])
+    :ok
+  end
 
   @doc """
   Send `text` to `to_id`. `spot`: the sender's block, or nil — the CALLER

@@ -54,6 +54,8 @@ defmodule Hoodride.Sweeper do
     Hoodride.Requests.heal_index(@request_ttl)
     sweep_empty_room_chats()
     Hoodride.Chat.heal_index()
+    # message ids kept for retries: 10 minutes
+    Hoodride.Chat.sweep_sent_ids()
     # full allowances are the same as none: drop their rows
     Hoodride.RateBudget.sweep()
     # lifted sign-in blocks and finished failure windows

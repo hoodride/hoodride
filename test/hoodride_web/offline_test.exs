@@ -117,7 +117,12 @@ defmodule HoodrideWeb.OfflineTest do
 
   test "Send: no answer is not 'sent' — the bubble goes, the text comes back" do
     [send] = Regex.run(~r/\$\("chat-form"\)\.addEventListener\("submit".*?\n\}\);/s, @app)
-    assert send =~ ~s[.receive("timeout", () => unsay(t("Message didn't send — try again")));]
+    # no answer: sent ONCE more with the same id (the server never delivers it
+    # twice — test_browser/chats.mjs); no answer to that either: "didn't send"
+    assert send =~
+             ~s[.receive("timeout", () => (last ? unsay(t("Message didn't send — try again")) : attempt(true)));]
+
+    assert send =~ "attempt(false);"
     [unsay] = Regex.run(~r/const unsay = \(why\) => \{.*?\n    \};/s, send)
     # (the bubble on screen now — redrawn if the chat was left and opened
     # again: test_browser/reloadscreens.mjs)

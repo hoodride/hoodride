@@ -358,13 +358,35 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   await rita.eval(`(() => { const c = socket.conn; window.__send = c.send.bind(c); c.send = (d) => { if (!String(d).includes('"send_msg"')) window.__send(d); }; return true; })()`);
   await send(rita);
   check((await textsFrom(rita, danId)).includes("lost on the way"), "shown as sent at first");
-  // Phoenix gives up on an answer after 10 s
-  await rita.waitFor(`document.getElementById("banner").textContent === "Message didn't send — try again"`, "the no-answer message", 15000);
+  // Phoenix gives up on an answer after 10 s — then the app sends it once
+  // more (same id): that lost too, it says so (~20 s)
+  await rita.waitFor(`document.getElementById("banner").textContent === "Message didn't send — try again"`, "the no-answer message", 30000);
   await rita.eval(`(socket.conn.send = window.__send, true)`);
   check(!(await rita.eval(`chatFor(realPeersById.get(${danId})).msgs.some(m => m.mine && m.text === "lost on the way")`)), "not shown as sent");
   check((await box(rita)) === "lost on the way", "the text is back in the box", await box(rita));
   check(await rita.eval("liveNow()"), "still connected throughout");
   await typeText(rita, "");
+
+  // the opposite: DELIVERED, but its answer lost on the way back (the
+  // connection dropped just after) — the app sends it again with the same
+  // id; the server knows it: one copy for Dan, no "didn't send" (owner,
+  // 2026-11-10: it said so when it had gone; sent again, a duplicate)
+  step("Rita's message reaches Dan but its answer is lost: sent again (same id) — Dan gets it once, Rita sees it sent, no 'didn't send'");
+  await typeText(rita, "delivered anyway");
+  // (only what THIS step says counts: the last step's banner may still be up)
+  await rita.eval(`(() => { const tb = transientBanner; window.__said = []; transientBanner = (text, ...a) => (window.__said.push(String(text)), tb(text, ...a)); return true; })()`);
+  await rita.eval(`(() => { const c = socket.conn; const om = c.onmessage; let drop = 1; c.onmessage = (ev) => { const d = String(ev.data); if (drop && d.includes('"phx_reply"') && d.includes('"ts"')) { drop--; return; } return om.call(c, ev); }; window.__om = om; return true; })()`);
+  await send(rita);
+  await dan.waitFor(`chats.has(realPeersById.get(${ritaId})) && chatFor(realPeersById.get(${ritaId})).msgs.some((m) => m.text === "delivered anyway")`, "Dan has it", 15000);
+  // its answer lost: after 10 s the app sends it again — answered this time
+  await rita.waitFor(`chatFor(realPeersById.get(${danId})).msgs.some((m) => m.mine && m.text === "delivered anyway" && m.id)`, "Rita's copy confirmed (the retry's answer)", 25000);
+  await new Promise((r) => setTimeout(r, 1500));
+  const said = await rita.eval(`window.__said`);
+  check(!said.some((x) => x.includes("didn't send")), "no 'didn't send'", said);
+  check((await box(rita)) === "", "the box stays empty", await box(rita));
+  const copies = await dan.eval(`chatFor(realPeersById.get(${ritaId})).msgs.filter((m) => m.text === "delivered anyway").length`);
+  check(copies === 1, "Dan has exactly one copy", copies);
+  check((await rita.eval(`chatFor(realPeersById.get(${danId})).msgs.filter((m) => m.mine && m.text === "delivered anyway").length`)) === 1, "Rita shows it once");
   await closeChatPanel(rita);
 
   step("Eve isn't in view: the chat closes, Rita's text is kept for Eve");

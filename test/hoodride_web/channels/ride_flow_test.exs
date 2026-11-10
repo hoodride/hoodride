@@ -204,6 +204,85 @@ defmodule HoodrideWeb.RideFlowTest do
     assert_receive %Broadcast{topic: "agg:h:c7-acc", payload: %{hands: 0}}
   end
 
+  # a message whose reply was lost (the connection dropped right after it
+  # was delivered) is sent again by the app with the SAME id: delivered
+  # once, the same receipt back — never twice, never counted twice
+  # (owner, 2026-11-10: "didn't send" when it did, then a duplicate)
+  test "a message sent again with the same client id is delivered once — same receipt", %{
+    rider: rider,
+    driver: driver
+  } do
+    rsock = connect_as(rider)
+    dsock = connect_as(driver)
+    {:ok, _, rchan} = subscribe_and_join(rsock, "user:#{rider.id}", %{})
+    {:ok, _, dchan} = subscribe_and_join(dsock, "user:#{driver.id}", %{})
+    _ = watch(rsock, @cell)
+    push(dchan, "driver_update", %{"cell" => @cell, "spot" => "spot9car"})
+    assert_push "driver_update", %{}
+
+    send = fn text, cid ->
+      ref = push(rchan, "send_msg", %{"to" => driver.id, "text" => text, "cid" => cid})
+      assert_reply ref, :ok, receipt
+      receipt
+    end
+
+    r1 = send.("hi", "c-1")
+    assert_push "msg", %{text: "hi"}
+    # the retry: same id — the same receipt, nothing delivered again
+    assert send.("hi", "c-1") == r1
+    refute_push "msg", %{text: "hi"}
+    # a NEW message with the same words: a new id — delivered
+    r3 = send.("hi", "c-2")
+    assert r3.id != r1.id
+    assert_push "msg", %{text: "hi"}
+    # (the history holds two, not three)
+    key = Hoodride.Chat.pair_key(rider.id, driver.id)
+    assert length(:ets.lookup(:chat_messages, key)) == 2
+
+    # a cid that isn't a short string (1–64 bytes) is no id at all: sent
+    # TWICE, each is new — delivered twice
+    for bad <- [123, "", String.duplicate("x", 65), String.duplicate("x", 200)] do
+      for _ <- 1..2 do
+        ref = push(rchan, "send_msg", %{"to" => driver.id, "text" => "again", "cid" => bad})
+        assert_reply ref, :ok, _
+        assert_push "msg", %{text: "again"}
+      end
+    end
+
+    # the longest that counts (64 bytes): a repeat is recognized
+    long = String.duplicate("y", 64)
+    r64 = send.("long id", long)
+    assert_push "msg", %{text: "long id"}
+    assert send.("long id", long) == r64
+    refute_push "msg", %{text: "long id"}
+  end
+
+  # the retry spends nothing: not the hour's new-chat allowance (a first
+  # message is a cold contact), not the message rate — it's the same message
+  test "a retried first message (same id) spends the new-chat allowance once", %{
+    rider: rider,
+    driver: driver
+  } do
+    rsock = connect_as(rider)
+    dsock = connect_as(driver)
+    {:ok, _, rchan} = subscribe_and_join(rsock, "user:#{rider.id}", %{})
+    {:ok, _, dchan} = subscribe_and_join(dsock, "user:#{driver.id}", %{})
+    _ = watch(rsock, @cell)
+    push(dchan, "driver_update", %{"cell" => @cell, "spot" => "spot9car"})
+    assert_push "driver_update", %{}
+
+    # 18 of the hour's 20 new chats already started
+    for _ <- 1..18, do: :ok = Hoodride.Throttle.new_conversation(rider.id)
+
+    for _ <- 1..2 do
+      ref = push(rchan, "send_msg", %{"to" => driver.id, "text" => "first", "cid" => "cold-1"})
+      assert_reply ref, :ok, _
+    end
+
+    # counted once: the 19th — one left (counted twice, none would be)
+    assert Hoodride.Throttle.new_conversation_allowed(rider.id) == :ok
+  end
+
   test "cancel-vs-accept race: first action wins", %{rider: rider, driver: driver} do
     rsock = connect_as(rider)
     dsock = connect_as(driver)

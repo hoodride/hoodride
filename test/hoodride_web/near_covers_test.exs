@@ -466,11 +466,13 @@ defmodule HoodrideWeb.NearCoversTest do
              "const ladder = { viewport: HoodViewport, h3, center: at, size: { w: size.w + 2 * NEAR_EDGE_PX, h: size.h + 2 * NEAR_EDGE_PX }, rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS };"
   end
 
+  # (a look-again — not a tap — never closer in than the map is: owner,
+  # 2026-11-10; test_browser/findnearestcover3b.mjs shows it)
   test "a screen that can't show people one by one at any zoom: no search, nothing said — but the map still comes to you" do
     f = body("findNearest")
 
     assert f =~
-             "if (!HoodNearby.showsMarkers(HoodViewport, h3, HoodNearby.screenAt(at, startZoom, ladder.size), ladder.rungs, ladder.budget)) {\n    map.easeTo({ center: [at.lng, at.lat], zoom: startZoom });\n    return;\n  }"
+             "if (!HoodNearby.showsMarkers(HoodViewport, h3, HoodNearby.screenAt(at, startZoom, ladder.size), ladder.rungs, ladder.budget)) {\n    map.easeTo({ center: [at.lng, at.lat], zoom: outFrom === null ? startZoom : Math.min(startZoom, map.getZoom()) });\n    return;\n  }"
 
     {skip, _} = :binary.match(f, "if (!HoodNearby.showsMarkers(")
     {looking, _} = :binary.match(f, "nearLooking = true;")
@@ -778,37 +780,27 @@ defmodule HoodrideWeb.NearCoversTest do
   end
 
   test "everyone it found gone a while (the map as it left it): looked again — 5 s, then longer, with jitter; outward from where it is; paused under a panel; only on its 1 s timer" do
+    # the rule itself is HoodNearby.watchLook (pure; test_js/foundwatch.test.mjs
+    # checks it look by look against the owner's rules, randomized); here, the
+    # page's answers wired in — and the outcome acted on
     lines_in_order(
       body("stillSeen"),
       [
         "if (!foundWatch || nearLooking) return;",
-        "const now = clocks();",
-        "if (foundWatch.lookedAt && HoodNearby.elapsed(foundWatch.lookedAt, now) > NEAR_LOOK_GAP_MS) foundWatch.seenAt = null;",
-        "foundWatch.lookedAt = now;",
-        "if (HoodNearby.lookingFor(state) !== foundWatch.type) return stopFindNearest();",
-        # in the background: checked BEFORE the page is measured (battery) —
-        # and before the panel check, so the count of "gone" is kept
-        "if (document.hidden) return void (foundWatch.seenAt = null);",
-        "if (mapOutOfSight() || panelOpen()) return void (foundWatch.goneAt = foundWatch.seenAt = null);",
-        "if (!DEMO && worldSync.refused()) return stopFindNearest();",
-        "const role = foundWatch.type === \"driver\" ? \"viewer\" : \"driver\";",
-        "if (!DEMO && (!worldSync.settled() || serverRole !== role || renderMarkersSoon.pending())) return;",
-        "if (bannerTimer) return void (foundWatch.goneAt = foundWatch.seenAt = null);",
-        "const size = mapSize();",
-        "const covers = nearCovers();",
-        "if (peopleOnMap(foundWatch.type).some((p) => HoodNearby.inSight(map.project([p.pos.lng, p.pos.lat]), p.half || NEAR_HALF, size, covers))) {",
-        "foundWatch.goneAt = null;",
-        "foundWatch.seenAt = foundWatch.seenAt || clocks();",
-        "if (researches && HoodNearby.elapsed(foundWatch.seenAt, clocks()) >= NEAR_SETTLED_MS) {",
-        "researches = 0;",
-        "foundWatch.wait = HoodNearby.researchWait(0, nearRand());",
-        "return;",
-        "foundWatch.seenAt = null;",
-        "foundWatch.goneAt = foundWatch.goneAt || clocks();",
-        "if (HoodNearby.elapsed(foundWatch.goneAt, clocks()) < foundWatch.wait) return;",
-        "const again = researches + 1;",
+        "const r = HoodNearby.watchLook(",
+        "gapMs: NEAR_LOOK_GAP_MS,",
+        "settledMs: NEAR_SETTLED_MS,",
+        "stop: () => HoodNearby.lookingFor(state) !== foundWatch.type,",
+        "hidden: () => document.hidden,",
+        "covered: () => mapOutOfSight() || panelOpen(),",
+        "refused: () => !DEMO && worldSync.refused(),",
+        "ready: () => DEMO || (worldSync.settled() && serverRole === role && !renderMarkersSoon.pending()),",
+        "message: () => !!bannerTimer,",
+        "return peopleOnMap(foundWatch.type).some((p) => HoodNearby.inSight(map.project([p.pos.lng, p.pos.lat]), p.half || NEAR_HALF, size, covers));",
+        "foundWatch = r.w;",
+        "if (r.act === \"stop\") return stopFindNearest();",
         "findNearest(nearFrom(), { outFrom: map.getZoom() });",
-        "researches = again;"
+        "researches = r.researches;"
       ],
       "stillSeen"
     )

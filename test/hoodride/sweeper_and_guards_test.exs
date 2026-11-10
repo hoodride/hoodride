@@ -390,6 +390,22 @@ defmodule Hoodride.SweeperAndGuardsTest do
     for id <- [95, 96], do: :ets.delete(:rides_by_user, id)
   end
 
+  # a message's client id is kept 10 minutes (a retry within them gets the
+  # same receipt); older ones are forgotten — and swept
+  test "message ids: a receipt within 10 min, none after; the sweep keeps only the fresh" do
+    now = System.system_time(:second)
+    :ets.insert(:chat_sent_ids, {{501, "old"}, %{id: 1, ts: now}, now - 601})
+    :ets.insert(:chat_sent_ids, {{501, "edge"}, %{id: 2, ts: now}, now - 599})
+    :ets.insert(:chat_sent_ids, {{501, "new"}, %{id: 3, ts: now}, now})
+    assert Hoodride.Chat.sent_receipt(501, "old") == nil
+    assert Hoodride.Chat.sent_receipt(501, "edge") == %{id: 2, ts: now}
+    assert Hoodride.Chat.sent_receipt(501, "new") == %{id: 3, ts: now}
+    assert Hoodride.Chat.sent_receipt(502, "new") == nil, "another sender's id is never theirs"
+    Sweeper.sweep_now()
+    assert :ets.lookup(:chat_sent_ids, {501, "old"}) == []
+    assert [_] = :ets.lookup(:chat_sent_ids, {501, "new"})
+  end
+
   test "the timer wiring itself sweeps (handle_info, not just sweep_now)" do
     # a reaped-looking driver: on map, no presence → one :sweep message reaps him
     Hoodride.Geo.driver_update(%{id: 81, name: "T81", photo: nil}, "cell8t", nil, ["c7T"])

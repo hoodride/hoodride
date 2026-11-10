@@ -665,3 +665,19 @@ test("◎ waiting while the live watch times out: the tap still centres when its
   p.lookups[p.lookups.length - 1].ok(p.reading(30));
   assert.deepEqual(p.did("reading")[0][2], { first: true, centre: true }, "the watch's timeout didn't end the tap");
 });
+
+
+// GO ONLINE (and ✋) complete only from a reading taken for them — the live
+// watch's — never a one-shot lookup's (◎, the quiet one at open), which may
+// be a remembered answer up to 60 s old (owner, 2026-11-10)
+test("GO ONLINE completes only from a reading taken for it — never a cached one-shot answer (◎'s, up to 60 s old)", () => {
+  const p = phone({ mode: "driver" });
+  p.loc.tapOnline();
+  p.loc.tapLocate();
+  const cached = p.lookups.find((l) => l.opts.maximumAge >= 60000);
+  assert.ok(cached, "(◎'s lookup accepts a cached answer)");
+  cached.ok(p.reading(12));
+  assert.equal(p.st.online, false, "not online from a cached answer");
+  p.fix(12);
+  assert.equal(p.st.online, true, "the watch's own reading: online");
+});

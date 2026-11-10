@@ -2473,6 +2473,12 @@ function markArrived() {
   refreshControls();
 }
 
+// a message's own id (the server dedupes a retry by it): random, unguessable
+function newMessageId() {
+  if (self.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
 // ===== Real ride =====
 function startRealRide(r) {
   // already in this ride (a reload's snapshot had it, and the live news
@@ -2480,6 +2486,11 @@ function startRealRide(r) {
   if (state.ride && state.ride.id === r.ride_id && rideChannel) return;
   const peer = ensurePeer(r.peer);
   peer.pending = false;
+  // a driver's ride starting: the server declined everyone else waiting on
+  // him (Requests.decline_all_for_driver, told only to them) — mirrored
+  // here, as going offline does: no stale Accept for them after the ride
+  // (owner, 2026-11-10: tapping it said "Too late — the request was withdrawn")
+  if (r.role === "driver") realPeersById.forEach((p) => p !== peer && p.pending && (p.pending = false));
   closeMapOverlays();
   state.ride = { peer, status: "connected", id: r.ride_id, role: r.role };
   state.handRaised = false;
@@ -3872,8 +3883,16 @@ $("chat-form").addEventListener("submit", (e) => {
       if (!$("chat").classList.contains("hidden") && state.chatView === "list") renderChat();
       transientBanner(why);
     };
+    // its own id (cid): a reply lost (the connection dropped just after it
+    // went) — the app sends it AGAIN with the same id, once: the server
+    // recognizes it (Hoodride.Chat.sent_receipt), gives the same receipt and
+    // never delivers it twice. Only if that fails too: "didn't send" (owner,
+    // 2026-11-10: it said so when it HAD gone — sent again: a duplicate).
+    // (Phoenix holds a push made while reconnecting and sends it on rejoin.)
+    const payload = { to: peer.id, text, spot: sharedSpot(), cid: newMessageId() };
+    const attempt = (last) =>
     userChannel
-      .push("send_msg", { to: peer.id, text, spot: sharedSpot() })
+      .push("send_msg", payload)
       // sent: its time and id are the server's from now on, like everyone
       // else's (whole seconds, then the id) — this phone's exact time put it
       // ahead of a message that came in later the same second (owner,
@@ -3931,7 +3950,8 @@ $("chat-form").addEventListener("submit", (e) => {
           refreshControls(); // the 💬 button: one chat fewer
         }
       })
-      .receive("timeout", () => unsay(t("Message didn't send — try again")));
+      .receive("timeout", () => (last ? unsay(t("Message didn't send — try again")) : attempt(true)));
+    attempt(false);
     return;
   }
 
@@ -4467,51 +4487,50 @@ function panelOpen() {
 // starts over (NEAR_SETTLED_MS).
 function stillSeen() {
   if (!foundWatch || nearLooking) return;
-  // a gap since the last look (NEAR_LOOK_GAP_MS): not watched meanwhile
-  const now = clocks();
-  if (foundWatch.lookedAt && HoodNearby.elapsed(foundWatch.lookedAt, now) > NEAR_LOOK_GAP_MS) foundWatch.seenAt = null;
-  foundWatch.lookedAt = now;
-  if (HoodNearby.lookingFor(state) !== foundWatch.type) return stopFindNearest();
-  // in the background, nobody's seen: the minute in sight is over — and no
-  // more of the page is measured (battery); the count of "gone" is kept
-  if (document.hidden) return void (foundWatch.seenAt = null);
-  if (mapOutOfSight() || panelOpen()) return void (foundWatch.goneAt = foundWatch.seenAt = null);
-  // a view the server refused for good: never answered — the watch ends (as
-  // the search does)
-  if (!DEMO && worldSync.refused()) return stopFindNearest();
-  // the app in the background, or the server not answered yet (its regular
-  // resync, a reconnect: the markers come back after it; as the role you
-  // look as), or its answer not drawn yet (a car just arrived: drawn on the
-  // next frame) — this look is skipped, the count kept (a resync every
-  // minute must not start it over — nor the minute in sight below)
+  // the rule itself: HoodNearby.watchLook (pure; test_js/foundwatch). Here:
+  // what the page says, each asked only when needed — in the background
+  // nothing of the page is measured (battery)
   const role = foundWatch.type === "driver" ? "viewer" : "driver";
-  if (!DEMO && (!worldSync.settled() || serverRole !== role || renderMarkersSoon.pending())) return;
-  // a message up a while over the top of the map: what's under it isn't
-  // "gone" — counted afresh after it
-  if (bannerTimer) return void (foundWatch.goneAt = foundWatch.seenAt = null);
-  const size = mapSize();
-  const covers = nearCovers();
-  if (peopleOnMap(foundWatch.type).some((p) => HoodNearby.inSight(map.project([p.pos.lng, p.pos.lat]), p.half || NEAR_HALF, size, covers))) {
-    foundWatch.goneAt = null;
-    foundWatch.seenAt = foundWatch.seenAt || clocks();
-    // in sight a whole minute without a break: whatever came and went before
-    // has settled — the back-off starts over (5 s next time, not 40)
-    if (researches && HoodNearby.elapsed(foundWatch.seenAt, clocks()) >= NEAR_SETTLED_MS) {
-      researches = 0;
-      foundWatch.wait = HoodNearby.researchWait(0, nearRand());
-    }
-    return;
+  const r = HoodNearby.watchLook(
+    foundWatch,
+    researches,
+    clocks(),
+    {
+      gapMs: NEAR_LOOK_GAP_MS,
+      settledMs: NEAR_SETTLED_MS,
+      stop: () => HoodNearby.lookingFor(state) !== foundWatch.type,
+      hidden: () => document.hidden,
+      covered: () => mapOutOfSight() || panelOpen(),
+      // a view the server refused for good: never answered — the watch ends
+      refused: () => !DEMO && worldSync.refused(),
+      // the server answered (its regular resync, a reconnect), as the role
+      // you look as, and its answer drawn: else this look is skipped
+      ready: () => DEMO || (worldSync.settled() && serverRole === role && !renderMarkersSoon.pending()),
+      // a message up over the top of the map: what's under it isn't "gone"
+      message: () => !!bannerTimer,
+      inSight: () => {
+        const size = mapSize();
+        const covers = nearCovers();
+        return peopleOnMap(foundWatch.type).some((p) => HoodNearby.inSight(map.project([p.pos.lng, p.pos.lat]), p.half || NEAR_HALF, size, covers));
+      },
+    },
+    nearRand
+  );
+  foundWatch = r.w;
+  if (r.act === "stop") return stopFindNearest();
+  if (r.act === "relook") {
+    // from the zoom the map is at, outward: never zooming back in
+    findNearest(nearFrom(), { outFrom: map.getZoom() });
   }
-  foundWatch.seenAt = null;
-  foundWatch.goneAt = foundWatch.goneAt || clocks();
-  // (longer each time it keeps happening — a car at the edge, coming and
-  // going — with jitter: HoodNearby.researchWait)
-  if (HoodNearby.elapsed(foundWatch.goneAt, clocks()) < foundWatch.wait) return;
-  const again = researches + 1;
-  // from the zoom the map is at, outward: never zooming back in
-  findNearest(nearFrom(), { outFrom: map.getZoom() });
-  researches = again;
+  researches = r.researches;
 }
+
+// the page hidden (another app, the screen off): noted AT ONCE — the watch's
+// timer may not run at all in the background, so it can't notice by itself;
+// back, someone already gone has their wait start over (HoodNearby.watchLook)
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && foundWatch) foundWatch.away = true;
+});
 
 // watched from now: everyone of `type` gone from sight a while — looked again
 function watchFound(type) {
@@ -4562,13 +4581,18 @@ function findNearest(at, { outFrom = null } = {}) {
   // a screen that can't show people one by one at any zoom (counts even
   // fully in — an 8K monitor at 100%): no search, nothing said — the map
   // still comes to you (as closer in as it goes)
+  // (a look-again — not a tap — never closer in than the map is: owner,
+  // 2026-11-10, only a tap gives a close-up)
   if (!HoodNearby.showsMarkers(HoodViewport, h3, HoodNearby.screenAt(at, startZoom, ladder.size), ladder.rungs, ladder.budget)) {
-    map.easeTo({ center: [at.lng, at.lat], zoom: startZoom });
+    map.easeTo({ center: [at.lng, at.lat], zoom: outFrom === null ? startZoom : Math.min(startZoom, map.getZoom()) });
     return;
   }
   const widestZoom = HoodNearby.widestMarkerZoom({ ...ladder, maxZoom: startZoom });
   const all = HoodNearby.zoomSteps(startZoom, widestZoom, NEAR_STEP);
   const steps = outFrom === null ? all : HoodNearby.stepsFrom(all, outFrom);
+  // a look-again from wider than the widest step: nowhere further out to
+  // go — it ends quietly where the map is (never zooming in to look)
+  if (!steps.length) return;
   // the screen and what covers it, measured now (a banner may have grown,
   // the phone turned, the address bar slid)
   const anyone = (zoom) => HoodNearby.anyoneAt({ me: at, people: peopleOnMap(type), size: mapSize(), covers: nearCovers(), zoom, half: NEAR_HALF });

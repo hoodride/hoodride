@@ -564,7 +564,9 @@ test("stepsFrom: a search looking again starts from the zoom it's at — never c
   assert.deepEqual(N.stepsFrom(zs, 13.2), [13, 12.5, 12.47], "between steps: the next one out");
   assert.deepEqual(N.stepsFrom(zs, 15), zs, "closer in than the start: all of them");
   assert.deepEqual(N.stepsFrom(zs, 12.47), [12.47]);
-  assert.deepEqual(N.stepsFrom(zs, 11), [12.47], "wider than the widest: the widest");
+  // (owner, 2026-11-10: the map NEVER zooms in by itself — a look-again
+  // from wider than the widest step has nowhere further out to go: none)
+  assert.deepEqual(N.stepsFrom(zs, 11), [], "wider than the widest: no step (never closer in)");
 });
 
 // Time away (owner, 2026-11-09): a phone asleep stops the steady clock
@@ -752,4 +754,327 @@ test("screenPoint: a longitude a whole turn off lands in the same place; inSight
   assert.ok(Math.abs(N.screenPoint(NYC, { lat: NYC.lat, lng: NYC.lng + 360 }, 14, PHONE).x - PHONE.w / 2) < 1e-6);
   assert.equal(N.inSight({ x: 0, y: 400 }, { l: 0, r: 0, t: 0, b: 0 }, PHONE, []), true);
   assert.deepEqual(N.markerReach({ left: 100, right: 144, top: 200, bottom: 244 }, [{ left: NaN, right: NaN, top: NaN, bottom: NaN }]), { l: 22, r: 22, t: 22, b: 22 });
+});
+
+// ===== Randomized (property test): the whole search, planned and walked =====
+// (owner, 2026-11-10) Drives markerStartZoom, showsMarkers, screenAt,
+// widestMarkerZoom, zoomSteps, stepsFrom, anyoneAt (→ screenPoint,
+// inSight), ringReach — composed as app.js findNearest does (rpPlan +
+// rpSearch mirror it). Replay: SEED=<seed> CASE=<i>; CASES=<n> for more.
+const RP_EDGE = 2; // app.js NEAR_EDGE_PX
+const RP_STEP = 0.5; // app.js NEAR_STEP
+const RP_CASES = Number(process.env.CASES) || 5000;
+
+function rpRng(seed) {
+  let s = seed >>> 0;
+  const next = () => {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  return {
+    next,
+    range: (lo, hi) => lo + (hi - lo) * next(),
+    int: (lo, hi) => lo + Math.floor((hi - lo + 1) * next()),
+    pick: (xs) => xs[Math.floor(xs.length * next())],
+    chance: (p) => next() < p,
+  };
+}
+
+const rpMercY = (lat) => {
+  const s = Math.sin((Math.max(-85.0511, Math.min(85.0511, lat)) * Math.PI) / 180);
+  return 0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI);
+};
+const rpLatOf = (y) => (Math.atan(Math.sinh(Math.PI * (1 - 2 * y))) * 180) / Math.PI;
+// the spot drawn at screen point `pt` (inverse of screenPoint)
+function rpFromScreen(me, pt, zoom, size) {
+  const scale = 512 * 2 ** zoom;
+  return { lat: rpLatOf(rpMercY(me.lat) + (pt.y - size.h / 2) / scale), lng: me.lng + ((pt.x - size.w / 2) / scale) * 360 };
+}
+// `m` metres from `me`, `deg` clockwise from north
+function rpAt(me, m, deg) {
+  const d = m / 6371008.8;
+  const b = (deg * Math.PI) / 180;
+  const la = (me.lat * Math.PI) / 180;
+  const lat = Math.asin(Math.sin(la) * Math.cos(d) + Math.cos(la) * Math.sin(d) * Math.cos(b));
+  const lng = (me.lng * Math.PI) / 180 + Math.atan2(Math.sin(b) * Math.sin(d) * Math.cos(la), Math.cos(d) - Math.sin(la) * Math.sin(lat));
+  return { lat: (lat * 180) / Math.PI, lng: (lng * 180) / Math.PI };
+}
+
+// the box rule written out again (the oracle): whole marker on screen
+// (touching ok), middle on screen, overlapping no cover; unmeasurable = covered
+function rpSeen(pt, reach, size, covers) {
+  const L = reach.l ?? reach.x, R = reach.r ?? reach.x, T = reach.t ?? reach.y, B = reach.b ?? reach.y;
+  const bx = { l: pt.x - L, r: pt.x + R, t: pt.y - T, b: pt.y + B };
+  if (![pt.x, pt.y, bx.l, bx.r, bx.t, bx.b].every((v) => typeof v === "number" && !Number.isNaN(v))) return false;
+  if (pt.x < 0 || pt.x > size.w || pt.y < 0 || pt.y > size.h) return false;
+  if (bx.l < 0 || bx.r > size.w || bx.t < 0 || bx.b > size.h) return false;
+  for (const c of covers) {
+    if (!(bx.r <= c.left || bx.l >= c.right || bx.b <= c.top || bx.t >= c.bottom)) return false;
+  }
+  return true;
+}
+
+function rpPlanner(r, kind) {
+  const yes = { res: RUNGS[0] };
+  const no = { res: RUNGS[1] };
+  if (kind === "real") return { planWatch: V.planWatch };
+  if (kind === "always") return { planWatch: () => yes };
+  if (kind === "never") return { planWatch: () => r.pick([no, null]) };
+  if (kind === "noisy") return { planWatch: () => r.pick([yes, no, null]) };
+  const limit = 360 * 2 ** -r.range(-1, 21); // people one by one iff the view is at most this wide
+  const nul = r.chance(0.2);
+  return { planWatch: (_h3, rect) => (rect.e - rect.w <= limit ? yes : nul ? null : no) };
+}
+
+// app.js findNearest's planning: the zooms, for a screen RP_EDGE bigger each side
+function rpPlan({ planner, me, size, maxZoom }) {
+  let calls = 0;
+  const viewport = { planWatch: (...a) => (calls++, planner.planWatch(...a)) };
+  const ladder = { viewport, h3, center: me, size: { w: size.w + 2 * RP_EDGE, h: size.h + 2 * RP_EDGE }, rungs: RUNGS, budget: BUDGET };
+  const start = N.markerStartZoom({ ...ladder, maxZoom });
+  if (!N.showsMarkers(viewport, h3, N.screenAt(me, start, ladder.size), RUNGS, BUDGET)) return { start, widest: null, all: null, calls };
+  const widest = N.widestMarkerZoom({ ...ladder, maxZoom: start });
+  return { start, widest, all: N.zoomSteps(start, widest, RP_STEP), calls };
+}
+
+// app.js findNearest's walk: no steps further out (a look-again from wider
+// than the widest): it stays; else each step — anyone in sight: found; else
+// counts only (wanted agg > 0, geo 0): silent; else the last: nobody; else out
+function rpSearch({ plan, me, people, size, covers, outFrom, world }) {
+  if (!plan.all) return { verdict: "no-search", zooms: [], looks: 0, steps: [] };
+  const steps = outFrom === null ? plan.all : N.stepsFrom(plan.all, outFrom);
+  if (!steps.length) return { verdict: "stay", zooms: [], looks: 0, steps };
+  const zooms = [steps[0]];
+  let looks = 0;
+  for (let i = 0; ; ) {
+    if (++looks > 1000) return { verdict: "runaway", zooms, looks, steps };
+    if (N.anyoneAt({ me, people, size, covers, zoom: steps[i], half: HALF })) return { verdict: "found", index: i, zoom: steps[i], zooms, looks, steps };
+    const w = world[Math.min(i, world.length - 1)];
+    if (w.agg > 0 && w.geo === 0) return { verdict: "silent", index: i, zooms, looks, steps };
+    if (i === steps.length - 1) return { verdict: "nobody", index: i, zooms, looks, steps };
+    zooms.push(steps[++i]);
+  }
+}
+
+const RP_STYLES = [
+  {},
+  { boxShadow: "none", outlineStyle: "none", outlineWidth: "0px", outlineOffset: "0px" },
+  { boxShadow: "rgb(255, 204, 0) 0px 0px 0px 3px, rgba(0, 0, 0, 0.4) 0px 2px 10px 0px" },
+  { boxShadow: "rgba(0, 0, 0, 0) 0px 0px 0px 6px" },
+  { boxShadow: "none", outlineStyle: "solid", outlineWidth: "3px", outlineOffset: "2px" },
+  { boxShadow: "oklch(0.8 0.17 90) 0px 0px 0px 2.5px" },
+];
+function rpCovers(r, size) {
+  const out = [];
+  const box = (top, bottom, left, right, style = {}) => {
+    const g = N.ringReach(style);
+    out.push({ top: top - g, bottom: bottom + g, left: left - g, right: right + g });
+  };
+  const inset = { top: r.pick([0, 0, 20, 47, 59]), bottom: r.pick([0, 0, 21, 34]), left: r.pick([0, 0, 0, 44, 59]), right: r.pick([0, 0, 0, 44]) };
+  if (inset.top) box(0, inset.top, 0, size.w);
+  if (inset.bottom) box(size.h - inset.bottom, size.h, 0, size.w);
+  if (inset.left) box(0, size.h, 0, inset.left);
+  if (inset.right) box(0, size.h, size.w - inset.right, size.w);
+  if (r.chance(0.6)) {
+    const t = r.range(0, 80);
+    box(t, t + r.range(20, 120), 16, size.w - 16, r.pick(RP_STYLES)); // a banner
+  }
+  if (r.chance(0.6))
+    for (let k = 0, n = r.int(1, 4); k < n; k++) {
+      const l = r.range(0, size.w - 48);
+      box(size.h - 96, size.h - 48, l, l + 48, r.pick(RP_STYLES)); // bottom buttons
+    }
+  for (let k = 0, n = r.int(0, 4); k < n; k++) {
+    const t = r.range(-50, size.h);
+    const l = r.range(-50, size.w);
+    box(t, t + r.range(0, size.h / 2), l, l + r.range(0, size.w / 2), r.pick(RP_STYLES)); // anything, partly off-screen too
+  }
+  if (r.chance(0.02)) box(0, size.h, 0, size.w); // over everything
+  if (r.chance(0.02)) out.push({ top: NaN, bottom: NaN, left: NaN, right: NaN }); // can't be measured
+  return out;
+}
+
+function rpReach(r) {
+  const k = r.int(0, 3);
+  if (k === 0) return undefined; // the default (HALF)
+  if (k === 1) return { x: 22, y: 22 };
+  if (k === 2) return { x: 37, y: 22 }; // a group
+  return { l: r.range(0, 45), r: r.range(0, 45), t: r.range(0, 45), b: r.range(0, 45) }; // a badge
+}
+
+function rpPeople(r, me, size, covers, zs) {
+  const out = [];
+  const n = r.chance(0.2) ? 0 : r.int(1, 8);
+  for (let k = 0; k < n; k++) {
+    const half = rpReach(r);
+    const re = half || HALF;
+    const L = re.l ?? re.x, R = re.r ?? re.x, T = re.t ?? re.y, B = re.b ?? re.y;
+    const z = r.pick(zs);
+    const d = r.pick([0, 0, -1, 1]); // exactly touching, or a pixel either way
+    let pos;
+    switch (r.int(0, 6)) {
+      case 0:
+        pos = rpAt(me, 10 ** r.range(0, 4.7), r.chance(0.3) ? r.pick([0, 90, 180, 270]) : r.range(0, 360));
+        break;
+      case 1: {
+        const pt = r.pick([
+          { x: L + d, y: r.range(T, size.h - B) },
+          { x: size.w - R - d, y: r.range(T, size.h - B) },
+          { x: r.range(L, size.w - R), y: T + d },
+          { x: r.range(L, size.w - R), y: size.h - B - d },
+        ]);
+        pos = rpFromScreen(me, pt, z, size);
+        break;
+      }
+      case 2: {
+        const c = covers.length ? r.pick(covers) : { top: 0, bottom: 0, left: 0, right: 0 };
+        const mx = (c.left + c.right) / 2, my = (c.top + c.bottom) / 2;
+        const pt = r.pick([
+          { x: mx, y: my },
+          { x: mx, y: c.bottom + T + d },
+          { x: mx, y: c.top - B - d },
+          { x: c.left - R - d, y: my },
+          { x: c.right + L + d, y: my },
+        ]);
+        pos = rpFromScreen(me, pt, z, size);
+        break;
+      }
+      case 3:
+        pos = rpFromScreen(me, r.pick([{ x: 0, y: size.h / 2 }, { x: size.w, y: size.h / 2 }, { x: size.w / 2, y: 0 }, { x: size.w / 2, y: size.h }]), z, size);
+        break;
+      case 4:
+        pos = { lat: me.lat, lng: me.lng };
+        break;
+      case 5:
+        pos = rpAt(me, r.range(5000, 2e6), r.range(0, 360));
+        break;
+      default:
+        pos = r.chance(0.8) ? rpFromScreen(me, { x: r.range(0, size.w), y: r.range(0, size.h) }, z, size) : { lat: NaN, lng: me.lng };
+    }
+    out.push({ pos, half });
+  }
+  return out;
+}
+
+const rpWorld = (r) => {
+  const u = r.next();
+  if (u < 0.7) return { agg: 0, geo: r.int(1, 110) };
+  if (u < 0.85) return { agg: r.int(1, 20), geo: 0 }; // counts only
+  if (u < 0.95) return { agg: r.int(1, 5), geo: r.int(1, 50) };
+  return { agg: 0, geo: 0 };
+};
+
+const RP_SIZES = [{ w: 1, h: 1 }, { w: 40, h: 40 }, { w: 260, h: 563 }, { w: 320, h: 568 }, PHONE, { w: 391, h: 843 }, { w: 844, h: 390 }, { w: 1280, h: 720 }, DESKTOP, { w: 2560, h: 1440 }, { w: 7680, h: 4320 }, { w: 20000, h: 20000 }];
+const RP_PLACES = [{ lat: 40.7154, lng: -74.0086 }, { lat: -16.78, lng: 179.9995 }, { lat: 69.6492, lng: 18.9553 }, { lat: 0, lng: 0 }];
+
+function rpCase(r, tally, info) {
+  const size = r.chance(0.7) ? r.pick(RP_SIZES) : { w: r.int(1, 4000), h: r.int(1, 4000) };
+  const me = r.chance(0.3) ? r.pick(RP_PLACES) : { lat: r.range(-80, 80), lng: r.range(-180, 180) };
+  const kind = size.w * size.h <= 2560 * 1440 && r.chance(1 / 40) ? "real" : r.pick(["span", "span", "span", "span", "always", "never", "noisy"]);
+  const maxZoom = r.chance(0.8) ? 14 : Math.round(r.range(10, 17) * 100) / 100;
+  Object.assign(info, { size, me, kind, maxZoom });
+  const plan = rpPlan({ planner: rpPlanner(r, kind), me, size, maxZoom });
+  info.plan = plan;
+  const zs = plan.all || [plan.start];
+  const outFrom = r.chance(0.5) ? null : r.pick([0, 24, plan.start, plan.widest ?? plan.start, r.pick(zs), r.pick(zs) - 1e-7, r.pick(zs) + 1e-7, r.range(0, 24)]);
+  const covers = rpCovers(r, size);
+  const people = rpPeople(r, me, size, covers, zs);
+  const world = zs.map(() => rpWorld(r));
+  Object.assign(info, { outFrom, covers, people, world });
+  const res = rpSearch({ plan, me, people, size, covers, outFrom, world });
+  info.res = res;
+  if (kind === "real") tally.real++;
+
+  // (2) always ends, within bounds: planner calls, steps, looks
+  assert.notEqual(res.verdict, "runaway", "never ended");
+  tally[res.verdict]++;
+  const startCalls = 2 + Math.ceil(Math.log2(Math.max(2, 1800 - Math.round(maxZoom * 100))));
+  const widestCalls = 2 + Math.ceil(Math.log2(1800 - 100));
+  assert.ok(plan.calls <= startCalls + widestCalls + 1, `planner calls ${plan.calls}`);
+  if (plan.all) {
+    assert.ok(plan.all.length <= Math.floor((plan.start - plan.widest) / RP_STEP) + 2, `steps ${plan.all}`);
+    assert.ok(res.zooms.length <= plan.all.length && res.looks === res.zooms.length, "one look per step");
+  }
+
+  // (1) never zooms in: always wider; never past the widest; a fresh search
+  // starts at the start; a look-again never closer in than the map is
+  const z = res.zooms;
+  for (let k = 1; k < z.length; k++) assert.ok(z[k] < z[k - 1], `zoomed in mid-search: ${z}`);
+  if (plan.all) {
+    assert.ok(z.every((q) => q >= plan.widest - 1e-9), `wider than the widest ${plan.widest}: ${z}`);
+    if (outFrom === null) assert.equal(z[0], plan.start);
+  }
+  if (outFrom !== null) assert.ok(z.every((q) => q <= outFrom + 1e-6), `a look-again from ${outFrom} zoomed IN: ${z}`);
+  if (kind === "real")
+    for (const q of z) assert.ok(N.showsMarkers(V, h3, N.screenAt(me, q, size), RUNGS, BUDGET), `counts at step ${q}`);
+  if (!plan.all) return;
+
+  // the oracle: every person at every step, by the box rule written out —
+  // and inSight agrees with it everywhere
+  let o = null;
+  res.steps.forEach((q, i) => {
+    const seen = people.filter((p) => {
+      const pt = N.screenPoint(me, p.pos, q, size);
+      const mine = rpSeen(pt, p.half || HALF, size, covers);
+      assert.equal(N.inSight(pt, p.half || HALF, size, covers), mine, `inSight disagrees at ${q}: ${JSON.stringify({ pt, half: p.half })}`);
+      return mine;
+    });
+    if (!o && seen.length) o = { index: i, zoom: q, seen };
+  });
+  const tipped = (k) => {
+    const w = world[Math.min(k, world.length - 1)];
+    return w.agg > 0 && w.geo === 0;
+  };
+  const firstTip = res.steps.findIndex((_, k) => tipped(k));
+
+  // (3) someone in sight at a step (and no counts-only state before it):
+  // found exactly there — never later, never a step that shows nobody
+  if (o && (firstTip === -1 || firstTip >= o.index)) assert.equal(res.verdict, "found", `in sight at ${o.zoom}, said ${res.verdict}`);
+  if (res.verdict === "found") assert.ok(o && o.index === res.index, `found at ${res.zoom}; first in sight: ${o && o.zoom}`);
+  if (res.verdict === "silent") assert.ok(tipped(res.index) && (!o || o.index > res.index), "silent only over counts, before anyone's in sight");
+
+  // (4) "nobody nearby yet": never with anyone in sight, never over counts
+  if (res.verdict === "nobody") {
+    assert.equal(o, null, `nobody — but in sight at ${o && o.zoom}`);
+    assert.equal(firstTip, -1, "nobody while the map shows counts");
+  }
+
+  // (5) found: it stays at that zoom, and someone there passes the box rule
+  if (res.verdict === "found") {
+    assert.equal(z.at(-1), res.zoom, "no step after finding");
+    const clear = people.filter((p) => {
+      const pt = N.screenPoint(me, p.pos, res.zoom, size);
+      return N.inSight(pt, p.half || HALF, size, covers) && rpSeen(pt, p.half || HALF, size, covers);
+    });
+    assert.ok(clear.length > 0, "found nobody in sight");
+  }
+}
+
+test("randomized: the whole search — never zooms in, always ends, stops at the first step anyone's in sight, never 'nobody' over counts", () => {
+  const seed = process.env.SEED !== undefined ? Number(process.env.SEED) >>> 0 : 20261110;
+  const only = process.env.CASE !== undefined ? Number(process.env.CASE) : null;
+  const tally = { found: 0, nobody: 0, silent: 0, stay: 0, "no-search": 0, real: 0 };
+  const from = only ?? 0;
+  const to = only === null ? RP_CASES : only + 1;
+  for (let i = from; i < to; i++) {
+    const r = rpRng((seed ^ Math.imul(i + 1, 0x9e3779b9)) >>> 0);
+    const info = {};
+    try {
+      rpCase(r, tally, info);
+    } catch (e) {
+      throw new Error(`${e.message}\n  seed ${seed} case ${i}: ${JSON.stringify(info).slice(0, 1500)}\n  replay: SEED=${seed} CASE=${i} node --test test_js/nearby.test.mjs`, { cause: e });
+    }
+  }
+  // (the cases really cover every outcome — else the run proves little)
+  if (only === null && RP_CASES >= 2000) {
+    const at = `seed ${seed}: ${JSON.stringify(tally)}`;
+    assert.ok(tally.found > RP_CASES / 10, at);
+    assert.ok(tally.nobody > RP_CASES / 50, at);
+    assert.ok(tally.silent > RP_CASES / 100, at);
+    assert.ok(tally["no-search"] > RP_CASES / 100, at);
+    assert.ok(tally.real >= 40, at);
+  }
 });
