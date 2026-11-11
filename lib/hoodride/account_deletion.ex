@@ -73,6 +73,9 @@ defmodule Hoodride.AccountDeletion do
     # meanwhile (every action checks it: HoodrideWeb.UserChannel)
     Hoodride.SessionTokens.forget(user_id)
     SignOuts.put(user_id, now)
+    # signed out everywhere — THEN a ride or request that slipped past the
+    # check in delete/1 meanwhile is ended/withdrawn (A1)
+    Rides.after_sign_out(user_id)
 
     # off the map; going offline also declines every incoming request, each
     # rider told (Geo's offline_core → Requests.decline_all_for_driver)

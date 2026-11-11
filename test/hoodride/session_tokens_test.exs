@@ -125,6 +125,38 @@ defmodule Hoodride.SessionTokensTest do
   # whose memory step isn't yet, and a sign-out landing in between. Without
   # the account's lock the sign-out cleared memory first, then the
   # replacement put its new token there: signed out, yet signed in.
+  # signing in again from the same browser (the silent Google refresh, on
+  # every return) replaces its token: never a moment with none — a ride's
+  # start asks "any sign-in left?" of its rider (any?/1; A1, third review
+  # 2026-11-11: a signed-in rider would have been declined in between)
+  test "signing in again: the new sign-in in before the old one out — never none" do
+    u = user("st-again")
+    {:ok, old} = SessionTokens.create(u.id)
+    test = self()
+
+    Application.put_env(:hoodride, :session_tokens_hook, fn :replace ->
+      send(test, {:between, SessionTokens.any?(u.id)})
+    end)
+
+    assert {:ok, new} = SessionTokens.create(u.id, old)
+    assert_received {:between, true}
+    # …and then just the new one
+    assert SessionTokens.lookup(old) == :error
+    assert {:ok, _} = SessionTokens.lookup(new)
+  end
+
+  test "any?: a sign-in left, by account — none after signing out" do
+    u = user("st-any")
+    other = user("st-any-other")
+    refute SessionTokens.any?(u.id)
+    {:ok, _} = SessionTokens.create(u.id)
+    {:ok, _} = SessionTokens.create(other.id)
+    assert SessionTokens.any?(u.id)
+    {:ok, _} = SessionTokens.revoke_all(u.id)
+    refute SessionTokens.any?(u.id)
+    assert SessionTokens.any?(other.id)
+  end
+
   test "a sign-out can't slip in between a replacement's two steps" do
     u = user("st-race")
     {:ok, old} = SessionTokens.create(u.id)

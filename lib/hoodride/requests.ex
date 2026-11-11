@@ -41,7 +41,7 @@ defmodule Hoodride.Requests do
 
   # `spot`: the rider's block, or nil — the caller decides whether it may be
   # shared (HoodrideWeb.UserChannel)
-  def create(rider, driver_id, spot \\ nil) do
+  def create(rider, driver_id, spot \\ nil, still_signed_in \\ fn -> true end) do
     cond do
       rider.id == driver_id -> {:error, :self}
       Hoodride.Rides.ride_id_of_user(rider.id) != nil -> {:error, :in_ride}
@@ -49,11 +49,11 @@ defmodule Hoodride.Requests do
       # unavailable means unaskable too: no new requests toward an off-map
       # driver (they'd just sit out the TTL against someone who can't come)
       not Hoodride.Geo.driver_on_map?(driver_id) -> {:error, :driver_offline}
-      true -> do_create(rider, driver_id, spot)
+      true -> do_create(rider, driver_id, spot, still_signed_in)
     end
   end
 
-  defp do_create(rider, driver_id, spot) do
+  defp do_create(rider, driver_id, spot, still_signed_in) do
     now = System.system_time(:second)
 
     # index first: the request is findable the instant it exists
@@ -74,6 +74,17 @@ defmodule Hoodride.Requests do
         end
 
         {:error, :driver_offline}
+
+      # saved — THEN: still signed in? Signed out since the channel's
+      # check, the sign-out may have looked for a request before this (A1,
+      # Rides.after_sign_out): withdrawn, never shown
+      not still_signed_in.() ->
+        case take_if_ours(rider.id, driver_id) do
+          {:ok, ts} -> consumed(rider.id, driver_id, ts)
+          _ -> :ok
+        end
+
+        {:error, :signed_out}
 
       true ->
         announce(rider, driver_id, now, spot)
@@ -131,6 +142,14 @@ defmodule Hoodride.Requests do
   # driver's request is never touched: the exact row is deleted only if it
   # is still there (`select_delete`), else read again.
   # → {:ok, ts} | :not_yours | :none
+  # the ride's look (accept/3): the accepting connection, and the rider —
+  # any sign-in left (a sign-out or a deletion removes every one BEFORE it
+  # looks for a ride: Rides.after_sign_out)
+  defp ride_look(nil, _rider_id), do: fn -> true end
+
+  defp ride_look(still_signed_in, rider_id),
+    do: fn -> still_signed_in.() and Hoodride.SessionTokens.any?(rider_id) end
+
   defp take_if_ours(rider_id, driver_id) do
     case :ets.lookup(@requests, rider_id) do
       [{^rider_id, ^driver_id, ts} = row] ->
@@ -165,8 +184,17 @@ defmodule Hoodride.Requests do
     end
   end
 
-  def accept(driver, rider_id) do
+  @doc """
+  The driver accepts the rider's request: `{:ok, ride_id}` or an error.
+  `still_signed_in` — the accepting connection's own sign-in check (the
+  channel's) — makes the ride look once its seats are its own (A1): that
+  connection still signed in AND the rider still signed in anywhere (their
+  sign-out deletes every sign-in, THEN looks for a ride: whichever is second
+  sees the other). nil (the default: tests, server tools): no look.
+  """
+  def accept(driver, rider_id, still_signed_in \\ nil) do
     driver_id = driver.id
+    look = ride_look(still_signed_in, rider_id)
 
     case take_if_ours(rider_id, driver_id) do
       {:ok, ts} ->
@@ -184,7 +212,7 @@ defmodule Hoodride.Requests do
             {:error, :gone}
 
           true ->
-            case Hoodride.Rides.start_ride(rider_id, driver.id) do
+            case Hoodride.Rides.start_ride(rider_id, driver.id, look) do
               {:ok, ride_id} ->
                 consumed(rider_id, driver_id, ts)
                 {:ok, ride_id}
@@ -196,11 +224,34 @@ defmodule Hoodride.Requests do
                 decline_consumed(rider_id, driver.id)
                 {:error, :busy}
 
+              {:error, reason} when reason in [:signed_out, :no_such_user] ->
+                # one of them signed out meanwhile, or the rider's account
+                # is gone (A1): the request ends here — declined, as for a
+                # busy driver — never put back for someone no longer there
+                consumed(rider_id, driver_id, ts)
+                decline_consumed(rider_id, driver.id)
+                {:error, reason}
+
               error ->
                 # the ride couldn't start: the request stands again — but
                 # only into an EMPTY slot (insert_new), never over a request
                 # the rider made in the meantime
                 :ets.insert_new(@requests, {rider_id, driver_id, ts})
+
+                # put back — THEN: either of them signed out meanwhile (their
+                # sign-out may have looked for a request before this — A1)?
+                # Taken back: declined, never left for someone gone
+                unless look.() do
+                  case take_if_ours(rider_id, driver_id) do
+                    {:ok, back} ->
+                      consumed(rider_id, driver_id, back)
+                      decline_consumed(rider_id, driver_id)
+
+                    _ ->
+                      :ok
+                  end
+                end
+
                 error
             end
         end

@@ -144,6 +144,17 @@ defmodule HoodrideWeb.UserChannel do
       else: signed_out(socket)
   end
 
+  @doc """
+  This connection's sign-in check, to be asked again AFTER a ride's seats
+  or a request are saved (Rides.start_ride, Requests.create): the sign-out
+  looks after it signs out — whichever is second sees the other (A1).
+  """
+  def still_signed_in(socket) do
+    user_id = socket.assigns.user_id
+    hash = socket.assigns[:token_hash]
+    fn -> HoodrideWeb.Auth.signed_in?(user_id, hash) end
+  end
+
   defp signed_out(socket) do
     send(socket.transport_pid, %Phoenix.Socket.Broadcast{
       topic: "user_socket:#{socket.assigns.user_id}",
@@ -260,7 +271,8 @@ defmodule HoodrideWeb.UserChannel do
       case Hoodride.Requests.create(
              socket.assigns.user,
              driver_id,
-             shareable_spot(socket, payload)
+             shareable_spot(socket, payload),
+             still_signed_in(socket)
            ) do
         # it went: only now is a new contact spent (a refusal — waiting on
         # another driver, the driver gone — spends nothing)
@@ -283,7 +295,7 @@ defmodule HoodrideWeb.UserChannel do
 
   defp event("accept_request", %{"rider_id" => rider_id}, socket)
        when is_integer(rider_id) do
-    case Hoodride.Requests.accept(socket.assigns.user, rider_id) do
+    case Hoodride.Requests.accept(socket.assigns.user, rider_id, still_signed_in(socket)) do
       {:ok, _ride_id} -> {:reply, :ok, socket}
       {:error, reason} -> {:reply, {:error, %{reason: to_string(reason)}}, socket}
     end

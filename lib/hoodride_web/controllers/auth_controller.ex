@@ -678,6 +678,10 @@ defmodule HoodrideWeb.AuthController do
 
       result ->
         if result == :ok do
+          # signed out — THEN a ride or request that slipped past the check
+          # above meanwhile is ended/withdrawn (A1: the partner never waits
+          # on someone signed out; the other side looks too)
+          Hoodride.Rides.after_sign_out(user.id)
           # off the map; going offline also declines every incoming
           # request, each rider told (as AccountDeletion does). A live
           # connection can't put anything back meanwhile: its sign-in is

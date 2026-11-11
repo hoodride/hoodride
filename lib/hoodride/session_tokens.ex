@@ -58,6 +58,14 @@ defmodule Hoodride.SessionTokens do
   def lookup(raw, now \\ now()),
     do: if(is_binary(raw), do: lookup_hash(hash(raw), now), else: :error)
 
+  @doc """
+  Any sign-in of `user_id` left in memory? A sign-out or a deletion removes
+  every one (revoke_all, forget) before it looks for a ride (A1: a ride's
+  start asks this of its rider — Requests.accept).
+  """
+  def any?(user_id),
+    do: :ets.select(@table, [{{:_, user_id, :_, :_}, [], [true]}], 1) != :"$end_of_table"
+
   @doc "The same, by the stored form (a connection pass carries only that)."
   def lookup_hash(hash, now \\ now())
 
@@ -110,8 +118,14 @@ defmodule Hoodride.SessionTokens do
         prune_rows(now)
       end)
 
-      if old, do: :ets.delete(@table, old)
+      # the new one in FIRST, then the old one out: never a moment with
+      # none — a ride's start asks "any sign-in left?" of its rider (any?/1,
+      # A1), and a rider signing in again (the silent Google refresh) would
+      # read as signed out in between (third review, 2026-11-11)
       :ets.insert(@table, {h, user_id, now, now})
+      # (a test can look at the moment between the two; nil in production)
+      if hook = Application.get_env(:hoodride, :session_tokens_hook), do: hook.(:replace)
+      if old, do: :ets.delete(@table, old)
       {:ok, raw}
     end)
   rescue

@@ -9,7 +9,14 @@ defmodule Hoodride.Rides do
     :ok
   end
 
-  def start_ride(rider_id, driver_id) do
+  @doc """
+  Starts the pair's ride: `{:ok, id}` or `{:error, reason}`. `still_signed_in`
+  (the accepting connection's own sign-in check — UserChannel) is asked once
+  the seats are the ride's, before anyone is told: signed out meanwhile →
+  `{:error, :signed_out}`, no ride. The sign-out looks for a ride AFTER it
+  signs out (after_sign_out/1): whichever is second sees the other (A1).
+  """
+  def start_ride(rider_id, driver_id, still_signed_in \\ fn -> true end) do
     # atomically claim both seats (all-or-nothing) — closes the race where the
     # same driver, on two sockets, accepts two riders "simultaneously"
     if :ets.insert_new(:rides_by_user, [{rider_id, :pending}, {driver_id, :pending}]) do
@@ -27,14 +34,25 @@ defmodule Hoodride.Rides do
              DynamicSupervisor.start_child(
                Hoodride.Rides.Supervisor,
                {Hoodride.Rides.Ride,
-                %{id: id, rider: rider_id, driver: driver_id, starter: self()}}
+                %{
+                  id: id,
+                  rider: rider_id,
+                  driver: driver_id,
+                  starter: self(),
+                  still_signed_in: still_signed_in
+                }}
              ),
            :ok <- begin(pid) do
         {:ok, id}
       else
         error ->
-          :ets.delete(:rides_by_user, rider_id)
-          :ets.delete(:rides_by_user, driver_id)
+          # only THIS start's rows — still starting, or listed as this ride
+          # (undone after its look): never a newer ride's that took the seat
+          for uid <- [rider_id, driver_id] do
+            :ets.delete_object(:rides_by_user, {uid, :pending})
+            :ets.delete_object(:rides_by_user, {uid, id})
+          end
+
           Hoodride.Roles.changed(rider_id)
           Hoodride.Roles.changed(driver_id)
           error
@@ -83,6 +101,25 @@ defmodule Hoodride.Rides do
 
   def set_pin(id, user_id, pin), do: call(id, {:set_pin, user_id, pin})
   def end_ride(id, user_id), do: call(id, {:end_ride, user_id})
+
+  @doc """
+  Just signed out (or the account deleted): a ride that started in that same
+  moment — past the sign-out's "in a ride?" check — is ended (the partner
+  told "ended"), and its own waiting request withdrawn (the driver told).
+  Called AFTER the sign-in is gone (A1). A ride still starting isn't ended
+  here: it looks itself, once its seats are its own (start_ride).
+  """
+  def after_sign_out(user_id) do
+    case ride_id_of_user(user_id) do
+      # (waits for a ride busy starting: its own look may end it first — gone)
+      id when is_binary(id) -> call(id, {:end_ride, user_id}, 30_000)
+      _ -> :ok
+    end
+
+    Hoodride.Requests.cancel(user_id)
+    :ok
+  end
+
   def arrived(id, user_id), do: call(id, {:arrived, user_id})
 
   @doc """
@@ -104,12 +141,12 @@ defmodule Hoodride.Rides do
     end
   end
 
-  defp call(id, msg) do
+  defp call(id, msg, timeout \\ 5_000) do
     case Registry.lookup(Hoodride.Rides.Registry, id) do
       [{pid, _}] ->
         # the process can die between lookup and call — that's still "gone"
         try do
-          GenServer.call(pid, msg)
+          GenServer.call(pid, msg, timeout)
         catch
           :exit, _ -> {:error, :gone}
         end
@@ -192,10 +229,20 @@ defmodule Hoodride.Rides.Ride do
   def name_retry_ms(attempt),
     do: min(Hoodride.Accounts.retry_wait_ms() * 2 ** (attempt - 1), 30_000)
 
-  defp start(id, rider, driver, peers, unnamed) do
+  defp start(id, rider, driver, peers, unnamed, still_signed_in) do
     now = System.system_time(:second)
     :ets.insert(:rides_by_user, [{rider, id}, {driver, id}])
 
+    # the seats are this ride's now — THEN: is the accepting sign-in still
+    # there? Signed out since its check, its sign-out may have looked for a
+    # ride before this (A1): nothing announced, no ride (start_ride frees
+    # the seats)
+    if still_signed_in.(),
+      do: started(id, rider, driver, peers, unnamed, now),
+      else: :signed_out
+  end
+
+  defp started(id, rider, driver, peers, unnamed, now) do
     # your ride starting withdraws any outstanding ask you had elsewhere
     # (found by the invariant fuzzer: mutual requests + accept left a live
     # outgoing request from someone already mid-ride) — withdrawn FIRST so
@@ -259,7 +306,11 @@ defmodule Hoodride.Rides.Ride do
   end
 
   @impl true
-  def handle_call(:begin, _from, {:starting, %{id: id, rider: rider, driver: driver}} = starting) do
+  def handle_call(
+        :begin,
+        _from,
+        {:starting, %{id: id, rider: rider, driver: driver} = args} = starting
+      ) do
     # who's who, FIRST — before anything is cancelled, moved or announced: a
     # partner that doesn't exist stops the ride here, cleanly (start_ride
     # frees the seats). A database that can't answer (overload) shows
@@ -269,10 +320,13 @@ defmodule Hoodride.Rides.Ride do
         # whose name couldn't be looked up: asked again once the ride runs
         unnamed = for {uid, :unnamed} <- [{rider, rider_known}, {driver, driver_known}], do: uid
 
-        {:ok, state} =
-          start(id, rider, driver, %{rider => driver_peer, driver => rider_peer}, unnamed)
+        peers = %{rider => driver_peer, driver => rider_peer}
+        check = Map.get(args, :still_signed_in, fn -> true end)
 
-        {:reply, :ok, state}
+        case start(id, rider, driver, peers, unnamed, check) do
+          {:ok, state} -> {:reply, :ok, state}
+          :signed_out -> {:stop, :normal, {:error, :signed_out}, starting}
+        end
 
       _ ->
         {:stop, :normal, {:error, :no_such_user}, starting}
