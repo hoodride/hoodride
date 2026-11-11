@@ -326,21 +326,66 @@ function setBanner(text) {
     // banner update took seconds and a reload missed its time
     // (lightreload2, 2026-11-10). Only when the text changes (every tick
     // calls this) and is banner-sized.
+    // The box then hugs its lines (fitBanner, a frame after that): wrapped,
+    // it stayed as wide as the cap, the balanced lines in its middle (owner,
+    // 2026-11-10). Any new text starts unfitted.
     const changed = text.length <= 300 && b.dataset.text !== text;
     if (changed) {
       b.dataset.text = text;
       b.style.textWrap = "wrap";
+      b.style.width = "";
+    } else if (text.length > 300) {
+      b.dataset.text = "";
+      b.style.width = "";
     }
+    // shown again unfitted (a rotation while it was hidden): fitted then
+    const refit = !changed && !b.style.width && b.classList.contains("hidden") && b.dataset.text === text;
     setIconText(b, text);
     b.classList.remove("hidden");
+    if (refit) requestAnimationFrame(() => requestAnimationFrame(() => fitBanner(b, text)));
     if (changed)
       requestAnimationFrame(() =>
         requestAnimationFrame(() => {
-          if (b.dataset.text === text) b.style.textWrap = "";
+          if (b.dataset.text !== text) return;
+          b.style.textWrap = "";
+          requestAnimationFrame(() => fitBanner(b, text));
         })
       );
   }
 }
+
+// The banner's box as wide as its widest line. Called ONLY at the start of a
+// frame after the browser's own layout of the text — reading it then costs
+// nothing (never a forced layout: see setBanner). One reading per text
+// change or rotation, never per tick.
+function fitBanner(b, text) {
+  if (!text || b.dataset.text !== text || b.classList.contains("hidden")) return;
+  const range = document.createRange();
+  range.selectNodeContents(b);
+  const lines = range.getBoundingClientRect().width;
+  const cs = getComputedStyle(b);
+  const sides =
+    parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth);
+  const fitted = Math.ceil(lines + sides) + 1;
+  if (lines > 0 && fitted < b.getBoundingClientRect().width) b.style.width = `${fitted}px`;
+}
+
+// rotated or resized: the cap changed — the box fitted afresh (once per
+// resize burst: cleared now, read two frames on, after the browser's layout)
+let bannerRefit = false;
+window.addEventListener("resize", () => {
+  const b = $("banner");
+  if (!b || (!b.style.width && !bannerRefit)) return;
+  b.style.width = "";
+  if (bannerRefit) return;
+  bannerRefit = true;
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      bannerRefit = false;
+      fitBanner(b, b.dataset.text);
+    })
+  );
+});
 
 function contextBanner() {
   // the connection is down: say so first (the reconnect then re-reads

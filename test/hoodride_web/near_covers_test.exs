@@ -966,6 +966,31 @@ defmodule HoodrideWeb.NearCoversTest do
     assert b =~ ~s[b.style.textWrap = "wrap";]
     assert b =~ "requestAnimationFrame(() =>
         requestAnimationFrame(() => {"
-    assert b =~ ~s[if (b.dataset.text === text) b.style.textWrap = "";]
+    assert b =~ ~s[if (b.dataset.text !== text) return;\n          b.style.textWrap = "";]
+    assert b =~ ~s[b.style.width = "";]
+  end
+
+  # the box fitted to its lines (owner, 2026-11-10) reads the layout — ONLY at
+  # the start of a frame, after the browser's own layout (free), never from
+  # setBanner itself (every tick calls it): each call sits in a frame callback
+  test "fitBanner reads the layout only inside a frame callback: three calls, each one in requestAnimationFrame" do
+    src = File.read!(Path.join(File.cwd!(), "priv/static/app.js"))
+
+    calls =
+      Regex.scan(~r/^.*fitBanner\(b, .*$/m, src)
+      |> List.flatten()
+      |> Enum.reject(&String.starts_with?(&1, "function fitBanner("))
+
+    assert calls == [
+             "    if (refit) requestAnimationFrame(() => requestAnimationFrame(() => fitBanner(b, text)));",
+             "          requestAnimationFrame(() => fitBanner(b, text));",
+             "      fitBanner(b, b.dataset.text);"
+           ]
+
+    # the resize one: inside two frames, once per burst
+    r = Regex.run(~r/window\.addEventListener\("resize", \(\) => \{.*?\n\}\);/s, src) |> hd()
+
+    assert r =~
+             ~s[b.style.width = "";\n  if (bannerRefit) return;\n  bannerRefit = true;\n  requestAnimationFrame(() =>\n    requestAnimationFrame(() => {\n      bannerRefit = false;\n      fitBanner(b, b.dataset.text);]
   end
 end

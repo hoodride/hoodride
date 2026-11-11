@@ -214,17 +214,37 @@ await journey("findnearestnobody: 'nobody nearby yet' — looked at again, never
   // wrapping (1 line → 3 → 2 on the owner's iPhone, 2026-11-10). Chrome never
   // showed it; this keeps the property, and no leftover style
   step("'nobody nearby yet' gone: the banner back to the short message's own size, nothing left over");
-  // (measured after the banner's two frames: its balancing back on)
-  const size = () => n.eval(`new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => { const r = document.getElementById("banner").getBoundingClientRect(); ok({ w: Math.round(r.width), h: Math.round(r.height) }); }))))`);
+  // (measured after the banner's frames: its balancing back on, then fitted)
+  const frames = (k) => "new Promise((ok) => { let i = 0; const f = () => (++i >= " + k + " ? ok(true) : requestAnimationFrame(f)); requestAnimationFrame(f); })";
+  const size = async () => {
+    await n.eval(frames(6));
+    return n.eval(`(() => { const r = document.getElementById("banner").getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height) }; })()`);
+  };
+  // the box against its lines: how much wider than its widest line + padding
+  const slack = () => n.eval(`(() => { const b = document.getElementById("banner"); const rg = document.createRange(); rg.selectNodeContents(b); const lines = rg.getBoundingClientRect().width; const cs = getComputedStyle(b); return b.getBoundingClientRect().width - lines - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight); })()`);
   await n.eval(`(state.handRaised = true, setBanner(contextBanner()), true)`);
   const fresh = await size();
   await n.eval(`(setNobodyNear(true), true)`);
   const long = await size();
+  // the wrapped message: the box hugs its lines (it stayed as wide as the
+  // cap, the balanced lines in its middle — owner, 2026-11-10) …
+  const hug = await slack();
+  const cap = await n.eval(`Math.min(innerWidth * 0.92, 560)`);
+  check(long.h > fresh.h, "(the long message wraps)", { fresh, long });
+  check(hug >= 0 && hug <= 3, "the wrapped banner hugs its lines: no empty band either side", { hug, long, cap });
+  check(long.w < cap - 10, "(narrower than the cap — the balanced lines are shorter)", { long, cap });
+  // … with the same lines it had unfitted (fitting never wraps it more)
+  const unfit = await n.eval(`(() => { const b = document.getElementById("banner"); const w = b.style.width; b.style.width = ""; const h = Math.round(b.getBoundingClientRect().height); b.style.width = w; return h; })()`);
+  check(unfit === long.h, "fitting keeps the same lines", { unfit, long });
+  // a rotation: cleared at once, fitted afresh after the layout
+  check(await n.eval(`(window.dispatchEvent(new Event("resize")), document.getElementById("banner").style.width === "")`), "a rotation: the old fit cleared at once");
+  await size();
+  check((await slack()) <= 3, "…and fitted afresh after it", await slack());
   await n.eval(`(setNobodyNear(false), true)`);
   const back = await size();
-  check(long.h > fresh.h || long.w > fresh.w, "(the long message is bigger)", { fresh, long });
   check(back.w === fresh.w && back.h === fresh.h, "back to the short message's own size", { fresh, long, back });
   check((await n.eval(`document.getElementById("banner").style.textWrap`)) === "", "no leftover style on the banner");
+  check((await n.eval(`document.getElementById("banner").style.width`)) === "", "no leftover width (one line: nothing to fit)");
   await n.eval(`(state.handRaised = false, setBanner(contextBanner()), true)`);
 
   await sleep(100);

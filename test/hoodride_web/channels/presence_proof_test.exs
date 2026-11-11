@@ -100,4 +100,57 @@ defmodule HoodrideWeb.PresenceProofTest do
     # reaper gets them — never an immortal ghost.)
     refute match?({:online, _}, Hoodride.Geo.presence_of(user.id))
   end
+
+  # the REAL phone book (Hoodride.UserChannels) and a REAL user channel: the
+  # phone book's process dying takes every channel down with it (no goodbye:
+  # their presence rows still say ONLINE), it comes back EMPTY, and a sweep
+  # in that gap keeps the user's car (the fix in Sweeper.past_grace?).
+  # This module is not async: no other test's channels are cut.
+  test "the real phone book dying: channels die with it, it restarts empty, the sweep keeps everyone",
+       %{user: user} do
+    tab = open_tab(user)
+    Hoodride.Geo.driver_update(%{id: user.id, name: "PP", photo: nil}, "cell8rb", nil)
+    assert [_] = Registry.lookup(Hoodride.UserChannels, user.id)
+
+    Process.unlink(tab.channel_pid)
+    ref = Process.monitor(tab.channel_pid)
+    [{_, part, _, _}] = Supervisor.which_children(Hoodride.UserChannels)
+    Process.exit(part, :kill)
+
+    # the channel dies with the phone book — killed, no goodbye
+    assert_receive {:DOWN, ^ref, :process, _, :killed}, 1000
+    new_part = await_new_partition(part)
+    assert new_part != part
+
+    # the new phone book is empty, yet the presence row still says ONLINE
+    assert Registry.lookup(Hoodride.UserChannels, user.id) == []
+    refute Hoodride.Geo.connected?(user.id)
+    assert [{_, :online, _}] = :ets.lookup(:geo_presence, user.id)
+
+    # make the row look like they connected 10 min ago (over the 5-min grace)
+    :ets.insert(:geo_presence, {user.id, :online, System.system_time(:second) - 600})
+    Hoodride.Sweeper.sweep_now()
+
+    assert Hoodride.Geo.driver_on_map?(user.id), "a sweep in the gap reaped a connected user"
+    assert [{_, :grace, t}] = :ets.lookup(:geo_presence, user.id)
+    assert t >= System.system_time(:second) - 2
+
+    # the phone book works again: the app rejoining is listed
+    _tab2 = open_tab(user)
+    assert [_] = Registry.lookup(Hoodride.UserChannels, user.id)
+  end
+
+  defp await_new_partition(old, tries \\ 300)
+  defp await_new_partition(_old, 0), do: flunk("the phone book never came back")
+
+  defp await_new_partition(old, tries) do
+    case Supervisor.which_children(Hoodride.UserChannels) do
+      [{_, pid, _, _}] when is_pid(pid) and pid != old ->
+        pid
+
+      _ ->
+        Process.sleep(10)
+        await_new_partition(old, tries - 1)
+    end
+  end
 end

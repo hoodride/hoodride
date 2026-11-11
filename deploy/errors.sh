@@ -13,13 +13,15 @@
 set -uo pipefail
 
 SINCE="${1:-24 hours ago}"
-KEY="${HOODRIDE_KEY:-$HOME/.ssh/hoodcab_ed25519}"
+# the SSH key: HOODRIDE_KEY=path, else ssh's own choice (~/.ssh/config)
 HOST="${HOODRIDE_HOST:-hood@72.14.182.98}"
+key=()
+if [ -n "${HOODRIDE_KEY:-}" ]; then key=(-i "$HOODRIDE_KEY"); fi
 
 # (quoted for the remote shell: a ' in it can't run anything there)
 since_q=$(printf '%q' "$SINCE")
 # shellcheck disable=SC2029 # expanded here on purpose, quoted for there
-if ! log=$(ssh -i "$KEY" "$HOST" "sudo -n journalctl -u hoodride --since $since_q -o cat --no-pager"); then
+if ! log=$(ssh ${key[@]+"${key[@]}"} "$HOST" "sudo -n journalctl -u hoodride --since $since_q -o cat --no-pager"); then
   echo "FAIL: couldn't read the server's log (ssh or sudo refused) — nothing checked"
   exit 2
 fi
