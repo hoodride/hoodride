@@ -98,7 +98,11 @@ await journey("ride details: decline, too late, Navigate, the pin, I'm here", as
   const viaEarlyPin = await finn.eval(`document.getElementById("nav-google").href`);
   check(viaEarlyPin === `https://www.google.com/maps/dir/?api=1&destination=${earlyPin.lat}%2C${earlyPin.lng}`, "Navigate: to the pin", { viaEarlyPin, earlyPin });
   await finn.click("nav-cancel");
-  // Rita taps her pin: removed — Finn's 📍 goes, and Navigate waits again
+  // Rita taps her pin: removed — Finn's 📍 goes, and Navigate waits again.
+  // (her phone draws it on the server's "pin" too, as Finn's does — which
+  // of them hears it first is chance: under a full run's load Finn could,
+  // and the tap found no pin. Waited for, as a person sees it before tapping)
+  await rita.waitFor(`state.pinPos && !!document.querySelector(".marker-pin")`, "Rita's own pin on her map");
   await rita.eval(`document.querySelector(".marker-pin").click(), true`);
   await bannerIs(rita, "📍 Pin removed — your driver will come to you");
   await finn.waitFor(`!state.ride.peer.pin && !(pinMarker && pinMarker._map)`, "Finn: the pin gone, from his map too");

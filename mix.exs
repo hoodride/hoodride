@@ -61,6 +61,8 @@ defmodule Hoodride.MixProject do
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      # database changes the version before can't run on (precommit)
+      {:excellent_migrations, "~> 0.1", only: [:dev, :test], runtime: false},
       {:stream_data, "~> 1.1", only: [:dev, :test]}
     ]
   end
@@ -95,6 +97,13 @@ defmodule Hoodride.MixProject do
         # security scan: fails on any finding not reviewed in place (a
         # `# sobelow_skip [...]` above the function — survives line shifts)
         "sobelow --config",
+        # no database change the version before couldn't run on — removing,
+        # renaming or retyping a column, dropping or renaming a table (owner,
+        # 2026-11-11: expand, then contract — the old column goes in a LATER
+        # release than the one that stops using it). A deploy that fails
+        # switches back to the version before: it must still read the
+        # database. Settings: config :excellent_migrations (config.exs)
+        "excellent_migrations.check_safety",
         # no secrets in anything git would publish (gitleaks; skipped, with a
         # note, where it isn't installed) — .gitleaks.toml lists the harmless
         "hoodride.secrets",

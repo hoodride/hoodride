@@ -101,6 +101,34 @@ config :hoodride, :restart_notice, min_ms: 4000, max_ms: 10000, flush_ms: 1000
 # CPU but cost memory and delay.
 config :hoodride, :map_batch_ms, 500
 
+# Database changes the version before can't run on fail the precommit
+# (mix excellent_migrations.check_safety — owner, 2026-11-11): a deploy that
+# fails switches back to the version before, which must still read the
+# database. Expand, then contract: a column goes in a LATER release than
+# the one that stops using it. Kept on: removing, renaming or retyping a
+# column; dropping or renaming a table; raw SQL (it could do any of those —
+# mark a safe one: # excellent_migrations:safety-assured-for-next-line
+# raw_sql_executed). Off: Postgres/MySQL locking and backfill checks, which
+# don't apply to SQLite. Changes before the last one already shipped are
+# not checked (start_after).
+config :excellent_migrations,
+  start_after: "20261108154456",
+  skip_checks: [
+    :check_constraint_added,
+    :column_added_with_default,
+    :column_reference_added,
+    :column_volatile_default,
+    :index_concurrently_without_disable_ddl_transaction,
+    :index_concurrently_without_disable_migration_lock,
+    :index_not_concurrently,
+    :json_column_added,
+    :many_columns_index,
+    :not_null_added,
+    :operation_delete,
+    :operation_insert,
+    :operation_update
+  ]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
