@@ -18,13 +18,20 @@ defmodule Hoodride.Rides do
       Hoodride.Roles.changed(driver_id)
       id = "r" <> Integer.to_string(System.unique_integer([:positive]))
 
-      case DynamicSupervisor.start_child(
-             Hoodride.Rides.Supervisor,
-             {Hoodride.Rides.Ride, %{id: id, rider: rider_id, driver: driver_id}}
-           ) do
-        {:ok, _pid} ->
-          {:ok, id}
-
+      # the supervisor only STARTS the process (instant); the start-up — both
+      # name lookups in the database, the announcements — runs in the ride,
+      # this caller waiting for it. Run by the supervisor itself, it made
+      # every ride start in the city wait in one line: one start stuck on a
+      # slow database held up every other driver's Accept.
+      with {:ok, pid} <-
+             DynamicSupervisor.start_child(
+               Hoodride.Rides.Supervisor,
+               {Hoodride.Rides.Ride,
+                %{id: id, rider: rider_id, driver: driver_id, starter: self()}}
+             ),
+           :ok <- begin(pid) do
+        {:ok, id}
+      else
         error ->
           :ets.delete(:rides_by_user, rider_id)
           :ets.delete(:rides_by_user, driver_id)
@@ -37,9 +44,27 @@ defmodule Hoodride.Rides do
     end
   end
 
+  # the ride's start-up, waited for (no limit, as the supervisor's start was:
+  # each lookup ends on its own — a database that can't answer reads
+  # "unavailable"). A start-up that crashes or stops: an error, the seats freed
+  defp begin(pid) do
+    GenServer.call(pid, :begin, :infinity)
+  catch
+    :exit, reason -> {:error, {:start_failed, reason}}
+  end
+
   def get(id), do: call(id, :get_state) |> wrap_get()
 
-  defp wrap_get({:error, :gone}), do: {:error, :gone}
+  @doc """
+  Whether ride `id`'s process exists — never asking it anything, so a ride
+  slow to answer (busy on a slow database) never reads as gone. Cleanup's
+  test for an orphaned seat: asking took "no answer in 5 s" for "gone" and
+  ended live rides.
+  """
+  def alive?(id), do: Registry.lookup(Hoodride.Rides.Registry, id) != []
+
+  # (a half-started ride's {:error, :starting} too: never read as a ride)
+  defp wrap_get({:error, _} = error), do: error
   defp wrap_get(state), do: {:ok, state}
 
   def ride_id_of_user(user_id) do
@@ -120,21 +145,14 @@ defmodule Hoodride.Rides.Ride do
 
   alias Hoodride.Rides.Positions
 
+  # Nothing here (the supervisor waits on init — every ride start in the
+  # city does): the start-up is :begin, asked by start_ride right after.
+  # Its starter is watched until then: dying in between, it would leave
+  # this ride half-started forever (handle_info :DOWN below)
   @impl true
-  def init(%{id: id, rider: rider, driver: driver}) do
-    # who's who, FIRST — before anything is cancelled, moved or announced: a
-    # partner that doesn't exist stops the ride here, cleanly (start_ride
-    # frees the seats). A database that can't answer (overload) shows
-    # "Neighbor" instead, so the ride still starts and BOTH are told.
-    case {peer_of(rider, :rider), peer_of(driver, :driver)} do
-      {{rider_peer, rider_known}, {driver_peer, driver_known}} ->
-        # whose name couldn't be looked up: asked again once the ride runs
-        unnamed = for {uid, :unnamed} <- [{rider, rider_known}, {driver, driver_known}], do: uid
-        start(id, rider, driver, %{rider => driver_peer, driver => rider_peer}, unnamed)
-
-      _ ->
-        {:stop, :no_such_user}
-    end
+  def init(%{starter: starter} = args) do
+    Process.monitor(starter)
+    {:ok, {:starting, args}}
   end
 
   defp peer_of(user_id, seat) do
@@ -234,6 +252,31 @@ defmodule Hoodride.Rides.Ride do
   end
 
   @impl true
+  def handle_call(:begin, _from, {:starting, %{id: id, rider: rider, driver: driver}} = starting) do
+    # who's who, FIRST — before anything is cancelled, moved or announced: a
+    # partner that doesn't exist stops the ride here, cleanly (start_ride
+    # frees the seats). A database that can't answer (overload) shows
+    # "Neighbor" instead, so the ride still starts and BOTH are told.
+    case {peer_of(rider, :rider), peer_of(driver, :driver)} do
+      {{rider_peer, rider_known}, {driver_peer, driver_known}} ->
+        # whose name couldn't be looked up: asked again once the ride runs
+        unnamed = for {uid, :unnamed} <- [{rider, rider_known}, {driver, driver_known}], do: uid
+
+        {:ok, state} =
+          start(id, rider, driver, %{rider => driver_peer, driver => rider_peer}, unnamed)
+
+        {:reply, :ok, state}
+
+      _ ->
+        {:stop, :normal, {:error, :no_such_user}, starting}
+    end
+  end
+
+  # not started (or started already): nothing else is answered — a start-up
+  # never runs twice, and nothing reaches a ride before it
+  def handle_call(_msg, _from, {:starting, _} = starting),
+    do: {:reply, {:error, :starting}, starting}
+
   def handle_call(:get_state, _from, state) do
     {:reply, Map.take(state, [:id, :rider, :driver, :pin, :arrived]), state}
   end
@@ -365,6 +408,17 @@ defmodule Hoodride.Rides.Ride do
     {:noreply, %{state | unnamed: still}}
   end
 
+  # its starter died before the start-up: nobody was told anything — the
+  # two-seat claim freed (only if still the claim), and gone. (Once started,
+  # a starter's end is just another message: ignored below.)
+  def handle_info({:DOWN, _, :process, starter, _}, {:starting, %{starter: starter} = args}) do
+    :ets.delete_object(:rides_by_user, {args.rider, :pending})
+    :ets.delete_object(:rides_by_user, {args.driver, :pending})
+    Hoodride.Roles.changed(args.rider)
+    Hoodride.Roles.changed(args.driver)
+    {:stop, :normal, {:starting, args}}
+  end
+
   def handle_info(_unknown, state), do: {:noreply, state}
 
   @impl true
@@ -373,7 +427,11 @@ defmodule Hoodride.Rides.Ride do
   # safety net for abnormal exits; idempotent with the eager free in end_ride.
   # A NORMAL stop (end_ride, abandoned) already announced "ended"; any other
   # exit (a crash) must announce it here, or both apps sit on a dead ride.
+  # stopped before its start-up finished: nobody was told anything, and its
+  # seats are still the claim — start_ride frees those
   @impl true
+  def terminate(_reason, {:starting, _}), do: :ok
+
   def terminate(reason, state) do
     free_seats(state)
 

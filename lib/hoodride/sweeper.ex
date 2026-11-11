@@ -212,17 +212,17 @@ defmodule Hoodride.Sweeper do
     ended =
       Hoodride.ETS.fold_match(:rides_by_user, @active_seats, MapSet.new(), fn {user_id, ride_id},
                                                                               acc ->
-        case Hoodride.Rides.get(ride_id) do
-          {:error, :gone} ->
-            if :ets.select_delete(:rides_by_user, [{{user_id, ride_id}, [], [true]}]) == 1 do
-              Hoodride.Roles.changed(user_id)
-              MapSet.put(acc, ride_id)
-            else
-              acc
-            end
-
-          _ ->
+        # its process gone — never "it didn't answer": a ride busy for 5 s
+        # (a slow database) was taken for gone, both told "ended" mid-ride
+        if Hoodride.Rides.alive?(ride_id) do
+          acc
+        else
+          if :ets.select_delete(:rides_by_user, [{{user_id, ride_id}, [], [true]}]) == 1 do
+            Hoodride.Roles.changed(user_id)
+            MapSet.put(acc, ride_id)
+          else
             acc
+          end
         end
       end)
 

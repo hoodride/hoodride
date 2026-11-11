@@ -2,6 +2,8 @@ defmodule Hoodride.RideServerTest do
   @moduledoc "The GenServer-per-ride: birth effects, authority, self-cleaning death."
   use ExUnit.Case
 
+  import ExUnit.CaptureLog
+
   alias Hoodride.{Geo, Rides}
 
   setup do
@@ -44,6 +46,227 @@ defmodule Hoodride.RideServerTest do
     assert_receive {:DOWN, ^ref, :process, ^pid, _}, 2_000
     assert Rides.ride_id_of_user(r.id) == "rB"
     assert Rides.ride_id_of_user(d.id) == "rB"
+  end
+
+  # cleanup took "slow" for "gone": asked a ride "are you there?" and, after
+  # 5 s with no answer (a ride busy on a slow database), freed both seats
+  # and told both people the ride ended — mid-ride. "Gone" is now only a
+  # ride whose process no longer exists; a slow one is left alone.
+  test "a ride slow to answer is never taken for gone: cleanup leaves it running",
+       %{rider: r, driver: d} do
+    {:ok, id} = Rides.start_ride(r.id, d.id)
+    pid = ride_pid(id)
+    HoodrideWeb.Endpoint.subscribe("ride:" <> id)
+    # (busy: answers nothing until resumed)
+    :sys.suspend(pid)
+
+    try do
+      Hoodride.Sweeper.heal_orphan_ride_slots()
+    after
+      :sys.resume(pid)
+    end
+
+    assert Rides.ride_id_of_user(r.id) == id, "cleanup freed a live ride's seat"
+    assert Rides.ride_id_of_user(d.id) == id
+    refute_received %Phoenix.Socket.Broadcast{event: "ended"}
+    assert {:ok, %{id: ^id}} = Rides.get(id)
+  end
+
+  test "a ride whose process is gone: cleanup still frees its seats and says 'ended'",
+       %{rider: r, driver: d} do
+    {:ok, id} = Rides.start_ride(r.id, d.id)
+    pid = ride_pid(id)
+    HoodrideWeb.Endpoint.subscribe("ride:" <> id)
+    ref = Process.monitor(pid)
+    # killed: no terminate, the seats left behind
+    Process.exit(pid, :kill)
+    assert_receive {:DOWN, ^ref, :process, ^pid, :killed}
+    assert Rides.ride_id_of_user(r.id) == id
+
+    Hoodride.Sweeper.heal_orphan_ride_slots()
+
+    assert Rides.ride_id_of_user(r.id) == nil
+    assert Rides.ride_id_of_user(d.id) == nil
+    assert_received %Phoenix.Socket.Broadcast{event: "ended", payload: %{reason: "error"}}
+  end
+
+  # every ride start waited in ONE line: the supervisor ran each ride's
+  # start-up (both name lookups in the database) itself, so one start stuck
+  # on a slow database held up every other driver's Accept in the city.
+  # The supervisor now only starts the process; the start-up runs in the
+  # ride, the accepting driver waiting for it.
+  test "one ride's slow start never holds up another's", %{rider: r, driver: d} do
+    {:ok, r2} =
+      Hoodride.Accounts.upsert_oauth_user(%{provider: "dev", provider_id: "rs-r2", name: "R2"})
+
+    {:ok, d2} =
+      Hoodride.Accounts.upsert_oauth_user(%{provider: "dev", provider_id: "rs-d2", name: "D2"})
+
+    me = self()
+    slow = r.id
+
+    Application.put_env(:hoodride, :user_lookup, fn id ->
+      if id == slow do
+        send(me, {:looking, self()})
+        receive do: (:go -> :ok)
+      end
+
+      Hoodride.Accounts.get_user(id)
+    end)
+
+    on_exit(fn -> Application.delete_env(:hoodride, :user_lookup) end)
+
+    first = Task.async(fn -> Rides.start_ride(r.id, d.id) end)
+    assert_receive {:looking, looker}, 2_000
+    second = Task.async(fn -> Rides.start_ride(r2.id, d2.id) end)
+    meanwhile = Task.yield(second, 1_000)
+    send(looker, :go)
+
+    assert {:ok, {:ok, id2}} = meanwhile, "the second start waited behind the slow one"
+    assert Rides.ride_id_of_user(r2.id) == id2
+    assert {:ok, id1} = Task.await(first)
+    assert Rides.ride_id_of_user(r.id) == id1
+  end
+
+  # a partner that doesn't exist (deleted a moment ago): no ride, both seats
+  # free, nobody told anything, no process left behind
+  test "a start for an account that's gone: an error, seats free, nothing announced, no ride left",
+       %{driver: d} do
+    gone = 4_294_967_000
+    HoodrideWeb.Endpoint.subscribe("user:#{d.id}")
+
+    kids = fn ->
+      for {_, pid, _, _} <- DynamicSupervisor.which_children(Hoodride.Rides.Supervisor), do: pid
+    end
+
+    before = kids.()
+
+    log = capture_log(fn -> assert {:error, :no_such_user} = Rides.start_ride(gone, d.id) end)
+    # stopped cleanly — no crash in its shutdown (a half-started ride's state
+    # isn't a ride's)
+    refute log =~ "terminating", log
+
+    assert Rides.ride_id_of_user(gone) == nil
+    assert Rides.ride_id_of_user(d.id) == nil
+    refute_received %Phoenix.Socket.Broadcast{event: "ride_started"}
+    # (its reply comes just before it stops: each new ride process watched
+    # until it's gone — none may stay)
+    for pid <- kids.() -- before do
+      ref = Process.monitor(pid)
+      assert_receive {:DOWN, ^ref, :process, ^pid, _}, 2_000, "a ride process was left behind"
+    end
+
+    # and the seats really are free: a real ride starts
+    {:ok, r2} =
+      Hoodride.Accounts.upsert_oauth_user(%{provider: "dev", provider_id: "rs-r3", name: "R3"})
+
+    assert {:ok, _} = Rides.start_ride(r2.id, d.id)
+  end
+
+  # the start is two steps now (the process, then its start-up): the one who
+  # started it dying in between (a connection cut that very moment) must not
+  # leave a ride half-started forever — both seats claimed, nobody told,
+  # cleanup never looking at a claim. It frees the claim and stops.
+  test "whoever started a ride dying before its start-up: the claim is freed, the half-started ride stops",
+       %{rider: r, driver: d} do
+    :ets.insert(:rides_by_user, [{r.id, :pending}, {d.id, :pending}])
+    starter = spawn(fn -> receive do: (:never -> :ok) end)
+
+    {:ok, pid} =
+      DynamicSupervisor.start_child(
+        Hoodride.Rides.Supervisor,
+        {Hoodride.Rides.Ride, %{id: "r-half", rider: r.id, driver: d.id, starter: starter}}
+      )
+
+    ref = Process.monitor(pid)
+    HoodrideWeb.Endpoint.subscribe(Hoodride.Roles.topic(r.id))
+    HoodrideWeb.Endpoint.subscribe(Hoodride.Roles.topic(d.id))
+    Process.exit(starter, :kill)
+
+    assert_receive {:DOWN, ^ref, :process, ^pid, _}, 2_000
+    assert Rides.ride_id_of_user(r.id) == nil
+    assert Rides.ride_id_of_user(d.id) == nil
+    # both apps told (else both stay off the map, their role unchanged)
+    rt = Hoodride.Roles.topic(r.id)
+    dt = Hoodride.Roles.topic(d.id)
+    assert_received %Phoenix.Socket.Broadcast{topic: ^rt, event: "changed"}
+    assert_received %Phoenix.Socket.Broadcast{topic: ^dt, event: "changed"}
+  end
+
+  # …and once started, its starter going away changes nothing (the accepting
+  # driver's connection may well close mid-ride)
+  test "a started ride outlives whoever started it", %{rider: r, driver: d} do
+    me = self()
+
+    starter =
+      spawn(fn ->
+        send(me, {:started, Rides.start_ride(r.id, d.id)})
+      end)
+
+    assert_receive {:started, {:ok, id}}, 2_000
+    ref = Process.monitor(starter)
+    assert_receive {:DOWN, ^ref, :process, ^starter, _}
+    pid = ride_pid(id)
+    _ = :sys.get_state(pid)
+    assert Rides.alive?(id)
+    assert Rides.ride_id_of_user(r.id) == id
+  end
+
+  # the start-up CRASHING (a bug, not a slow database): the starter gets an
+  # error and frees the claim — else both seats stay claimed and cleanup
+  # never looks at a claim: both off the map until a restart
+  test "a start-up that crashes: an error, both seats free, a later ride starts",
+       %{rider: r, driver: d} do
+    Application.put_env(:hoodride, :user_lookup, fn _ -> raise ArgumentError, "a bug" end)
+    on_exit(fn -> Application.delete_env(:hoodride, :user_lookup) end)
+
+    capture_log(fn ->
+      assert {:error, {:start_failed, _}} = Rides.start_ride(r.id, d.id)
+    end)
+
+    assert Rides.ride_id_of_user(r.id) == nil
+    assert Rides.ride_id_of_user(d.id) == nil
+    Application.delete_env(:hoodride, :user_lookup)
+    assert {:ok, _} = Rides.start_ride(r.id, d.id)
+  end
+
+  # the start-up is waited for however long it takes: a start given up on
+  # (seats freed, the request put back) would still finish — a ghost ride,
+  # both told "ride started" for a request that's back
+  test "a start-up slower than 5 s is still waited for: the ride starts, its seats its own",
+       %{rider: r, driver: d} do
+    Application.put_env(:hoodride, :user_lookup, fn id ->
+      if id == r.id, do: Process.sleep(5_500)
+      Hoodride.Accounts.get_user(id)
+    end)
+
+    on_exit(fn -> Application.delete_env(:hoodride, :user_lookup) end)
+    assert {:ok, id} = Rides.start_ride(r.id, d.id)
+    assert Rides.ride_id_of_user(r.id) == id
+    assert Rides.ride_id_of_user(d.id) == id
+  end
+
+  # before its start-up a ride answers nothing else (no state to read), and
+  # its start-up never runs twice
+  test "a half-started ride: anything but its start-up refused; the start-up runs once",
+       %{rider: r, driver: d} do
+    :ets.insert(:rides_by_user, [{r.id, :pending}, {d.id, :pending}])
+
+    {:ok, pid} =
+      DynamicSupervisor.start_child(
+        Hoodride.Rides.Supervisor,
+        {Hoodride.Rides.Ride, %{id: "r-once", rider: r.id, driver: d.id, starter: self()}}
+      )
+
+    assert GenServer.call(pid, :get_state) == {:error, :starting}
+    assert Rides.get("r-once") == {:error, :starting}
+    assert GenServer.call(pid, {:end_ride, r.id}) == {:error, :starting}
+    HoodrideWeb.Endpoint.subscribe("user:#{d.id}")
+    assert GenServer.call(pid, :begin) == :ok
+    assert_receive %Phoenix.Socket.Broadcast{event: "ride_started"}
+    assert GenServer.call(pid, :begin) == {:error, :bad_request}
+    refute_receive %Phoenix.Socket.Broadcast{event: "ride_started"}, 100
+    assert Rides.ride_id_of_user(r.id) == "r-once"
   end
 
   test "an ending ride still frees its own seats", %{rider: r, driver: d} do
