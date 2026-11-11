@@ -21,15 +21,17 @@
   }
 
   // something a reload would interrupt: a ride, a request, a raised hand,
-  // a shift, or a half-typed message (the reload restores the first four,
-  // but a driver's GPS or a rider meeting up shouldn't blink for an update)
-  // view: {mode, online, handRaised, ride: {status} | null, draft}
+  // a shift, a half-typed message, or a form open (the reload restores the
+  // first four, but a driver's GPS or a rider meeting up shouldn't blink for
+  // an update; the car form's typing was lost — U2, owner 2026-11-11)
+  // view: {mode, online, handRaised, ride: {status} | null, draft, form}
   function isBusy(view) {
     return (
       !!view.ride ||
       !!view.handRaised ||
       (view.mode === "driver" && !!view.online) ||
-      (view.draft || "").trim() !== ""
+      (view.draft || "").trim() !== "" ||
+      !!view.form
     );
   }
 

@@ -449,6 +449,11 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   overflow-wrap: anywhere;
   text-align: center;
 }
+/* a new text being fitted: laid out (measured, counted as a cover) but not
+   drawn — #banner-was shows the banner as it was meanwhile, so the box is
+   never seen as wide as the cap (owner, 2026-11-11) */
+.banner.fitting { visibility: hidden; }
+#banner-was { pointer-events: none; }
 
 .bottom-controls {
   position: absolute;

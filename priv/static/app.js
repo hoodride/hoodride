@@ -315,6 +315,7 @@ function setBanner(text) {
   const b = $("banner");
   if (!text) {
     b.classList.add("hidden");
+    bannerFitted(b);
   } else {
     // laid out afresh when the text changes: Safari kept a longer text's
     // balanced wrapping (text-wrap: balance) for the shorter one after it —
@@ -328,29 +329,64 @@ function setBanner(text) {
     // calls this) and is banner-sized.
     // The box then hugs its lines (fitBanner, a frame after that): wrapped,
     // it stayed as wide as the cap, the balanced lines in its middle (owner,
-    // 2026-11-10). Any new text starts unfitted.
-    const changed = text.length <= 300 && b.dataset.text !== text;
+    // 2026-11-10). Any new text starts unfitted — and isn't drawn until
+    // fitted (.fitting): it flashed as wide as the cap for those frames
+    // (owner, 2026-11-11). The banner as it was stays on screen meanwhile
+    // (holdBanner); the text itself is in place at once (read, measured).
+    // (only plain text is fitted: a list — a message's icon + raw text — or
+    // a long text is drawn at once as it is; a list never matched its own
+    // dataset copy and was kept hidden for its whole time: review, 2026-11-11)
+    const fits = typeof text === "string" && text.length <= 300;
+    const changed = fits && b.dataset.text !== text;
     if (changed) {
+      holdBanner(b);
+      b.classList.add("fitting");
       b.dataset.text = text;
       b.style.textWrap = "wrap";
       b.style.width = "";
-    } else if (text.length > 300) {
+    } else if (!fits) {
       b.dataset.text = "";
       b.style.width = "";
+      bannerFitted(b);
     }
     // shown again unfitted (a rotation while it was hidden): fitted then
     const refit = !changed && !b.style.width && b.classList.contains("hidden") && b.dataset.text === text;
+    if (refit) b.classList.add("fitting");
     setIconText(b, text);
     b.classList.remove("hidden");
-    if (refit) requestAnimationFrame(() => requestAnimationFrame(() => fitBanner(b, text)));
+    if (refit) requestAnimationFrame(() => requestAnimationFrame(() => (fitBanner(b, text), bannerFitted(b, text))));
     if (changed)
       requestAnimationFrame(() =>
         requestAnimationFrame(() => {
           if (b.dataset.text !== text) return;
           b.style.textWrap = "";
-          requestAnimationFrame(() => fitBanner(b, text));
+          requestAnimationFrame(() => (fitBanner(b, text), bannerFitted(b, text)));
         })
       );
+  }
+}
+
+// the banner as it's showing now, copied to #banner-was while its new text
+// is fitted. Only a banner on screen and drawn: one mid-fit keeps the copy
+// already showing (the last one seen); a hidden one has nothing to keep
+function holdBanner(b) {
+  const was = $("banner-was");
+  if (!was || !was.classList.contains("hidden") || b.classList.contains("hidden") || b.classList.contains("fitting")) return;
+  was.replaceChildren(...[...b.childNodes].map((n) => n.cloneNode(true)));
+  was.style.width = b.style.width;
+  was.style.textWrap = b.style.textWrap;
+  was.classList.remove("hidden");
+}
+
+// fitted (or nothing to fit): the banner drawn, the copy gone. For a text
+// that's since been replaced, nothing — the newer one's own frames do it
+function bannerFitted(b, text) {
+  if (text !== undefined && b.dataset.text !== text) return;
+  b.classList.remove("fitting");
+  const was = $("banner-was");
+  if (was && !was.classList.contains("hidden")) {
+    was.classList.add("hidden");
+    was.replaceChildren();
   }
 }
 
@@ -371,18 +407,24 @@ function fitBanner(b, text) {
 }
 
 // rotated or resized: the cap changed — the box fitted afresh (once per
-// resize burst: cleared now, read two frames on, after the browser's layout)
+// resize burst: cleared now, read two frames on, after the browser's layout).
+// Not drawn unfitted meanwhile — the banner as it was shows instead, as for a
+// new text. A new text's own fitting under way: left to finish it
 let bannerRefit = false;
 window.addEventListener("resize", () => {
   const b = $("banner");
   if (!b || (!b.style.width && !bannerRefit)) return;
+  holdBanner(b);
+  b.classList.add("fitting");
   b.style.width = "";
   if (bannerRefit) return;
   bannerRefit = true;
   requestAnimationFrame(() =>
     requestAnimationFrame(() => {
       bannerRefit = false;
+      if (b.style.textWrap === "wrap") return;
       fitBanner(b, b.dataset.text);
+      bannerFitted(b);
     })
   );
 });
@@ -604,24 +646,31 @@ $("settings-refresh-link").addEventListener("click", () => HoodGoogleRefresh.tak
 // use (HoodUpdate.isBusy) — then ONE silent Google round trip. "due" is
 // cleared first, so a failure can't loop. "Back": the page shown again,
 // focus, a restored page, or opening the app (onSignedIn)
+// what's in progress, for the busy rule (HoodUpdate.isBusy) — the app
+// update's silent reload and the Google refresh's round trip both wipe the
+// page: never while any of it is going on. The car form open: what's typed
+// in it would go (U2, owner 2026-11-11)
+function busyView() {
+  return {
+    mode: state.mode,
+    online: state.online,
+    handRaised: state.handRaised,
+    ride: state.ride,
+    draft: allDrafts(),
+    form: carSheetOpen(),
+  };
+}
 let awayFromApp = false;
 let googleRefreshing = false;
 function tryGoogleRefresh() {
   if (DEMO || !state.realUser || googleRefreshing) return;
   // stepped aside: Google's answer would come back as a new page load
   if (steppedAside()) return;
-  const view = {
-    mode: state.mode,
-    online: state.online,
-    handRaised: state.handRaised,
-    ride: state.ride,
-    draft: allDrafts(),
-  };
   const go = HoodGoogleRefresh.shouldRefresh({
     due: HoodGoogleRefresh.isDue(storageOrNull()),
     google: state.realUser.provider === "google",
     away: awayFromApp,
-    busy: HoodUpdate.isBusy(view),
+    busy: HoodUpdate.isBusy(busyView()),
   });
   if (!go) return;
   googleRefreshing = true;
@@ -851,6 +900,8 @@ function closeCarSheet(e) {
   $("car-sheet").classList.add("hidden");
   $("car-backdrop").classList.add("hidden");
   returnFocus(carSheetOpener, e);
+  // new Terms came while it was open: asked now (refusedReload)
+  if (reloadAfterCarForm) location.reload();
 }
 
 function carError(msg, fields = []) {
@@ -1164,7 +1215,7 @@ function onJoinSignedOut() {
   signedOutCheck = (async () => {
     try {
       const res = await apiFetch("/api/socket_token");
-      if (await ownRefusal(res)) return location.reload();
+      if (refusedReload(await ownRefusal(res))) return;
       if (res.ok) {
         socketToken = (await res.json()).token;
         socketTokenAt = performance.now();
@@ -1176,15 +1227,29 @@ function onJoinSignedOut() {
 }
 
 // Hood Ride's OWN "not signed in" / "Terms first" answer — never just any
-// 401/403 (a proxy's challenge page must not reload the app)
+// 401/403 (a proxy's challenge page must not reload the app). → which
+// ("unauthenticated" | "terms"), or false
 async function ownRefusal(res) {
   if (res.status !== 401 && res.status !== 403) return false;
   try {
     const body = await res.json();
-    return !!body && (body.error === "unauthenticated" || body.error === "terms");
+    return !!body && (body.error === "unauthenticated" || body.error === "terms") ? body.error : false;
   } catch (_) {
     return false;
   }
+}
+
+// refused (ownRefusal's answer): the reload shows the sign-in screen or asks
+// for the Terms. New Terms with the car form open: the moment the form
+// closes — saved or cancelled — not before (what's typed in it would go;
+// saving it still works: the car save doesn't ask for the Terms — owner,
+// 2026-11-11). Signed out: at once (nothing can be saved). → refused?
+let reloadAfterCarForm = false;
+function refusedReload(why) {
+  if (!why) return false;
+  if (why === "terms" && carSheetOpen()) reloadAfterCarForm = true;
+  else location.reload();
+  return true;
 }
 
 // browsers authenticate the socket with a signed token (session-cookie
@@ -1206,7 +1271,7 @@ async function refreshSocketToken() {
     const res = await apiFetch("/api/socket_token");
     // signed out (here or elsewhere), or new Terms of Use while the app was
     // open: the reload shows the sign-in screen or asks for the Terms
-    if (await ownRefusal(res)) return location.reload();
+    if (refusedReload(await ownRefusal(res))) return;
     if (res.ok) {
       const body = await res.json();
       socketToken = body.token;
@@ -1346,18 +1411,11 @@ const LOADED_BUILD = (document.querySelector('meta[name="hoodride-build"]') || {
 let serverBuild = null;
 
 function checkForUpdate() {
-  const view = {
-    mode: state.mode,
-    online: state.online,
-    handRaised: state.handRaised,
-    ride: state.ride,
-    draft: allDrafts(),
-  };
   const action = HoodUpdate.decide({
     loadedBuild: LOADED_BUILD,
     serverBuild,
     hidden: document.visibilityState === "hidden",
-    busy: HoodUpdate.isBusy(view),
+    busy: HoodUpdate.isBusy(busyView()),
   });
   if (action === "offer") showUpdateAvailable();
   else if (action === "reload") reloadForUpdate();
@@ -2986,7 +3044,9 @@ const loc = HoodLocator.create({
       HoodSession.noteQuietReload(tabStorage(), sessionStamp);
       location.reload();
     },
-    typing: () => (($("chat-input") && $("chat-input").value) || "").trim() !== "",
+    // (the car form open too: the reload wiped what was typed in it — U2's
+    // second route, review 2026-11-11; test_browser/carformupdate.mjs)
+    typing: () => (($("chat-input") && $("chat-input").value) || "").trim() !== "" || carSheetOpen(),
   },
 });
 
@@ -3657,7 +3717,7 @@ async function loadChat(peer, c) {
   try {
     const res = await apiFetch(`/api/chat?peer=${encodeURIComponent(peer.id)}`, { signal: stop.signal });
     // signed out, or new Terms: the reload shows the sign-in or asks
-    if (chats.get(peer) === c && (await ownRefusal(res))) return location.reload();
+    if (chats.get(peer) === c && refusedReload(await ownRefusal(res))) return;
     if (res.ok) {
       body = await res.json();
       outcome = "ok";

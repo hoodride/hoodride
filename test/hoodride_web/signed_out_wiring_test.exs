@@ -42,7 +42,7 @@ defmodule HoodrideWeb.SignedOutWiringTest do
     assert f =~ "if (signedOutCheck) return;"
     assert f =~ "socket.disconnect();"
     assert f =~ ~s[const res = await apiFetch("/api/socket_token");]
-    assert f =~ "if (await ownRefusal(res)) return location.reload();"
+    assert f =~ "if (refusedReload(await ownRefusal(res))) return;"
     assert f =~ "socket.connect();"
   end
 
@@ -65,7 +65,48 @@ defmodule HoodrideWeb.SignedOutWiringTest do
     assert f =~ ~s[body.error === "unauthenticated" || body.error === "terms"]
 
     [refresh] = Regex.run(~r/async function refreshSocketToken\(\) \{.*?\n\}\n/s, @app)
-    assert refresh =~ "if (await ownRefusal(res)) return location.reload();"
+    assert refresh =~ "if (refusedReload(await ownRefusal(res))) return;"
     refute refresh =~ "res.status === 401"
+  end
+
+  # new Terms with the car form open: the reload waits for the form to close
+  # (saved or cancelled) — what's typed in it would go (owner, 2026-11-11;
+  # test_browser/carformupdate.mjs). Signed out: at once
+  test "refused: reload at once — new Terms with the car form open, once it closes" do
+    [f] =
+      Regex.run(
+        ~r/function refusedReload\(why\) \{.*?
+\}
+/s,
+        @app
+      )
+
+    assert f =~ "if (!why) return false;"
+    assert f =~ ~s[if (why === "terms" && carSheetOpen()) reloadAfterCarForm = true;
+  else location.reload();]
+
+    [o] =
+      Regex.run(
+        ~r/async function ownRefusal\(res\) \{.*?
+\}
+/s,
+        @app
+      )
+
+    assert o =~ ~s[body.error === "terms") ? body.error : false;]
+
+    [c] =
+      Regex.run(
+        ~r/function closeCarSheet\(e\) \{.*?
+\}
+/s,
+        @app
+      )
+
+    assert c =~ "if (reloadAfterCarForm) location.reload();"
+    # every refusal goes through it: no reload straight off ownRefusal
+    refute @app =~ "(await ownRefusal(res))) return location.reload()"
+    refute @app =~ "if (await ownRefusal(res)) return location.reload()"
+    assert length(String.split(@app, "refusedReload(await ownRefusal(res))")) - 1 == 3
   end
 end

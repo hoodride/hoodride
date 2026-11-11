@@ -183,6 +183,11 @@ await journey("findnearestnobody: 'nobody nearby yet' — looked at again, never
   await nobodyAround(n);
   await n.eval(`(receiveMsg(drivers[1], "hello from the test"), true)`);
   await n.waitFor(`document.getElementById("banner").textContent.includes("hello from the test")`, "the message in the banner", 3000);
+  // …and drawn, not only there: a message banner is an icon + raw text (a
+  // list, not a string) — the fitting step never took it as fitted and kept
+  // it invisible for its whole time, the old banner showing instead (review,
+  // 2026-11-11)
+  await n.waitFor(`(() => { const b = document.getElementById("banner"); return getComputedStyle(b).visibility === "visible" && document.getElementById("banner-was").classList.contains("hidden"); })()`, "the message drawn, nothing held over it", 1000);
   check(await n.eval(`nobodyNear`), "(still nobody nearby meanwhile)");
   await n.waitFor(`document.getElementById("banner").textContent.includes("nobody nearby yet")`, "the line back once the message has gone", 15000);
 
@@ -222,10 +227,41 @@ await journey("findnearestnobody: 'nobody nearby yet' — looked at again, never
   };
   // the box against its lines: how much wider than its widest line + padding
   const slack = () => n.eval(`(() => { const b = document.getElementById("banner"); const rg = document.createRange(); rg.selectNodeContents(b); const lines = rg.getBoundingClientRect().width; const cs = getComputedStyle(b); return b.getBoundingClientRect().width - lines - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight); })()`);
+  // what's DRAWN, frame by frame (owner, 2026-11-11: the new text flashed
+  // as wide as the cap for a few frames before it was fitted): looked at
+  // just after each frame's paint — the banner if drawn, else the banner as
+  // it was (#banner-was), else nothing
+  const watch = () =>
+    n.eval(`(() => {
+      window.__drawn = [];
+      let on = true;
+      window.__stopDrawn = () => ((on = false), window.__drawn);
+      const look = () => {
+        const b = document.getElementById("banner"), was = document.getElementById("banner-was");
+        const drawn = (e) => !e.classList.contains("hidden") && getComputedStyle(e).visibility === "visible";
+        const el = drawn(b) ? b : drawn(was) ? was : null;
+        window.__drawn.push(el ? { id: el.id, w: Math.round(el.getBoundingClientRect().width) } : null);
+      };
+      const f = () => { if (!on) return; setTimeout(look, 0); requestAnimationFrame(f); };
+      requestAnimationFrame(f);
+      return true;
+    })()`);
+  // every frame drew one of the two sizes — the old box or the new fitted
+  // one — never anything wider, never nothing; and the old one did show
+  // while the new text was fitted (the watch really saw the change)
+  const drawnOnly = async (sizes, what) => {
+    const drawn = await n.eval(`__stopDrawn()`);
+    const bad = drawn.filter((d) => !d || !sizes.some((w) => Math.abs(d.w - w) <= 1));
+    check(drawn.length >= 5 && bad.length === 0, `${what}: every frame the old banner or the new one fitted — never wider, never a blank`, { sizes, bad, drawn });
+    return drawn;
+  };
   await n.eval(`(state.handRaised = true, setBanner(contextBanner()), true)`);
   const fresh = await size();
+  await watch();
   await n.eval(`(setNobodyNear(true), true)`);
   const long = await size();
+  const grew = await drawnOnly([fresh.w, long.w], "'nobody nearby yet' added");
+  check(grew.some((d) => d.id === "banner-was") && grew.at(-1).id === "banner" && grew.at(-1).w === long.w, "(the old banner held while the new text was fitted, then the new one)", grew);
   // the wrapped message: the box hugs its lines (it stayed as wide as the
   // cap, the balanced lines in its middle — owner, 2026-11-10) …
   const hug = await slack();
@@ -237,14 +273,19 @@ await journey("findnearestnobody: 'nobody nearby yet' — looked at again, never
   const unfit = await n.eval(`(() => { const b = document.getElementById("banner"); const w = b.style.width; b.style.width = ""; const h = Math.round(b.getBoundingClientRect().height); b.style.width = w; return h; })()`);
   check(unfit === long.h, "fitting keeps the same lines", { unfit, long });
   // a rotation: cleared at once, fitted afresh after the layout
+  await watch();
   check(await n.eval(`(window.dispatchEvent(new Event("resize")), document.getElementById("banner").style.width === "")`), "a rotation: the old fit cleared at once");
   await size();
+  await drawnOnly([long.w], "a rotation");
   check((await slack()) <= 3, "…and fitted afresh after it", await slack());
+  await watch();
   await n.eval(`(setNobodyNear(false), true)`);
   const back = await size();
+  await drawnOnly([long.w, fresh.w], "'nobody nearby yet' gone");
   check(back.w === fresh.w && back.h === fresh.h, "back to the short message's own size", { fresh, long, back });
   check((await n.eval(`document.getElementById("banner").style.textWrap`)) === "", "no leftover style on the banner");
   check((await n.eval(`document.getElementById("banner").style.width`)) === "", "no leftover width (one line: nothing to fit)");
+  check(await n.eval(`(() => { const was = document.getElementById("banner-was"); return !document.getElementById("banner").classList.contains("fitting") && was.classList.contains("hidden") && was.childNodes.length === 0; })()`), "drawn, and the held copy gone");
   await n.eval(`(state.handRaised = false, setBanner(contextBanner()), true)`);
 
   await sleep(100);

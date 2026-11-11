@@ -38,6 +38,8 @@ defmodule HoodrideWeb.NearCoversTest do
   # on the map screen, but not over the map while anyone looks at it
   @not_counted %{
     "map" => "the map itself",
+    "banner-was" =>
+      "the banner as it was, shown only for the frames while #banner's new text is fitted — #banner (counted) is laid out at its new size meanwhile",
     "class:topbar" =>
       "the top bar: a see-through fade — what's on it is counted (btn-account, .topbar-title, btn-mode)",
     "bottom-controls" =>
@@ -982,8 +984,8 @@ defmodule HoodrideWeb.NearCoversTest do
       |> Enum.reject(&String.starts_with?(&1, "function fitBanner("))
 
     assert calls == [
-             "    if (refit) requestAnimationFrame(() => requestAnimationFrame(() => fitBanner(b, text)));",
-             "          requestAnimationFrame(() => fitBanner(b, text));",
+             "    if (refit) requestAnimationFrame(() => requestAnimationFrame(() => (fitBanner(b, text), bannerFitted(b, text))));",
+             "          requestAnimationFrame(() => (fitBanner(b, text), bannerFitted(b, text)));",
              "      fitBanner(b, b.dataset.text);"
            ]
 
@@ -991,6 +993,36 @@ defmodule HoodrideWeb.NearCoversTest do
     r = Regex.run(~r/window\.addEventListener\("resize", \(\) => \{.*?\n\}\);/s, src) |> hd()
 
     assert r =~
-             ~s[b.style.width = "";\n  if (bannerRefit) return;\n  bannerRefit = true;\n  requestAnimationFrame(() =>\n    requestAnimationFrame(() => {\n      bannerRefit = false;\n      fitBanner(b, b.dataset.text);]
+             ~s[b.style.width = "";\n  if (bannerRefit) return;\n  bannerRefit = true;\n  requestAnimationFrame(() =>\n    requestAnimationFrame(() => {\n      bannerRefit = false;\n      if (b.style.textWrap === "wrap") return;\n      fitBanner(b, b.dataset.text);\n      bannerFitted(b);]
+  end
+
+  # an unfitted box is never drawn (owner, 2026-11-11: the new text flashed
+  # as wide as the cap for a few frames): laid out but hidden (.fitting)
+  # until fitted, the banner as it was showing meanwhile (#banner-was). The
+  # frames themselves: test_browser/findnearestnobody.mjs
+  test "a new text, or a rotation, is drawn only once fitted; the old banner shows meanwhile" do
+    b = body("setBanner")
+    assert b =~ ~s[if (changed) {\n      holdBanner(b);\n      b.classList.add("fitting");]
+    assert b =~ ~s[if (refit) b.classList.add("fitting");]
+    # hidden, or a list (a message's icon + text) or a long text (never
+    # fitted): drawn at once, the copy gone
+    assert b =~ ~s[const fits = typeof text === "string" && text.length <= 300;]
+    assert b =~ ~s[} else if (!fits) {]
+    assert b =~ ~s[b.classList.add("hidden");\n    bannerFitted(b);]
+    assert b =~ ~s[b.style.width = "";\n      bannerFitted(b);]
+
+    r = Regex.run(~r/window\.addEventListener\("resize", \(\) => \{.*?\n\}\);/s, @app) |> hd()
+    assert r =~ ~s[holdBanner(b);\n  b.classList.add("fitting");\n  b.style.width = "";]
+
+    # not drawn — still laid out: measured, and counted as a cover
+    assert @css =~ ".banner.fitting { visibility: hidden; }"
+    assert @css =~ "#banner-was { pointer-events: none; }"
+    assert @html =~ ~s[<div id="banner-was" class="banner hidden" aria-hidden="true"></div>]
+
+    # the copy: only of a banner drawn on screen; a stale fit never shows
+    assert body("holdBanner") =~
+             ~s[b.classList.contains("hidden") || b.classList.contains("fitting")) return;]
+
+    assert body("bannerFitted") =~ "if (text !== undefined && b.dataset.text !== text) return;"
   end
 end

@@ -15,7 +15,7 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const U = require("../priv/static/update.js");
 
-const idle = { mode: "rider", online: false, handRaised: false, ride: null, draft: "" };
+const idle = { mode: "rider", online: false, handRaised: false, ride: null, draft: "", form: false };
 const v = (over) => ({ ...idle, ...over });
 
 test("the same build, or nothing to compare: nothing to do", () => {
@@ -47,6 +47,15 @@ test("busy: a ride, a request, a raised hand, a shift, or a half-typed message",
   assert.equal(U.isBusy(v({ handRaised: true })), true);
   assert.equal(U.isBusy(v({ mode: "driver", online: true })), true);
   assert.equal(U.isBusy(v({ draft: "on my way" })), true);
+});
+
+// a form open — the car form, half filled in: a reload wiped what was typed
+// (U2, owner 2026-11-11; test_browser/carformupdate.mjs)
+test("busy: a form open (the car form)", () => {
+  assert.equal(U.isBusy(v({ form: true })), true);
+  assert.equal(U.decide({ loadedBuild: "a1", serverBuild: "b2", hidden: true, busy: U.isBusy(v({ form: true })) }), "offer");
+  // closed: not busy for it
+  assert.equal(U.isBusy(v({ form: false })), false);
 });
 
 test("not busy: just looking at the map, as a rider or an off-duty driver", () => {

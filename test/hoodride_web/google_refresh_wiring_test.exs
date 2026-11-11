@@ -114,6 +114,20 @@ defmodule HoodrideWeb.GoogleRefreshWiringTest do
     assert b =~ "if (DEMO || !state.realUser || googleRefreshing) return;"
   end
 
+  # the update's silent reload and this refresh both wipe the page: one view
+  # of what's in progress for both — the car form open counts (U2, owner
+  # 2026-11-11: what was typed in it was lost; test_browser/carformupdate.mjs)
+  test "both page-wiping paths ask the busy rule with the same view, the car form in it" do
+    assert body("tryGoogleRefresh") =~ "busy: HoodUpdate.isBusy(busyView()),"
+    assert body("checkForUpdate") =~ "busy: HoodUpdate.isBusy(busyView()),"
+    assert length(String.split(@app, "HoodUpdate.isBusy(")) - 1 == 2
+    assert body("busyView") =~ "form: carSheetOpen(),"
+    # the third: the reload on return while location is blocked (locator.js
+    # onVisible) waits while app.typing() — the car form open counts
+    assert @app =~
+             ~s[typing: () => (($("chat-input") && $("chat-input").value) || "").trim() !== "" || carSheetOpen(),]
+  end
+
   test "'back' is the page shown again, focus, a restored page, or opening the app" do
     assert @app =~ ~s[document.addEventListener("visibilitychange", onGoogleRefreshVisibility);]
     assert @app =~ ~s[window.addEventListener("focus", tryGoogleRefresh);]

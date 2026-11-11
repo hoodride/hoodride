@@ -80,7 +80,7 @@ defmodule HoodrideWeb.LightReloadSourceTest do
 
   test "signed out or new Terms first; only Hood Ride's own 404 \"none\" closes the chat" do
     l = body("loadChat")
-    assert l =~ "if (chats.get(peer) === c && (await ownRefusal(res))) return location.reload();"
+    assert l =~ "if (chats.get(peer) === c && refusedReload(await ownRefusal(res))) return;"
     {own, _} = :binary.match(l, "ownRefusal(res)")
     {ok, _} = :binary.match(l, "if (res.ok)")
     assert own < ok
