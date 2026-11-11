@@ -74,9 +74,16 @@ systemctl enable hoodride >/dev/null 2>&1
 echo "   hoodride enabled (starts at boot once a release is deployed)"
 echo "   cloudflared: enable after the tunnel is set up — systemctl enable --now cloudflared"
 
-# deploy.sh restarts the app and checks it as cloudflared: just those, no password
+# deploy.sh stops/starts the app, copies its database while stopped (and
+# puts the copy back if the new version fails — db_copy.sh), and checks it
+# as cloudflared: just those, no password. (db_copy.sh lives in your own
+# folder: whoever can edit it can run anything as root — as with any deploy
+# user that restarts services; keep that account to yourself.)
 cat > /etc/sudoers.d/hoodride-deploy <<EOF
 $ADMIN ALL=(root) NOPASSWD: /usr/bin/systemctl restart hoodride
+$ADMIN ALL=(root) NOPASSWD: /usr/bin/systemctl stop hoodride
+$ADMIN ALL=(root) NOPASSWD: /usr/bin/systemctl start hoodride
+$ADMIN ALL=(root) NOPASSWD: /usr/bin/bash $HERE/db_copy.sh *
 $ADMIN ALL=(cloudflared) NOPASSWD: /usr/bin/curl
 EOF
 chmod 0440 /etc/sudoers.d/hoodride-deploy

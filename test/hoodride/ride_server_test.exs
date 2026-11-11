@@ -72,6 +72,27 @@ defmodule Hoodride.RideServerTest do
     assert {:ok, %{id: ^id}} = Rides.get(id)
   end
 
+  # a ride process that just ended is still listed for a moment (the
+  # registry removes it a little later): never "alive" — else cleanup skips
+  # it and nobody is told the ride ended (found by ContactPrivacyTest in a
+  # full run; pinned here with the registry held so the moment can't pass)
+  test "a ride just ended, still listed: not alive", %{rider: r, driver: d} do
+    {:ok, id} = Rides.start_ride(r.id, d.id)
+    pid = ride_pid(id)
+    [{_, part, _, _} | _] = Supervisor.which_children(Hoodride.Rides.Registry)
+    :sys.suspend(part)
+
+    try do
+      ref = Process.monitor(pid)
+      Process.exit(pid, :kill)
+      assert_receive {:DOWN, ^ref, :process, ^pid, :killed}
+      assert [{^pid, _}] = Registry.lookup(Hoodride.Rides.Registry, id), "(still listed)"
+      refute Rides.alive?(id)
+    after
+      :sys.resume(part)
+    end
+  end
+
   test "a ride whose process is gone: cleanup still frees its seats and says 'ended'",
        %{rider: r, driver: d} do
     {:ok, id} = Rides.start_ride(r.id, d.id)

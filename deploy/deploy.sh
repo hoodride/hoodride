@@ -6,10 +6,10 @@
 #
 # Builds next to the running one, switches /opt/hoodride/current, restarts,
 # and checks the app answers on its socket the way cloudflared reaches it —
-# if not, switches back and restarts the previous one. Keeps the last 3.
+# if not, puts the database back as it was (its copy, made just before)
+# and switches back to the previous one. Keeps the last 3 of each.
 set -euo pipefail
 APP=/opt/hoodride
-SOCK=/run/hoodride/app.sock
 . "$HOME/beam/env.sh"   # Erlang + Elixir (deploy/install_beam.sh)
 cd "$(dirname "$0")/.."
 
@@ -27,36 +27,16 @@ rm -f "$NEW/releases/COOKIE"
 STATIC="$(ls -d "$NEW"/lib/hoodride-*/priv/static)"
 mix hoodride.minify --in-place "$STATIC" --keep "$HOME/.cache/hoodride"
 
-PREV="$(readlink -f "$APP/current" 2>/dev/null || true)"
-ln -sfn "$NEW" "$APP/current"
-sudo /usr/bin/systemctl restart hoodride
+# stop, copy the database, switch, start, check — or put the database AND
+# the code back as they were (switch.sh). Not live: stop here.
+"$(dirname "$0")/switch.sh" "$NEW"
+# anything Cloudflare adds to the pages that the CSP doesn't know (warns only)
+"$(dirname "$0")/cloudflare_check.sh"
+# the automatic 10:00 UTC restart (apt-auto-reboot.conf), visible here
+echo "server: up since $(uptime -s)$([ -f /var/run/reboot-required ] && echo ' · a security fix needs a restart: at 10:00 UTC')"
 
-# as cloudflared: the same user, group and socket the tunnel uses
-healthy() {
-  for _ in $(seq 1 30); do
-    code="$(sudo -u cloudflared /usr/bin/curl -s -o /dev/null -w '%{http_code}' --max-time 2 \
-      --unix-socket "$SOCK" -H 'x-forwarded-proto: https' http://localhost/api/me || true)"
-    [ "$code" = 200 ] && return 0
-    sleep 1
-  done
-  return 1
-}
-
-if healthy; then
-  echo "live: $NEW"
-  # anything Cloudflare adds to the pages that the CSP doesn't know (warns only)
-  "$(dirname "$0")/cloudflare_check.sh"
-  # the automatic 10:00 UTC restart (apt-auto-reboot.conf), visible here
-  echo "server: up since $(uptime -s)$([ -f /var/run/reboot-required ] && echo ' · a security fix needs a restart: at 10:00 UTC')"
-else
-  echo "the new release doesn't answer — see: journalctl -u hoodride -n 50"
-  if [ -n "$PREV" ] && [ -d "$PREV" ]; then
-    ln -sfn "$PREV" "$APP/current"
-    sudo /usr/bin/systemctl restart hoodride
-    healthy && echo "switched back: $PREV" || echo "the previous release doesn't answer either"
-  fi
-  exit 1
-fi
+# the newest 3 database copies kept — one per release kept below
+sudo /usr/bin/bash "$PWD/deploy/db_copy.sh" prune 3
 
 # keep the newest 3 (never the live one)
 live="$(readlink -f "$APP/current")"

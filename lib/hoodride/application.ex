@@ -33,6 +33,10 @@ defmodule Hoodride.Application do
       Hoodride.Repo,
       {Ecto.Migrator,
        repos: Application.fetch_env!(:hoodride, :ecto_repos), skip: skip_migrations?()},
+      # can THIS version read the database as it now is? If not, it refuses
+      # to start — a deploy switching back onto a newer version's database
+      # changes fails its check loudly instead of failing every sign-in
+      Hoodride.SchemaCheck,
       # the sign-outs a connect checks, loaded before the web server starts
       # (it blocks: no connection is accepted before the list is there)
       Hoodride.SignOuts,

@@ -18,7 +18,6 @@ defmodule HoodrideWeb.DeleteAccountTest do
   require Phoenix.ChannelTest
 
   alias Hoodride.{Accounts, Chat, Geo, Requests, Rides, SessionStamp, SignOuts}
-  alias HoodrideWeb.Auth
 
   @cell "882a1072c7fffff"
 

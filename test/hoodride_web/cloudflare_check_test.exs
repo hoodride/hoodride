@@ -8,10 +8,12 @@ defmodule HoodrideWeb.CloudflareCheckTest do
   """
   use ExUnit.Case, async: true
 
+  # (live = switch.sh succeeded: under set -e, deploy.sh stops there if not)
   test "deploy.sh runs the check once the new release answers" do
     deploy = File.read!("deploy/deploy.sh")
-    [_, after_live] = String.split(deploy, ~s(echo "live: $NEW"), parts: 2)
-    assert after_live =~ ~r/^\s*#.*\n\s*"\$\(dirname "\$0"\)\/cloudflare_check\.sh"/
+    [_, after_live] = String.split(deploy, ~s(/switch.sh" "$NEW"\n), parts: 2)
+    assert after_live =~ ~r/\A\s*#.*\n\s*"\$\(dirname "\$0"\)\/cloudflare_check\.sh"/
+    assert deploy =~ "set -euo pipefail"
   end
 
   test "every known addition is one the CSP allows (else the list hides a blocked script)" do

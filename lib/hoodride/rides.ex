@@ -61,7 +61,14 @@ defmodule Hoodride.Rides do
   test for an orphaned seat: asking took "no answer in 5 s" for "gone" and
   ended live rides.
   """
-  def alive?(id), do: Registry.lookup(Hoodride.Rides.Registry, id) != []
+  def alive?(id) do
+    # (a process just ended is still listed for a moment — the registry
+    # removes it a little later: alive means listed AND running)
+    case Registry.lookup(Hoodride.Rides.Registry, id) do
+      [{pid, _}] -> Process.alive?(pid)
+      [] -> false
+    end
+  end
 
   # (a half-started ride's {:error, :starting} too: never read as a ride)
   defp wrap_get({:error, _} = error), do: error
