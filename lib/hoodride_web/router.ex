@@ -83,6 +83,9 @@ defmodule HoodrideWeb.Router do
     # browser sends these itself (Safari with `Origin: null`): not checked
     # by :own_pages, and they change nothing
     post "/csp-report", CspReportController, :create
+    # the app's own error reports (priv/static/errors.js): WHAT broke, never
+    # who — they change nothing (HoodrideWeb.ClientErrorController)
+    post "/client-error", ClientErrorController, :create
     match :*, "/*path", AuthController, :not_found
   end
 

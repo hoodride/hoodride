@@ -4,10 +4,46 @@
 // requests, rides. Demo mode (?demo=1, or no backend): mocks.
 // ============================================================
 
+// ===== Error reports (owner, 2026-11-10) — FIRST, before anything can throw =====
+// An unexpected error: a small report to the server — WHAT broke, never who
+// (HoodErrors: scrubbed, each once, at most 5 a minute / 30 a session).
+// errors.js caught any error since the page began; from here the app takes
+// them. The reporter is made at the first report, from what's already
+// loaded — so a crash while this very file is starting is reported too.
+let errorReports = null;
+function reportError(e, where = "other") {
+  if (typeof HoodErrors === "undefined") return; // its file didn't load: no reports
+  // a network failure (no signal, a blip, the map's files) is the network,
+  // not a bug — not reported (found by its own journey, 2026-11-10)
+  if (HoodErrors.isNetwork(e)) return;
+  if (!errorReports) {
+    const br = typeof HoodSendFilter !== "undefined" ? HoodSendFilter.browserOf(navigator.userAgent, !!navigator.brave) : {};
+    errorReports = HoodErrors.create({
+      send: (r) => {
+        // the demo talks to no server — asked at send time (a visitor's demo
+        // starts after the app has); before DEMO exists: not the demo
+        let demo = false;
+        try {
+          demo = DEMO;
+        } catch (_) {}
+        if (demo) return;
+        fetch("/api/client-error", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(r), keepalive: true, credentials: "same-origin" }).catch(() => {});
+      },
+      now: () => Date.now(),
+      build: (document.querySelector('meta[name="hoodride-build"]') || {}).content || "?",
+      // ("Samsung Internet" — one word: the server takes no spaces there)
+      browser: `${String(br.app || "Browser").replace(/\s+/g, "")}/${br.platform || "other"}`,
+    });
+  }
+  errorReports.report(e, where);
+}
+if (typeof HoodErrors !== "undefined") HoodErrors.attach((e) => reportError(e));
+
 // every visible message through t("…") with its English as the key
 // (i18n.js; `mix hoodride.i18n.extract` collects them). Set when SHOWN,
 // never once at load — the language is chosen after the scripts load
 const { t, tc, tn } = HoodI18n;
+
 
 const H3_RES = 8; // cell topics / registration (coarse)
 const H3_DISPLAY_RES = 9; // car + hand display fuzz: ~block-level (research's ~200m sweet spot)
@@ -280,8 +316,29 @@ function setBanner(text) {
   if (!text) {
     b.classList.add("hidden");
   } else {
+    // laid out afresh when the text changes: Safari kept a longer text's
+    // balanced wrapping (text-wrap: balance) for the shorter one after it —
+    // "✋ … need a ride" went 1 line → 3 with "· nobody nearby yet" → 2 when
+    // that went (owner's iPhone, 2026-11-10). Balancing off while the new
+    // text goes in, back on two frames later: the browser's own layout in
+    // between starts it fresh. NEVER a forced layout here (void offsetWidth):
+    // it lays out the WHOLE page at once — with a 1 MB chat open, every
+    // banner update took seconds and a reload missed its time
+    // (lightreload2, 2026-11-10). Only when the text changes (every tick
+    // calls this) and is banner-sized.
+    const changed = text.length <= 300 && b.dataset.text !== text;
+    if (changed) {
+      b.dataset.text = text;
+      b.style.textWrap = "wrap";
+    }
     setIconText(b, text);
     b.classList.remove("hidden");
+    if (changed)
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          if (b.dataset.text === text) b.style.textWrap = "";
+        })
+      );
   }
 }
 
@@ -2767,6 +2824,7 @@ function initMap() {
   map.on("error", (e) => {
     if (e.tile || e.sourceId) return;
     console.error("map:", e.error?.message || e.error);
+    reportError(e.error || e, "map");
   });
 
   const el = document.createElement("div");
@@ -2796,6 +2854,15 @@ function initMap() {
     // yet": what's on screen no longer says who's near you)
     if (!e.nearSearch) movedByHand();
   });
+  // a finger put down on the bare map while the search is STEPPING ends it
+  // at once — before any move: the press stops the step's move, and the
+  // search, seeing a still map, took its next step straight away, its own
+  // move then overriding the finger's drag before it began (owner,
+  // 2026-11-10). (The canvas only: a tap on a car or ✋ — a marker — isn't
+  // this; nor is a tap while it only watches someone found.)
+  map.getCanvas().addEventListener("pointerdown", () => {
+    if (nearLooking) movedByHand();
+  });
 
   if (DEMO) {
     // the demo comes back as what you last picked too (offline, like the
@@ -2822,6 +2889,7 @@ function initMap() {
 // Brave's own check — its name can be missing from the user agent)
 const BROWSER = HoodSendFilter.browserOf(navigator.userAgent, !!navigator.brave);
 const PLATFORM = BROWSER.platform;
+
 const loc = HoodLocator.create({
   geolocation: "geolocation" in navigator ? navigator.geolocation : null,
   queryPermission: async () =>
@@ -4547,6 +4615,7 @@ function watchLook() {
   } catch (e) {
     stopFindNearest();
     console.error("find the nearest (watch):", e);
+    reportError(e, "search");
   }
 }
 
@@ -4613,6 +4682,7 @@ function findNearest(at, { outFrom = null } = {}) {
   } catch (e) {
     stopFindNearest();
     console.error("find the nearest:", e);
+    reportError(e, "search");
     return;
   }
   // anything thrown in a look (a marker gone mid-measure…): the search ends
@@ -4623,6 +4693,7 @@ function findNearest(at, { outFrom = null } = {}) {
     } catch (e) {
       if (seq === nearSeq) stopFindNearest();
       console.error("find the nearest:", e);
+      reportError(e, "search");
     }
   };
   const look = () => {
@@ -5290,7 +5361,10 @@ const booting = HoodBoot.create({
   backoff: (attempt) => HoodSync.reconnectBackoff(attempt),
   setTimer: (f, ms) => setTimeout(f, ms),
   clearTimer: (timer) => clearTimeout(timer),
-  onError: (e) => console.error("couldn't open the app", e),
+  onError: (e) => {
+    console.error("couldn't open the app", e);
+    reportError(e, "start");
+  },
 });
 // ?demo=1: the pretend world, whoever opens it — never the account, never
 // the server (owner, 2026-11-07: signed in, the demo ALSO connected as you,

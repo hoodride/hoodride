@@ -30,13 +30,22 @@ defmodule HoodrideWeb.SameUserWiringTest do
   test "no request to /api leaves the app without apiFetch" do
     for f <- Path.wildcard(Path.join(@static, "*.js")),
         Path.basename(f) not in ["sw.js", "maplibre-gl.js", "phoenix.min.js", "h3-js.umd.js"] do
-      src = File.read!(f)
+      # ONE exception, on purpose: the error report (app.js reportError) —
+      # it never says who (no account header: "what broke, never who"), and
+      # it must work while the app is starting, before there's an account or
+      # apiFetch to call; a mismatch must never sign the view out over it
+      src = File.read!(f) |> String.replace(~s[fetch("/api/client-error"], "")
       # a bare fetch("/api…"), fetch('/api…') or fetch(`/api…`)
       refute src =~ ~r/(?<![A-Za-z_.])fetch\(\s*["'`]\/api/, "#{f} calls /api without apiFetch"
       refute src =~ ~r/window\.fetch\(\s*["'`]\/api/, "#{f} calls /api without apiFetch"
     end
 
     assert length(Regex.scan(~r/apiFetch\("\/api\//, @app)) == 11
+    # (the one exception, and only once: the error report, with no account)
+    assert length(Regex.scan(~r/fetch\("\/api\/client-error"/, @app)) == 1
+    refute @app =~ ~r/x-hood-user[^
+]*client-error|client-error[^
+]*x-hood-user/
   end
 
   test "apiFetch: the account shown, the header checked (never the body), the cover, no answer" do

@@ -209,6 +209,24 @@ await journey("findnearestnobody: 'nobody nearby yet' — looked at again, never
   const out = await search(n);
   check(out.trace[0] === 14 && out.trace.length === 1 && out.z === 14 && !out.nobody && (await n.eval(`foundWatch !== null`)), "in to the usual view, the car found there (watched: found)", out);
 
+  // the banner's size after "nobody nearby yet" goes: exactly the short
+  // message's own, laid out afresh — Safari kept the longer text's balanced
+  // wrapping (1 line → 3 → 2 on the owner's iPhone, 2026-11-10). Chrome never
+  // showed it; this keeps the property, and no leftover style
+  step("'nobody nearby yet' gone: the banner back to the short message's own size, nothing left over");
+  // (measured after the banner's two frames: its balancing back on)
+  const size = () => n.eval(`new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => { const r = document.getElementById("banner").getBoundingClientRect(); ok({ w: Math.round(r.width), h: Math.round(r.height) }); }))))`);
+  await n.eval(`(state.handRaised = true, setBanner(contextBanner()), true)`);
+  const fresh = await size();
+  await n.eval(`(setNobodyNear(true), true)`);
+  const long = await size();
+  await n.eval(`(setNobodyNear(false), true)`);
+  const back = await size();
+  check(long.h > fresh.h || long.w > fresh.w, "(the long message is bigger)", { fresh, long });
+  check(back.w === fresh.w && back.h === fresh.h, "back to the short message's own size", { fresh, long, back });
+  check((await n.eval(`document.getElementById("banner").style.textWrap`)) === "", "no leftover style on the banner");
+  await n.eval(`(state.handRaised = false, setBanner(contextBanner()), true)`);
+
   await sleep(100);
   await n.close();
 });

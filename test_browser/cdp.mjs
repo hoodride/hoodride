@@ -426,6 +426,13 @@ function page(cdp, sessionId, name) {
     click: (id) => p.eval(`document.getElementById(${JSON.stringify(id)}).click(), true`),
     // a real mouse click at a point on the page (e.g. on the map)
     // a real mouse drag from one point to another (as a finger drags the map)
+    // a finger put down (no move yet) — and lifted, later, by release()
+    async press(x, y) {
+      await send("Input.dispatchMouseEvent", { type: "mousePressed", x, y, button: "left", buttons: 1, clickCount: 1 });
+    },
+    async release(x, y) {
+      await send("Input.dispatchMouseEvent", { type: "mouseReleased", x, y, button: "left", buttons: 0, clickCount: 1 });
+    },
     async drag(x1, y1, x2, y2) {
       await send("Input.dispatchMouseEvent", { type: "mousePressed", x: x1, y: y1, button: "left", buttons: 1, clickCount: 1 });
       for (let i = 1; i <= 8; i++) {

@@ -75,6 +75,21 @@ defmodule HoodrideWeb.BrowserJourneysTest do
 
     on_exit(fn -> :telemetry.detach(handler) end)
 
+    # the app's error reports, as the server logged them
+    # (HoodrideWeb.ClientErrorController): asked for by server("client_error_has …")
+    reports = start_supervised!({Agent, fn -> [] end}, id: :client_errors)
+    reports_handler = "journeys-errors-#{System.unique_integer([:positive])}"
+
+    :telemetry.attach(
+      reports_handler,
+      [:hoodride, :client_error],
+      fn _, _, %{line: line}, agent -> Agent.update(agent, &[line | &1]) end,
+      reports
+    )
+
+    on_exit(fn -> :telemetry.detach(reports_handler) end)
+    Process.put(:client_errors, reports)
+
     # requests refused as coming from another site (HoodrideWeb.CrossOrigin):
     # counted here, asked for by server("cross_site_refused")
     refused = :counters.new(1, [])
@@ -172,6 +187,40 @@ defmodule HoodrideWeb.BrowserJourneysTest do
 
   # as if a new version were deployed: the server now runs another build
   # (an open app learns it on its next (re)join — "Update available")
+  # a client error report the server logged, containing this text — and
+  # nothing personal (waits a moment: the page sends it as it happens)
+  defp server("client_error_has " <> text) do
+    agent = Process.get(:client_errors)
+
+    Enum.reduce_while(1..30, nil, fn _, _ ->
+      lines = Agent.get(agent, & &1)
+
+      case Enum.find(lines, &String.contains?(&1, text)) do
+        nil ->
+          Process.sleep(100)
+          {:cont, "no client error with #{inspect(text)} — got: #{inspect(lines)}"}
+
+        # found: and nothing personal in it — no long number, email or link
+        line ->
+          # (the build — a version hash — aside: its hex has digit runs)
+          if Regex.match?(~r/\d{4,}|@\w|https?:\/\//, Regex.replace(~r/ build=\S+/, line, "")),
+            do: {:halt, "a report carried something personal: #{line}"},
+            else: {:halt, "ok"}
+      end
+    end)
+  end
+
+  # NO client error report containing this text arrived (given 2 s to come)
+  defp server("client_error_none " <> text) do
+    Process.sleep(2000)
+    lines = Agent.get(Process.get(:client_errors), & &1)
+
+    case Enum.find(lines, &String.contains?(&1, text)) do
+      nil -> "ok"
+      line -> "a report arrived that shouldn't have: #{line}"
+    end
+  end
+
   defp server("new_build") do
     :persistent_term.put(@build_key, "journey-new-build")
     "ok"

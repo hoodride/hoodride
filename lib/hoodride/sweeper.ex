@@ -5,6 +5,7 @@ defmodule Hoodride.Sweeper do
   (deadline index) documented in ARCHITECTURE.md for when it's ever needed.
   """
   use GenServer
+  require Logger
 
   # how often it wakes; config :sweep_every_ms — :manual in tests, which run
   # sweep_now/0 on purpose (a tick landing mid-test reaped that test's
@@ -45,30 +46,92 @@ defmodule Hoodride.Sweeper do
   @conversation_keys [{{:"$1", :_}, [], [:"$1"]}]
 
   @doc "One synchronous sweep — used by the timer and by tests."
-  def sweep_now do
-    expire_stale_requests()
-    heal_orphan_ride_slots()
-    sweep_stale_geo()
-    heal_geo_consistency()
-    heal_unlawful_requests()
-    Hoodride.Requests.heal_index(@request_ttl)
-    sweep_empty_room_chats()
-    Hoodride.Chat.heal_index()
-    # message ids kept for retries: 10 minutes
-    Hoodride.Chat.sweep_sent_ids()
-    # full allowances are the same as none: drop their rows
-    Hoodride.RateBudget.sweep()
-    # lifted sign-in blocks and finished failure windows
-    Hoodride.SignInFailures.sweep()
-    # sign-outs past every session's lifetime revoke nothing any more
-    Hoodride.SignOuts.sweep()
-    # sign-ins past their 30 days (or their year): gone from memory
-    Hoodride.SessionTokens.sweep()
-    # session-stamp rows of accounts with no device connected for a day
-    Hoodride.SessionStamp.prune()
-    # the recount trusts membership: repair it first
-    Enum.each(Hoodride.Geo.member_drift(), &Hoodride.Geo.rebuild_members/1)
-    Hoodride.Geo.recompute_aggregates()
+  def sweep_now, do: run_steps(steps())
+
+  @doc """
+  The sweep's steps, in order — each {name, fun}. Run one by one by
+  run_steps/1: a step that fails is logged and SKIPPED, never the ones after
+  it (a step failing every time used to stop every later one for good —
+  sign-ins, rate rows, chats piling up on a 1 GB server; the recount
+  never running).
+  """
+  def steps do
+    [
+      {:expire_stale_requests, &expire_stale_requests/0},
+      {:heal_orphan_ride_slots, &heal_orphan_ride_slots/0},
+      {:sweep_stale_geo, &sweep_stale_geo/0},
+      {:heal_geo_consistency, &heal_geo_consistency/0},
+      {:heal_unlawful_requests, &heal_unlawful_requests/0},
+      {:requests_heal_index, fn -> Hoodride.Requests.heal_index(@request_ttl) end},
+      {:sweep_empty_room_chats, &sweep_empty_room_chats/0},
+      {:chat_heal_index, &Hoodride.Chat.heal_index/0},
+      # message ids kept for retries: 10 minutes
+      {:chat_sent_ids, &Hoodride.Chat.sweep_sent_ids/0},
+      # full allowances are the same as none: drop their rows
+      {:rate_budget, &Hoodride.RateBudget.sweep/0},
+      # lifted sign-in blocks and finished failure windows
+      {:sign_in_failures, &Hoodride.SignInFailures.sweep/0},
+      # sign-outs past every session's lifetime revoke nothing any more
+      {:sign_outs, &Hoodride.SignOuts.sweep/0},
+      # sign-ins past their 30 days (or their year): gone from memory
+      {:session_tokens, &Hoodride.SessionTokens.sweep/0},
+      # session-stamp rows of accounts with no device connected for a day
+      {:session_stamps, &Hoodride.SessionStamp.prune/0},
+      # the recount trusts membership: repair it first
+      {:rebuild_members,
+       fn ->
+         Enum.each(Hoodride.Geo.member_drift(), fn user_id ->
+           repaired("membership drift")
+           Hoodride.Geo.rebuild_members(user_id)
+         end)
+       end},
+      {:recompute_aggregates, &Hoodride.Geo.recompute_aggregates/0}
+    ]
+  end
+
+  @doc false
+  # each step on its own: anything it raises, throws or exits with is logged
+  # (ONE line: "sweep step NAME failed: …") and the next step runs
+  def run_steps(steps) do
+    for {name, fun} <- steps do
+      try do
+        fun.()
+      rescue
+        e ->
+          Logger.error(
+            "sweep step #{name} failed: #{inspect(e.__struct__)} at #{place(__STACKTRACE__)}"
+          )
+      catch
+        kind, _reason ->
+          Logger.error("sweep step #{name} failed: #{kind} at #{place(__STACKTRACE__)}")
+      end
+    end
+
+    log_repairs()
+  end
+
+  # where it failed: module, function/arity, file:line — never the error's
+  # text or a call's arguments (they can carry a user id, a cell: a place)
+  defp place([{mod, fun, args, loc} | _]) do
+    arity = if is_list(args), do: length(args), else: args
+    "#{inspect(mod)}.#{fun}/#{arity} #{loc[:file]}:#{loc[:line]}"
+  end
+
+  defp place(_), do: "?"
+
+  # The REPAIR LOG: a repair is a fix of something that should never be (a
+  # car and a ✋ at once, a seat with no ride, a drifted index…) — each kind
+  # counted during the sweep, ONE warning line per kind after it ("repair:
+  # WHAT ×N"). A non-empty repair log means a bug somewhere. Normal
+  # clean-ups (someone gone past grace) are not repairs.
+  defp repaired(what), do: Process.put({:repair, what}, Process.get({:repair, what}, 0) + 1)
+
+  defp log_repairs do
+    for {{:repair, what} = key, n} <- Process.get() do
+      Process.delete(key)
+      Logger.warning("repair: #{what} ×#{n}")
+    end
+
     :ok
   end
 
@@ -82,6 +145,8 @@ defmodule Hoodride.Sweeper do
     # car declines its waiters)
     each_match(:geo_hands, @hand_ids, fn user_id ->
       if Hoodride.Geo.driver_on_map?(user_id) do
+        repaired("car and ✋ at once")
+
         case :ets.lookup(:geo_parents, user_id) do
           [{_, :driver, _}] ->
             Hoodride.Geo.hand_down(user_id)
@@ -98,8 +163,11 @@ defmodule Hoodride.Sweeper do
 
     # (b) mid-ride ghosts: a positional update that raced the ride start
     each_match(:rides_by_user, @active_seats, fn {user_id, _ride_id} ->
-      if Hoodride.Geo.driver_on_map?(user_id), do: Hoodride.Geo.driver_offline(user_id)
-      if :ets.member(:geo_hands, user_id), do: Hoodride.Geo.hand_down(user_id)
+      car? = Hoodride.Geo.driver_on_map?(user_id)
+      hand? = :ets.member(:geo_hands, user_id)
+      if car? or hand?, do: repaired("on the map mid-ride")
+      if car?, do: Hoodride.Geo.driver_offline(user_id)
+      if hand?, do: Hoodride.Geo.hand_down(user_id)
     end)
 
     # (altitude orphans are pruned by the recount, inside its writer pause)
@@ -107,7 +175,10 @@ defmodule Hoodride.Sweeper do
     # (c) cell index drift — a read-only scan finds suspect users, then each
     # is re-derived inside its OWN writer shard (serialized with its live
     # updates, so a false positive from an in-flight write is harmless)
-    Enum.each(Hoodride.Geo.cell_index_drift(), &Hoodride.Geo.reindex_user/1)
+    Enum.each(Hoodride.Geo.cell_index_drift(), fn user_id ->
+      repaired("cell index drift")
+      Hoodride.Geo.reindex_user(user_id)
+    end)
   end
 
   # The request reconciler: a create can race the thing that would have
@@ -120,9 +191,11 @@ defmodule Hoodride.Sweeper do
     each_match(:ride_requests, @request_pairs, fn {rider_id, driver_id} ->
       cond do
         :ets.member(:rides_by_user, rider_id) ->
+          repaired("unlawful request")
           Hoodride.Requests.cancel(rider_id)
 
         :ets.member(:rides_by_user, driver_id) or not Hoodride.Geo.driver_on_map?(driver_id) ->
+          repaired("unlawful request")
           Hoodride.Requests.decline(driver_id, rider_id)
 
         true ->
@@ -154,6 +227,7 @@ defmodule Hoodride.Sweeper do
       end)
 
     for ride_id <- ended do
+      repaired("orphaned ride")
       HoodrideWeb.Endpoint.broadcast("ride:" <> ride_id, "ended", %{by: nil, reason: "error"})
     end
 
@@ -183,7 +257,12 @@ defmodule Hoodride.Sweeper do
     # so this pass reads them all — but copies only {id, ts}, never the
     # cell or spot
     each_match(:geo_drivers, @driver_id_ts, fn {user_id, ts} ->
-      if now - ts > @position_stale or past_grace?(user_id, now) do
+      stale? = now - ts > @position_stale
+
+      if stale? or past_grace?(user_id, now) do
+        # silent past the limit while CONNECTED: a stuck app (a repair);
+        # silent because they left: the normal grace reap
+        if stale? and Hoodride.Geo.connected?(user_id), do: repaired("frozen car")
         Hoodride.Geo.driver_offline(user_id)
       end
     end)
@@ -231,9 +310,23 @@ defmodule Hoodride.Sweeper do
   # per pass, not once per user
   defp past_grace?(user_id, now) do
     not Hoodride.Geo.connected?(user_id) and
-      case Hoodride.Geo.grace_since(user_id) do
-        nil -> true
-        since -> now - since > @presence_grace
+      case :ets.lookup(:geo_presence, user_id) do
+        [] ->
+          true
+
+        # ONLINE, yet in no channel: its channel ended without a goodbye —
+        # e.g. the phone book (the UserChannels Registry) restarting took
+        # every channel down with it; the apps rejoin within a second. The
+        # row's time is when they CONNECTED, never "gone since": the grace
+        # clock starts NOW (a sweep in that gap reaped everyone connected
+        # over 5 min — cars, ✋, chats). Truly gone: reaped 5 min on.
+        [{_, :online, _}] ->
+          repaired("online without a channel")
+          Hoodride.Geo.user_disconnected(user_id)
+          false
+
+        [{_, _, since}] ->
+          now - since > @presence_grace
       end
   end
 end

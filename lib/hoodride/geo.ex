@@ -1,4 +1,6 @@
 defmodule Hoodride.Geo do
+  require Logger
+
   @moduledoc """
   The live world: who is where, right now. All ETS, all ephemeral.
   Cells are opaque strings (H3 computed client-side via h3-js) —
@@ -722,25 +724,32 @@ defmodule Hoodride.Geo do
   end
 
   defp heal_cells(expected, actual) do
-    for cell <- Enum.uniq(Map.keys(expected) ++ Map.keys(actual)) do
-      {ed, eh} = Map.get(expected, cell, {0, 0})
+    healed =
+      for cell <- Enum.uniq(Map.keys(expected) ++ Map.keys(actual)) do
+        {ed, eh} = Map.get(expected, cell, {0, 0})
 
-      case Map.get(actual, cell) do
-        {^ed, ^eh} ->
-          :ok
+        case Map.get(actual, cell) do
+          {^ed, ^eh} ->
+            :ok
 
-        nil ->
-          # absent at snapshot: create only if STILL absent
-          if :ets.insert_new(@agg, {cell, ed, eh}),
-            do: settle_and_broadcast(cell, changed_sides({0, 0}, {ed, eh}))
+          nil ->
+            # absent at snapshot: create only if STILL absent
+            if :ets.insert_new(@agg, {cell, ed, eh}) do
+              settle_and_broadcast(cell, changed_sides({0, 0}, {ed, eh}))
+              :healed
+            end
 
-        {ad, ah} ->
-          if :ets.select_replace(@agg, [{{cell, ad, ah}, [], [{:const, {cell, ed, eh}}]}]) == 1 do
-            settle_and_broadcast(cell, changed_sides({ad, ah}, {ed, eh}))
-          end
+          {ad, ah} ->
+            if :ets.select_replace(@agg, [{{cell, ad, ah}, [], [{:const, {cell, ed, eh}}]}]) == 1 do
+              settle_and_broadcast(cell, changed_sides({ad, ah}, {ed, eh}))
+              :healed
+            end
+        end
       end
-    end
+      |> Enum.count(&(&1 == :healed))
 
+    # (the repair log — Hoodride.Sweeper: counts that were wrong, healed)
+    if healed > 0, do: Logger.warning("repair: hex count ×#{healed}")
     :ok
   end
 

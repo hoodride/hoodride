@@ -60,6 +60,23 @@ await journey("findnearestcover2: a card, the share prompt, Update available, th
   const sw = await p.eval(`({ trace: __trace.slice(), nobody: nobodyNear, looking: nearLooking })`);
   check(n0 < all && sw.trace.length === n0 && !sw.nobody && !sw.looking, "a finger's drag ends it where it was: no step more, nothing said", { sw, n0, all });
 
+  // the race behind a flaky drag (owner, 2026-11-10): a finger put down on
+  // the map STOPS the search's moving step at once — the search saw a still
+  // map and took its next step straight away, its own move then overriding
+  // the finger's drag before it began. A press on the bare map while the
+  // search is stepping ends it — before any move
+  step("a finger put down on the map mid-step (not moved yet): the search ends there — no next step, no 'nobody'");
+  await farAway(p);
+  const pb = await p.eval(`(__trace.length = 0, window.__slowSteps = 6000, nearSeq)`);
+  await tapLocate(p);
+  await p.waitFor(`nearSeq > ${pb} && __trace.length >= 2`, "the second step");
+  await p.press(120, 420);
+  await p.eval(`(window.__slowSteps = 0, true)`);
+  await new Promise((r) => setTimeout(r, 1500));
+  const pr = await p.eval(`({ looking: nearLooking, trace: __trace.slice(), nobody: nobodyNear })`);
+  await p.release(120, 420);
+  check(!pr.looking && pr.trace.length === 2 && !pr.nobody, "the press ended it: no next step, nothing said", pr);
+
   step("a search ended part-way by ✋ down: no more steps, no 'nobody'");
   await farAway(p);
   await p.eval(`(window.__onStep = (n) => { if (n === 2) document.getElementById("btn-hand").click(); }, true)`);

@@ -948,4 +948,24 @@ defmodule HoodrideWeb.NearCoversTest do
     assert i =~ "pitchWithRotate: false,"
     assert i =~ "map.touchZoomRotate.disableRotation();"
   end
+
+  # the banner is updated often (every tick, every message) — a forced
+  # layout there lays out the WHOLE page at once: with a big chat open each
+  # update took seconds and a reload missed its time (lightreload2,
+  # 2026-11-10). Safari's stale balancing is undone without one: balancing
+  # off, back on two frames later
+  test "setBanner never forces a layout; it restores balancing two frames later" do
+    b = body("setBanner")
+    # (its comments name what's forbidden: the code is checked, not them)
+    code = Regex.replace(~r{//[^
+]*}, b, "")
+
+    refute code =~
+             ~r/offset(Width|Height|Top|Left)|getBoundingClientRect|getComputedStyle|scrollHeight|clientWidth/
+
+    assert b =~ ~s[b.style.textWrap = "wrap";]
+    assert b =~ "requestAnimationFrame(() =>
+        requestAnimationFrame(() => {"
+    assert b =~ ~s[if (b.dataset.text === text) b.style.textWrap = "";]
+  end
 end

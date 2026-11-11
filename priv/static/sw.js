@@ -16,6 +16,7 @@ const ASSETS = [
   "i18n.js",
   "viewport.js",
   "sync.js",
+  "errors.js",
   "sendfilter.js",
   "locator.js",
   "browse.js",

@@ -1,4 +1,6 @@
 defmodule Hoodride.Chat do
+  require Logger
+
   @moduledoc """
   Ephemeral conversations. A conversation exists once a message is sent, or
   once a ride starts between the two (open/2) — never just because a chat
@@ -307,6 +309,8 @@ defmodule Hoodride.Chat do
       end)
 
     unless bad == [] and :ets.info(@by_user, :size) == 2 * :ets.info(@conversations, :size) do
+      # (the repair log — Hoodride.Sweeper)
+      Logger.warning("repair: chat index ×1")
       # re-checked: a row's conversation may have been (re)created since
       for {{user, {a, b} = key}} = row <- bad,
           (user != a and user != b) or not :ets.member(@conversations, key) do

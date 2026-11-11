@@ -1,4 +1,6 @@
 defmodule Hoodride.Requests do
+  require Logger
+
   @moduledoc """
   The request state machine. One open request per rider (it's the table key).
   Open states are held, terminal states are deleted — resolution leaves nothing.
@@ -309,6 +311,9 @@ defmodule Hoodride.Requests do
       end)
 
     unless clean? and :ets.info(@by_driver, :size) == :ets.info(@requests, :size) do
+      # (the repair log — Hoodride.Sweeper)
+      Logger.warning("repair: request index ×1")
+
       each_match(@requests, [{:"$1", [], [:"$1"]}], fn {rider_id, driver_id, ts} ->
         unless :ets.member(@by_driver, {driver_id, rider_id}),
           do: :ets.insert(@by_driver, {{driver_id, rider_id}, ts})

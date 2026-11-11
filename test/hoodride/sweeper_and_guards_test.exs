@@ -406,6 +406,270 @@ defmodule Hoodride.SweeperAndGuardsTest do
     assert [_] = :ets.lookup(:chat_sent_ids, {501, "new"})
   end
 
+  # the "who's connected" phone book (the UserChannels Registry) restarting
+  # empty — its connections die with it and rejoin within a second; a sweep
+  # in THAT gap sees nobody connected. A presence row that says ONLINE (since
+  # they opened the app) must read as "here now", never "gone since then":
+  # else everyone connected over 5 min loses their car, ✋ and chats
+  test "an empty phone book with an ONLINE presence row: the sweep removes nobody (online = here now)" do
+    Geo.driver_update(%{id: 610, name: "On", photo: nil}, "cell8on", nil, [])
+    Geo.hand_up(611, "cell8oh", nil, [])
+    long_ago = System.system_time(:second) - 600
+    # connected 10 min ago — their channels just died with the phone book
+    :ets.insert(:geo_presence, {610, :online, long_ago})
+    :ets.insert(:geo_presence, {611, :online, long_ago})
+    assert Registry.lookup(Hoodride.UserChannels, 610) == []
+
+    Sweeper.sweep_now()
+
+    assert Geo.driver_on_map?(610), "a car whose owner was online was reaped"
+    assert :ets.member(:geo_hands, 611), "a ✋ whose owner was online was reaped"
+    # their grace clock started NOW (not "since they connected") …
+    assert [{610, :grace, t}] = :ets.lookup(:geo_presence, 610)
+    assert t >= System.system_time(:second) - 2
+    # … so one truly gone (never came back) is still reaped 5 min on
+    :ets.insert(:geo_presence, {610, :grace, t - 301})
+    Sweeper.sweep_now()
+    refute Geo.driver_on_map?(610), "gone for good: reaped after the grace"
+  end
+
+  test "the phone book really restarting: its channels go down with it (they rejoin: nothing is held without a channel)" do
+    # (a private phone book set up as the app's — killing the shared one
+    # would cut other tests' channels running alongside)
+    book = :"phone_book_#{System.unique_integer([:positive])}"
+    start_supervised!({Registry, keys: :duplicate, name: book})
+    parent = self()
+
+    pid =
+      spawn(fn ->
+        Registry.register(book, 613, self())
+        send(parent, :in)
+        Process.sleep(:infinity)
+      end)
+
+    assert_receive :in
+    ref = Process.monitor(pid)
+    [{_, part, _, _} | _] = Supervisor.which_children(book)
+    Process.exit(part, :kill)
+    assert_receive {:DOWN, ^ref, :process, ^pid, :killed}
+  end
+
+  test "really gone (a GRACE row past 5 min): still reaped — the fix spares only 'online'" do
+    Geo.driver_update(%{id: 612, name: "Gone", photo: nil}, "cell8gn", nil, [])
+    :ets.insert(:geo_presence, {612, :grace, System.system_time(:second) - 600})
+    Sweeper.sweep_now()
+    refute Geo.driver_on_map?(612)
+  end
+
+  # one step failing (a bug, every time) must never stop the steps after it:
+  # sign-ins, rate rows, chats would pile up for good on a 1 GB server, and
+  # the recount never run. Each failure is logged as ONE line, and skipped.
+  test "a failing sweep step is logged and skipped — every later step still runs" do
+    import ExUnit.CaptureLog
+    me = self()
+    ran = fn name -> fn -> send(me, {:ran, name}) end end
+
+    log =
+      capture_log(fn ->
+        :ok =
+          Sweeper.run_steps([
+            {:first, ran.(:first)},
+            {:raises, fn -> raise "boom" end},
+            {:throws, fn -> throw(:oops) end},
+            {:exits, fn -> exit(:gone) end},
+            {:last, ran.(:last)}
+          ])
+      end)
+
+    assert_received {:ran, :first}
+    assert_received {:ran, :last}
+    assert log =~ "sweep step raises failed: RuntimeError at"
+    # (the error's text is never logged: it can echo a user id or a cell)
+    refute log =~ "boom"
+    assert log =~ "sweep step throws failed:"
+    assert log =~ "sweep step exits failed:"
+  end
+
+  test "a failed step's line names the failure, never the data it failed on (a user id, a cell)" do
+    import ExUnit.CaptureLog
+
+    log =
+      capture_log(fn ->
+        Sweeper.run_steps([
+          {:matches, fn -> {:ok, _} = Enum.random([{123_456, "8928308280fffff"}]) end},
+          {:exits, fn -> exit({:reindex, 654_321}) end}
+        ])
+      end)
+
+    assert log =~ "sweep step matches failed: MatchError at"
+    assert log =~ "sweep step exits failed: exit at"
+    refute log =~ "123456"
+    refute log =~ "8928308280fffff"
+    refute log =~ "654321"
+  end
+
+  test "the sweep runs every step, in order (none lost in the move to a list)" do
+    names = Enum.map(Sweeper.steps(), &elem(&1, 0))
+
+    assert names ==
+             ~w(expire_stale_requests heal_orphan_ride_slots sweep_stale_geo heal_geo_consistency
+             heal_unlawful_requests requests_heal_index sweep_empty_room_chats chat_heal_index chat_sent_ids
+             rate_budget sign_in_failures sign_outs session_tokens session_stamps rebuild_members
+             recompute_aggregates)a
+
+    assert Enum.all?(Sweeper.steps(), fn {_, f} -> is_function(f, 0) end)
+  end
+
+  # the REPAIR LOG: each real repair (a fix of something that should never
+  # be) is ONE warning line, "repair: WHAT ×N" — a non-empty repair log means
+  # a bug somewhere; normal clean-ups (gone past grace) log nothing
+  describe "the repair log" do
+    import ExUnit.CaptureLog
+
+    test "a normal sweep — someone gone past grace reaped — logs no repair" do
+      Geo.driver_update(%{id: 620, name: "G", photo: nil}, "cell8rl", nil, [])
+      :ets.insert(:geo_presence, {620, :grace, System.system_time(:second) - 600})
+      # silent 4 min BECAUSE they left (no channel): the normal reap, not a
+      # "frozen car"
+      Geo.driver_update(%{id: 627, name: "S", photo: nil}, "cell8sl", nil, [])
+      [{_, c, sp, _}] = :ets.lookup(:geo_drivers, 627)
+      :ets.insert(:geo_drivers, {627, c, sp, System.system_time(:second) - 240})
+      :ets.insert(:geo_presence, {627, :grace, System.system_time(:second) - 240})
+      log = capture_log(fn -> Sweeper.sweep_now() end)
+      refute log =~ "repair:"
+      refute Geo.driver_on_map?(627)
+    end
+
+    test "a repair is logged once — the next sweep, with nothing to fix, logs nothing" do
+      Registry.register(Hoodride.UserChannels, 628, self())
+      Geo.user_connected(628)
+      Geo.driver_update(%{id: 628, name: "T", photo: nil}, "cell8t1", nil, [])
+      :ets.insert(:geo_hands, {628, "cell8t1", nil})
+      assert capture_log(fn -> Sweeper.sweep_now() end) =~ "repair: car and ✋ at once ×1"
+      refute capture_log(fn -> Sweeper.sweep_now() end) =~ "repair:"
+    end
+
+    test "a ✋ alone in a ride; a membership row missing; a count row missing: each a repair" do
+      for id <- [629, 634], do: Registry.register(Hoodride.UserChannels, id, self())
+      for id <- [629, 634], do: Geo.user_connected(id)
+      # a ✋ (no car) of someone in a ride (a stand-in ride answering)
+      me = self()
+
+      ride =
+        spawn(fn ->
+          Registry.register(Hoodride.Rides.Registry, "ride-h", nil)
+          send(me, :up)
+
+          (fn loop ->
+             receive do
+               {:"$gen_call", from, :get_state} ->
+                 GenServer.reply(from, %{id: "ride-h"})
+                 loop.(loop)
+             end
+           end).(fn l -> l.(l) end)
+        end)
+
+      assert_receive :up
+      Geo.hand_up(629, "cell8h2", nil, [])
+      :ets.insert(:rides_by_user, {629, "ride-h"})
+      # a car whose membership row and count row went missing
+      Geo.driver_update(%{id: 634, name: "M", photo: nil}, "cell8m1", nil, ["c7-mm"])
+      :ets.delete(:geo_members, {"c7-mm", 634})
+      :ets.delete(:geo_agg, "c7-mm")
+
+      log = capture_log(fn -> Sweeper.sweep_now() end)
+      assert log =~ "repair: on the map mid-ride ×1", log
+      assert log =~ "repair: membership drift ×1", log
+      assert log =~ "repair: hex count ×1", log
+      :ets.delete(:rides_by_user, 629)
+      Process.exit(ride, :kill)
+    end
+
+    test "each kind of repair: one line naming it, with its count" do
+      now = System.system_time(:second)
+      # car AND ✋ at once
+      Geo.user_connected(621)
+      Registry.register(Hoodride.UserChannels, 621, self())
+      Geo.driver_update(%{id: 621, name: "B", photo: nil}, "cell8b1", nil, [])
+      :ets.insert(:geo_hands, {621, "cell8b1", nil})
+      # on the map mid-ride
+      Geo.user_connected(622)
+      Registry.register(Hoodride.UserChannels, 622, self())
+      Geo.driver_update(%{id: 622, name: "R", photo: nil}, "cell8r1", nil, [])
+      # (a live ride: a stand-in answering as the ride's process does)
+      me = self()
+
+      ride =
+        spawn(fn ->
+          Registry.register(Hoodride.Rides.Registry, "ride-x", nil)
+          send(me, :ride_up)
+
+          (fn loop ->
+             receive do
+               {:"$gen_call", from, :get_state} ->
+                 GenServer.reply(from, %{id: "ride-x"})
+                 loop.(loop)
+             end
+           end).(fn l -> l.(l) end)
+        end)
+
+      assert_receive :ride_up
+      :ets.insert(:rides_by_user, {622, "ride-x"})
+      # a seat whose ride is gone (its process killed): an orphaned ride
+      :ets.insert(:rides_by_user, {626, "ride-gone"})
+      # cell index drift
+      Geo.user_connected(623)
+      Registry.register(Hoodride.UserChannels, 623, self())
+      Geo.driver_update(%{id: 623, name: "D", photo: nil}, "cell8d1", nil, [])
+      :ets.delete(:geo_by_cell, {"cell8d1", 623})
+      # a frozen car (connected, silent 4 min)
+      Geo.user_connected(624)
+      Registry.register(Hoodride.UserChannels, 624, self())
+      Geo.driver_update(%{id: 624, name: "F", photo: nil}, "cell8f1", nil, [])
+      [{_, c, sp, _}] = :ets.lookup(:geo_drivers, 624)
+      :ets.insert(:geo_drivers, {624, c, sp, now - 240})
+      # online, yet in no channel
+      Geo.driver_update(%{id: 625, name: "O", photo: nil}, "cell8o1", nil, [])
+      :ets.insert(:geo_presence, {625, :online, now - 600})
+
+      log = capture_log(fn -> Sweeper.sweep_now() end)
+
+      for what <- [
+            "car and ✋ at once",
+            "on the map mid-ride",
+            "frozen car",
+            "online without a channel",
+            "orphaned ride"
+          ],
+          do: assert(log =~ "repair: #{what} ×1", "missing: #{what}
+#{log}")
+
+      # (the car-and-✋ setup's hand had no index row either: two drifted)
+      assert log =~ ~r/repair: cell index drift ×\d+/, log
+
+      :ets.delete(:rides_by_user, 622)
+      Process.exit(ride, :kill)
+    end
+
+    test "a wrong hex count, a stray chat index row, a missing request index row: each healed, each logged" do
+      now = System.system_time(:second)
+      # a count that says 7 cars where there are none
+      :ets.insert(:geo_agg, {"c7-wrong", 7, 0})
+      # a chat index row with no conversation behind it
+      :ets.insert(:chat_by_user, {{630, {630, 631}}})
+      # an open request missing from the by-driver index
+      :ets.insert(:ride_requests, {632, 633, now})
+      Registry.register(Hoodride.UserChannels, 633, self())
+      Geo.user_connected(633)
+      Geo.driver_update(%{id: 633, name: "Q", photo: nil}, "cell8q1", nil, [])
+      log = capture_log(fn -> Sweeper.sweep_now() end)
+      assert log =~ "repair: hex count ×1", log
+      assert log =~ "repair: chat index ×1", log
+      assert log =~ "repair: request index ×1", log
+      :ets.delete(:ride_requests, 632)
+    end
+  end
+
   test "the timer wiring itself sweeps (handle_info, not just sweep_now)" do
     # a reaped-looking driver: on map, no presence → one :sweep message reaps him
     Hoodride.Geo.driver_update(%{id: 81, name: "T81", photo: nil}, "cell8t", nil, ["c7T"])
@@ -476,7 +740,9 @@ defmodule Hoodride.SweeperAndGuardsTest do
     Geo.user_connected(92)
     :ets.insert(:ride_requests, {92, 778, now})
 
-    Hoodride.Sweeper.sweep_now()
+    log = ExUnit.CaptureLog.capture_log(fn -> Hoodride.Sweeper.sweep_now() end)
+    # (the repair log: one cancel, one decline)
+    assert log =~ "repair: unlawful request ×2", log
 
     assert Requests.open_request_of(r.id) == nil
     assert Requests.open_request_of(92) == nil
