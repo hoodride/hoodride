@@ -60,7 +60,7 @@ snapshot() {
   # (none on the very first deploy: putting it back = no database again)
   printf '%s\n' "${copied[@]+"${copied[@]}"}" > "$to/complete"
   trap - EXIT
-  echo "database copied: $to (${#copied[@]} file(s))" || true
+  echo "database copied: $to (${#copied[@]} file(s))" 2>/dev/null || true
 }
 
 restore() {
@@ -93,7 +93,7 @@ restore() {
   for f in "${STAGED[@]+"${STAGED[@]}"}"; do mv -f "$DIR/.restoring-$f" "$DIR/$f"; done
   STAGED=()
   trap - EXIT
-  echo "database put back as it was before $1" || true
+  echo "database put back as it was before $1" 2>/dev/null || true
 }
 
 prune() {

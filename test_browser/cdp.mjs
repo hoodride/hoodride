@@ -188,7 +188,7 @@ export async function launch() {
       const { browserContextId } = await cdp.send("Target.createBrowserContext", { disposeOnDetach: true });
       const { targetId } = await cdp.send("Target.createTarget", { url: "about:blank", browserContextId });
       const { sessionId } = await cdp.send("Target.attachToTarget", { targetId, flatten: true });
-      const p = page(cdp, sessionId, name);
+      const p = page(cdp, sessionId, name, browserContextId);
       // the location permission for this person: "granted", "prompt" (asks:
       // a headless browser answers its own question "blocked"), "denied"
       p.locationPermission = (setting) =>
@@ -212,7 +212,7 @@ export async function launch() {
       p.openSameProfileTab = async (tabName = `${name} (tab 2)`, where = at) => {
         const t = await cdp.send("Target.createTarget", { url: "about:blank", browserContextId });
         const s = await cdp.send("Target.attachToTarget", { targetId: t.targetId, flatten: true });
-        const q = page(cdp, s.sessionId, tabName);
+        const q = page(cdp, s.sessionId, tabName, browserContextId);
         q.locationPermission = p.locationPermission;
         await cdp.send("Page.enable", {}, s.sessionId);
         await cdp.send("Runtime.enable", {}, s.sessionId);
@@ -258,7 +258,9 @@ const WHY = `(() => ({
   moved: !!document.getElementById("session-moved"),
 }))()`;
 
-function page(cdp, sessionId, name) {
+function page(cdp, sessionId, name, browserContextId) {
+  // the profile's offline workers (sw.js): their own network, cut with the page's
+  const workers = new Map();
   const errors = [];
   let loads = 0;
   cdp.on((msg) => {
@@ -472,25 +474,60 @@ function page(cdp, sessionId, name) {
     // a slow connection: at most `bytesPerSec` each way (light reload: a big
     // chat loading). Put back with offline(false) — a finally, so a failure
     // doesn't leave the next step slow
+    // the browser's own download cache emptied (a phone may have dropped it
+    // any time): only what the offline worker keeps is left
+    async clearHttpCache() {
+      await send("Network.enable");
+      await send("Network.clearBrowserCache");
+    },
     async throttle(bytesPerSec) {
       await send("Network.enable");
       await send("Network.emulateNetworkConditions", { offline: false, latency: 0, downloadThroughput: bytesPerSec, uploadThroughput: bytesPerSec });
     },
     // no network at all (every request fails) / back
     async offline(on) {
+      const conditions = { offline: on, latency: 0, downloadThroughput: -1, uploadThroughput: -1 };
       await send("Network.enable");
-      await send("Network.emulateNetworkConditions", { offline: on, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
+      await send("Network.emulateNetworkConditions", conditions);
+      // …and the offline worker's own requests: the page's switch doesn't
+      // reach it — it fetched from the server "offline", and offline tests
+      // passed that never were (found 2026-11-11, U1). Found afresh on each
+      // try below: a worker the browser had stopped starts again on the
+      // next request — a new one, its network to be cut too
+      const toWorkers = async () => {
+        const { targetInfos } = await cdp.send("Target.getTargets");
+        for (const t of targetInfos) {
+          if (t.type !== "service_worker" || t.browserContextId !== browserContextId) continue;
+          try {
+            if (!workers.has(t.targetId)) {
+              const { sessionId: ws } = await cdp.send("Target.attachToTarget", { targetId: t.targetId, flatten: true });
+              workers.set(t.targetId, ws);
+              await cdp.send("Network.enable", {}, ws);
+            }
+            await cdp.send("Network.emulateNetworkConditions", conditions, workers.get(t.targetId));
+          } catch (_) {
+            // (a worker that just stopped: its session gone — found again next try)
+            workers.delete(t.targetId);
+          }
+        }
+      };
+      await toWorkers();
       // Chrome can answer before the switch has taken effect — a tap right
       // after then still reached the server offline, or failed back online
       // (the terms journey, ~1 run in 12 under load, 2026-11-01). Wait until
-      // a request really fails / really arrives (any answer will do; /api/
-      // so the service worker never answers it from its cache).
-      const reached = `fetch("/api/net-check", { method: "HEAD", cache: "no-store" }).then(() => true, () => false)`;
+      // a request really fails / really arrives: one past the worker (/api/,
+      // never answered from its cache) AND one through it (an address it
+      // never keeps: a not-found — offline, nothing to answer it with).
+      const reached = `Promise.all([
+        fetch("/api/net-check", { method: "HEAD", cache: "no-store" }).then(() => true, () => false),
+        fetch("/net-check-" + Date.now(), { cache: "no-store" }).then(() => true, () => false),
+      ]).then(([direct, viaWorker]) => (${on} ? direct || viaWorker : direct && viaWorker))`;
       const t0 = Date.now();
       let tries = 0;
       while ((await p.eval(reached)) === on) {
         if (++tries > 100) throw new Error(`FAILED (${name}): the network never went ${on ? "off" : "back on"}`);
         await sleep(50);
+        await toWorkers();
       }
       if (tries > 0) console.log(`  (the network took ${Date.now() - t0} ms to go ${on ? "off" : "on"})`);
     },

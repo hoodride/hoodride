@@ -150,6 +150,15 @@ defmodule HoodrideWeb.OfflineTest do
       )
 
     assert saving =~ "c.put(e.request, copy);"
-    assert length(String.split(@sw, "c.put(")) - 1 == 2, "a save outside the ok branch"
+    [_, fetching] = String.split(@sw, ~s[self.addEventListener("fetch"], parts: 2)
+    assert length(String.split(fetching, "c.put(")) - 1 == 2, "a save outside the ok branch"
+
+    # the install's copy of the person's home (keepHome, U1): only a good
+    # answer too — its saves all after the not-ok return
+    [_, keeping] = String.split(@sw, "async function keepHome(c) {", parts: 2)
+    [keeping, _] = String.split(keeping, ~s[self.addEventListener("activate"], parts: 2)
+    [before_check, after_check] = String.split(keeping, "if (!res.ok) return;", parts: 2)
+    refute before_check =~ "c.put(", "a home saved before its answer was checked"
+    assert length(String.split(after_check, "c.put(")) - 1 == 2
   end
 end

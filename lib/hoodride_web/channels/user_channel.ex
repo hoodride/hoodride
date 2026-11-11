@@ -8,6 +8,21 @@ defmodule HoodrideWeb.UserChannel do
 
   alias Hoodride.Geo
 
+  # A request's answer goes through THIS channel, in line behind its replies
+  # (R2, owner 2026-11-11). Phoenix sends a broadcast straight to the phone,
+  # past the channel: a decline (or expiry, or the ride starting) sent while
+  # the channel was still answering the request arrived BEFORE "request
+  # sent" — the app then showed "Requested…" for a request already gone.
+  # Intercepted, each waits for the reply being made. (One for an OLDER
+  # request was broadcast before the new push came in: still ahead of it.)
+  intercept ["request_declined", "request_expired", "ride_started"]
+
+  @impl true
+  def handle_out(event, payload, socket) do
+    push(socket, event, payload)
+    {:noreply, socket}
+  end
+
   # The box warns at 500 (HoodChatList); this is a looser BACKSTOP: phones
   # and the server can run different Unicode versions, and a stacked
   # conjunct ("क्ष्म्य") is 1 character now but 4 under older rules — so a

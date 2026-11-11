@@ -131,7 +131,9 @@ await journey("lightreload2: reconnects, failures, a refused message, a ride, a 
 
   step("a ride starts with Ann, their chat already there as a summary: it loads when opened");
   await server(`start_ride ${samId} ${annId}`);
-  await sam.waitFor(`state.ride && state.ride.status === "connected"`, "Sam in the ride");
+  // (Ann starts where Sam is: "connected" turns "arrived" at once — either
+  // is in the ride; waiting for "connected" alone could miss it)
+  await sam.waitFor(`state.ride && ["connected", "arrived"].includes(state.ride.status)`, "Sam in the ride");
   check((await sam.eval(`${chatOf(annId)}.loaded`)) === false, "(still a summary)");
   await sam.eval(`openChat(realPeersById.get(${annId})), true`);
   await loaded(sam, annId);

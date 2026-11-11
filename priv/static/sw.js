@@ -64,9 +64,36 @@ const ASSETS = [
 ];
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS).then(() => keepHome(c))));
   self.skipWaiting();
 });
+
+// The home page in the person's language, kept by the NEW copy too (U1,
+// owner 2026-11-11): the old copy had it only because it was opened —
+// after a deploy (the old copy wiped at activate) the app opened offline
+// in English. Its language read from the old copy's "/" (still there
+// during install), its page and the files it names (its language's words:
+// i18n-ja.js) fetched fresh. Never fails the install: at worst, English.
+async function keepHome(c) {
+  try {
+    const home = new Request(self.location.origin + "/");
+    const old = await caches.match(home);
+    if (!old) return;
+    const lang = ((await old.text()).match(/<html[^>]*\slang="([^"]+)"/) || [])[1];
+    if (!lang || !/^[A-Za-z]{2,3}(-[A-Za-z0-9]+)?$/.test(lang)) return;
+    const address = lang === "en" ? "/" : "/" + lang;
+    const res = await fetch(address, { redirect: "manual" });
+    if (!res.ok) return;
+    const html = await res.clone().text();
+    // (a fresh copy: "/" is opened as the app's start — never a redirect)
+    const page = () => new Response(html, { headers: res.headers });
+    await c.put(home, page());
+    if (address !== "/") await c.put(new Request(self.location.origin + address), page());
+    // the files the page names that the list above doesn't (its language)
+    const files = [...html.matchAll(/(?:src|href)="(\/?[\w.-]+\.(?:js|css|svg|png)(?:\?vsn=[\w-]*)?)"/g)].map((m) => m[1]);
+    await Promise.all(files.map((f) => c.match(f).then((hit) => hit || c.add(f).catch(() => {}))));
+  } catch (_) {}
+}
 
 // a new CACHE name wipes every older cache — including whatever an older
 // worker stored that it shouldn't have (see the fetch rule below)
