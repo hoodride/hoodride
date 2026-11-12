@@ -17,7 +17,7 @@ defmodule HoodrideWeb.CspReportController do
 
   require Logger
 
-  @max_bytes 64_000
+  @max_bytes Hoodride.Limits.csp_report_bytes()
   @kinds ~w(inline eval wasm-eval data blob self trusted-types-policy trusted-types-sink)
 
   def create(conn, params) do

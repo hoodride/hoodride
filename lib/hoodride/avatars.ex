@@ -24,9 +24,9 @@ defmodule Hoodride.Avatars do
   """
   require Logger
 
-  @max_bytes 512_000
-  @timeout_ms 3_000
-  @size 128
+  @max_bytes Hoodride.Limits.avatar_bytes()
+  @timeout_ms Hoodride.Limits.avatar_fetch_ms()
+  @size Hoodride.Limits.avatar_px()
   @google_hosts [".googleusercontent.com"]
   @facebook_hosts [".fbcdn.net", ".fbsbx.com"]
   @name ~r/\A[A-Za-z0-9_-]{22}\.(jpg|png|webp)\z/

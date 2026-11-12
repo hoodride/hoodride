@@ -125,7 +125,7 @@ defmodule HoodrideWeb.Lang do
 
   # a year, from the last visit (the privacy policy: "a cookie remembers
   # your choice for a year")
-  @year 365 * 24 * 60 * 60
+  @year div(Hoodride.Limits.language_cookie_ms(), 1000)
 
   @doc """
   The language picked, kept by the SERVER and renewed on every page

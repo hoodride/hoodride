@@ -41,18 +41,17 @@ defmodule Hoodride.SessionTokens do
   # replacements not used yet by any request: {hash, user_id} (the
   # database's `unused`, so a restart doesn't forget a lost reply)
   @fresh :session_token_fresh
-  @day 86_400_000
-  @valid_ms 30 * @day
-  @rotate_after_ms 7 * @day
-  @cap_ms 365 * @day
+  @valid_ms Hoodride.Limits.sign_in_valid_ms()
+  @rotate_after_ms Hoodride.Limits.sign_in_renew_after_ms()
+  @cap_ms Hoodride.Limits.sign_in_max_age_ms()
   # the key fix (owner, 2026-11-12): at most this many sign-ins per account
   # — one device keeps ~5 over a month (its current one and the replaced
   # ones in their 30 days), so two devices never lose one
-  @max_per_account 10
+  @max_per_account Hoodride.Limits.sign_ins_per_account()
   # a replaced token may renew again only when its replacement went unused
   # this long: a phone's requests sent together all carry the old one, and
   # a second renewal among them would take back the one the phone kept
-  @lost_reply_ms 60_000
+  @lost_reply_ms Hoodride.Limits.lost_reply_ms()
 
   def init_table do
     # (one call per table: Hoodride.EtsTablesTest counts them)

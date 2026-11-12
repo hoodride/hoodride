@@ -144,12 +144,10 @@ defmodule HoodrideWeb.AvatarServingTest do
     end
 
     test "the photo budget stays twice reveal's (burst and per minute)" do
-      limits = Application.get_env(:hoodride, :avatar_budget) || [per_minute: 120, burst: 40]
+      limits = Hoodride.Limits.avatar_budget()
       assert limits[:burst] == 2 * HoodrideWeb.WorldChannel.reveal_max()
       assert limits[:per_minute] == 2 * HoodrideWeb.WorldChannel.reveal_per_minute()
-
-      config = Config.Reader.read!("config/config.exs", env: :prod)[:hoodride][:avatar_budget]
-      assert config == [per_minute: 120, burst: 40]
+      assert limits == [per_minute: 120, burst: 40]
     end
   end
 

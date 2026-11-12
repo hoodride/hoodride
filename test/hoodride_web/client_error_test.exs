@@ -160,4 +160,42 @@ client error: forged", "build" => "b 1"})
 
     refute log =~ String.duplicate("z", 300)
   end
+
+  alias HoodrideWeb.ClientErrorController, as: C
+
+  # (abuse review, 2026-11-12) the scrubbing ran on the WHOLE message — up
+  # to 64 KB, no sign-in needed — and only then cut it to 200: the email
+  # pattern on 64 KB of letters takes seconds of CPU per report
+  test "a 64 KB message is scrubbed in milliseconds, not seconds" do
+    for junk <- [
+          String.duplicate("a", 64_000),
+          String.duplicate("a.", 32_000),
+          String.duplicate("1 ", 32_000),
+          String.duplicate("ab-", 21_000) <> "@"
+        ] do
+      {us, out} = :timer.tc(fn -> C.scrub(junk) end)
+      assert String.length(out) <= 200
+      assert us < 100_000, "#{div(us, 1000)} ms for #{byte_size(junk)} bytes"
+    end
+  end
+
+  # cutting BEFORE scrubbing could split an email or a link: the half left
+  # no longer looks like one and would be logged as text — and a long link
+  # before it shrinks to <link>, pulling what was far down into the 200 kept
+  test "a cut never leaves half an email or link in the line" do
+    long_link = "https://x.example/" <> String.duplicate("p", 960)
+
+    for tail <- ["someone.private@mail.example.com", "https://y.example/secret/path"] do
+      out = C.scrub("boom " <> long_link <> " then " <> tail <> " more words")
+      refute out =~ "someone", out
+      refute out =~ "private", out
+      refute out =~ "secret", out
+      assert out =~ "boom <link> then"
+    end
+  end
+
+  test "nothing changes for an ordinary message" do
+    assert C.scrub("TypeError: x is undefined, mail a@b.example, call 555 1234") ==
+             "TypeError: x is undefined, mail <email>, call <n>"
+  end
 end

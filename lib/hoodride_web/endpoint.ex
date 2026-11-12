@@ -30,7 +30,7 @@ defmodule HoodrideWeb.Endpoint do
     # closed with 1009 "message too big" (WsFrameLimitTest)
     websocket: [
       connect_info: [:peer_data, :x_headers, session: @session_options],
-      max_frame_size: 65_536
+      max_frame_size: Hoodride.Limits.ws_frame_bytes()
     ],
     longpoll: false,
     auth_token: true
@@ -90,8 +90,8 @@ defmodule HoodrideWeb.Endpoint do
   plug Plug.Parsers,
     parsers: [:json],
     pass: ["*/*"],
-    length: 64_000,
-    read_length: 64_000,
+    length: Hoodride.Limits.http_body_bytes(),
+    read_length: Hoodride.Limits.http_body_bytes(),
     json_decoder: Phoenix.json_library()
 
   plug Plug.Head

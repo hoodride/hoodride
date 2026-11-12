@@ -27,16 +27,16 @@ defmodule HoodrideWeb.UserChannel do
   # and the server can run different Unicode versions, and a stacked
   # conjunct ("क्ष्म्य") is 1 character now but 4 under older rules — so a
   # message the box allowed is never refused here
-  @max_msg_chars 2000
+  @max_msg_chars Hoodride.Limits.message_chars()
   # …but one character can carry thousands of stacked marks ("Zalgo"): 20 KB
   # is 500 of the heaviest real characters (👩🏻‍❤️‍💋‍👨🏼 is 35 bytes: 17.5 KB) with
   # room to spare, and more than 30 marks in a row is no language (Unicode's
   # Stream-Safe Text Format: 30 is "significantly beyond what is required
   # for any linguistic usage")
-  @max_msg_bytes 20_480
+  @max_msg_bytes Hoodride.Limits.message_bytes()
   @stacked_marks ~r/\p{M}{31}/u
   # H3 cells are ~16 chars; anything bigger is garbage, not geography
-  @max_cell_bytes 24
+  @max_cell_bytes Hoodride.Limits.cell_bytes()
 
   defguardp valid_cell(cell) when is_binary(cell) and byte_size(cell) <= @max_cell_bytes
 
@@ -59,8 +59,8 @@ defmodule HoodrideWeb.UserChannel do
   # about a second. Fire-and-forget updates are silently dropped when over;
   # events that expect a reply get "rate_limited". Never a hang-up: this
   # channel carries chat, requests and presence.
-  @events_per_minute 120
-  @events_burst 30
+  @events_per_minute Hoodride.Limits.events_per_minute()
+  @events_burst Hoodride.Limits.events_burst()
   @noreply_events ~w(driver_update driver_offline hand_up hand_down)
 
   # a socket that lost the session is refused first (HoodrideWeb.SessionGate);
@@ -399,7 +399,7 @@ defmodule HoodrideWeb.UserChannel do
   defp valid_parents(%{"parents" => parents}) when is_list(parents) do
     parents
     |> Enum.filter(&(is_binary(&1) and byte_size(&1) <= @max_cell_bytes))
-    |> Enum.take(4)
+    |> Enum.take(Hoodride.Limits.parent_cells())
   end
 
   defp valid_parents(_), do: []

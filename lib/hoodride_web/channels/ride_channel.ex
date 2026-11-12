@@ -46,8 +46,8 @@ defmodule HoodrideWeb.RideChannel do
   # a minute (one per 1.5s tick), so 120/min with burst 30 is ~3x headroom.
   # It protects the ride partner from a flooded position stream. Over the
   # limit, fire-and-forget events are dropped; replying ones say so.
-  @ride_per_minute 120
-  @ride_burst 30
+  @ride_per_minute Hoodride.Limits.ride_per_minute()
+  @ride_burst Hoodride.Limits.ride_burst()
   @noreply_events ~w(pos set_pin clear_pin end_ride)
 
   @impl true

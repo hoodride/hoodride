@@ -148,7 +148,7 @@ defmodule HoodrideWeb.CraftedRequestsTest do
         block_ms: 3_600_000
       )
 
-      on_exit(fn -> Application.delete_env(:hoodride, :sign_in_failures) end)
+      on_exit(fn -> Application.put_env(:hoodride, :sign_in_failures, nil) end)
 
       Req.Test.stub(
         HoodrideWeb.Google,

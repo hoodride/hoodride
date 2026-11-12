@@ -111,9 +111,9 @@ defmodule HoodrideWeb.SameUserTest do
     end
 
     test "a refused request still spends the budget (as every refusal)", %{a: a, b: b} do
-      old = Application.get_env(:hoodride, :http_budget)
+      saved = Hoodride.TestHelpers.save_env([:http_budget])
       Application.put_env(:hoodride, :http_budget, per_minute: 1, burst: 1)
-      on_exit(fn -> Application.put_env(:hoodride, :http_budget, old) end)
+      on_exit(fn -> Hoodride.TestHelpers.restore_env(saved) end)
 
       assert other_account?(get(tab(b, a), "/api/state"))
       assert other_account?(get(tab(b, a), "/api/state"))

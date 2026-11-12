@@ -83,7 +83,7 @@ defmodule Hoodride.SignInFailures do
     :ok
   end
 
-  defp conf, do: Application.get_env(:hoodride, :sign_in_failures)
+  defp conf, do: Hoodride.Limits.budget(:sign_in_failures)
 
   defp now, do: System.monotonic_time(:millisecond)
 end

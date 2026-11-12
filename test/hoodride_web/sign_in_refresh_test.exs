@@ -167,7 +167,7 @@ defmodule HoodrideWeb.SignInRefreshTest do
         block_ms: 3_600_000
       )
 
-      on_exit(fn -> Application.delete_env(:hoodride, :sign_in_failures) end)
+      on_exit(fn -> Application.put_env(:hoodride, :sign_in_failures, nil) end)
       :ok
     end
 
@@ -418,7 +418,7 @@ defmodule HoodrideWeb.SignInRefreshTest do
         block_ms: 3_600_000
       )
 
-      on_exit(fn -> Application.delete_env(:hoodride, :sign_in_failures) end)
+      on_exit(fn -> Application.put_env(:hoodride, :sign_in_failures, nil) end)
       conn = conn |> signed_in(g) |> get("/auth/google?refresh=1")
       {_, q} = query(conn)
       {:ok, _} = Hoodride.SessionTokens.revoke_all(g.id)
@@ -440,7 +440,7 @@ defmodule HoodrideWeb.SignInRefreshTest do
         block_ms: 3_600_000
       )
 
-      on_exit(fn -> Application.delete_env(:hoodride, :sign_in_failures) end)
+      on_exit(fn -> Application.put_env(:hoodride, :sign_in_failures, nil) end)
 
       Req.Test.stub(HoodrideWeb.Google, fn c ->
         send(self(), :google_called)
@@ -678,7 +678,7 @@ defmodule HoodrideWeb.SignInRefreshTest do
     end
 
     test "the refresh limit refills: one more every 2 minutes (the shipped numbers)" do
-      l = Config.Reader.read!("config/config.exs", env: :prod)[:hoodride][:refresh_budget]
+      l = Hoodride.Limits.refresh_budget()
       spend = fn t -> Hoodride.RateBudget.spend(4242, :refresh, l[:per_minute], l[:burst], t) end
       for _ <- 1..5, do: assert({:ok, _} = spend.(0))
       assert {:deny, _} = spend.(0)
@@ -691,7 +691,7 @@ defmodule HoodrideWeb.SignInRefreshTest do
   describe "the sweep" do
     test "the server's regular sweep clears lifted sign-in blocks" do
       Application.put_env(:hoodride, :sign_in_failures, max: 1, window_ms: 1, block_ms: 1)
-      on_exit(fn -> Application.delete_env(:hoodride, :sign_in_failures) end)
+      on_exit(fn -> Application.put_env(:hoodride, :sign_in_failures, nil) end)
       Hoodride.SignInFailures.record({203, 0, 113, 9}, System.monotonic_time(:millisecond) - 10)
       assert :ets.tab2list(:sign_in_failures) != []
       Hoodride.Sweeper.sweep_now()
@@ -700,11 +700,10 @@ defmodule HoodrideWeb.SignInRefreshTest do
   end
 
   describe "sign-in starts: their own pool" do
-    # the numbers that ship (config.exs as prod reads it), not test copies
+    # the numbers that ship (Hoodride.Limits), not test copies
     setup do
-      prod = Config.Reader.read!("config/config.exs", env: :prod)[:hoodride]
-      Application.put_env(:hoodride, :sign_in_budget, prod[:sign_in_budget])
-      on_exit(fn -> Application.delete_env(:hoodride, :sign_in_budget) end)
+      Application.put_env(:hoodride, :sign_in_budget, Hoodride.Limits.sign_in_budget())
+      on_exit(fn -> Application.put_env(:hoodride, :sign_in_budget, nil) end)
       :ok
     end
 

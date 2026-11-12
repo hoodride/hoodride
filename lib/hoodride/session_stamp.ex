@@ -32,7 +32,7 @@ defmodule Hoodride.SessionStamp do
   @highest :session_highest
   # account → the last time (ms) a prune pass saw a device of it connected
   @last_live :session_last_live
-  @keep_offline_ms 86_400_000
+  @keep_offline_ms Hoodride.Limits.session_stamp_keep_ms()
 
   def init_table do
     Hoodride.ETS.new(@highest, [:named_table, :public, :set])

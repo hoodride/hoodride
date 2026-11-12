@@ -16,8 +16,8 @@ defmodule HoodrideWeb.JoinBudget do
 
   alias Hoodride.RateBudget
 
-  @per_minute 30
-  @burst 30
+  @per_minute Hoodride.Limits.joins_per_minute()
+  @burst Hoodride.Limits.joins_burst()
 
   @spec check(Phoenix.Socket.t()) :: :ok | {:error, map}
   def check(socket) do

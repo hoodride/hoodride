@@ -26,7 +26,7 @@ defmodule HoodrideWeb.HttpBudget do
 
   @impl true
   def call(conn, opts) do
-    case Application.get_env(:hoodride, opts[:config]) do
+    case Hoodride.Limits.budget(opts[:config]) do
       nil -> conn
       limits -> check(conn, limits[:per_minute], limits[:burst], opts[:name])
     end

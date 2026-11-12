@@ -38,11 +38,12 @@ defmodule HoodrideWeb.BrowserJourneysTest do
 
     # every person and every reload comes from one address: no per-address
     # budgets here (as in dev)
-    for key <- [:http_budget, :ws_budget, :sign_in_budget, :avatar_budget, :chat_budget] do
-      old = Application.get_env(:hoodride, key)
-      Application.put_env(:hoodride, key, nil)
-      on_exit(fn -> Application.put_env(:hoodride, key, old) end)
-    end
+    # (saved exactly — not set means the shipped number: restoring a nil
+    # switched every budget OFF for the tests after, 2026-11-12)
+    budgets = [:http_budget, :ws_budget, :sign_in_budget, :avatar_budget, :chat_budget]
+    saved = Hoodride.TestHelpers.save_env(budgets)
+    for key <- budgets, do: Application.put_env(:hoodride, key, nil)
+    on_exit(fn -> Hoodride.TestHelpers.restore_env(saved) end)
 
     # a journey may "deploy" a new version (server("new_build")): the
     # server's own build is put back afterwards

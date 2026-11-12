@@ -25,18 +25,18 @@ defmodule Hoodride.Throttle do
   @hour 3_600_000
 
   # a fast real chat is ~10-15 short messages a minute
-  @messages_per_minute 30
+  @messages_per_minute Hoodride.Limits.messages_per_minute()
   # rapid back-and-forth with one person is ~10 a minute
-  @pair_messages_per_minute 15
+  @pair_messages_per_minute Hoodride.Limits.pair_messages_per_minute()
   # a rider contacts 3-5 drivers, a driver a handful of riders; 20 leaves a
   # rider in a quiet area 4-5 tries at a ride even with many "no"s, and still
   # slows a spammer working through the whole neighbourhood (owner's pick,
   # 2026-10-28: 10 was tight there, 30+ would reach nearly everyone on a
   # small map). Only COLD contact counts: replying, or messaging someone you
   # already talk to, is free.
-  @new_conversations_per_hour 20
+  @new_conversations_per_hour Hoodride.Limits.new_chats_per_hour()
   # "no" sticks for a minute, but a genuine retry is still possible
-  @request_cooldown @minute
+  @request_cooldown Hoodride.Limits.request_cooldown_ms()
 
   @doc """
   May `from_id` message `to_id` now? Read-only: `:ok`, or `{:deny, ms}` —

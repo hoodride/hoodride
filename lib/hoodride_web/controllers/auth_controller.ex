@@ -87,7 +87,7 @@ defmodule HoodrideWeb.AuthController do
         Hoodride.Requests.open_request_of(user_id) != nil
 
   defp refresh_allowed?(user_id) do
-    case Application.get_env(:hoodride, :refresh_budget) do
+    case Hoodride.Limits.budget(:refresh_budget) do
       nil ->
         true
 

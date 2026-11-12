@@ -23,7 +23,7 @@ defmodule Hoodride.Accounts.User do
   # the most common US car colors (iSeeCars 2025: white, black, gray, blue,
   # silver, red ≈ 96%), then the rest — a list keeps the label clean
   @car_colors ~w(White Black Gray Silver Blue Red Green Brown Beige Yellow Orange Gold Purple Other)
-  @car_text_max 24
+  @car_text_max Hoodride.Limits.car_text_chars()
 
   def car_colors, do: @car_colors
 

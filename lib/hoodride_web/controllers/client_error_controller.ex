@@ -18,7 +18,12 @@ defmodule HoodrideWeb.ClientErrorController do
 
   require Logger
 
-  @max_message 200
+  @max_message Hoodride.Limits.error_report_chars()
+  # scrubbed: at most this much of the message (abuse review, 2026-11-12:
+  # the patterns ran on all of it — up to 64 KB, no sign-in needed — and
+  # 64 KB of letters took 18 s of CPU in the email pattern). Enough for the
+  # 200 kept after links shrink to <link>
+  @scrub_window Hoodride.Limits.error_scrub_chars()
   @where ~w(map chat ride settings search start sync other)
 
   def create(conn, %{"kind" => kind, "message" => message} = params)
@@ -33,7 +38,12 @@ defmodule HoodrideWeb.ClientErrorController do
     # thousands an IPv6 host has — never drowns the real errors or fills the
     # disk), then ONE line saying the rest of the minute is dropped. The
     # reply is the same either way: a sender learns nothing.
-    cap = Application.get_env(:hoodride, :client_error_cap, 100)
+    cap =
+      Application.get_env(
+        :hoodride,
+        :client_error_cap,
+        Hoodride.Limits.error_reports_per_minute()
+      )
 
     case Hoodride.RateLimit.inc(:client_errors, 60_000) do
       n when n <= cap ->
@@ -57,6 +67,7 @@ defmodule HoodrideWeb.ClientErrorController do
   # digits out; one line; capped
   def scrub(text) do
     text
+    |> window()
     |> String.replace(~r/\b(?:https?|wss?):\/\/\S+/i, "<link>")
     |> String.replace(~r/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/u, "<email>")
     # a number of 2+ digits (with its . - ( ) and spaces): small account ids
@@ -64,6 +75,19 @@ defmodule HoodrideWeb.ClientErrorController do
     |> String.replace(~r/\d[\d.\-() ]*\d/, "<n>")
     |> String.replace(~r/[\x00-\x1f\x7f]+/, " ")
     |> String.slice(0, @max_message)
+  end
+
+  # the first @scrub_window characters; when that cuts the message, its last
+  # word goes too — it may be half an email or link, which no longer looks
+  # like one and would be logged as text (emails and links have no spaces,
+  # so a cut one is dropped whole)
+  defp window(text) do
+    if String.length(text) <= @scrub_window do
+      text
+    else
+      cut = String.slice(text, 0, @scrub_window)
+      String.replace(cut, ~r/\S+\z/u, "")
+    end
   end
 
   # "file.js:line:col", up to 3 — nothing else

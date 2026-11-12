@@ -94,19 +94,32 @@ defmodule Hoodride.TestHelpers do
 
   @doc """
   Put app settings back as they were (`[{key, value}]`, saved before a test
-  changed them). Restore, never just delete: a setting the test config
-  provides (config.exs budgets are ON in tests) would stay OFF for every
-  test after, depending on the random order.
+  changed them). Restore, never just delete a setting the test config sets.
+  For the rate budgets: not set = Hoodride.Limits' shipped number (ON);
+  `nil` = off (config/test.exs: sign_in_budget, sign_in_failures) — a test
+  that changed one of those puts `nil` back.
   """
   def restore_env(saved) do
     for {k, v} <- saved do
-      if v == nil,
-        do: Application.delete_env(:hoodride, k),
-        else: Application.put_env(:hoodride, k, v)
+      case v do
+        # saved by save_env/1: exactly as it was — set (even to nil), or not
+        {:ok, value} -> Application.put_env(:hoodride, k, value)
+        :error -> Application.delete_env(:hoodride, k)
+        nil -> Application.delete_env(:hoodride, k)
+        value -> Application.put_env(:hoodride, k, value)
+      end
     end
 
     :ok
   end
+
+  @doc """
+  The app settings `keys` exactly as they are — set (even to nil: a budget
+  switched off) or not set at all (a budget's shipped number) — for
+  restore_env/1. (2026-11-12: saving with get_env read "not set" as nil, and
+  restoring that switched every budget OFF for the tests after.)
+  """
+  def save_env(keys), do: for(k <- keys, do: {k, Application.fetch_env(:hoodride, k)})
 
   def scrub_live_state do
     # kill ride processes leaked by a previous test (their timers and

@@ -11,8 +11,8 @@ defmodule Hoodride.Sweeper do
   # sweep_now/0 on purpose (a tick landing mid-test reaped that test's
   # presence-less drivers: random failures on a slow machine)
   @every_ms 60_000
-  @request_ttl 5 * 60
-  @presence_grace 5 * 60
+  @request_ttl div(Hoodride.Limits.request_expiry_ms(), 1000)
+  @presence_grace div(Hoodride.Limits.presence_grace_ms(), 1000)
 
   def start_link(opts) do
     every =
@@ -247,7 +247,7 @@ defmodule Hoodride.Sweeper do
   # socket (wedged app, dead GPS pipeline). Healthy clients heartbeat every
   # ~20s even parked, so minutes of silence can only mean broken. Hands are
   # one-shot by design (no stream), so only grace applies to them.
-  @position_stale 3 * 60
+  @position_stale div(Hoodride.Limits.position_stale_ms(), 1000)
 
   @doc false
   def sweep_stale_geo do

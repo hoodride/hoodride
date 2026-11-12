@@ -61,10 +61,10 @@ defmodule HoodrideWeb.WorldChannel do
   # worst-case hoard at 120 × ~100 bytes ≈ 12 KB of registry, versus the
   # unbounded hoard this limit exists to prevent. The cap is checked on the
   # DESIRED set before anything changes: all or nothing.
-  @max_watch 120
+  @max_watch Hoodride.Limits.map_cells_watched()
 
   # same opaque-cell rule as every other surface
-  @max_cell_bytes 24
+  @max_cell_bytes Hoodride.Limits.cell_bytes()
 
   # THE SYNC BUDGET (flow limit, completing what the cap's stock limit can't):
   # every new cell costs a snapshot, so a spin loop (set A, set B, set A...)
@@ -76,8 +76,8 @@ defmodule HoodrideWeb.WorldChannel do
   # channel's assigns, and a rejoin refilled it). Refusals are cheap and
   # spend nothing, so we keep refusing rather than hanging up. `reveal`
   # spends from the same budget: a tap is rare, so one covers both.
-  @sync_per_minute 60
-  @sync_burst 20
+  @sync_per_minute Hoodride.Limits.sync_per_minute()
+  @sync_burst Hoodride.Limits.sync_burst()
 
   # a batched reveal: at most a burst of ids (priv/static/reveal_queue.js
   # sends no more — test/hoodride_web/channels/reveal_batch_test.exs)

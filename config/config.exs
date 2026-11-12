@@ -57,38 +57,11 @@ config :esbuild,
 # on in dev, and one level change away in prod.
 config :phoenix, :filter_parameters, ["password", "secret", "lat", "lng", "token", "text"]
 
-# per-address HTTP budget (HoodrideWeb.HttpBudget): opening the app is ~3
-# calls; 120 at once covers a café on one IPv4 address, then 1 a second
-config :hoodride, :http_budget, per_minute: 60, burst: 120
-
-# profile photos (/avatars/:name) have their OWN budget, per account: a busy
-# pile list must not use up what /api/state needs. 2x reveal's (a photo is
-# only learned through reveal — 20 names at once, 60 a minute — chat or a
-# ride, and each loads once per device): burst 40, 120 a minute
-# (test/hoodride_web/avatar_serving_test.exs checks they stay in step)
-config :hoodride, :avatar_budget, per_minute: 120, burst: 40
-
-# opening a chat (GET /api/chat, light reload) has its OWN budget, per
-# account: tapping through chats can't use up what /api/state needs
-config :hoodride, :chat_budget, per_minute: 60, burst: 60
-
-# per-address budget on WebSocket handshakes, before the token is checked
-# (HoodrideWeb.UserSocket): the same numbers — a person connects ~once per page
-config :hoodride, :ws_budget, per_minute: 60, burst: 120
-
-# Sign-in (HoodrideWeb.AuthController) — the numbers, and where they come from:
-#   * starts (/auth/*) have their OWN pool, so sign-in can't eat the app's
-#     budget: 30 a minute per address. No standard for password-free sign-in:
-#     between Okta's /authorize (60/min) and password-login examples (5–10),
-#     generous because a carrier's CGNAT puts many people on one address
-#   * codes Google refuses (made-up codes, RFC 6819 §4.4.1.12): 30 in 3
-#     minutes block the address for an hour — GitLab's published numbers
-#   * "Refresh from Google": 5 at once, then one every 2 minutes (5 per 10
-#     minutes) per account — a judgment call
-# (Hoodride.RateBudget lets `burst` + 1 through at once: 29 → 30, 4 → 5)
-config :hoodride, :sign_in_budget, per_minute: 30, burst: 29
-config :hoodride, :sign_in_failures, max: 30, window_ms: 180_000, block_ms: 3_600_000
-config :hoodride, :refresh_budget, per_minute: 0.5, burst: 4
+# The rate budgets (requests, photos, chats, live-connection handshakes,
+# sign-in starts, refused sign-in codes, Google refreshes) are in
+# lib/hoodride/limits.ex with every other limit, and their reasons
+# (owner, 2026-11-12: all limits in one place). An environment may switch one
+# off here: `config :hoodride, :http_budget, nil` (dev.exs, loadtest.exs).
 
 # A planned restart (HoodrideWeb.RestartNotice): apps reconnect once at a random
 # moment in [min_ms, max_ms] (the server is back in ~5 s); flush_ms is the

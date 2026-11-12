@@ -178,7 +178,7 @@ defmodule Hoodride.Rides.Ride do
   @moduledoc "A living ride. Born at accept, dies at end — the death IS the deletion."
   use GenServer, restart: :temporary
 
-  @abandoned_after 30 * 60
+  @abandoned_after div(Hoodride.Limits.ride_abandoned_ms(), 1000)
   @check_every 60_000
 
   def start_link(args) do

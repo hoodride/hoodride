@@ -51,7 +51,9 @@ await journey("findnearestcover2: a card, the share prompt, Update available, th
   // however busy the machine)
   const before = await p.eval(`(__trace.length = 0, window.__slowSteps = 6000, nearSeq)`);
   await tapLocate(p);
-  await p.waitFor(`nearSeq > ${before} && __trace.length >= 2`, "the second step");
+  // (20 s: the first step's move alone is the 6 s set above, then the map
+  // settles — 10 s left ~4 s spare, and a busy full run ran out, 2026-11-12)
+  await p.waitFor(`nearSeq > ${before} && __trace.length >= 2`, "the second step", 20000);
   await p.drag(120, 420, 260, 420);
   await p.eval(`(window.__slowSteps = 0, true)`);
   await p.waitFor(`!nearLooking`, "the drag ended it", 5000);
@@ -69,7 +71,9 @@ await journey("findnearestcover2: a card, the share prompt, Update available, th
   await farAway(p);
   const pb = await p.eval(`(__trace.length = 0, window.__slowSteps = 6000, nearSeq)`);
   await tapLocate(p);
-  await p.waitFor(`nearSeq > ${pb} && __trace.length >= 2`, "the second step");
+  // (20 s: the first step's move alone is the 6 s set above, then the map
+  // settles — 10 s left ~4 s spare, and a busy full run ran out, 2026-11-12)
+  await p.waitFor(`nearSeq > ${pb} && __trace.length >= 2`, "the second step", 20000);
   await p.press(120, 420);
   await p.eval(`(window.__slowSteps = 0, true)`);
   await new Promise((r) => setTimeout(r, 1500));

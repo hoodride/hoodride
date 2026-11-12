@@ -34,7 +34,7 @@ defmodule Hoodride.SignOuts do
   alias Hoodride.Repo
 
   @table :sign_outs
-  @keep_ms 30 * 86_400_000
+  @keep_ms Hoodride.Limits.sign_out_keep_ms()
 
   def init_table do
     Hoodride.ETS.new(@table, [:named_table, :public, :set, read_concurrency: true])

@@ -38,11 +38,11 @@ defmodule Hoodride.Chat do
   # {{sender, cid}, receipt, at}: a message the app may send again (its reply
   # lost) — the same id gets the same receipt, never a second delivery
   @sent_ids :chat_sent_ids
-  @sent_id_ttl 600
+  @sent_id_ttl div(Hoodride.Limits.message_id_keep_ms(), 1000)
 
   # retained history per conversation — delivery is never capped, only what
   # the server remembers; old messages fall off the back (ephemeral by nature)
-  @max_history 50
+  @max_history Hoodride.Limits.chat_history()
 
   def init_tables do
     Hoodride.ETS.new(@conversations, [:named_table, :public, :set])
@@ -173,8 +173,8 @@ defmodule Hoodride.Chat do
     })
   end
 
-  @preview_chars 100
-  @preview_bytes 400
+  @preview_chars Hoodride.Limits.chat_preview_chars()
+  @preview_bytes Hoodride.Limits.chat_preview_bytes()
 
   @doc """
   The start of a message for the chat list: whole characters (graphemes —

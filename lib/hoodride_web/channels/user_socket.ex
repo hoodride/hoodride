@@ -52,8 +52,8 @@ defmodule HoodrideWeb.UserSocket do
   # a page load or reconnect is one connect; a phone on flaky Wi-Fi
   # reconnects at most ~10 times a minute (the client backs off): 21 at
   # once, then one every 3 s
-  @connects_per_minute 20
-  @connects_burst 20
+  @connects_per_minute Hoodride.Limits.connects_per_minute()
+  @connects_burst Hoodride.Limits.connects_burst()
 
   # the latest connect of each user and its deadline token
   @slots :socket_slots
@@ -89,7 +89,7 @@ defmodule HoodrideWeb.UserSocket do
   # attempt. `config :hoodride, :ws_budget` (nil = off: dev, the monster is one
   # address). The account's own connect budget still applies after.
   defp handshake_budget(%{peer_data: %{address: peer}} = connect_info) do
-    case Application.get_env(:hoodride, :ws_budget) do
+    case Hoodride.Limits.budget(:ws_budget) do
       nil ->
         :ok
 

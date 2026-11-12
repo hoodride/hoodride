@@ -23,15 +23,21 @@ defmodule Hoodride.SignInFailuresTest do
       block_ms: 60 * @min
     )
 
-    on_exit(fn -> Application.delete_env(:hoodride, :sign_in_failures) end)
+    on_exit(fn -> Application.put_env(:hoodride, :sign_in_failures, nil) end)
     :ok
   end
 
   test "what ships: GitLab's numbers — 30 in 3 minutes, blocked 1 hour; off in dev" do
+    assert Hoodride.Limits.sign_in_failures() == [
+             max: 30,
+             window_ms: 180_000,
+             block_ms: 3_600_000
+           ]
+
     prod = Config.Reader.read!("config/config.exs", env: :prod)[:hoodride]
-    assert prod[:sign_in_failures] == [max: 30, window_ms: 180_000, block_ms: 3_600_000]
+    refute Keyword.has_key?(prod, :sign_in_failures), "prod runs Hoodride.Limits' numbers"
     dev = Config.Reader.read!("config/config.exs", env: :dev)[:hoodride]
-    assert dev[:sign_in_failures] == nil
+    assert Keyword.fetch!(dev, :sign_in_failures) == nil
   end
 
   test "29 failures in 3 minutes: still allowed; the 30th blocks the address" do

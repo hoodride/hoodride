@@ -25,7 +25,7 @@ defmodule HoodrideWeb.Auth do
   alias Hoodride.SessionTokens
 
   @token_salt "user socket"
-  @token_max_s 86_400
+  @token_max_s div(Hoodride.Limits.socket_pass_ms(), 1000)
 
   @doc """
   The signed-in user for a session map (string or atom keys) —

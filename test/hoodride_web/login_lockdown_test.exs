@@ -545,7 +545,7 @@ defmodule HoodrideWeb.LoginLockdownTest do
     # use up the app's budget): HoodrideWeb.SignInRefreshTest
     test "/auth/* is budgeted too — from its own pool, not this one" do
       Application.put_env(:hoodride, :sign_in_budget, per_minute: 60, burst: 5)
-      on_exit(fn -> Application.delete_env(:hoodride, :sign_in_budget) end)
+      on_exit(fn -> Application.put_env(:hoodride, :sign_in_budget, nil) end)
       ip = {198, 51, 100, 24}
       codes = for _ <- 1..8, do: get(%{build_conn() | remote_ip: ip}, "/auth/nope").status
       assert 429 in codes
@@ -800,9 +800,10 @@ defmodule HoodrideWeb.LoginLockdownTest do
       # config.exs imports the env's file last: read it as prod (which keeps
       # the base value) — read as dev it's nil, and `nil >= 100` is TRUE in
       # Elixir's term order (this check passed with any number; mutant-caught)
-      base = Config.Reader.read!("config/config.exs", env: :prod)
-      burst = base[:hoodride][:ws_budget][:burst]
+      burst = Hoodride.Limits.ws_budget()[:burst]
       assert is_integer(burst) and burst >= 100
+      base = Config.Reader.read!("config/config.exs", env: :prod)
+      refute Keyword.has_key?(base[:hoodride], :ws_budget), "prod runs Hoodride.Limits' numbers"
       dev = Config.Reader.read!("config/dev.exs", env: :dev)
       assert Keyword.has_key?(dev[:hoodride], :ws_budget) and dev[:hoodride][:ws_budget] == nil
     end
