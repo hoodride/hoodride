@@ -43,6 +43,16 @@ defmodule Hoodride.Chat do
   # retained history per conversation — delivery is never capped, only what
   # the server remembers; old messages fall off the back (ephemeral by nature)
   @max_history Hoodride.Limits.chat_history()
+  # …and at most this many bytes of text: 50 × 20 KB kept per chat let ~50
+  # accounts hold 1 GB (abuse review, 2026-11-12)
+  @max_history_bytes Hoodride.Limits.chat_history_bytes()
+
+  # who STARTED a conversation (its first message): {starter_id, pair_key},
+  # a bag — "chats you started" is one lookup (Hoodride.Limits
+  # chats_started_open). A ride's own chat (open/2) has no starter. Removed
+  # with the conversation; a stray from a send racing a delete goes at the
+  # sweeper's repair pass (heal_index)
+  @started :chat_started
 
   def init_tables do
     Hoodride.ETS.new(@conversations, [:named_table, :public, :set])
@@ -50,6 +60,7 @@ defmodule Hoodride.Chat do
     Hoodride.ETS.new(@by_user, [:named_table, :public, :ordered_set])
     Hoodride.ETS.new(@spots, [:named_table, :public, :set])
     Hoodride.ETS.new(@sent_ids, [:named_table, :public, :set])
+    Hoodride.ETS.new(@started, [:named_table, :public, :bag])
     :ok
   end
 
@@ -93,9 +104,16 @@ defmodule Hoodride.Chat do
     now = System.system_time(:second)
     id = System.unique_integer([:positive, :monotonic])
 
-    :ets.insert(@conversations, {key, now})
+    # a NEW conversation: this message started it (counted against the
+    # sender's open chats — the caller checked room first, can_start?/2)
+    unless :ets.insert_new(@conversations, {key, now}),
+      do: :ets.insert(@conversations, {key, now}),
+      else: mark_started(from.id, key)
+
     index(key)
-    :ets.insert(@messages, {key, id, from.id, text, now})
+    # only the text's own bytes: a slice of the incoming frame kept the WHOLE
+    # frame (up to 64 KB) alive in memory for as long as the message was
+    :ets.insert(@messages, {key, id, from.id, :binary.copy(text), now})
     trim_history(key)
     if spot, do: :ets.insert(@spots, {{key, from.id}, spot, System.system_time(:millisecond)})
 
@@ -122,6 +140,31 @@ defmodule Hoodride.Chat do
     :ets.insert(@conversations, {key, System.system_time(:second)})
     index(key)
     :ok
+  end
+
+  @doc """
+  How many of `user_id`'s open conversations they started (by a first
+  message) — the ones Hoodride.Limits.chats_started_open caps.
+  """
+  def started_open(user_id) do
+    Enum.count(:ets.lookup(@started, user_id), fn {_, key} -> :ets.member(@conversations, key) end)
+  end
+
+  @doc """
+  May `from_id` send to `to_id`? Always into a chat they already have; a
+  NEW one only while they've started fewer than chats_started_open.
+  """
+  def can_start?(from_id, to_id),
+    do: exists?(from_id, to_id) or started_open(from_id) < Hoodride.Limits.chats_started_open()
+
+  @doc """
+  "End chat": `user_id` ends their conversation with `peer_id` — gone for
+  both, the other told who ended it. `:ok`, or `:none` (no such chat). The
+  caller refuses a ride partner's (HoodrideWeb.UserChannel).
+  """
+  def end_chat(user_id, peer_id) do
+    key = pair_key(user_id, peer_id)
+    if :ets.member(@conversations, key), do: delete_conversation(key, user_id), else: :none
   end
 
   def conversations_for(user_id) do
@@ -241,31 +284,56 @@ defmodule Hoodride.Chat do
     end
   end
 
+  # this sender started it — unless an End chat or the sweeper deleted it in
+  # the moment between (its delete found no row to remove): then the row
+  # goes too, never charged for a chat the other person starts next (review,
+  # 2026-11-12; what still slips through, heal_index drops)
+  defp mark_started(starter, key) do
+    :ets.insert(@started, {starter, key})
+    unless :ets.member(@conversations, key), do: :ets.delete_object(@started, {starter, key})
+  end
+
   defp index({a, b} = key) do
     :ets.insert(@by_user, [{{a, key}}, {{b, key}}])
   end
 
+  # the newest @max_history messages and at most @max_history_bytes of
+  # their text, oldest dropped first — the newest always kept (one message
+  # is at most Hoodride.Limits.message_bytes, under the byte cap)
   defp trim_history(key) do
-    messages = :ets.lookup(@messages, key)
-    excess = length(messages) - @max_history
+    newest_first =
+      @messages
+      |> :ets.lookup(key)
+      |> Enum.sort_by(fn {_k, id, _s, _t, _ts} -> id end, :desc)
 
-    if excess > 0 do
-      messages
-      |> Enum.sort_by(fn {_k, id, _s, _t, _ts} -> id end)
-      |> Enum.take(excess)
-      |> Enum.each(fn obj -> :ets.delete_object(@messages, obj) end)
-    end
+    # the newest RUN only: once one doesn't fit, every older one goes too —
+    # never an older small message kept past a dropped big one (a history
+    # with a hole in it: the lightreload2 journey, 2026-11-12)
+    {_kept, _bytes, _full, drop} =
+      Enum.reduce(newest_first, {0, 0, false, []}, fn {_k, _id, _s, text, _ts} = obj,
+                                                      {n, bytes, full, drop} ->
+        size = byte_size(text)
+        fits = n == 0 or (n < @max_history and bytes + size <= @max_history_bytes)
+
+        if fits and not full,
+          do: {n + 1, bytes + size, false, drop},
+          else: {n, bytes, true, [obj | drop]}
+      end)
+
+    Enum.each(drop, &:ets.delete_object(@messages, &1))
   end
 
   @doc """
   Deletes a conversation and tells BOTH people, so whoever is still in the
   app clears it at once (the other one rebuilds from /api/state on return).
+  `by`: who ended it ("End chat"), told to both (`ended_by`) — the other
+  person sees "{name} ended the chat"; nil: the sweeper (someone away).
   The conversation row is TAKEN atomically: only the call that really
   removed it announces it — two racing deletes (or a delete of a chat that
   is already gone) never say "closed" twice. Write order as documented
   above: the index rows, THEN the conversation.
   """
-  def delete_conversation({a, b} = key) do
+  def delete_conversation({a, b} = key, by \\ nil) do
     :ets.delete(@by_user, {a, key})
     :ets.delete(@by_user, {b, key})
 
@@ -277,8 +345,11 @@ defmodule Hoodride.Chat do
         :ets.delete(@messages, key)
         :ets.delete(@spots, {key, a})
         :ets.delete(@spots, {key, b})
-        HoodrideWeb.Endpoint.broadcast("user:#{a}", "chat_closed", %{peer_id: b})
-        HoodrideWeb.Endpoint.broadcast("user:#{b}", "chat_closed", %{peer_id: a})
+        :ets.delete_object(@started, {a, key})
+        :ets.delete_object(@started, {b, key})
+        extra = if by, do: %{ended_by: by}, else: %{}
+        HoodrideWeb.Endpoint.broadcast("user:#{a}", "chat_closed", Map.put(extra, :peer_id, b))
+        HoodrideWeb.Endpoint.broadcast("user:#{b}", "chat_closed", Map.put(extra, :peer_id, a))
         :ok
     end
   end
@@ -326,6 +397,11 @@ defmodule Hoodride.Chat do
     # a block whose conversation is gone (a send racing a delete) goes too
     each_match(@spots, [{{{:"$1", :_}, :_, :_}, [], [:"$_"]}], fn {{key, _}, _, _} = row ->
       unless :ets.member(@conversations, key), do: :ets.delete_object(@spots, row)
+    end)
+
+    # …and a "who started it" row whose conversation is gone
+    each_match(@started, [{{:_, :_}, [], [:"$_"]}], fn {_, key} = row ->
+      unless :ets.member(@conversations, key), do: :ets.delete_object(@started, row)
     end)
 
     # …and so does a MESSAGE whose conversation is gone: the same race can

@@ -149,22 +149,23 @@ line two	tab"
       assert Chat.preview("ok" <> huge) == "ok"
     end
 
-    test "51 stored (a send in progress): the newest 50, in order — the same set /api/chat gives" do
+    test "one more than kept (a send in progress): the newest kept, in order — the same set /api/chat gives" do
       me = user("lr-me4")
       eve = user("lr-eve")
-      for i <- 1..50, do: say(eve, me, "m#{i}")
-      # a 51st, straight in (a send between its insert and its trim)
+      cap = Hoodride.Limits.chat_history()
+      for i <- 1..cap, do: say(eve, me, "m#{i}")
+      # one more, straight in (a send between its insert and its trim)
       key = Chat.pair_key(me.id, eve.id)
 
       :ets.insert(
         :chat_messages,
-        {key, System.unique_integer([:positive, :monotonic]), eve.id, "m51",
+        {key, System.unique_integer([:positive, :monotonic]), eve.id, "m#{cap + 1}",
          System.system_time(:second)}
       )
 
       c = by_peer(list(me), eve)
-      assert length(c["theirs"]) == 50
-      assert c["last"]["preview"] == "m51"
+      assert length(c["theirs"]) == cap
+      assert c["last"]["preview"] == "m#{cap + 1}"
       ids = Enum.map(c["theirs"], & &1["id"])
       assert ids == Enum.sort(ids)
 

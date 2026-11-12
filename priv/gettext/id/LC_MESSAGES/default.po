@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Tidak dapat menghapus akun Anda — silakan coba lagi."
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "Tidak dapat mengakhiri chat — coba lagi"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Pesan tidak bisa dimuat. Coba lagi."
 
@@ -309,6 +313,10 @@ msgstr "Pengemudi"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "Pengemudi tidak bisa mengambil perjalanan ini — coba yang lain"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "Akhiri chat"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "Kode sumber di GitHub"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "Ketuk lagi untuk mengakhiri"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "Ketuk untuk menghapus"
 
@@ -784,6 +796,10 @@ msgstr "Anda sudah sering memperbarui — coba lagi dalam beberapa menit"
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "Anda sudah memulai banyak chat baru — coba lagi nanti"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "Anda memulai terlalu banyak chat — akhiri salah satunya dulu"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1014,6 +1030,10 @@ msgstr "{distance} dari sini"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name} mengakhiri chat"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

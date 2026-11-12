@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Rho koj tus account tsis tau — thov sim dua."
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "Xaus kev sib tham tsis tau — sim dua"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Thauj tsis tau cov lus. Sim dua."
 
@@ -309,6 +313,10 @@ msgstr "Tus tsav tsheb"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "Tus tsav tsheb tuaj tsis tau — sim lwm tus"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "Xaus kev sib tham"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "Source code ntawm GitHub"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "Kov dua ib zaug kom xaus"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "Nias kom rho tawm"
 
@@ -784,6 +796,10 @@ msgstr "Koj hloov kho ntau zaus lawm — sim dua ob peb feeb ntxiv"
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "Koj pib kev sib tham tshiab ntau heev lawm — sim dua tom qab"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "Koj tau pib kev sib tham ntau dhau lawm — xaus ib qho ntawm cov ntawd ua ntej"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1014,6 +1030,10 @@ msgstr "deb {distance}"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name} tau xaus kev sib tham"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

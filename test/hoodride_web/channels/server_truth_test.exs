@@ -130,20 +130,24 @@ defmodule HoodrideWeb.ServerTruthTest do
     end
   end
 
-  test "conversation history is capped at the last 50 messages", %{user: u, peer: p} do
+  test "conversation history is capped at the last #{Hoodride.Limits.chat_history()} messages", %{
+    user: u,
+    peer: p
+  } do
     me = %{id: u.id, name: u.name, photo: nil}
+    cap = Hoodride.Limits.chat_history()
 
-    for i <- 1..55 do
+    for i <- 1..(cap + 5) do
       {:ok, _} = Hoodride.Chat.send_message(me, p.id, "msg #{i}")
     end
 
     [conv] = Hoodride.Chat.conversations_for(p.id)
-    assert length(conv.messages) == 50
+    assert length(conv.messages) == cap
     # the oldest five fell off the back; the newest survives
     texts = Enum.map(conv.messages, & &1.text)
     refute "msg 5" in texts
     assert "msg 6" in texts
-    assert List.last(texts) == "msg 55"
+    assert List.last(texts) == "msg #{cap + 5}"
   end
 
   # a ghost gets the SAME refusal as any unreachable person: saying

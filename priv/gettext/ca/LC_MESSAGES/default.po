@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "No s'ha pogut suprimir el teu compte. Torna-ho a provar."
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "No s'ha pogut acabar el xat. Torna-ho a provar"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "No s'han pogut carregar els missatges. Torna-ho a provar."
 
@@ -309,6 +313,10 @@ msgstr "Conductor"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "El conductor no pot fer aquest viatge. Prova'n un altre"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "Acaba el xat"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "Codi font a GitHub"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "Torna a tocar per acabar"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "Toca per treure'l"
 
@@ -784,6 +796,10 @@ msgstr "Has actualitzat moltes vegades. Torna-ho a provar d'aquí a uns minuts"
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "Has començat molts xats nous. Torna-ho a provar més tard"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "Has començat massa xats. Primer acaba'n un"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1028,6 +1044,10 @@ msgstr "a {distance}"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name} ha acabat el xat"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

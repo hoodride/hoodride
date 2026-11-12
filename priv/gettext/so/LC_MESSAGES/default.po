@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Akoonkaaga lama tirtiri karin — fadlan isku day mar kale."
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "Lama dhammayn karin wada sheekaysiga — isku day mar kale"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Fariimaha lama soo rari karin. Isku day mar kale."
 
@@ -309,6 +313,10 @@ msgstr "Darawal"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "Darawalku ma qaadi karo kan — isku day mid kale"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "Dhammee wada sheekaysiga"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "Koodhka asalka ah ee GitHub"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "Mar kale taabo si aad u dhammayso"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "Taabo si aad u saarto"
 
@@ -784,6 +796,10 @@ msgstr "Marar badan ayaad cusboonaysiisay — isku day dhowr daqiiqo kadib"
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "Sheekeysiyo badan oo cusub ayaad bilowday — mar dambe isku day"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "Waxaad bilowday wada sheekaysi aad u badan — marka hore mid ka mid ah dhammee"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1021,6 +1037,10 @@ msgstr "{distance} u jira"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name} wuu dhammeeyay wada sheekaysiga"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

@@ -96,6 +96,18 @@ test("chat_closed for the chat on screen: also close the panel", () => {
   assert.match(a.banner, /Maria/);
 });
 
+// End chat (owner, 2026-11-12): who ended it decides what's said
+test("they tapped End chat: '{name} ended the chat'", () => {
+  const a = B.chatClosedActions({ hasChat: true, isOpen: true, name: "Maria", endedBy: "peer" });
+  assert.deepEqual([a.remove, a.close], [true, true]);
+  assert.equal(a.banner, "Maria ended the chat");
+});
+
+test("I tapped End chat: removed and closed, nothing said", () => {
+  const a = B.chatClosedActions({ hasChat: true, isOpen: true, name: "Maria", endedBy: "me" });
+  assert.deepEqual(a, { remove: true, close: true, banner: null });
+});
+
 test("chat_closed for a chat I don't have (a reload already dropped it): nothing at all", () => {
   assert.deepEqual(B.chatClosedActions({ hasChat: false, isOpen: false, name: "Maria" }), {
     remove: false,

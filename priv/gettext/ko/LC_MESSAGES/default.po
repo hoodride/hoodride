@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "계정을 삭제하지 못했어요. 다시 시도해 주세요."
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "채팅을 종료할 수 없어요. 다시 시도해 주세요"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "메시지를 불러오지 못했어요. 다시 시도해 주세요."
 
@@ -309,6 +313,10 @@ msgstr "운전자"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "운전자가 이 요청을 받을 수 없어요. 다른 운전자를 찾아보세요"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "채팅 종료"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "GitHub의 소스 코드"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "한 번 더 탭하면 종료돼요"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "탭하여 삭제"
 
@@ -784,6 +796,10 @@ msgstr "새로고침을 너무 많이 했어요. 몇 분 후에 다시 시도해
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "새 채팅을 너무 많이 시작했어요. 나중에 다시 시도해 주세요"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "시작한 채팅이 너무 많아요. 먼저 그중 하나를 종료하세요"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1014,6 +1030,10 @@ msgstr "{distance} 거리"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name}님이 채팅을 종료했어요"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

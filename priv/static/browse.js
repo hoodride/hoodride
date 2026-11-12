@@ -72,13 +72,17 @@
   // The server deleted a conversation (one of the two was gone past grace):
   // drop it, close it if it's on screen, and say plainly why — only if this
   // app still had it (after a reload it's simply not there).
-  function chatClosedActions({ hasChat, isOpen, name }) {
+  // endedBy: "peer" — they tapped End chat: say so; "me" — you did: nothing
+  // to say; else the server ended it (they've been away past grace)
+  function chatClosedActions({ hasChat, isOpen, name, endedBy }) {
     if (!hasChat) return { remove: false, close: false, banner: null };
-    return {
-      remove: true,
-      close: !!isOpen,
-      banner: t("Chat with {name} ended — they've been away a while", { name }),
-    };
+    const banner =
+      endedBy === "me"
+        ? null
+        : endedBy === "peer"
+          ? t("{name} ended the chat", { name })
+          : t("Chat with {name} ended — they've been away a while", { name });
+    return { remove: true, close: !!isOpen, banner };
   }
 
   // PILES. Fuzzed markers in one block sit on EXACTLY the same point, so

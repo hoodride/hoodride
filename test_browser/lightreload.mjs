@@ -56,24 +56,24 @@ const texts = (p, id) => p.eval(`${chatOf(p, id)}.msgs.map((m) => m.text)`);
 const heldCount = (p) => p.eval(`window.__held.length`);
 
 await journey("lightreload: the chat list on reload, a chat's messages when it's opened", async (browser) => {
-  step("Ann writes Sam 30 messages; a reload brings his chats with no message text — her line and 30 unread from the summary");
+  step("Ann writes Sam 18 messages; a reload brings his chats with no message text — her line and 18 unread from the summary");
   const sam = await browser.person("BT-Sam");
   const ann = await browser.person("BT-Ann");
   const bo = await browser.person("BT-Bo");
   const [samId, annId, boId] = [await sam.id(), await ann.id(), await bo.id()];
   await wire(sam);
-  await server(`many_msgs ${annId} ${samId} 30 ann`);
+  await server(`many_msgs ${annId} ${samId} 18 ann`);
   await server(`many_msgs ${boId} ${samId} 2 bo`);
-  await sam.waitFor(`${chatOf(sam, annId)} && ${chatOf(sam, annId)}.msgs.length === 30`, "heard live first");
+  await sam.waitFor(`${chatOf(sam, annId)} && ${chatOf(sam, annId)}.msgs.length === 18`, "heard live first");
   await reload(sam);
   const st = await sam.eval(`window.__states.at(-1)`);
   check(!st.includes('"ann1"') && !st.includes('"ann2"') && !st.includes('"bo1"'), "no message text in the reload", st.slice(0, 400));
-  check(st.includes('"preview":"ann30"'), "her last message's preview is");
+  check(st.includes('"preview":"ann18"'), "her last message's preview is");
   check((await sam.eval(`${chatOf(sam, annId)}.loaded`)) === false && (await sam.eval(`${chatOf(sam, annId)}.msgs.length`)) === 0, "her chat: a summary");
   await sam.click("btn-chat");
   await sam.waitFor(`state.chatView === "list" && !document.getElementById("chat").classList.contains("hidden")`, "the list");
-  check(q(await row(sam, "BT-Ann")) === q({ unread: "30", line: "ann30" }), "Ann's row: 30 unread, 'ann30'", await row(sam, "BT-Ann"));
-  check((await sam.eval(`${chatOf(sam, annId)}.unread`)) === 30, "counted");
+  check(q(await row(sam, "BT-Ann")) === q({ unread: "18", line: "ann18" }), "Ann's row: 18 unread, 'ann18'", await row(sam, "BT-Ann"));
+  check((await sam.eval(`${chatOf(sam, annId)}.unread`)) === 18, "counted");
 
   step("opening her chat: 'Loading…'; Send does nothing and the text stays; then her messages, the 'New messages' line above the first");
   await sam.eval(`window.__hold = true, true`);
@@ -81,15 +81,15 @@ await journey("lightreload: the chat list on reload, a chat's messages when it's
   await sam.waitFor(`window.__held.length === 1`, "the load asked (held)");
   check((await loadingShown(sam)) === "Loading…", "'Loading…'", await loadingShown(sam));
   check(await sam.eval(`!document.getElementById("chat-form").classList.contains("hidden") && document.getElementById("chat-name").textContent === "BT-Ann"`), "her name and the box above it");
-  check((await sam.eval(`${chatOf(sam, annId)}.unread`)) === 30, "not read yet");
+  check((await sam.eval(`${chatOf(sam, annId)}.unread`)) === 18, "not read yet");
   await typeText(sam, "hi Ann");
   await send(sam);
   check((await box(sam)) === "hi Ann", "Send did nothing: the text stays", await box(sam));
   check(!(await texts(sam, annId)).includes("hi Ann"), "nothing sent");
   await sam.eval(`window.__hold = false, window.__release(), true`);
   await loaded(sam, annId);
-  const all30 = Array.from({ length: 30 }, (_, i) => `ann${i + 1}`);
-  check(q(await texts(sam, annId)) === q(all30), "her 30 messages", await texts(sam, annId));
+  const all18 = Array.from({ length: 18 }, (_, i) => `ann${i + 1}`);
+  check(q(await texts(sam, annId)) === q(all18), "her 18 messages", await texts(sam, annId));
   check((await sam.eval(`chatLineMsg && chatLineMsg.text`)) === "ann1", "the line above the first unread", await sam.eval(`chatLineMsg && chatLineMsg.text`));
   check(await sam.eval(`!!document.querySelector("#chat-messages .chat-line")`), "drawn");
   check((await sam.eval(`${chatOf(sam, annId)}.unread`)) === 0, "read now");
@@ -109,7 +109,7 @@ await journey("lightreload: the chat list on reload, a chat's messages when it's
   check((await sam.eval(`${chatOf(sam, annId)}.unread`)) === 1, "counted", await sam.eval(`${chatOf(sam, annId)}.unread`));
   await sam.eval(`window.__hold = false, window.__release(), true`);
   await loaded(sam, annId);
-  check(q(await texts(sam, annId)) === q([...all30, "late1"]), "once, in its place", await texts(sam, annId));
+  check(q(await texts(sam, annId)) === q([...all18, "late1"]), "once, in its place", await texts(sam, annId));
   check(!(await sam.eval(`window.__banners`)).some((b) => b.includes("late1")), "no banner (it's the chat on screen)", await sam.eval(`window.__banners`));
 
   step("a ride note on a chat not opened since the reload: its line in the list, then in its place when the messages come");

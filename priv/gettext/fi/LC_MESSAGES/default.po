@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Tilin poistaminen epäonnistui. Yritä uudelleen."
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "Keskustelun lopettaminen ei onnistunut. Yritä uudelleen"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Viestejä ei voitu ladata. Yritä uudelleen."
 
@@ -309,6 +313,10 @@ msgstr "Kuljettaja"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "Kuljettaja ei voi ottaa tätä kyytiä. Kokeile toista"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "Lopeta keskustelu"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "Lähdekoodi GitHubissa"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "Lopeta napauttamalla uudelleen"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "Poista napauttamalla"
 
@@ -784,6 +796,10 @@ msgstr "Olet päivittänyt monta kertaa. Yritä uudelleen muutaman minuutin pä�
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "Olet aloittanut monta uutta chatia. Yritä myöhemmin uudelleen"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "Olet aloittanut liian monta keskustelua. Lopeta ensin yksi niistä"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1021,6 +1037,10 @@ msgstr "{distance} päässä"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name} lopetti keskustelun"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

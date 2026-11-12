@@ -50,8 +50,8 @@ await journey("lightreload2: reconnects, failures, a refused message, a ride, a 
   const ann = await browser.person("BT-Ann");
   const [samId, annId] = [await sam.id(), await ann.id()];
   await wire(sam);
-  await server(`many_msgs ${annId} ${samId} 30 a`);
-  await sam.waitFor(`${chatOf(annId)} && ${chatOf(annId)}.msgs.length === 30`, "heard live first");
+  await server(`many_msgs ${annId} ${samId} 18 a`);
+  await sam.waitFor(`${chatOf(annId)} && ${chatOf(annId)}.msgs.length === 18`, "heard live first");
 
   step("a reconnect while her chat on screen is still loading: it loads (in full, with the reconnect), the line in place, read");
   await reload(sam);
@@ -60,13 +60,13 @@ await journey("lightreload2: reconnects, failures, a refused message, a ride, a 
   await sam.waitFor(`window.__held.length === 1`, "the load asked (held)");
   await reload(sam);
   await loaded(sam, annId);
-  check(await sam.eval(`state.chatPeer.id === ${annId} && !document.querySelector("#chat-messages .chat-loading") && document.querySelectorAll("#chat-messages .msg").length === 30`), "drawn, not 'Loading…'");
+  check(await sam.eval(`state.chatPeer.id === ${annId} && !document.querySelector("#chat-messages .chat-loading") && document.querySelectorAll("#chat-messages .msg").length === 18`), "drawn, not 'Loading…'");
   check((await sam.eval(`chatLineMsg && chatLineMsg.text`)) === "a1", "the line above the first unread", await sam.eval(`chatLineMsg && chatLineMsg.text`));
   check((await sam.eval(`${chatOf(annId)}.unread`)) === 0, "read");
   // the old load's answer comes now: for a chat that's gone (dropped)
   await sam.eval(`window.__hold = false, window.__release(), true`);
   await new Promise((r) => setTimeout(r, 1000));
-  check((await texts(sam, annId)).length === 30, "the late answer dropped: nothing twice", (await texts(sam, annId)).length);
+  check((await texts(sam, annId)).length === 18, "the late answer dropped: nothing twice", (await texts(sam, annId)).length);
 
   step("a reconnect with her chat open and loaded: it stays loaded — no 'Loading…' flash; on the list, the list stays");
   await reload(sam);
@@ -89,7 +89,7 @@ await journey("lightreload2: reconnects, failures, a refused message, a ride, a 
     await sam.eval(`window.__fake = null, true`);
     await sam.click("chatRetry");
     await loaded(sam, annId);
-    check((await texts(sam, annId)).length === 30, `${status}: loaded after Try again`);
+    check((await texts(sam, annId)).length === 18, `${status}: loaded after Try again`);
     await sam.eval(`(document.getElementById("chat-input").value = "", ${chatOf(annId)}.draft = "", closeChat()), true`);
     await reload(sam);
   }
@@ -137,12 +137,14 @@ await journey("lightreload2: reconnects, failures, a refused message, a ride, a 
   check((await sam.eval(`${chatOf(annId)}.loaded`)) === false, "(still a summary)");
   await sam.eval(`openChat(realPeersById.get(${annId})), true`);
   await loaded(sam, annId);
-  check((await texts(sam, annId)).includes("a30"), "her messages");
+  check((await texts(sam, annId)).includes("a18"), "her messages");
   await sam.click("btn-endride");
   await sam.waitFor(`!state.ride`, "the ride over");
   await sam.eval(`closeChat(), true`);
 
-  step("50 messages of ~20 KB each on a slow connection (~200 KB/s): loaded well within the time limit, never 'Couldn't load'");
+  // (a chat now keeps at most 64 KB of text, newest first — the chat fix,
+  // 2026-11-12; it was 50 × 20 KB, about 1 MB, the size this step was for)
+  step("50 messages of ~20 KB each: only the newest that fit in a chat's 64 KB come back — on a slow connection (~200 KB/s), never 'Couldn't load'");
   await server(`big_msgs ${annId} ${samId} 50`);
   await sam.waitFor(`${chatOf(annId)}.msgs.length >= 50`, "heard live", 30000);
   await reload(sam);
@@ -157,7 +159,10 @@ await journey("lightreload2: reconnects, failures, a refused message, a ride, a 
   check(!(await sam.eval(`${chatOf(annId)}.failed`)), "never failed");
   const got = await sam.eval(`(() => { const e = performance.getEntriesByType("resource").filter((r) => r.name.includes("/api/chat")).at(-1); return e ? { size: e.transferSize, ms: e.responseEnd - e.requestStart } : null; })()`);
   const size = got && got.size;
-  check(size > 300 * 1024, "a big answer really came (over 300 KB on the wire)", got);
+  // (bytes, as the server counts them: an emoji pair is 11 bytes, 5 in .length)
+  const kept = await sam.eval(`${chatOf(annId)}.msgs.reduce((n, m) => n + new TextEncoder().encode(m.text).length, 0)`);
+  check(kept > 40_000 && kept <= 65_536, "the most a chat keeps came back: over 40 KB, at most 64 KB", kept);
+  check((await texts(sam, annId)).length <= 3, "only the newest few of the 50", (await texts(sam, annId)).length);
   // …and the connection really was slow: it took about as long as ~200 KB/s
   // needs (the slowing proven to have worked, not assumed)
   check(got.ms >= (size / 204800) * 1000 * 0.7, "it came at the slow speed (the slowing really on)", got);

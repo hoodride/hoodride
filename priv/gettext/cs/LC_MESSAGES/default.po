@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Účet se nepodařilo smazat – zkus to prosím znovu."
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "Chat se nepodařilo ukončit – zkus to znovu"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Zprávy se nepodařilo načíst. Zkus to znovu."
 
@@ -309,6 +313,10 @@ msgstr "Řidič"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "Řidič tuhle jízdu nemůže vzít – zkus jiného"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "Ukončit chat"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "Zdrojový kód na GitHubu"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "Klepni znovu pro ukončení"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "Klepnutím odstraníš"
 
@@ -784,6 +796,10 @@ msgstr "Aktualizuješ moc často – zkus to za pár minut"
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "Zakládáš moc nových chatů – zkus to později"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "Začal(a) jsi příliš mnoho chatů – nejdřív jeden z nich ukonči"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1028,6 +1044,10 @@ msgstr "{distance} odtud"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name} ukončil(a) chat"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

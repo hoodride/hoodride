@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Nem sikerült törölni a fiókodat – kérlek, próbáld újra."
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "Nem sikerült befejezni a csevegést – próbáld újra"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Nem sikerült betölteni az üzeneteket. Próbáld újra."
 
@@ -309,6 +313,10 @@ msgstr "Sofőr"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "A sofőr ezt nem tudja vállalni – próbálj egy másikat"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "Csevegés befejezése"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "Forráskód a GitHubon"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "Koppints újra a befejezéshez"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "Koppints az eltávolításhoz"
 
@@ -784,6 +796,10 @@ msgstr "Sokszor frissítettél – próbáld újra pár perc múlva"
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "Sok új csevegést indítottál – próbáld újra később"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "Túl sok csevegést kezdtél – előbb fejezz be egyet közülük"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1021,6 +1037,10 @@ msgstr "{distance} távolságra"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name} befejezte a csevegést"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

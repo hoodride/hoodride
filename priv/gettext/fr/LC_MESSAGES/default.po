@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Impossible de supprimer votre compte. Veuillez réessayer."
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "Impossible de terminer la discussion. Réessayez"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Impossible de charger les messages. Réessaie."
 
@@ -309,6 +313,10 @@ msgstr "Conducteur"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "Ce conducteur ne peut pas prendre ce trajet. Essayez-en un autre"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "Terminer la discussion"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "Code source sur GitHub"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "Touchez à nouveau pour terminer"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "Touchez pour retirer"
 
@@ -784,6 +796,10 @@ msgstr "Vous avez beaucoup actualisé. Réessayez dans quelques minutes"
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "Vous avez lancé beaucoup de nouvelles discussions. Réessayez plus tard"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "Vous avez lancé trop de discussions. Terminez-en d'abord une"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1028,6 +1044,10 @@ msgstr "à {distance}"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name} a terminé la discussion"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

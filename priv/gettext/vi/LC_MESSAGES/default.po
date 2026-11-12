@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Không thể xóa tài khoản của bạn — vui lòng thử lại."
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "Không thể kết thúc cuộc trò chuyện — hãy thử lại"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Không tải được tin nhắn. Hãy thử lại."
 
@@ -309,6 +313,10 @@ msgstr "Tài xế"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "Tài xế không nhận được chuyến này — hãy thử người khác"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "Kết thúc trò chuyện"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "Mã nguồn trên GitHub"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "Nhấn lần nữa để kết thúc"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "Nhấn để xóa"
 
@@ -784,6 +796,10 @@ msgstr "Bạn đã làm mới nhiều lần — hãy thử lại sau vài phút"
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "Bạn đã bắt đầu nhiều cuộc trò chuyện mới — hãy thử lại sau"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "Bạn đã bắt đầu quá nhiều cuộc trò chuyện — hãy kết thúc một cuộc trước"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1014,6 +1030,10 @@ msgstr "cách {distance}"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name} đã kết thúc cuộc trò chuyện"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

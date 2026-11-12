@@ -44,8 +44,12 @@ defmodule Hoodride.Limits do
      "How long a sent message's id is remembered, so a resend after a lost reply isn't a duplicate."},
 
     # ---------- chats ----------
-    {:chats, :chat_history, 50,
-     "Messages kept per conversation (older ones drop off); also the most an unread count can show."},
+    {:chats, :chat_history, 20,
+     "Messages kept per conversation (older ones drop off); also the most an unread count can show. Delivery is never capped — only what the server remembers (owner, 2026-11-12: 50 → 20; ride chats are short)."},
+    {:chats, :chat_history_bytes, 65_536,
+     "Bytes of message text kept per conversation, oldest dropped first, the newest always kept (owner, 2026-11-12: 64 KB, so 20 long messages fit in any language; about 50 accounts could otherwise hold 1 GB)."},
+    {:chats, :chats_started_open, 10,
+     "Open chats one person STARTED (by a first message): the next is refused until one ends. Chats others start, and a ride's own chat, never count (owner, 2026-11-12)."},
     {:chats, :chat_preview_chars, 100, "Characters of a message shown as a chat's preview."},
     {:chats, :chat_preview_bytes, 400, "Bytes of that preview."},
 

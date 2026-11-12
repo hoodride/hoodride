@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "无法删除你的账号，请重试。"
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "无法结束聊天，请重试"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "无法加载消息，请重试。"
 
@@ -309,6 +313,10 @@ msgstr "司机"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "司机无法接这一单，请换一位试试"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "结束聊天"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "GitHub 上的源代码"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "再点一次即可结束"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "点按即可移除"
 
@@ -784,6 +796,10 @@ msgstr "你刷新的次数太多了，请过几分钟再试"
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "你发起的新聊天太多了，请稍后再试"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "你发起的聊天太多了，请先结束其中一个"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1014,6 +1030,10 @@ msgstr "距离 {distance}"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name}结束了聊天"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

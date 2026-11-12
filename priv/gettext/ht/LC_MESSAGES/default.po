@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Pa t ka efase kont ou — tanpri eseye ankò."
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "Pa ka fini chat la — eseye ankò"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Nou pa t ka chaje mesaj yo. Eseye ankò."
 
@@ -309,6 +313,10 @@ msgstr "Chofè"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "Chofè a pa ka pran sa a — eseye yon lòt"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "Fini chat la"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "Kòd sous la sou GitHub"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "Tape ankò pou fini"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "Peze pou retire"
 
@@ -784,6 +796,10 @@ msgstr "Ou mete ajou twòp — eseye ankò nan kèk minit"
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "Ou kòmanse anpil nouvo chat — eseye ankò pita"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "Ou kòmanse twòp chat — fini youn ladan yo anvan"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1014,6 +1030,10 @@ msgstr "a {distance}"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name} fini chat la"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

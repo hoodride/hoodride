@@ -245,7 +245,8 @@ defmodule HoodrideWeb.UserChannel do
                limits([
                  {cold_allowed(cold?, me), "too_many_new_chats"},
                  {Hoodride.Throttle.message_allowed(me, to_id), "rate_limited"}
-               ]) do
+               ]),
+             :ok <- room_for_chat(me, to_id) do
           spot = shareable_spot(socket, payload)
           {:ok, receipt} = Hoodride.Chat.send_message(socket.assigns.user, to_id, text, spot)
           Hoodride.Chat.remember_sent(me, client_id(payload), receipt)
@@ -307,6 +308,24 @@ defmodule HoodrideWeb.UserChannel do
     {:reply, :ok, socket}
   end
 
+  # "End chat" (owner, 2026-11-12): either person ends a chat — gone for
+  # both, the other told who ended it. Never your ride partner's mid-ride
+  # (it ends with the ride). Spends the events budget like any action
+  defp event("end_chat", %{"peer" => peer_id}, socket) when is_integer(peer_id) do
+    me = socket.assigns.user_id
+
+    cond do
+      Hoodride.Rides.partners?(me, peer_id) ->
+        {:reply, {:error, %{reason: "in_ride"}}, socket}
+
+      Hoodride.Chat.end_chat(me, peer_id) == :ok ->
+        {:reply, :ok, socket}
+
+      true ->
+        {:reply, {:error, %{reason: "none"}}, socket}
+    end
+  end
+
   # malformed payloads get an error reply, never a channel crash
   defp event(_event, _payload, socket) do
     {:reply, {:error, %{reason: "bad_request"}}, socket}
@@ -365,6 +384,14 @@ defmodule HoodrideWeb.UserChannel do
       :cold -> {:ok, true}
       {:error, reply} -> {:error, reply}
     end
+  end
+
+  # a NEW chat needs room: at most Hoodride.Limits.chats_started_open open
+  # chats you started (abuse review, 2026-11-12) — an existing one always
+  defp room_for_chat(me, to_id) do
+    if Hoodride.Chat.can_start?(me, to_id),
+      do: :ok,
+      else: {:error, %{reason: "too_many_chats"}}
   end
 
   defp cold_allowed(false, _me), do: :ok

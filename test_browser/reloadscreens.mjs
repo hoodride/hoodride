@@ -506,14 +506,14 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
 
   // a reload while reading a chat: still there (it went to the newest; the
   // "New messages" line and ↓ gone) — at the line, and scrolled up
-  step("30 new from Dora; Sam opens her chat at the 'New messages' line; a reload: the line still there, where he was");
+  step("18 new from Dora; Sam opens her chat at the 'New messages' line; a reload: the line still there, where he was");
   await sam.eval(`(window.__drop = true), true`); // (heard only through the reload)
-  await onServer(`many_msgs ${doraId} ${samId} 30`);
+  await onServer(`many_msgs ${doraId} ${samId} 18`);
   await new Promise((r) => setTimeout(r, 1000));
   await sam.eval(`(window.__drop = false), true`);
   await sam.eval(`closeChat(), true`);
   await reload(sam);
-  check((await sam.eval(`chatFor(realPeersById.get(${doraId})).unread`)) === 30, "30 unread from Dora", await sam.eval(`chatFor(realPeersById.get(${doraId})).unread`));
+  check((await sam.eval(`chatFor(realPeersById.get(${doraId})).unread`)) === 18, "18 unread from Dora", await sam.eval(`chatFor(realPeersById.get(${doraId})).unread`));
   await doraChatOpen();
   await sam.eval(`new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => done(true), 50))))`);
   const lineAt = () => sam.eval(`(() => { const b = document.getElementById("chat-messages"); const l = b.querySelector(".chat-line"); return { line: l ? Math.round(l.getBoundingClientRect().top - b.getBoundingClientRect().top) : null, above: l && l.nextElementSibling ? l.nextElementSibling.textContent : null, top: Math.round(b.scrollTop), fromBottom: Math.round(b.scrollHeight - b.scrollTop - b.clientHeight), jump: !document.getElementById("chat-jump").classList.contains("hidden") }; })()`);
@@ -553,22 +553,23 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   check(listAfter.list && !listAfter.jump, "the list, no ↓", listAfter);
   await sam.eval(`closeChat(), true`);
 
-  // more than the server's last 50 on Sam's phone (heard live): a reload
-  // brings only 50 — what's above him changes. Still the same message
+  // more than the server's last 20 on Sam's phone (heard live): a reload
+  // brings only 20 (Hoodride.Limits.chat_history, the chat fix 2026-11-12)
+  // — what's above him changes. Still the same message
   // where it was; the 3 that came while it loaded count on ↓
-  step("60 from Dora heard live, Sam scrolled up to one of them; 3 more while a reload loads: the same message where it was, ↓ 3");
+  step("30 from Dora heard live, Sam scrolled up to one of them; 3 more while a reload loads: the same message where it was, ↓ 3");
   await doraChatOpen();
-  await onServer(`many_msgs ${doraId} ${samId} 60 c`);
-  await sam.waitFor(`chatFor(realPeersById.get(${doraId})).msgs.filter((m) => m.text.startsWith("c") && !isNaN(Number(m.text.slice(1)))).length === 60`, "the 60 heard live");
-  check((await sam.eval(`chatFor(realPeersById.get(${doraId})).msgs.length`)) > 50, "(more than 50 on his phone)");
+  await onServer(`many_msgs ${doraId} ${samId} 30 c`);
+  await sam.waitFor(`chatFor(realPeersById.get(${doraId})).msgs.filter((m) => m.text.startsWith("c") && !isNaN(Number(m.text.slice(1)))).length === 30`, "the 30 heard live");
+  check((await sam.eval(`chatFor(realPeersById.get(${doraId})).msgs.length`)) > 20, "(more than 20 on his phone)");
   const pinned = await sam.eval(`(() => {
     const b = document.getElementById("chat-messages");
-    const el = [...b.querySelectorAll(".msg")].find((e) => e.textContent === "c40");
+    const el = [...b.querySelectorAll(".msg")].find((e) => e.textContent === "c20");
     b.scrollTop += el.getBoundingClientRect().top - b.getBoundingClientRect().top - 20;
     b.dispatchEvent(new Event("scroll"));
     return { offset: Math.round(el.getBoundingClientRect().top - b.getBoundingClientRect().top), fromBottom: Math.round(b.scrollHeight - b.scrollTop - b.clientHeight) };
   })()`);
-  check(pinned.fromBottom > 100, "(scrolled up: c40 near the top)", pinned);
+  check(pinned.fromBottom > 100, "(scrolled up: c20 near the top)", pinned);
   await sam.eval(`(window.__drop = true), true`); // (the 3 heard only through the reload)
   await onServer(`many_msgs ${doraId} ${samId} 3 d`);
   await new Promise((r) => setTimeout(r, 800));
@@ -577,11 +578,11 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   await sam.eval(`new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => done(true), 50))))`);
   const capped = await sam.eval(`(() => {
     const b = document.getElementById("chat-messages");
-    const el = [...b.querySelectorAll(".msg")].find((e) => e.textContent === "c40");
+    const el = [...b.querySelectorAll(".msg")].find((e) => e.textContent === "c20");
     const badge = document.getElementById("chat-jump-count");
     return { msgs: chatFor(realPeersById.get(${doraId})).msgs.length, offset: el ? Math.round(el.getBoundingClientRect().top - b.getBoundingClientRect().top) : null, badge: badge.classList.contains("hidden") ? null : badge.textContent };
   })()`);
-  check(capped.msgs === 50 && capped.offset !== null && Math.abs(capped.offset - pinned.offset) <= 2, "the same message where it was (the server's 50)", { pinned, capped });
+  check(capped.msgs === 20 && capped.offset !== null && Math.abs(capped.offset - pinned.offset) <= 2, "the same message where it was (the server's 20)", { pinned, capped });
   check(capped.badge === "3", "↓ 3: the ones that came while it loaded", capped);
 
   // ↓ adds up: 2 heard live while scrolled up (already on it), 1 missed
@@ -626,11 +627,11 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
 
   // the first unread is a note ("📩 requested a ride"): the line above it;
   // the reload drops the note — the line goes above the next real message
-  step("away from Dora's chat: a note, then 30 from her; opened at the line (above the note); a reload: the line above her first message");
+  step("away from Dora's chat: a note, then 18 from her; opened at the line (above the note); a reload: the line above her first message");
   await sam.eval(`closeChat(), true`);
   await sam.eval(`(receiveMsg(realPeersById.get(${doraId}), "📩 a note first"), true)`);
-  await onServer(`many_msgs ${doraId} ${samId} 30 k`);
-  await sam.waitFor(`chatFor(realPeersById.get(${doraId})).msgs.some((m) => m.text === "k30")`, "the 30 heard");
+  await onServer(`many_msgs ${doraId} ${samId} 18 k`);
+  await sam.waitFor(`chatFor(realPeersById.get(${doraId})).msgs.some((m) => m.text === "k18")`, "the 18 heard");
   await doraChatOpen();
   await sam.eval(`new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => done(true), 50))))`);
   const noteLine = await lineAt();

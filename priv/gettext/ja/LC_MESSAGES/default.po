@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "アカウントを削除できませんでした。もう一度お試しください。"
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "チャットを終了できませんでした。もう一度お試しください"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "メッセージを読み込めませんでした。もう一度お試しください。"
 
@@ -309,6 +313,10 @@ msgstr "ドライバー"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "このドライバーは対応できません。別のドライバーをお試しください"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "チャットを終了"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "GitHub のソースコード"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "もう一度タップで終了"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "タップして削除"
 
@@ -784,6 +796,10 @@ msgstr "更新の回数が多すぎます。数分後にもう一度お試しく
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "新しいチャットを始めすぎています。後でもう一度お試しください"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "始めたチャットが多すぎます。先にどれかを終了してください"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1014,6 +1030,10 @@ msgstr "{distance}先"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name}さんがチャットを終了しました"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

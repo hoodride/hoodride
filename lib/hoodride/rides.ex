@@ -99,6 +99,12 @@ defmodule Hoodride.Rides do
     end
   end
 
+  @doc "Are `a` and `b` in a ride together now (a started ride, not a pending seat)?"
+  def partners?(a, b) do
+    ride = ride_id_of_user(a)
+    is_binary(ride) and ride == ride_id_of_user(b)
+  end
+
   def set_pin(id, user_id, pin), do: call(id, {:set_pin, user_id, pin})
   def end_ride(id, user_id), do: call(id, {:end_ride, user_id})
 

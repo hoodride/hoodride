@@ -63,6 +63,16 @@ defmodule HoodrideWeb.AbuseLimitsTest do
 
   defp msg(chan, to, text \\ "hi"), do: reply(chan, "send_msg", %{"to" => to.id, "text" => text})
 
+  # a new contact, and then that chat ended — someone working through the
+  # neighbourhood one chat at a time. At most 10 open chats you started
+  # (Hoodride.Limits.chats_started_open, the chat fix 2026-11-12): the hour's
+  # new-contact limit, which these tests are about, is then the one reached
+  defp msg_ended(chan, from, to) do
+    r = msg(chan, to)
+    Hoodride.Chat.delete_conversation(Hoodride.Chat.pair_key(from.id, to.id))
+    r
+  end
+
   # A cold contact must be on the sender's screen (HoodrideWeb.Reach): put
   # `targets` on the map as cars in `cell`, and give `user` a map watching it.
   defp car(u, cell),
@@ -236,7 +246,10 @@ defmodule HoodrideWeb.AbuseLimitsTest do
     for s <- strangers, do: car(s, "cC")
     see(a, "cC")
 
-    results = for s <- Enum.take(strangers, 20), do: msg(t, s)
+    # (the first kept open: the end checks an existing chat still works)
+    results =
+      [msg(t, hd(strangers)) | for(s <- Enum.slice(strangers, 1, 19), do: msg_ended(t, a, s))]
+
     assert Enum.all?(results, &match?({:ok, _}, &1))
     assert {:error, %{reason: "too_many_new_chats", retry_ms: w}} = msg(t, List.last(strangers))
     assert w > 3_000_000
@@ -278,7 +291,7 @@ defmodule HoodrideWeb.AbuseLimitsTest do
     assert {:ok, _} = reply(t, "cancel_request", %{})
 
     # 19 more cold messages use up the hour's 20 (1 + 19)
-    for d <- Enum.take(rest, 19), do: assert({:ok, _} = msg(t, d))
+    for d <- Enum.take(rest, 19), do: assert({:ok, _} = msg_ended(t, a, d))
     assert {:error, %{reason: "too_many_new_chats"}} = msg(t, List.last(rest))
   end
 
@@ -301,7 +314,7 @@ defmodule HoodrideWeb.AbuseLimitsTest do
 
     # 19 more cold contacts use up the hour's 20 (1 + 19) — had the request
     # been charged too, the 19th would already be refused
-    for d <- Enum.take(rest, 19), do: assert({:ok, _} = msg(t, d))
+    for d <- Enum.take(rest, 19), do: assert({:ok, _} = msg_ended(t, a, d))
     assert {:error, %{reason: "too_many_new_chats"}} = msg(t, List.last(rest))
   end
 
@@ -385,7 +398,7 @@ defmodule HoodrideWeb.AbuseLimitsTest do
           )
 
     # …and none of them counted: 19 more new contacts still go through (1 + 19)
-    for d <- Enum.take(others, 19), do: assert({:ok, _} = msg(t, d))
+    for d <- Enum.take(others, 19), do: assert({:ok, _} = msg_ended(t, a, d))
     assert {:error, %{reason: "too_many_new_chats"}} = msg(t, List.last(others))
   end
 
@@ -406,7 +419,7 @@ defmodule HoodrideWeb.AbuseLimitsTest do
           )
 
     assert {:ok, _} = reply(t, "cancel_request", %{})
-    for d <- Enum.take(others, 19), do: assert({:ok, _} = msg(t, d))
+    for d <- Enum.take(others, 19), do: assert({:ok, _} = msg_ended(t, a, d))
     assert {:error, %{reason: "too_many_new_chats"}} = msg(t, List.last(others))
   end
 
@@ -437,7 +450,7 @@ defmodule HoodrideWeb.AbuseLimitsTest do
     for _ <- 1..15, do: assert({:ok, _} = msg(t, b))
     lane_refilled()
     # 15 cold contacts to new people (16 cold so far), total now 30
-    for u <- Enum.take(others, 15), do: assert({:ok, _} = msg(t, u))
+    for u <- Enum.take(others, 15), do: assert({:ok, _} = msg_ended(t, a, u))
     # a new person now: refused by the total — and must cost no new contact
     for _ <- 1..5,
         do: assert({:error, %{reason: "rate_limited", retry_ms: _}} = msg(t, Enum.at(others, 15)))
@@ -449,7 +462,7 @@ defmodule HoodrideWeb.AbuseLimitsTest do
     :ets.match_delete(Hoodride.RateLimit, {{:msg_pair, :_, :_}, :_, :_})
 
     # 16 + 4 = 20 new contacts: the refused ones didn't count
-    for u <- Enum.slice(others, 15, 4), do: assert({:ok, _} = msg(t, u))
+    for u <- Enum.slice(others, 15, 4), do: assert({:ok, _} = msg_ended(t, a, u))
     assert {:error, %{reason: "too_many_new_chats"}} = msg(t, List.last(others))
   end
 
@@ -460,7 +473,8 @@ defmodule HoodrideWeb.AbuseLimitsTest do
     see(a, "cL")
 
     # 20 new contacts (all 20 cold), then 10 more to an existing one: total 30
-    for u <- Enum.take(others, 20), do: assert({:ok, _} = msg(t, u))
+    assert {:ok, _} = msg(t, hd(others))
+    for u <- Enum.slice(others, 1, 19), do: assert({:ok, _} = msg_ended(t, a, u))
     lane_refilled()
     for _ <- 1..10, do: assert({:ok, _} = msg(t, hd(others)))
 

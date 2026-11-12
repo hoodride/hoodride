@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Hesabın silinemedi. Lütfen tekrar dene."
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "Sohbet bitirilemedi. Tekrar dene"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Mesajlar yüklenemedi. Tekrar dene."
 
@@ -309,6 +313,10 @@ msgstr "Sürücü"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "Sürücü bu yolculuğu alamıyor. Başka birini dene"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "Sohbeti bitir"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "GitHub'da kaynak kodu"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "Bitirmek için tekrar dokun"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "Kaldırmak için dokun"
 
@@ -784,6 +796,10 @@ msgstr "Çok fazla yeniledin. Birkaç dakika sonra tekrar dene"
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "Çok fazla yeni sohbet başlattın. Daha sonra tekrar dene"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "Çok fazla sohbet başlattın. Önce birini bitir"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1021,6 +1037,10 @@ msgstr "{distance} uzakta"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name} sohbeti bitirdi"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

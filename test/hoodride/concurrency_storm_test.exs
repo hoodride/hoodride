@@ -176,13 +176,13 @@ defmodule Hoodride.ConcurrencyStormTest do
     end
   end
 
-  test "chat under fire: concurrent senders lose nothing, history keeps exactly the newest 50",
+  test "chat under fire: concurrent senders lose nothing, history keeps exactly the newest #{Hoodride.Limits.chat_history()}",
        %{users: [a, b | _]} do
     ma = %{id: a.id, name: a.name, photo: nil}
     mb = %{id: b.id, name: b.name, photo: nil}
 
     # four tasks hammer the SAME conversation from both sides — 120 sends
-    # against a 50-message cap. duplicate_bag appends are per-message objects
+    # against the message cap (Hoodride.Limits.chat_history). duplicate_bag appends are per-message objects
     # (no read-modify-write), and trims are prefix-deletes of one sorted
     # order, so nothing in flight can be lost or double-counted.
     tasks =
@@ -207,9 +207,9 @@ defmodule Hoodride.ConcurrencyStormTest do
       |> Enum.map(fn {_k, id, _s, _t, _ts} -> id end)
       |> Enum.sort()
 
-    # exactly the cap survives, and it is PRECISELY the newest 50 of the 120
+    # exactly the cap survives, and it is PRECISELY the newest of the 120
     # ids ever issued — oldest trimmed, none lost in the middle, none doubled
-    assert surviving == Enum.take(issued, -50)
+    assert surviving == Enum.take(issued, -Hoodride.Limits.chat_history())
   end
 
   test "a parallel storm of same-account mutations converges to a lawful world after one sweep",

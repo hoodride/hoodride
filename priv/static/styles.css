@@ -710,6 +710,13 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 #chat-name { font-weight: 700; font-size: 16px; }
 .chat-dist { font-size: 12px; opacity: 0.7; }
 .chat-dist:empty { display: none; }
+/* End chat: a small link under the name (as Change under yours); armed —
+   "Tap again to end" — in the danger color */
+.chat-end {
+  align-self: flex-start; background: none; border: 0; padding: 2px 0; margin: 0;
+  color: var(--accent); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.chat-end.armed { color: var(--danger); }
 .chat-header .card-close { top: 14px; }
 
 .chat-back { position: static; font-size: 22px; padding: 0 6px; display: inline-flex; align-items: center; gap: 4px; }

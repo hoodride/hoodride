@@ -133,7 +133,14 @@ defmodule Hoodride.UserLookupIndexTest do
           :chat_by_user
         ])
 
-      conv = first_index(calls, &(&1 == {:insert, :chat_conversations}))
+      # (a new chat's first write is insert_new — who started it is known by
+      # it, Chat @started; the chat fix, 2026-11-12)
+      conv =
+        first_index(
+          calls,
+          &(&1 in [{:insert, :chat_conversations}, {:insert_new, :chat_conversations}])
+        )
+
       idx = first_index(calls, &(&1 == {:insert, :chat_by_user}))
       assert conv && idx && conv < idx, "send order was #{inspect(calls)}"
     end

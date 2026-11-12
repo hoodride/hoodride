@@ -359,6 +359,24 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     "ok"
   end
 
+  # this person has already STARTED `n` open chats (a first message to n
+  # new people each) — at the limit (Hoodride.Limits.chats_started_open),
+  # the next new chat is refused
+  defp server("chats_started " <> args) do
+    [n, id] = args |> String.split() |> Enum.map(&String.to_integer/1)
+
+    for i <- 1..n do
+      name = "BT-S#{i}"
+
+      {:ok, u} =
+        Hoodride.Accounts.upsert_oauth_user(%{provider: "dev", provider_id: name, name: name})
+
+      {:ok, _} = Hoodride.Chat.send_message(%{id: id, name: "BT", photo: nil}, u.id, "hi")
+    end
+
+    if Hoodride.Chat.started_open(id) >= n, do: "ok", else: "not counted"
+  end
+
   # these two's conversation is deleted (as when one of them has gone) —
   # both are told, as by the sweeper
   defp server("close_chat " <> ids) do

@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "አካውንትዎን መሰረዝ አልተቻለም — እባክዎ እንደገና ይሞክሩ።"
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "ቻቱን መጨረስ አልተቻለም — እንደገና ይሞክሩ"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "መልዕክቶችን መጫን አልተቻለም። እንደገና ይሞክሩ።"
 
@@ -309,6 +313,10 @@ msgstr "ሹፌር"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "ሹፌሩ ይህን መውሰድ አይችሉም — ሌላ ይሞክሩ"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "ቻቱን ጨርስ"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "የምንጭ ኮድ በGitHub ላይ"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "ለመጨረስ እንደገና ይንኩ"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "ለማስወገድ ይንኩ"
 
@@ -784,6 +796,10 @@ msgstr "ብዙ ጊዜ አድሰዋል — ከጥቂት ደቂቃዎች በኋላ
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "ብዙ አዳዲስ ውይይቶችን ጀምረዋል — ቆየት ብለው ይሞክሩ"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "በጣም ብዙ ቻቶች ጀምረዋል — መጀመሪያ ከእነሱ አንዱን ይጨርሱ"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1021,6 +1037,10 @@ msgstr "{distance} ርቀት ላይ"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name} ቻቱን ጨርሰዋል"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

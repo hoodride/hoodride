@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "ਤੁਹਾਡਾ ਖਾਤਾ ਮਿਟਾਇਆ ਨਹੀਂ ਜਾ ਸਕਿਆ — ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "ਚੈਟ ਖਤਮ ਨਹੀਂ ਹੋ ਸਕੀ — ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "ਸੁਨੇਹੇ ਲੋਡ ਨਹੀਂ ਹੋ ਸਕੇ। ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
 
@@ -309,6 +313,10 @@ msgstr "ਡਰਾਈਵਰ"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "ਡਰਾਈਵਰ ਇਹ ਰਾਈਡ ਨਹੀਂ ਲੈ ਸਕਦਾ — ਕੋਈ ਹੋਰ ਡਰਾਈਵਰ ਅਜ਼ਮਾਓ"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "ਚੈਟ ਖਤਮ ਕਰੋ"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "GitHub 'ਤੇ ਸਰੋਤ ਕੋਡ"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "ਖਤਮ ਕਰਨ ਲਈ ਦੁਬਾਰਾ ਟੈਪ ਕਰੋ"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "ਹਟਾਉਣ ਲਈ ਟੈਪ ਕਰੋ"
 
@@ -784,6 +796,10 @@ msgstr "ਤੁਸੀਂ ਬਹੁਤ ਵਾਰ ਰਿਫ੍ਰੈਸ਼ ਕੀ�
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "ਤੁਸੀਂ ਬਹੁਤ ਸਾਰੀਆਂ ਨਵੀਆਂ ਚੈਟਾਂ ਸ਼ੁਰੂ ਕੀਤੀਆਂ ਹਨ — ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "ਤੁਸੀਂ ਬਹੁਤ ਸਾਰੀਆਂ ਚੈਟਾਂ ਸ਼ੁਰੂ ਕੀਤੀਆਂ ਹਨ — ਪਹਿਲਾਂ ਉਨ੍ਹਾਂ ਵਿੱਚੋਂ ਇੱਕ ਖਤਮ ਕਰੋ"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1021,6 +1037,10 @@ msgstr "{distance} ਦੂਰ"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name} ਨੇ ਚੈਟ ਖਤਮ ਕਰ ਦਿੱਤੀ"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

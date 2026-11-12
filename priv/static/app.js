@@ -1349,7 +1349,14 @@ async function connectSocket() {
     restartNotice = { min: min_ms, max: max_ms };
   });
 
-  userChannel.on("chat_closed", ({ peer_id }) => closeChatWith(realPeersById.get(peer_id)));
+  // ended_by: someone tapped End chat (the chat fix, 2026-11-12) — else the
+  // server ended it (someone away past grace)
+  userChannel.on("chat_closed", ({ peer_id, ended_by }) =>
+    closeChatWith(
+      realPeersById.get(peer_id),
+      ended_by == null ? null : ended_by === peer_id ? "peer" : ended_by === state.realUser.id ? "me" : null
+    )
+  );
 
   userChannel.on("msg", (m) => {
     const peer = ensurePeer(m.from);
@@ -1499,7 +1506,7 @@ function showSessionMoved() {
 // the server deleted a conversation (the other person has been gone past
 // grace) — or a chat's opening found it gone (loadChat): cleared here too,
 // instead of leaving a chat that can't be used. `peer` may be unknown
-function closeChatWith(peer) {
+function closeChatWith(peer, endedBy = null) {
   // on screen: their chat itself — not the list you went back to from it
   // (that closed the whole list, other chats and all — owner, 2026-11-07)
   const isOpen = !!peer && state.chatPeer === peer && !$("chat").classList.contains("hidden") && state.chatView !== "list";
@@ -1507,6 +1514,7 @@ function closeChatWith(peer) {
     hasChat: !!peer && chats.has(peer),
     isOpen,
     name: peer ? peer.name : "",
+    endedBy,
   });
   if (a.remove) {
     chats.delete(peer);
@@ -3369,6 +3377,9 @@ function openChatList() {
 
 function closeChat() {
   $("chat").classList.add("hidden");
+  // an armed End chat goes with the panel: reopened, it asks again (review,
+  // 2026-11-12: armed, closed, reopened in 3 s — one tap ended it)
+  disarmEndChat();
   // the keyboard goes with it: its text box no longer focused (find the
   // nearest counts the keyboard's area only while you type — nearCovers)
   if (document.activeElement === $("chat-input")) $("chat-input").blur();
@@ -3376,6 +3387,57 @@ function closeChat() {
   refreshControls();
 }
 $("chat-close").addEventListener("click", closeChat);
+
+// ===== End chat (owner, 2026-11-12) =====
+// Either person ends a chat: gone for both, the other told "{name} ended
+// the chat" (chat_closed's ended_by). Only a chat the server has (a message
+// went or came, a reload's, a ride's) — and never your ride partner's while
+// the ride lasts (it ends with the ride). Tap twice: the first tap turns it
+// into "Tap again to end" for 3 s (no box to dismiss; owner's pick)
+let endArmed = null;
+let endTimer = null;
+function canEndChat(peer) {
+  const c = peer && chats.get(peer);
+  if (DEMO || !c) return false;
+  const onServer = c.server || c.msgs.some((m) => m.id != null);
+  const rideWithThem = !!state.ride && !!state.ride.peer && state.ride.peer.id === peer.id;
+  return onServer && !rideWithThem;
+}
+function disarmEndChat() {
+  clearTimeout(endTimer);
+  endTimer = null;
+  endArmed = null;
+  const b = $("chat-end");
+  b.textContent = t("End chat");
+  b.classList.remove("armed");
+}
+function showEndChat(peer) {
+  if (endArmed && endArmed !== peer) disarmEndChat();
+  $("chat-end").classList.toggle("hidden", !canEndChat(peer));
+}
+$("chat-end").addEventListener("click", () => {
+  const peer = state.chatPeer;
+  if (!canEndChat(peer)) return showEndChat(peer);
+  if (endArmed !== peer) {
+    endArmed = peer;
+    $("chat-end").textContent = t("Tap again to end");
+    $("chat-end").classList.add("armed");
+    clearTimeout(endTimer);
+    endTimer = setTimeout(disarmEndChat, 3000);
+    return;
+  }
+  disarmEndChat();
+  if (!liveNow()) return transientBanner(CANT_REACH());
+  userChannel
+    .push("end_chat", { peer: peer.id })
+    // gone: here at once (the server tells both — ours says "me": no message)
+    .receive("ok", () => closeChatWith(peer, "me"))
+    .receive("error", (e) =>
+      // already gone (the other ended it first, or the sweeper did)
+      e && e.reason === "none" ? closeChatWith(peer, "me") : transientBanner(t("Couldn't end the chat — try again"))
+    )
+    .receive("timeout", () => transientBanner(t("Couldn't end the chat — try again")));
+});
 
 // ‹: the list — always, even with one other chat left (it jumped straight
 // into that one: owner, 2026-11-07). Nothing is dropped while the window is
@@ -3401,6 +3463,7 @@ function renderChat() {
     $("chat-name").textContent = t("Chats");
     $("chat-dist").textContent = "";
     $("chat-photo").classList.add("hidden"); // the list's rows have their own
+    showEndChat(null);
     // (the "about a block" note is off — index.html #chat-note)
     // $("chat-note").classList.add("hidden");
     $("chat-form").classList.add("hidden");
@@ -3461,6 +3524,7 @@ function renderChat() {
     $("chat-photo").dataset.name = state.chatPeer.name || "";
     $("chat-photo").src = state.chatPeer.photo || HoodAvatar.url(state.chatPeer.name);
     $("chat-photo").classList.remove("hidden");
+    showEndChat(state.chatPeer);
     // a rider's messages share their rough area with the person they write
     // to — the note saying so is off (index.html #chat-note; the privacy
     // page still says it)
@@ -4108,6 +4172,8 @@ $("chat-form").addEventListener("submit", (e) => {
         if (!c || c.msgs[c.msgs.length - 1] !== sentMsg) return; // something newer since
         c.lastAt = sentMsg.at;
         c.lastId = r.id;
+        // delivered: the chat is on the server now — it can be ended
+        if (state.chatPeer === peer) showEndChat(peer);
         // the list, if it's showing (‹ tapped before the answer): its order
         // may change — a message that came in the same second goes on top
         if (!$("chat").classList.contains("hidden") && state.chatView === "list") renderChat();
@@ -4120,6 +4186,7 @@ $("chat-form").addEventListener("submit", (e) => {
           out_of_view: t("{name} isn't in view — zoom in and find their car again", { name: peer.name }),
           rate_limited: t("⏳ You're sending too fast — slow down a sec"),
           too_many_new_chats: t("You've started a lot of new chats — try again later"),
+          too_many_chats: t("You've started too many chats — end one of them first"),
         };
         unsay(msgs[e.reason] || t("Message didn't send — connection?"));
         // can't message them now (a first message): nothing to keep their
@@ -5348,6 +5415,9 @@ function refreshControls() {
   if (!DEMO) loc.reconcile();
   // an open Settings sheet follows the ride (its sign-out row blocks in one)
   if (settingsOpen()) renderSettings();
+  // End chat follows too: a message delivered (the chat now on the server),
+  // a ride starting or ending with them
+  if (!$("chat").classList.contains("hidden")) showEndChat(state.chatView === "list" ? null : state.chatPeer);
   // a ride or shift just finished: the next safe moment for a refresh
   tryGoogleRefresh();
   const rider = state.mode === "rider";

@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "حذف حسابتان ممکن نشد — لطفاً دوباره امتحان کنید."
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "پایان دادن به گفتگو ممکن نشد — دوباره امتحان کنید"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "پیام‌ها بارگیری نشد. دوباره امتحان کنید."
 
@@ -309,6 +313,10 @@ msgstr "راننده"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "راننده نمی‌تواند این سفر را قبول کند — راننده دیگری را امتحان کنید"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "پایان گفتگو"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "کد منبع در GitHub"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "برای پایان دوباره بزنید"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "برای حذف بزنید"
 
@@ -784,6 +796,10 @@ msgstr "زیاد به‌روزرسانی کرده‌اید — چند دقیقه
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "گفتگوهای جدید زیادی شروع کرده‌اید — بعداً امتحان کنید"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "گفتگوهای زیادی را شروع کرده‌اید — اول یکی از آنها را تمام کنید"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1021,6 +1037,10 @@ msgstr "در فاصلهٔ {distance}"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name} گفتگو را تمام کرد"
 
 #: priv/static/app.js
 msgid "{name} has arrived"

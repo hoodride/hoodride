@@ -226,6 +226,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Imeshindwa kufuta akaunti yako — tafadhali jaribu tena."
 
 #: priv/static/app.js
+msgid "Couldn't end the chat — try again"
+msgstr "Imeshindwa kumaliza gumzo — jaribu tena"
+
+#: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Imeshindwa kupakia ujumbe. Jaribu tena."
 
@@ -309,6 +313,10 @@ msgstr "Dereva"
 #: priv/static/app.js
 msgid "Driver can't take this one — try another"
 msgstr "Dereva hawezi kuchukua safari hii — jaribu mwingine"
+
+#: priv/static/app.js, priv/static/index.html
+msgid "End chat"
+msgstr "Maliza gumzo"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "End ride"
@@ -682,6 +690,10 @@ msgid "Source code on GitHub"
 msgstr "Msimbo chanzo kwenye GitHub"
 
 #: priv/static/app.js
+msgid "Tap again to end"
+msgstr "Gusa tena ili kumaliza"
+
+#: priv/static/app.js
 msgid "Tap to remove"
 msgstr "Gusa ili uondoe"
 
@@ -784,6 +796,10 @@ msgstr "Umesasisha mara nyingi — jaribu tena baada ya dakika chache"
 #: priv/static/app.js
 msgid "You've started a lot of new chats — try again later"
 msgstr "Umeanzisha gumzo nyingi mpya — jaribu tena baadaye"
+
+#: priv/static/app.js
+msgid "You've started too many chats — end one of them first"
+msgstr "Umeanzisha mazungumzo mengi mno — maliza moja kati yake kwanza"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"
@@ -1021,6 +1037,10 @@ msgstr "umbali wa {distance}"
 msgctxt "car description, no color"
 msgid "{make} {model}"
 msgstr "{make} {model}"
+
+#: priv/static/browse.js
+msgid "{name} ended the chat"
+msgstr "{name} amemaliza gumzo"
 
 #: priv/static/app.js
 msgid "{name} has arrived"
