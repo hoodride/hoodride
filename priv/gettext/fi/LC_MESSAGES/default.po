@@ -697,6 +697,10 @@ msgstr "Kuljettaja ei ole enää lähellä"
 msgid "That rider isn't looking anymore"
 msgstr "Matkustaja ei enää etsi kyytiä"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "Tämä on eri Google-tili. Kirjaudu ensin ulos käyttääksesi sitä"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Tätä ei voi kumota. Tilisi poistetaan, sinut poistetaan kartalta, keskustelusi suljetaan ja sinut kirjataan ulos kaikilla laitteilla. Jos kirjaudut myöhemmin uudelleen, aloitat uudella tilillä."

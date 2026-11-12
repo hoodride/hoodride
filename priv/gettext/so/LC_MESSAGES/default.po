@@ -697,6 +697,10 @@ msgstr "Darawalkaas hadda ma joogo"
 msgid "That rider isn't looking anymore"
 msgstr "Rakaabkaas hadda safar ma raadinayo"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "Kani waa akoon Google oo kale — marka hore ka bax si aad u isticmaasho"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Tan dib looma celin karo. Akoonkaaga waa la tirtirayaa, khariidadda waa lagaa saarayaa, sheekeysiyadaada waa la xirayaa, qalab kastana waa lagaa saarayaa. Haddii aad mar dambe gasho, akoon cusub ayaa bilaabmaya."

@@ -202,6 +202,8 @@ let carSheetOpener = null; // set when the car sheet opens
 let demandTimer = null;
 let requestTimer = null;
 let bannerTimer = null;
+// the message showing is location's own (transientBanner's fromLoc)
+let bannerIsLoc = false;
 // a request/accept on its way: the button's label while waiting, or null
 // (startRideAction; here, early, because refreshControls reads it)
 let rideActionInFlight = null;
@@ -483,13 +485,29 @@ function situationBanner() {
 }
 
 // ms: how long it stays (location steps are long: they get longer)
-function transientBanner(text, ms = 3500) {
+// `fromLoc`: location's own message ("location is off", "approximate…") —
+// the next reading's redraw replaces it, as it always did: a good reading
+// a second later must not leave "location is off" up (review, 2026-11-12)
+function transientBanner(text, ms = 3500, fromLoc = false) {
   clearTimeout(bannerTimer);
+  bannerIsLoc = fromLoc;
   setBanner(text);
   bannerTimer = setTimeout(() => {
     bannerTimer = null;
+    bannerIsLoc = false;
     setBanner(contextBanner());
   }, ms);
+}
+
+// a ✋ / GO ONLINE tap (or its cancel): the person acting — a message on
+// screen gives way to what the tap shows ("Finding your location…"); only a
+// location reading's own redraw leaves a message alone (redrawBanner)
+function locTap(which) {
+  clearTimeout(bannerTimer);
+  bannerTimer = null;
+  bannerIsLoc = false;
+  if (which === "hand") loc.tapHand();
+  else loc.tapOnline();
 }
 
 // ===== Login wiring =====
@@ -942,7 +960,7 @@ async function saveCar(e) {
   const goOnline = $("car-sheet").dataset.goOnline === "1";
   closeCarSheet();
   renderCarNote();
-  if (goOnline && state.mode === "driver" && !state.online && !state.ride) loc.tapOnline();
+  if (goOnline && state.mode === "driver" && !state.online && !state.ride) locTap("online");
 }
 
 HoodCar.COLORS.forEach((c) => $("car-color").add(new Option(HoodCar.colorName(c), c)));
@@ -3032,8 +3050,19 @@ const loc = HoodLocator.create({
     // after whatever is running now (e.g. a ride starting: it redraws the
     // banner right after the refresh that found location blocked) — so
     // nothing in the same step draws over it
-    message: (text) => queueMicrotask(() => transientBanner(text, 12000)),
-    redrawBanner: () => setBanner(contextBanner()),
+    message: (text) => queueMicrotask(() => transientBanner(text, 12000, true)),
+    // every location reading redraws: another message on screen is left
+    // alone (it wiped "Couldn't refresh…" at once; the A2 journey,
+    // 2026-11-12) — the normal banner comes back when it ends
+    // (transientBanner). Location's own message is replaced, as before. A ✋
+    // / GO ONLINE tap ends any message first (locTap): the person acting
+    redrawBanner: () => {
+      if (bannerTimer && !bannerIsLoc) return;
+      clearTimeout(bannerTimer);
+      bannerTimer = null;
+      bannerIsLoc = false;
+      setBanner(contextBanner());
+    },
     refresh: () => refreshControls(),
     showShare: (text) => showSharePrompt(text),
     hideShare: () => hideSharePrompt(),
@@ -4390,7 +4419,7 @@ $("btn-hand").addEventListener("click", () => {
   // up or down, refused at once while not live (no GPS wait for something
   // that can't go through); cancelling a GPS wait is this phone's own
   else if (!liveNow() && !loc.pending.hand) transientBanner(CANT_REACH());
-  else loc.tapHand();
+  else locTap("hand");
 });
 
 // Go online and Need a ride: the camera centres on you at this zoom — the
@@ -4927,7 +4956,7 @@ $("btn-online").addEventListener("click", () => {
   // cancels the wait; going off never waits)
   if (DEMO) setOnline(!state.online);
   else if (!liveNow() && !loc.pending.online) transientBanner(CANT_REACH());
-  else if (state.online || loc.pending.online) loc.tapOnline(); // off, or cancel the wait
+  else if (state.online || loc.pending.online) locTap("online"); // off, or cancel the wait
   else goOnlineWithCar();
 });
 
@@ -4938,7 +4967,7 @@ async function goOnlineWithCar() {
   if (state.myCar === undefined && !(await loadMyCar()))
     return transientBanner(t("Couldn't reach Hood Ride — try again"));
   if (!state.myCar) return openCarSheet({ goOnline: true });
-  loc.tapOnline();
+  locTap("online");
 }
 
 function setOnline(on) {

@@ -697,6 +697,10 @@ msgstr "Tài xế đó không còn ở gần nữa"
 msgid "That rider isn't looking anymore"
 msgstr "Hành khách đó không còn tìm xe nữa"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "Đó là một tài khoản Google khác — hãy đăng xuất trước để dùng tài khoản đó"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Thao tác này không thể hoàn tác. Tài khoản của bạn sẽ bị xóa, bạn bị gỡ khỏi bản đồ, các cuộc trò chuyện bị đóng và bạn bị đăng xuất trên mọi thiết bị. Nếu sau này đăng nhập lại, bạn sẽ bắt đầu với một tài khoản mới."

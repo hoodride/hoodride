@@ -697,6 +697,10 @@ msgstr "Ez a sofőr már nincs a közelben"
 msgid "That rider isn't looking anymore"
 msgstr "Ez az utas már nem keres fuvart"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "Ez egy másik Google-fiók – a használatához előbb jelentkezz ki"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Ez nem vonható vissza. A fiókod törlődik, lekerülsz a térképről, a beszélgetéseid lezárulnak, és minden eszközön kijelentkeztetünk. Ha később újra bejelentkezel, új fiókot kezdesz."

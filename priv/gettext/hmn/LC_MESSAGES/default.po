@@ -697,6 +697,10 @@ msgstr "Tus tsav tsheb ntawd tsis nyob ze lawm"
 msgid "That rider isn't looking anymore"
 msgstr "Tus caij tsheb ntawd tsis nrhiav lawm"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "Qhov no yog lwm tus account Google — tawm ua ntej mam li siv tau"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Qhov no thim tsis tau. Koj tus account yuav raug rho tawm, koj yuav raug tshem tawm ntawm daim ntawv qhia chaw, koj cov kev sib tham yuav raug kaw, thiab koj yuav raug tawm ntawm txhua lub cuab yeej. Yog koj rov nkag dua tom qab, yuav pib ib tus account tshiab."

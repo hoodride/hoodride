@@ -55,6 +55,7 @@ test("what the server says back: a short message, or nothing", () => {
   assert.match(R.outcome("?refresh=ride"), /after your ride/);
   assert.match(R.outcome("?refresh=limit"), /try again in a few minutes/);
   assert.match(R.outcome("?refresh=blocked"), /Couldn't refresh right now/);
+  assert.match(R.outcome("?refresh=other"), /different Google account — sign out first/);
   assert.equal(R.outcome("?demo=1"), null);
   assert.equal(R.outcome(""), null);
   assert.equal(R.outcome("?refresh=<script>"), null, "only the known answers");

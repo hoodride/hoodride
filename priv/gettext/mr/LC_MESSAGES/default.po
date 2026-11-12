@@ -697,6 +697,10 @@ msgstr "तो ड्रायव्हर आता जवळपास ना�
 msgid "That rider isn't looking anymore"
 msgstr "तो प्रवासी आता राइड शोधत नाही"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "हे दुसरे Google खाते आहे. ते वापरण्यासाठी आधी साइन आउट करा"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "हे पूर्ववत करता येणार नाही. तुमचे खाते काढून टाकले जाईल, तुम्हाला नकाशावरून काढले जाईल, तुमची संभाषणे बंद होतील आणि प्रत्येक डिव्हाइसवरून तुम्ही साइन आउट व्हाल. नंतर पुन्हा साइन इन केल्यास नवीन खाते सुरू होईल."

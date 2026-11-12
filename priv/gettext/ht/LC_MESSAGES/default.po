@@ -697,6 +697,10 @@ msgstr "Chofè sa a pa la ankò"
 msgid "That rider isn't looking anymore"
 msgstr "Pasaje sa a pa chèche ankò"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "Sa a se yon lòt kont Google — dekonekte anvan pou w ka itilize l"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Ou p ap ka defèt sa. Kont ou ap efase, ou ap soti sou kat la, konvèsasyon ou yo ap fèmen, epi ou ap dekonekte sou tout aparèy ou. Si ou konekte ankò pita, se yon kont tou nèf."

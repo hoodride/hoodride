@@ -697,6 +697,10 @@ msgstr "Pengemudi itu sudah tidak ada di sekitar"
 msgid "That rider isn't looking anymore"
 msgstr "Penumpang itu sudah tidak mencari tumpangan"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "Itu akun Google yang lain — keluar dulu untuk menggunakannya"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Tindakan ini tidak dapat dibatalkan. Akun Anda dihapus, Anda dihilangkan dari peta, percakapan Anda ditutup, dan Anda dikeluarkan dari semua perangkat. Jika nanti masuk lagi, Anda akan memulai dengan akun baru."

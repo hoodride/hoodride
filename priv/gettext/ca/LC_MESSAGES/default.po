@@ -697,6 +697,10 @@ msgstr "Aquest conductor ja no és a prop"
 msgid "That rider isn't looking anymore"
 msgstr "Aquest passatger ja no busca viatge"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "Aquest és un altre compte de Google. Tanca la sessió primer per fer-lo servir"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Aquesta acció no es pot desfer. Se suprimeix el teu compte, desapareixes del mapa, es tanquen les teves converses i es tanca la sessió a tots els dispositius. Si tornes a iniciar la sessió més endavant, començaràs amb un compte nou."

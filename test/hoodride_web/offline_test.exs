@@ -85,11 +85,11 @@ defmodule HoodrideWeb.OfflineTest do
   test "✋ and Go online taps are refused while not live (up or down)" do
     hand = click("btn-hand")
     assert hand =~ "else if (!liveNow() && !loc.pending.hand) transientBanner(CANT_REACH());"
-    assert before?(hand, "!liveNow()", "loc.tapHand()")
+    assert before?(hand, "!liveNow()", ~s[locTap("hand")])
 
     online = click("btn-online")
     assert online =~ "else if (!liveNow() && !loc.pending.online) transientBanner(CANT_REACH());"
-    assert before?(online, "!liveNow()", "loc.tapOnline()")
+    assert before?(online, "!liveNow()", ~s[locTap("online")])
   end
 
   test "switching Drive/Ride with ✋ up or online is refused while not live" do

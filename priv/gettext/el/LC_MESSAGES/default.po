@@ -697,6 +697,10 @@ msgstr "Αυτός ο οδηγός δεν είναι πια κοντά"
 msgid "That rider isn't looking anymore"
 msgstr "Αυτός ο επιβάτης δεν ψάχνει πια διαδρομή"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "Αυτός είναι διαφορετικός λογαριασμός Google — αποσυνδέσου πρώτα για να τον χρησιμοποιήσεις"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Αυτό δεν αναιρείται. Ο λογαριασμός σου διαγράφεται, αφαιρείσαι από τον χάρτη, οι συνομιλίες σου κλείνουν και αποσυνδέεσαι από όλες τις συσκευές. Αν συνδεθείς ξανά αργότερα, θα ξεκινήσεις νέο λογαριασμό."

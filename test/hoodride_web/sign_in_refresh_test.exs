@@ -261,6 +261,177 @@ defmodule HoodrideWeb.SignInRefreshTest do
     end
   end
 
+  # A2 (2026-11-11): the hint is only a hint — at Google's account picker
+  # (the button) someone signed into two Google accounts can pick the
+  # other one. A refresh completes ONLY as the account signed in now:
+  # anything else signs no one in, makes no account and changes none —
+  # "that's another Google account" (sign out first to switch).
+  describe "a refresh that comes back as ANOTHER Google account" do
+    defp google_users(sub),
+      do:
+        Hoodride.Repo.query!(
+          "SELECT count(*) FROM users WHERE provider = 'google' AND provider_id = ?",
+          [sub]
+        ).rows
+
+    defp refresh_back_as(conn, mode, info) do
+      conn = get(conn, "/auth/google?refresh=" <> mode)
+      {_, q} = query(conn)
+      google_says(info)
+      get(recycle(conn), "/auth/google/callback", %{"code" => "c", "state" => q["state"]})
+    end
+
+    test "a NEW Google account: not signed in, no account made — back, still the same person",
+         %{conn: conn, g: g} do
+      for mode <- ["1", "silent"] do
+        c =
+          build_conn()
+          |> signed_in(g)
+          |> refresh_back_as(mode, %{"sub" => "g-sub-new", "given_name" => "Newt"})
+
+        assert redirected_to(c, 302) == "/?refresh=other", mode
+        assert json_response(get(recycle(c), "/api/me"), 200)["user"]["id"] == g.id, mode
+        assert google_users("g-sub-new") == [[0]], "#{mode}: an account was made"
+      end
+
+      _ = conn
+    end
+
+    test "an EXISTING other account: not signed in as it, and it isn't changed", %{
+      conn: conn,
+      g: g
+    } do
+      {:ok, h} =
+        Accounts.upsert_oauth_user(%{provider: "google", provider_id: "g-sub-88", name: "Hal"})
+
+      c =
+        conn
+        |> signed_in(g)
+        |> refresh_back_as("1", %{"sub" => "g-sub-88", "given_name" => "Harold"})
+
+      assert redirected_to(c, 302) == "/?refresh=other"
+      assert json_response(get(recycle(c), "/api/me"), 200)["user"]["id"] == g.id
+      assert Accounts.get_user(h.id).name == "Hal", "the other account was written"
+      assert Accounts.get_user(g.id).name == "Gina"
+    end
+
+    test "the sign-in itself is untouched: still valid, no new one made for the other account",
+         %{conn: conn, g: g} do
+      {:ok, h} =
+        Accounts.upsert_oauth_user(%{provider: "google", provider_id: "g-sub-88", name: "Hal"})
+
+      conn = signed_in(conn, g)
+      token = get_session(conn, :user_token)
+      c = refresh_back_as(conn, "1", %{"sub" => "g-sub-88", "given_name" => "Hal"})
+      assert get_session(c, :user_token) == token
+      assert {:ok, _} = Hoodride.SessionTokens.lookup(token)
+      refute Hoodride.SessionTokens.any?(h.id)
+    end
+
+    test "signed out meanwhile: another account comes back — no one signed in, nothing made",
+         %{conn: conn, g: g} do
+      conn = conn |> signed_in(g) |> get("/auth/google?refresh=1")
+      {_, q} = query(conn)
+      {:ok, _} = Hoodride.SessionTokens.revoke_all(g.id)
+      google_says(%{"sub" => "g-sub-new", "given_name" => "Newt"})
+      c = get(recycle(conn), "/auth/google/callback", %{"code" => "c", "state" => q["state"]})
+      assert redirected_to(c, 302) == "/"
+      assert json_response(get(recycle(c), "/api/me"), 200)["user"] == nil
+      assert google_users("g-sub-new") == [[0]]
+    end
+
+    # another tab of the same browser became account H after this refresh
+    # left (signed out and in): the refresh coming back as G must not take
+    # the browser back to G — it is H's now
+    test "the browser is another account by the time it comes back: not switched back", %{g: g} do
+      {:ok, h} =
+        Accounts.upsert_oauth_user(%{provider: "google", provider_id: "g-sub-88", name: "Hal"})
+
+      started = build_conn() |> signed_in(g) |> get("/auth/google?refresh=1")
+      {_, q} = query(started)
+
+      oauth =
+        for k <- ["oauth_state", "oauth_verifier", "oauth_refresh"],
+            into: %{},
+            do: {k, get_session(started, k)}
+
+      now_h =
+        init_test_session(build_conn(), Map.merge(Hoodride.TestHelpers.session_for(h.id), oauth))
+
+      google_says(%{"sub" => "g-sub-77", "given_name" => "Gina"})
+      c = get(now_h, "/auth/google/callback", %{"code" => "c", "state" => q["state"]})
+      assert redirected_to(c, 302) == "/?refresh=other"
+      assert json_response(get(recycle(c), "/api/me"), 200)["user"]["id"] == h.id
+    end
+
+    # (review, 2026-11-11: a state is not tied to its provider — a Google
+    # refresh's state taken to the FACEBOOK callback crashed (500) on the
+    # refresh's expected account)
+    test "a refresh's state taken to the Facebook callback: no one signed in, no 500", %{
+      conn: conn,
+      g: g
+    } do
+      Application.put_env(:hoodride, :facebook_app_id, "fb-app")
+      Application.put_env(:hoodride, :facebook_app_secret, "fb-secret")
+      Application.put_env(:hoodride, :facebook_req, plug: {Req.Test, HoodrideWeb.Facebook})
+
+      on_exit(fn ->
+        for k <- [:facebook_app_id, :facebook_app_secret, :facebook_req],
+            do: Application.delete_env(:hoodride, k)
+      end)
+
+      Req.Test.stub(HoodrideWeb.Facebook, fn c ->
+        if c.request_path =~ "access_token",
+          do: Req.Test.json(c, %{"access_token" => "at"}),
+          else: Req.Test.json(c, %{"id" => "fb-9", "first_name" => "Fred"})
+      end)
+
+      conn = conn |> signed_in(g) |> get("/auth/google?refresh=1")
+      {_, q} = query(conn)
+      c = get(recycle(conn), "/auth/facebook/callback", %{"code" => "c", "state" => q["state"]})
+      assert redirected_to(c, 302) == "/?refresh=other"
+      assert json_response(get(recycle(c), "/api/me"), 200)["user"]["id"] == g.id
+
+      assert Hoodride.Repo.query!("SELECT count(*) FROM users WHERE provider = 'facebook'").rows ==
+               [[0]]
+    end
+
+    test "an ordinary sign-in (not a refresh) may still pick another account", %{conn: conn, g: g} do
+      {:ok, h} =
+        Accounts.upsert_oauth_user(%{provider: "google", provider_id: "g-sub-88", name: "Hal"})
+
+      conn = conn |> signed_in(g) |> get("/auth/google")
+      {_, q} = query(conn)
+      google_says(%{"sub" => "g-sub-88", "given_name" => "Hal"})
+      c = get(recycle(conn), "/auth/google/callback", %{"code" => "c", "state" => q["state"]})
+      assert redirected_to(c, 302) == "/"
+      assert json_response(get(recycle(c), "/api/me"), 200)["user"]["id"] == h.id
+    end
+
+    test "a code Google refuses during a refresh is still counted (never skipped)", %{
+      conn: conn,
+      g: g
+    } do
+      Application.put_env(:hoodride, :sign_in_failures,
+        max: 1,
+        window_ms: 180_000,
+        block_ms: 3_600_000
+      )
+
+      on_exit(fn -> Application.delete_env(:hoodride, :sign_in_failures) end)
+      conn = conn |> signed_in(g) |> get("/auth/google?refresh=1")
+      {_, q} = query(conn)
+      {:ok, _} = Hoodride.SessionTokens.revoke_all(g.id)
+
+      Req.Test.stub(HoodrideWeb.Google, fn c ->
+        c |> Plug.Conn.put_status(400) |> Req.Test.json(%{"error" => "invalid_grant"})
+      end)
+
+      get(recycle(conn), "/auth/google/callback", %{"code" => "made-up", "state" => q["state"]})
+      assert response(get(build_conn(), "/auth/google"), 429)
+    end
+  end
+
   describe "failed sign-ins (made-up codes)" do
     setup do
       Application.put_env(:hoodride, :sign_in_failures,

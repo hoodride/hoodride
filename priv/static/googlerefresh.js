@@ -75,6 +75,9 @@
     // the address is blocked for sign-ins (made-up codes from someone on
     // the same network): you're still signed in
     blocked: () => t("Couldn't refresh right now — try again later"),
+    // Google came back as ANOTHER of your Google accounts (its picker):
+    // nothing changed, you're still you (A2, 2026-11-11)
+    other: () => t("That's a different Google account — sign out first to use it"),
   };
   function outcome(search) {
     const v = new URLSearchParams(search || "").get("refresh");

@@ -697,6 +697,10 @@ msgstr "Wala na sa paligid ang driver na iyon"
 msgid "That rider isn't looking anymore"
 msgstr "Hindi na naghahanap ng sakay ang pasaherong iyon"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "Ibang Google account iyan — mag-sign out muna para magamit ito"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Hindi na ito maa-undo. Buburahin ang account mo, aalisin ka sa mapa, isasara ang mga usapan mo, at masa-sign out ka sa bawat device. Kapag nag-sign in ka ulit sa ibang pagkakataon, bagong account ang sisimulan."

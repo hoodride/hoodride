@@ -697,6 +697,10 @@ msgstr "Ce conducteur n'est plus dans les parages"
 msgid "That rider isn't looking anymore"
 msgstr "Ce passager ne cherche plus de trajet"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "C'est un autre compte Google. Déconnectez-vous d'abord pour l'utiliser"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Cette action est irréversible. Votre compte est supprimé, vous disparaissez de la carte, vos discussions sont fermées et vous êtes déconnecté de tous vos appareils. Si vous vous reconnectez plus tard, un nouveau compte sera créé."

@@ -172,16 +172,22 @@ defmodule HoodrideWeb.AuthController do
         failed(conn, refreshing, 403, "Sign-in session mismatch — go back and try again.")
 
       true ->
-        case exchange(conn, p, code, verifier) do
+        case exchange(conn, p, code, verifier, refresh_only(conn, refreshing)) do
+          # a REFRESH completes only as the account signed in NOW (A2,
+          # 2026-11-11): the hint is only a hint — at Google's picker someone
+          # with two Google accounts can pick the other. Then no one is
+          # signed in and no account is made or changed (exchange stops
+          # before writing). Signed out everywhere meanwhile (another
+          # device): no one — the refresh mustn't sign this browser back in
+          :other_account when conn.assigns.current_user != nil ->
+            back(conn, "other")
+
+          :other_account ->
+            redirect(conn, to: "/")
+
           # an ACCOUNT, nothing else: a provider's error reply also comes back
           # as {:ok, response} (Req), and was once signed in — a crash (500)
           # instead of the friendly page when Google was down
-          # a REFRESH (the app still signed in when it left) completes only
-          # if that sign-in still exists: signed out everywhere meanwhile
-          # (another device), the refresh mustn't sign this one back in
-          {:ok, %Accounts.User{}} when refreshing and conn.assigns.current_user == nil ->
-            redirect(conn, to: "/")
-
           {:ok, %Accounts.User{} = user} ->
             case Auth.sign_in(conn, user) do
               {:ok, conn} ->
@@ -259,13 +265,36 @@ defmodule HoodrideWeb.AuthController do
 
   # only the database being unable to answer is caught; any other error (a
   # bug) still crashes visibly
-  defp exchange(conn, p, code, verifier) do
-    exchange_code(conn, p, code, verifier)
+  defp exchange(conn, p, code, verifier, only) do
+    exchange_code(conn, p, code, verifier, only)
   rescue
     _ in [DBConnection.ConnectionError, Exqlite.Error] -> :db_failed
   end
 
-  defp exchange_code(conn, "google", code, verifier) do
+  # A refresh: the Google ID it must come back as — the account signed in
+  # NOW (another tab may have changed it since the refresh left), :nobody
+  # when signed out meanwhile or no longer a Google account, :unavailable
+  # when the database can't say. nil: an ordinary sign-in, any account.
+  defp refresh_only(_conn, false), do: nil
+
+  defp refresh_only(conn, true) do
+    with %{id: id} <- conn.assigns[:current_user],
+         %Accounts.User{provider: "google", provider_id: sub} <- Accounts.profile(id) do
+      sub
+    else
+      {:error, :unavailable} -> :unavailable
+      _ -> :nobody
+    end
+  end
+
+  # checked BEFORE anything is written: a refresh never makes or changes
+  # another account
+  defp same_account(nil, _sub), do: :ok
+  defp same_account(sub, sub), do: :ok
+  defp same_account(:unavailable, _sub), do: :db_failed
+  defp same_account(_only, _sub), do: :other_account
+
+  defp exchange_code(conn, "google", code, verifier, only) do
     with {:token, token} <-
            token(
              Req.post(
@@ -285,7 +314,8 @@ defmodule HoodrideWeb.AuthController do
          # an account ID that is TEXT, in a profile that is a map: anything
          # else used to crash (Ecto refuses a nil comparison)
          {:ok, %{status: 200, body: %{"sub" => sub} = info}} when is_binary(sub) <-
-           Req.get(@google_userinfo, [auth: {:bearer, token}] ++ req_options("google")) do
+           Req.get(@google_userinfo, [auth: {:bearer, token}] ++ req_options("google")),
+         :ok <- same_account(only, sub) do
       old = Accounts.photo_of("google", sub)
       # our own small copy, made now (Hoodride.Avatars) — viewers never
       # ask Google, and the link can't rot
@@ -304,7 +334,10 @@ defmodule HoodrideWeb.AuthController do
     end
   end
 
-  defp exchange_code(conn, "facebook", code, verifier) do
+  # (a refresh is Google only: a refresh's state brought HERE — a state isn't
+  # tied to its provider — is never a match, nothing written: it crashed on
+  # `only` before (review, 2026-11-11))
+  defp exchange_code(conn, "facebook", code, verifier, only) do
     with {:token, token} <-
            token(
              Req.post(
@@ -325,7 +358,8 @@ defmodule HoodrideWeb.AuthController do
              @fb_me,
              [params: [fields: "id,first_name"], auth: {:bearer, token}] ++
                req_options("facebook")
-           ) do
+           ),
+         :ok <- if(only == nil, do: :ok, else: :other_account) do
       old = Accounts.photo_of("facebook", id)
       # our own small copy, made now with the user's own token
       # (Hoodride.Avatars): Facebook's tokenless picture address gives a

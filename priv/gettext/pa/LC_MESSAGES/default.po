@@ -697,6 +697,10 @@ msgstr "ਉਹ ਡਰਾਈਵਰ ਹੁਣ ਨੇੜੇ ਨਹੀਂ ਹੈ"
 msgid "That rider isn't looking anymore"
 msgstr "ਉਹ ਸਵਾਰੀ ਹੁਣ ਰਾਈਡ ਨਹੀਂ ਲੱਭ ਰਹੀ"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "ਇਹ ਕੋਈ ਹੋਰ Google ਖਾਤਾ ਹੈ — ਇਸਨੂੰ ਵਰਤਣ ਲਈ ਪਹਿਲਾਂ ਸਾਈਨ ਆਊਟ ਕਰੋ"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "ਇਸਨੂੰ ਅਣਕੀਤਾ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਦਾ। ਤੁਹਾਡਾ ਖਾਤਾ ਹਟਾ ਦਿੱਤਾ ਜਾਵੇਗਾ, ਤੁਹਾਨੂੰ ਨਕਸ਼ੇ ਤੋਂ ਹਟਾ ਦਿੱਤਾ ਜਾਵੇਗਾ, ਤੁਹਾਡੀਆਂ ਗੱਲਬਾਤਾਂ ਬੰਦ ਹੋ ਜਾਣਗੀਆਂ ਅਤੇ ਤੁਹਾਨੂੰ ਹਰ ਡੀਵਾਈਸ ਤੋਂ ਸਾਈਨ ਆਊਟ ਕਰ ਦਿੱਤਾ ਜਾਵੇਗਾ। ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਸਾਈਨ ਇਨ ਕਰਨ ਨਾਲ ਨਵਾਂ ਖਾਤਾ ਸ਼ੁਰੂ ਹੋਵੇਗਾ।"

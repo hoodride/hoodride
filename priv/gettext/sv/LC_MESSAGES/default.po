@@ -697,6 +697,10 @@ msgstr "Den föraren är inte i närheten längre"
 msgid "That rider isn't looking anymore"
 msgstr "Den passageraren letar inte längre"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "Det är ett annat Google-konto. Logga ut först för att använda det"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Det här går inte att ångra. Ditt konto raderas, du tas bort från kartan, dina konversationer stängs och du loggas ut på alla enheter. Om du loggar in igen senare skapas ett nytt konto."

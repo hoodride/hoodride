@@ -697,6 +697,10 @@ msgstr "Dereva huyo hayupo karibu tena"
 msgid "That rider isn't looking anymore"
 msgstr "Abiria huyo hatafuti usafiri tena"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "Hiyo ni akaunti nyingine ya Google — ondoka kwanza ili uitumie"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Hatua hii haiwezi kutenduliwa. Akaunti yako itafutwa, utaondolewa kwenye ramani, mazungumzo yako yatafungwa na utatolewa kwenye vifaa vyote. Ukiingia tena baadaye, utaanza akaunti mpya."

@@ -188,4 +188,52 @@ defmodule HoodrideWeb.GoogleRefreshWiringTest do
     [logout] = Regex.run(~r/\$\("btn-logout"\)\.addEventListener\("click".*?\n}\);\n/s, @app)
     assert logout =~ "HoodGoogleRefresh.forget(storageOrNull());"
   end
+
+  # (2026-11-12, found by the A2 journey refreshother.mjs) every location
+  # reading redraws the normal banner (locator.js app.redrawBanner): it
+  # wiped a message on screen at once — "That's a different Google account",
+  # "Couldn't refresh…" never seen. A message showing (bannerTimer) is left
+  # alone; the normal banner comes back when it ends (transientBanner)
+  test "a location redraw leaves a message on screen alone" do
+    [redraw] = Regex.run(~r/redrawBanner: \(\) => \{\n.*?\n    \},/s, @app)
+    {guard, _} = :binary.match(redraw, "if (bannerTimer && !bannerIsLoc) return;")
+    {draw, _} = :binary.match(redraw, "setBanner(contextBanner());")
+    assert guard < draw
+
+    msg = body("transientBanner")
+    assert msg =~ "setBanner(contextBanner());", "the normal banner back when the message ends"
+    assert msg =~ "bannerIsLoc = fromLoc;"
+  end
+
+  # …except location's OWN message ("location is off", "approximate"): the
+  # next reading replaces it, as before — a good reading a second later
+  # mustn't leave "location is off" up for 11 s (review, 2026-11-12)
+  test "location's own message is marked as such, and a redraw replaces it" do
+    assert @app =~ "message: (text) => queueMicrotask(() => transientBanner(text, 12000, true)),"
+    [redraw] = Regex.run(~r/redrawBanner: \(\) => \{\n.*?\n    \},/s, @app)
+    assert redraw =~ "clearTimeout(bannerTimer);"
+    assert redraw =~ "bannerTimer = null;"
+
+    for fun <- ["locTap"],
+        do: assert(body(fun) =~ "bannerIsLoc = false;", fun)
+
+    assert length(Regex.scan(~r/transientBanner\([^)]*, true\)/, @app)) == 1,
+           "only location's messages are marked"
+  end
+
+  # …but a ✋ / GO ONLINE tap is the person acting: the message gives way
+  # at once ("Finding your location…" — else a 12 s "Location is off" stood
+  # over the retry). Every tap goes through locTap
+  test "a ✋ / GO ONLINE tap ends a message on screen first" do
+    tap = body("locTap")
+    {clear, _} = :binary.match(tap, "bannerTimer = null;")
+    {go, _} = :binary.match(tap, "loc.tapHand()")
+    assert clear < go
+    assert tap =~ "clearTimeout(bannerTimer);"
+
+    assert Regex.scan(~r/\bloc\.tap(Hand|Online)\(\)/, @app) |> length() == 2,
+           "only locTap calls the locator's taps"
+
+    assert length(Regex.scan(~r/locTap\("(hand|online)"\)/, @app)) == 4
+  end
 end

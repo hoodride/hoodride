@@ -697,6 +697,10 @@ msgstr "그 운전자는 이제 근처에 없어요"
 msgid "That rider isn't looking anymore"
 msgstr "그 탑승자는 이제 차를 찾고 있지 않아요"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "다른 Google 계정이에요. 사용하려면 먼저 로그아웃하세요"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "이 작업은 취소할 수 없어요. 계정이 삭제되고, 지도에서 사라지고, 대화가 종료되며, 모든 기기에서 로그아웃돼요. 나중에 다시 로그인하면 새 계정으로 시작해요."

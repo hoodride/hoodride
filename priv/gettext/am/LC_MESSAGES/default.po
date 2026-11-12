@@ -697,6 +697,10 @@ msgstr "ያ ሹፌር ከአሁን በኋላ በአካባቢው የሉም"
 msgid "That rider isn't looking anymore"
 msgstr "ያ ተሳፋሪ ከአሁን በኋላ ጉዞ እየፈለጉ አይደሉም"
 
+#: priv/static/googlerefresh.js
+msgid "That's a different Google account — sign out first to use it"
+msgstr "ይህ ሌላ የGoogle መለያ ነው — ለመጠቀም መጀመሪያ ይውጡ"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "ይህ ሊቀለበስ አይችልም። አካውንትዎ ይሰረዛል፣ ከካርታው ይወገዳሉ፣ ውይይቶችዎ ይዘጋሉ፣ እና ከሁሉም መሣሪያዎች ይወጣሉ። በኋላ እንደገና ሲገቡ አዲስ አካውንት ይጀምራል።"
