@@ -138,13 +138,15 @@ defmodule HoodrideWeb.LoginLockdownTest do
   # ---------- logout: everywhere, for real ----------
 
   describe "logout" do
-    test "records the time, and every older session stops working", %{conn: conn} do
+    test "deletes every sign-in: every older session stops working", %{conn: conn} do
       u = user("lo-a")
       # another device's sign-in (or a stolen copy of a cookie)
       other = signed_in(build_conn(), u)
       conn = post(signed_in(conn, u), "/api/logout")
       assert json_response(conn, 200) == %{"ok" => true}
-      assert is_integer(Accounts.get_user(u.id).logged_out_at)
+
+      assert Hoodride.Repo.query!("SELECT count(*) FROM user_tokens WHERE user_id = ?", [u.id]).rows ==
+               [[0]]
 
       assert me(other) == nil
       # a sign-in AFTER the logout works

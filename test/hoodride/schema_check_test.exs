@@ -34,7 +34,7 @@ defmodule Hoodride.SchemaCheckTest do
     src = File.read!("lib/hoodride/application.ex")
     migrator = :binary.match(src, "{Ecto.Migrator,") |> elem(0)
     check = :binary.match(src, "Hoodride.SchemaCheck,") |> elem(0)
-    sign_outs = :binary.match(src, "      Hoodride.SignOuts,") |> elem(0)
-    assert migrator < check and check < sign_outs
+    first_reader = :binary.match(src, "      Hoodride.SessionTokens,") |> elem(0)
+    assert migrator < check and check < first_reader
   end
 end

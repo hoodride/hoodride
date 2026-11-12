@@ -34,8 +34,8 @@
     `POST /api/account/delete {confirm}`; a small link under Sign out, beside
     Privacy Policy, then a confirm step — Sign out itself has none, owner's
     choice: reversible):
-    refused (409) in a ride or with your own request waiting; else denylist
-    FIRST, then off the map (going offline declines incoming requests, riders
+    refused (409) in a ride or with your own request waiting; else the
+    account's row and its sign-ins deleted FIRST, then off the map (going offline declines incoming requests, riders
     told), chats closed (partner told), presence + session stamp forgotten,
     the row deleted, every device disconnected, session dropped. Signing in
     again = a new account. 12 + 8 tests, 16 mutants; Chrome by measurement;
@@ -634,8 +634,10 @@ Design notes:
     minute. A Google refresh finishing after a sign-out everywhere doesn't
     sign that device back in.
   - **Logout signs out everywhere**: every sign-in token of the account
-    deleted (one transaction with `logged_out_at` and the `sign_outs` row,
-    still written so a rollback to the release before keeps refusing),
+    deleted (no sign-out record is kept since 2026-11-12: a pass names its
+    sign-in, so deleting the sign-ins refuses everything — the old
+    `sign_outs` denylist had no reader left, and a sign-in/delete loop
+    piled its rows up; the table stays, empty, for the release before),
     every socket of the account closed (92 ms, live). One live session per
     account already, so "everywhere" is right.
     Off the map at once too (owner, 2026-10-31): the car offline (riders
@@ -1832,7 +1834,8 @@ memory/CPU and the configured 1,048,576 are the limits, not ports.
 **Arrivals:** a burst of thousands joining at once is what tips a busy
 server (join work + each newcomer widens the fan-out). The database used to
 fail first — every connect read the user (pool of 5): fixed by the sign-out
-DENYLIST (connects read no database; Hoodride.SignOuts) and the pool's
+DENYLIST (connects read no database; Hoodride.SignOuts — since replaced by
+the in-memory sign-ins, Hoodride.SessionTokens) and the pool's
 queue_target 1 s. The logger used to drop errors under bursts (Erlang drops
 past 200 queued messages): connect/join lines at :debug, prod request lines
 off.
@@ -2127,7 +2130,7 @@ image_mode, forum avatar caches) serve outside images themselves. Plan
 
 Audit of every place a user is read or written (owner asked "all the
 issues that come with getting user"). Sockets read no database (token
-carries name/photo; sign-outs in the in-memory denylist); chat and
+carries name/photo and names its sign-in, checked in memory); chat and
 requests use the connection's copy. The rest:
 
 **DONE:**
@@ -2620,7 +2623,7 @@ The privacy page has a section for the EU, the UK and Switzerland (`#gdpr`),
 GDPR Article 13's items in plain words: who's responsible (Hood Ride and the
 contact address), the legal bases (contract: account, map area, rides,
 requests, messages, ride location; legitimate interests: abuse prevention,
-error logs, sign-out records, the Terms agreement record, cookieless visit
+error logs, the Terms agreement record, cookieless visit
 counts), the rights and how (one month to answer; the local data
 protection authority), transfers (servers in the US; Cloudflare under the
 EU-U.S. Data Privacy Framework and the SCCs — its DPA), that sign-in and

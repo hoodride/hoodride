@@ -4,7 +4,7 @@ defmodule HoodrideWeb.DeleteAccountTest do
   route too). From the drawer, after a confirmation step; refused during a
   ride or while your own ride request waits (like sign-out). In order:
 
-    1. the denylist (Hoodride.SignOuts) — every token and session dies first;
+    1. its sign-ins deleted (Hoodride.SessionTokens) — every token and session dies first;
     2. live state cleared — off the map (car and ✋), incoming requests
        declined (each rider told), chats closed (the partner told),
        presence and the session stamp forgotten;
@@ -17,7 +17,7 @@ defmodule HoodrideWeb.DeleteAccountTest do
 
   require Phoenix.ChannelTest
 
-  alias Hoodride.{Accounts, Chat, Geo, Requests, Rides, SessionStamp, SignOuts}
+  alias Hoodride.{Accounts, Chat, Geo, Requests, Rides, SessionStamp}
 
   @cell "882a1072c7fffff"
 
@@ -45,8 +45,6 @@ defmodule HoodrideWeb.DeleteAccountTest do
       token = Hoodride.TestHelpers.socket_token_for(u.id)
       # another device's sign-in, made before the deletion
       other = Hoodride.TestHelpers.session_for(u.id)
-      before = System.system_time(:millisecond)
-      Process.sleep(2)
       conn = delete_account(signed_in(conn, u))
       assert json_response(conn, 200) == %{"ok" => true}
 
@@ -61,8 +59,6 @@ defmodule HoodrideWeb.DeleteAccountTest do
       assert Phoenix.ChannelTest.connect(HoodrideWeb.UserSocket, %{},
                connect_info: %{auth_token: token}
              ) == :error
-
-      refute SignOuts.allowed?(u.id, before), "anything issued before the deletion"
     end
 
     test "the session cookie is ended", %{conn: conn} do

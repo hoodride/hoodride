@@ -15,7 +15,6 @@ defmodule Hoodride.Application do
     Hoodride.SignInFailures.init_table()
     HoodrideWeb.UserSocket.init_table()
     Hoodride.SessionStamp.init_table()
-    Hoodride.SignOuts.init_table()
     Hoodride.SessionTokens.init_table()
     # the build is fixed at boot: files edited later are the NEXT build
     HoodrideWeb.Build.current()
@@ -37,11 +36,9 @@ defmodule Hoodride.Application do
       # to start — a deploy switching back onto a newer version's database
       # changes fails its check loudly instead of failing every sign-in
       Hoodride.SchemaCheck,
-      # the sign-outs a connect checks, loaded before the web server starts
-      # (it blocks: no connection is accepted before the list is there)
-      Hoodride.SignOuts,
-      # the sign-ins (Hoodride.SessionTokens): the same — every request and
-      # connect checks them in memory
+      # the sign-ins (Hoodride.SessionTokens), loaded before the web server
+      # starts (it blocks: no connection is accepted before the list is
+      # there) — every request and connect checks them in memory
       Hoodride.SessionTokens,
       # profile photos: the folder exists, files nothing points to removed
       Hoodride.Avatars,

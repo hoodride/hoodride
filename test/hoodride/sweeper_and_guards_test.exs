@@ -514,7 +514,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
     assert names ==
              ~w(expire_stale_requests heal_orphan_ride_slots sweep_stale_geo heal_geo_consistency
              heal_unlawful_requests requests_heal_index sweep_empty_room_chats chat_heal_index chat_sent_ids
-             rate_budget sign_in_failures sign_outs session_tokens session_stamps rebuild_members
+             rate_budget sign_in_failures session_tokens session_stamps rebuild_members
              recompute_aggregates)a
 
     assert Enum.all?(Sweeper.steps(), fn {_, f} -> is_function(f, 0) end)

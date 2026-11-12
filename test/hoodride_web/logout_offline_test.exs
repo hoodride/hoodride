@@ -94,7 +94,11 @@ defmodule HoodrideWeb.LogoutOfflineTest do
       refused = logout(conn, rider)
       assert json_response(refused, 409) == %{"error" => "in_ride"}
       assert json_response(get(recycle(refused), "/api/me"), 200)["user"]["id"] == rider.id
-      assert Accounts.get_user(rider.id).logged_out_at == nil
+
+      assert Hoodride.Repo.query!("SELECT count(*) FROM user_tokens WHERE user_id = ?", [rider.id]).rows !=
+               [[0]],
+             "still signed in"
+
       refute_received %Phoenix.Socket.Broadcast{event: "disconnect"}
       assert Rides.ride_id_of_user(rider.id) == ride_id
       assert Rides.ride_id_of_user(driver.id) == ride_id
@@ -104,7 +108,10 @@ defmodule HoodrideWeb.LogoutOfflineTest do
       u = user("lo-pending")
       :ets.insert(:rides_by_user, {u.id, :pending})
       assert json_response(logout(conn, u), 409) == %{"error" => "in_ride"}
-      assert Accounts.get_user(u.id).logged_out_at == nil
+
+      assert Hoodride.Repo.query!("SELECT count(*) FROM user_tokens WHERE user_id = ?", [u.id]).rows !=
+               [[0]],
+             "still signed in"
     end
 
     test "while your own ride request waits: cancel it first", %{conn: conn} do
@@ -114,7 +121,11 @@ defmodule HoodrideWeb.LogoutOfflineTest do
       :ok = Requests.create(me_map(rider), driver.id)
 
       assert json_response(logout(conn, rider), 409) == %{"error" => "request_waiting"}
-      assert Accounts.get_user(rider.id).logged_out_at == nil
+
+      assert Hoodride.Repo.query!("SELECT count(*) FROM user_tokens WHERE user_id = ?", [rider.id]).rows !=
+               [[0]],
+             "still signed in"
+
       assert Requests.open_request_of(rider.id)
     end
 
@@ -124,13 +135,16 @@ defmodule HoodrideWeb.LogoutOfflineTest do
       Geo.hand_up(hand.id, @cell, @cell, [])
       Geo.driver_update(me_map(car), @cell, nil, [])
 
-      Repo.query!("ALTER TABLE sign_outs RENAME TO sign_outs_away")
+      # a real database failure: the sign-ins can't be deleted
+      Repo.query!(
+        "CREATE TRIGGER refuse_x BEFORE DELETE ON user_tokens BEGIN SELECT RAISE(ABORT, 'refused'); END"
+      )
 
       try do
         assert json_response(logout(conn, hand), 503) == %{"error" => "failed"}
         assert json_response(logout(build_conn(), car), 503) == %{"error" => "failed"}
       after
-        Repo.query!("ALTER TABLE sign_outs_away RENAME TO sign_outs")
+        Repo.query!("DROP TRIGGER refuse_x")
       end
 
       assert Geo.hand_of(hand.id)

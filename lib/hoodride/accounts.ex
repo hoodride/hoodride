@@ -156,27 +156,19 @@ defmodule Hoodride.Accounts do
   stops working. `:ok`, or `{:error, :failed}` when the database couldn't —
   then nothing changed.
   """
-  def mark_logged_out(user_id, at_ms \\ nil) do
-    # Every sign-in token of the account deleted (Hoodride.SessionTokens) —
-    # in ONE transaction with the older sign-out records (the sign-out time
-    # and the column the release before this one reads: a rollback keeps
-    # refusing), under the account's lock, the database FIRST. If it can't,
-    # NOTHING changes and the caller says so: a sign-out the server couldn't
-    # make is a failed sign-out (OWASP), never a half one.
-    case Hoodride.SessionTokens.revoke_all(user_id, fn now ->
-           at = at_ms || now
-
-           from(u in User, where: u.id == ^user_id)
-           |> Repo.update_all(set: [logged_out_at: at])
-
-           Hoodride.SignOuts.persist(user_id, at)
-         end) do
-      {:ok, now} ->
-        Hoodride.SignOuts.put(user_id, at_ms || now)
-        :ok
-
-      {:error, :failed} ->
-        {:error, :failed}
+  def mark_logged_out(user_id) do
+    # Every sign-in token of the account deleted (Hoodride.SessionTokens),
+    # under the account's lock, the database FIRST. That alone refuses
+    # everything the account's devices hold: a request names its token, a
+    # live-connection pass names the token it came from (HoodrideWeb.Auth).
+    # If the database can't, NOTHING changes and the caller says so: a
+    # sign-out the server couldn't make is a failed sign-out (OWASP), never
+    # a half one. (No sign-out record is kept: the old denylist,
+    # Hoodride.SignOuts, had no reader left once passes named their token —
+    # and a sign-in/delete loop piled its rows up. Removed 2026-11-12.)
+    case Hoodride.SessionTokens.revoke_all(user_id) do
+      {:ok, _at} -> :ok
+      {:error, :failed} -> {:error, :failed}
     end
   end
 

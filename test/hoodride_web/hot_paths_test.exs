@@ -17,7 +17,7 @@ defmodule HoodrideWeb.HotPathsTest do
   """
   use HoodrideWeb.ConnCase, async: false
 
-  alias Hoodride.{Accounts, Chat, Geo, Repo, Requests, SignOuts, TestClient}
+  alias Hoodride.{Accounts, Chat, Geo, Repo, Requests, TestClient}
 
   @cell "882a1072c7fffff"
 
@@ -46,9 +46,7 @@ defmodule HoodrideWeb.HotPathsTest do
 
   # what a restart does: memory gone, refilled from the database
   defp restart! do
-    :ets.delete_all_objects(:sign_outs)
     :ets.delete_all_objects(:session_tokens)
-    :ok = SignOuts.load()
     :ok = Hoodride.SessionTokens.load()
   end
 

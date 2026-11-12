@@ -1,23 +1,24 @@
 defmodule HoodrideWeb.RevocationTest do
   @moduledoc """
-  Revocations (sign-outs and deletions) must survive a RESTART. The
-  denylist (Hoodride.SignOuts) lives in memory and is refilled at start-up
-  from the database. It used to be refilled from `users.logged_out_at` —
-  deleted WITH the account — so after any restart within a day a deleted
-  account's leftover socket token (it carries name and photo; a connect
-  reads no database) connected again. Now revocations have their own
-  table, and deleting an account is ONE database step (row gone +
-  revocation saved) done FIRST: if it fails, nothing changed and a retry
-  works.
+  Revocations (sign-outs and deletions) must survive a RESTART. Both
+  delete the account's sign-ins in the database FIRST (Hoodride.SessionTokens;
+  a deletion by the cascade), then from memory; a live-connection pass names
+  the sign-in it came from, so it's refused — and after a restart too, since
+  memory is refilled from the table. (Once, a deleted account's leftover
+  pass connected again after a restart: the refusal lived only in memory.)
+  If the database step fails, nothing changed and a retry works.
+
+  No record of a revocation is kept (the sign-out denylist, Hoodride.SignOuts,
+  had no reader left once passes named their sign-in; the delete loop,
+  2026-11-12, piled its rows up — removed).
   """
   use HoodrideWeb.ConnCase, async: false
 
   require Phoenix.ChannelTest
 
-  alias Hoodride.{Accounts, Geo, Repo, SignOuts}
+  alias Hoodride.{Accounts, Geo, Repo}
 
   @cell "882a1072c7fffff"
-  @day 86_400_000
 
   setup do
     Hoodride.TestHelpers.scrub_live_state()
@@ -32,14 +33,21 @@ defmodule HoodrideWeb.RevocationTest do
   defp signed_in(conn, u),
     do: init_test_session(conn, Hoodride.TestHelpers.session_for(u.id))
 
-  # what a restart does to the denylist and the sign-ins: memory gone,
-  # refilled from the database
+  # what a restart does to the sign-ins: memory gone, refilled from the
+  # database
   defp restart! do
-    :ets.delete_all_objects(:sign_outs)
     :ets.delete_all_objects(:session_tokens)
-    :ok = SignOuts.load()
     :ok = Hoodride.SessionTokens.load()
   end
+
+  # a real database failure: every delete from `table` refused
+  defp refuse_deletes(table),
+    do:
+      Repo.query!(
+        "CREATE TRIGGER refuse_#{table} BEFORE DELETE ON #{table} BEGIN SELECT RAISE(ABORT, 'refused'); END"
+      )
+
+  defp allow_deletes(table), do: Repo.query!("DROP TRIGGER refuse_#{table}")
 
   defp connects?(token),
     do:
@@ -72,8 +80,8 @@ defmodule HoodrideWeb.RevocationTest do
     token = Hoodride.TestHelpers.socket_token_for(u.id)
     Process.sleep(2)
 
-    # a real database failure: the revocation can't be saved
-    Repo.query!("ALTER TABLE sign_outs RENAME TO sign_outs_away")
+    # a real database failure: the account's row can't be deleted
+    refuse_deletes("users")
 
     conn1 =
       Hoodride.TestHelpers.post_json(signed_in(conn, u), "/api/account/delete", %{
@@ -87,7 +95,7 @@ defmodule HoodrideWeb.RevocationTest do
     assert connects?(token), "not signed out by a delete that didn't happen"
     assert Geo.driver_cell(u.id) == @cell
 
-    Repo.query!("ALTER TABLE sign_outs_away RENAME TO sign_outs")
+    allow_deletes("users")
 
     assert json_response(
              Hoodride.TestHelpers.post_json(signed_in(build_conn(), u), "/api/account/delete", %{
@@ -107,16 +115,15 @@ defmodule HoodrideWeb.RevocationTest do
       Process.sleep(2)
       conn = signed_in(conn, u)
 
-      Repo.query!("ALTER TABLE sign_outs RENAME TO sign_outs_away")
+      refuse_deletes("user_tokens")
       failed = post(conn, "/api/logout")
       assert json_response(failed, 503) == %{"error" => "failed"}
 
-      # not half signed out: the session, the live connection, the record
+      # not half signed out: the session, the live connection
       assert json_response(get(recycle(failed), "/api/me"), 200)["user"]["id"] == u.id
       assert connects?(token)
-      assert Accounts.get_user(u.id).logged_out_at == nil
 
-      Repo.query!("ALTER TABLE sign_outs_away RENAME TO sign_outs")
+      allow_deletes("user_tokens")
       done = post(recycle(failed), "/api/logout")
       assert json_response(done, 200) == %{"ok" => true}
       refute connects?(token)
@@ -132,9 +139,10 @@ defmodule HoodrideWeb.RevocationTest do
 
     test "Accounts.mark_logged_out says so instead of half-doing it" do
       u = user("rv-so3")
-      Repo.query!("ALTER TABLE sign_outs RENAME TO sign_outs_away")
+      token = Hoodride.TestHelpers.socket_token_for(u.id)
+      refuse_deletes("user_tokens")
       assert Accounts.mark_logged_out(u.id) == {:error, :failed}
-      assert SignOuts.allowed?(u.id, System.system_time(:millisecond) - 1)
+      assert connects?(token), "still signed in"
     end
   end
 
@@ -148,55 +156,6 @@ defmodule HoodrideWeb.RevocationTest do
     refute connects?(token)
   end
 
-  test "a newer revocation wins; an older one never overwrites it" do
-    now = System.system_time(:millisecond)
-    :ok = SignOuts.persist(77, now - 1_000)
-    :ok = SignOuts.persist(77, now - 2_000)
-    restart!()
-    refute SignOuts.allowed?(77, now - 1_500)
-    assert SignOuts.allowed?(77, now - 999)
-  end
-
-  defp rows(ids),
-    do:
-      Repo.query!(
-        "SELECT user_id FROM sign_outs WHERE user_id IN (#{Enum.join(ids, ",")}) ORDER BY user_id"
-      ).rows
-
-  test "each new revocation drops the table's rows older than 30 days" do
-    now = System.system_time(:millisecond)
-
-    Repo.query!("INSERT INTO sign_outs (user_id, at) VALUES (81, ?), (82, ?)", [
-      now - 31 * @day,
-      now - 29 * @day
-    ])
-
-    :ok = SignOuts.persist(84, now, now)
-    assert rows([81, 82, 84]) == [[82], [84]]
-  end
-
-  test "start-up drops the table's rows older than 30 days" do
-    now = System.system_time(:millisecond)
-
-    Repo.query!("INSERT INTO sign_outs (user_id, at) VALUES (85, ?), (86, ?)", [
-      now - 31 * @day,
-      now - 29 * @day
-    ])
-
-    :ok = SignOuts.load(now)
-    assert rows([85, 86]) == [[86]]
-  end
-
-  test "the Sweeper never touches the database: it trims memory only" do
-    now = System.system_time(:millisecond)
-    Repo.query!("INSERT INTO sign_outs (user_id, at) VALUES (87, ?)", [now - 31 * @day])
-    SignOuts.put(87, now - 31 * @day)
-
-    :ok = SignOuts.sweep(now)
-    assert :ets.lookup(:sign_outs, 87) == []
-    assert rows([87]) == [[87]], "the table is trimmed by writes and start-up, not the sweep"
-  end
-
   test "the migration moves today's sign-outs into the table" do
     mod =
       Hoodride.TestHelpers.migration("priv/repo/migrations/20261027032653_create_sign_outs.exs")
@@ -205,5 +164,16 @@ defmodule HoodrideWeb.RevocationTest do
     Repo.query!("UPDATE users SET logged_out_at = 12345 WHERE id = ?", [u.id])
     Repo.query!(mod.copy_sql())
     assert Repo.query!("SELECT at FROM sign_outs WHERE user_id = ?", [u.id]).rows == [[12345]]
+  end
+
+  test "the records already kept are cleared (the table stays for the version before)" do
+    mod =
+      Hoodride.TestHelpers.migration("priv/repo/migrations/20261112200023_clear_sign_outs.exs")
+
+    Repo.query!("INSERT INTO sign_outs (user_id, at) VALUES (91, 1), (92, 2)")
+
+    Repo.query!(mod.clear_sql())
+
+    assert Repo.query!("SELECT count(*) FROM sign_outs").rows == [[0]]
   end
 end

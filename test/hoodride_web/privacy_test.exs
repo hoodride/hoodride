@@ -79,6 +79,8 @@ defmodule HoodrideWeb.PrivacyTest do
           do: assert(html =~ must, "missing: #{must}")
 
       refute html =~ ~r/email address you sign in with/i
+      # none kept since 2026-11-12 (the delete loop)
+      refute html =~ ~r/sign-out records/i
       # the contact address is on the domain (owner, 2026-10-31): Cloudflare
       # Email Routing forwards contact@hoodride.app to the owner's Gmail (it
       # receives only once hoodride.app is bought and routed — ARCHITECTURE.md)
@@ -91,7 +93,8 @@ defmodule HoodrideWeb.PrivacyTest do
     # sign-out records hold an account number and a time, for 30 days
     # (Hoodride.SignOuts, the session's 30 days). 6 since 2026-11-08: sign-in
     # records (Hoodride.SessionTokens: one per signed-in device, 30 days after
-    # last use, a year at most)
+    # last use, a year at most). 5 again since 2026-11-12: no sign-out records
+    # are kept any more (nothing read them; the delete loop piled them up)
     test "how long we keep it: plain kinds, each with a limit (owner's pick, 2026-10-28)", %{
       conn: conn
     } do
@@ -105,7 +108,6 @@ defmodule HoodrideWeb.PrivacyTest do
                ["Your account" <> _, "Until you delete your account"],
                ["Live info" <> _, live],
                ["IP addresses (to stop abuse)", "A few minutes, never saved"],
-               ["Sign-out records (to keep signed-out sessions closed)", "30 days"],
                [
                  "Sign-in records (one per signed-in device, to keep you signed in)",
                  "Until you sign out, or 30 days after you last use the app (at most a year)"

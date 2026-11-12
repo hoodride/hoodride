@@ -168,7 +168,10 @@ defmodule HoodrideWeb.AvatarServingTest do
   test "a delete the database can't do leaves the photo too", %{conn: conn, dir: dir} do
     name = stored(dir, @png)
     u = user("av-del2", "/avatars/#{name}")
-    Repo.query!("ALTER TABLE sign_outs RENAME TO sign_outs_away")
+    # a real database failure: the account's row can't be deleted
+    Repo.query!(
+      "CREATE TRIGGER refuse_x BEFORE DELETE ON users BEGIN SELECT RAISE(ABORT, 'refused'); END"
+    )
 
     assert Hoodride.TestHelpers.post_json(signed_in(conn, u), "/api/account/delete", %{
              "confirm" => "DELETE"

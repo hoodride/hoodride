@@ -17,7 +17,7 @@ defmodule Hoodride.SessionTokens do
       "on all your devices"); deleting the account deletes them with it.
 
   Read from MEMORY (`:session_tokens`, loaded before the web server starts,
-  as Hoodride.SignOuts): no database read per request — the capacity test's
+  as the app's other start-up lists): no database read per request — the capacity test's
   thousands of connects at once ran the pool dry. Every change writes the
   DATABASE FIRST, then memory, and takes the account's lock (`:global.trans`
   on this one node), so two changes of one account never interleave: a
@@ -256,19 +256,14 @@ defmodule Hoodride.SessionTokens do
   def rotate(_), do: :error
 
   @doc """
-  Sign out everywhere: every token of the account deleted — together with
-  `also.(at)` (the account's other sign-out records) in ONE transaction, the
-  time `at` taken inside the lock. `{:ok, at}`, or `{:error, :failed}` when
-  the database couldn't: then NOTHING changed (never half signed out).
+  Sign out everywhere: every token of the account deleted, the time `at`
+  taken inside the lock. `{:ok, at}`, or `{:error, :failed}` when the
+  database couldn't: then NOTHING changed (never half signed out).
   """
-  def revoke_all(user_id, also \\ fn _at -> :ok end) do
+  def revoke_all(user_id) do
     locked(user_id, fn ->
       at = now()
-
-      Repo.transaction(fn ->
-        from(t in "user_tokens", where: t.user_id == ^user_id) |> Repo.delete_all()
-        also.(at)
-      end)
+      from(t in "user_tokens", where: t.user_id == ^user_id) |> Repo.delete_all()
 
       forget_now(user_id)
       {:ok, at}
@@ -391,7 +386,7 @@ defmodule Hoodride.SessionTokens do
   end
 
   # the TABLE is trimmed by code that already writes it (each sign-in) and
-  # at start-up, so the Sweeper stays memory-only (as Hoodride.SignOuts)
+  # at start-up, so the Sweeper stays memory-only
   defp prune_rows(now) do
     from(t in "user_tokens",
       where: t.inserted_at < ^(now - @valid_ms) or t.authenticated_at < ^(now - @cap_ms)
@@ -417,7 +412,7 @@ defmodule Hoodride.SessionTokens do
 
   defp now, do: System.system_time(:millisecond)
 
-  # the start-up step: load, then step aside (as Hoodride.SignOuts)
+  # the start-up step: load, then step aside
   @doc false
   def child_spec(_),
     do: %{id: __MODULE__, start: {__MODULE__, :start_link, []}, restart: :transient}

@@ -348,7 +348,7 @@ defmodule HoodrideWeb.LogoutAcceptRaceTest do
   # deleting the account: the same look, after its sign-ins are gone
   test "account deletion looks too: after the sign-ins are forgotten" do
     src = File.read!("lib/hoodride/account_deletion.ex")
-    [after_erase] = Regex.run(~r/defp after_erase\(user_id, now\) do.*?\n  end\n/s, src)
+    [after_erase] = Regex.run(~r/defp after_erase\(user_id\) do.*?\n  end\n/s, src)
     {forget, _} = :binary.match(after_erase, "Hoodride.SessionTokens.forget(user_id)")
     {look, _} = :binary.match(after_erase, "Rides.after_sign_out(user_id)")
     assert forget < look

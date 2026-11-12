@@ -95,8 +95,6 @@ defmodule Hoodride.Limits do
     {:sign_in, :lost_reply_ms, @minute,
      "A renewal whose new sign-in went unused this long may renew again (its reply was lost on bad signal)."},
     {:sign_in, :socket_pass_ms, @day, "A live-connection pass is accepted for this long."},
-    {:sign_in, :sign_out_keep_ms, 30 * @day,
-     "A sign-out record is kept this long (anything made before it stays refused)."},
     {:sign_in, :session_stamp_keep_ms, @day,
      "Which device was chosen last is kept this long after an account's last connection."},
     {:sign_in, :language_cookie_ms, 365 * @day,

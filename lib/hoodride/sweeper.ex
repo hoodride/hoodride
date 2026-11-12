@@ -71,8 +71,6 @@ defmodule Hoodride.Sweeper do
       {:rate_budget, &Hoodride.RateBudget.sweep/0},
       # lifted sign-in blocks and finished failure windows
       {:sign_in_failures, &Hoodride.SignInFailures.sweep/0},
-      # sign-outs past every session's lifetime revoke nothing any more
-      {:sign_outs, &Hoodride.SignOuts.sweep/0},
       # sign-ins past their 30 days (or their year): gone from memory
       {:session_tokens, &Hoodride.SessionTokens.sweep/0},
       # session-stamp rows of accounts with no device connected for a day

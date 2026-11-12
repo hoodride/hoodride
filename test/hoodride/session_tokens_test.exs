@@ -114,8 +114,12 @@ defmodule Hoodride.SessionTokensTest do
     u = user("st-fail")
     {:ok, raw} = SessionTokens.create(u.id)
 
-    assert SessionTokens.revoke_all(u.id, fn _ -> raise Exqlite.Error, message: "busy" end) ==
-             {:error, :failed}
+    # a real database failure: the sign-ins can't be deleted
+    Hoodride.Repo.query!(
+      "CREATE TRIGGER refuse_x BEFORE DELETE ON user_tokens BEGIN SELECT RAISE(ABORT, 'busy'); END"
+    )
+
+    assert SessionTokens.revoke_all(u.id) == {:error, :failed}
 
     assert {:ok, _} = SessionTokens.lookup(raw)
     assert rows(u.id) == [[SessionTokens.hash(raw)]]

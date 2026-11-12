@@ -4,26 +4,22 @@ defmodule HoodrideWeb.SignOutsTest do
   connecting at once ran the pool of 5 dry — every connect read the user to
   check the token against a sign-out — and ~half got HTTP 500).
 
-  A DENYLIST instead (token revocation's usual answer: entries kept only
-  while the tokens they revoke could still be valid): `Hoodride.SignOuts`
-  holds, in memory, when each account signed out — only sign-outs from the
-  last 30 days (every session and token issued before one is expired by
-  then). The token carries the name and photo the socket needs, so a
-  connect is a signature check and one memory lookup. Loaded at start-up
-  (after migrations, before the web server), written FIRST on sign-out.
+  The token carries the name and photo the socket needs, and names its
+  SIGN-IN (Hoodride.SessionTokens, in memory, loaded at start-up before the
+  web server): a connect is a signature check and one memory lookup.
+  Signing out or deleting the account deletes the sign-ins, so the pass is
+  refused — with no database read, and after a restart too.
 
-  Since 2026-11-08 a connection pass names its SIGN-IN (Hoodride.SessionTokens,
-  also in memory): signing out deletes the sign-ins, so the pass is refused —
-  still with no database read. The sign-out list stays written for the
-  release before (a rollback keeps refusing).
+  (A sign-out DENYLIST, Hoodride.SignOuts, did this before 2026-11-08 and
+  was kept, read by nothing, until the delete loop (2026-11-12): sign in,
+  delete, again — a 30-day record each, piled up by a script. Removed: no
+  record of a sign-out or a deletion is kept.)
   """
   use HoodrideWeb.ConnCase, async: false
 
   require Phoenix.ChannelTest
 
-  alias Hoodride.{Accounts, SignOuts}
-
-  @day_ms 86_400_000
+  alias Hoodride.{AccountDeletion, Accounts, Repo}
 
   setup do
     Hoodride.TestHelpers.scrub_live_state()
@@ -40,6 +36,8 @@ defmodule HoodrideWeb.SignOutsTest do
   end
 
   defp now_ms, do: System.system_time(:millisecond)
+
+  defp kept(table), do: hd(hd(Repo.query!("SELECT count(*) FROM #{table}").rows))
 
   defp connect(token),
     do:
@@ -102,14 +100,6 @@ defmodule HoodrideWeb.SignOutsTest do
       assert {:ok, _} = connect(Hoodride.TestHelpers.socket_token_for(u.id))
     end
 
-    test "a token issued in the same millisecond as the sign-out is refused (strictly after)" do
-      t = now_ms()
-      SignOuts.put(4_294_967_311, t)
-      refute SignOuts.allowed?(4_294_967_311, t)
-      assert SignOuts.allowed?(4_294_967_311, t + 1)
-      assert SignOuts.allowed?(4_294_967_312, t), "never signed out: allowed"
-    end
-
     # everyone signed in once more at the switch to sign-in tokens (owner,
     # 2026-11-08): a pass naming no sign-in is no pass — the app fetches a
     # new one, and a browser no longer signed in shows the sign-in screen
@@ -125,83 +115,44 @@ defmodule HoodrideWeb.SignOutsTest do
     end
   end
 
-  describe "the denylist" do
-    test "of two sign-outs the LATER time wins, in either order" do
-      SignOuts.put(4_294_967_321, 2_000)
-      SignOuts.put(4_294_967_321, 1_000)
-      refute SignOuts.allowed?(4_294_967_321, 1_500)
-
-      SignOuts.put(4_294_967_322, 1_000)
-      SignOuts.put(4_294_967_322, 2_000)
-      refute SignOuts.allowed?(4_294_967_322, 1_500)
-    end
-
-    test "sign-out writes it (and the database: a restart keeps it)" do
-      u = user("so-db")
+  describe "nothing kept after a sign-out or a deletion" do
+    test "signed out: the old pass stays refused after a restart (its sign-ins are gone from the table)" do
+      u = user("so-restart")
       token = Hoodride.TestHelpers.socket_token_for(u.id)
-      before = now_ms()
-      Process.sleep(2)
       :ok = Accounts.mark_logged_out(u.id)
-      refute SignOuts.allowed?(u.id, before)
 
-      # a restart: the tables empty, the start-up loads refill them
-      :ets.delete_all_objects(:sign_outs)
+      # a restart: memory empty, the start-up load refills it
       :ets.delete_all_objects(:session_tokens)
-      assert SignOuts.load() == :ok
       assert Hoodride.SessionTokens.load() == :ok
       assert connect(token) == :error
     end
 
-    test "the start-up load takes the last 30 days' sign-outs, not older ones" do
-      recent = user("so-29d")
-      old = user("so-31d")
-      now = now_ms()
-      Accounts.mark_logged_out(recent.id, now - 29 * @day_ms)
-      Accounts.mark_logged_out(old.id, now - 31 * @day_ms)
-      :ets.delete_all_objects(:sign_outs)
+    test "deleted: the old pass stays refused after a restart too" do
+      u = user("so-del-restart")
+      token = Hoodride.TestHelpers.socket_token_for(u.id)
+      :ok = AccountDeletion.delete(u.id)
 
-      SignOuts.load(now)
-      assert :ets.lookup(:sign_outs, recent.id) == [{recent.id, now - 29 * @day_ms}]
-      assert :ets.lookup(:sign_outs, old.id) == []
+      :ets.delete_all_objects(:session_tokens)
+      assert Hoodride.SessionTokens.load() == :ok
+      assert connect(token) == :error
     end
 
-    test "the sweep drops rows older than 30 days, keeps newer ones" do
-      now = now_ms()
-      SignOuts.put(4_294_967_331, now - 31 * @day_ms)
-      SignOuts.put(4_294_967_332, now - 29 * @day_ms)
-      SignOuts.sweep(now)
-      assert :ets.lookup(:sign_outs, 4_294_967_331) == []
-      assert [_] = :ets.lookup(:sign_outs, 4_294_967_332)
-    end
+    # (the delete loop, 2026-11-12: each round a new account and a record
+    # kept 30 days — a million from one script)
+    test "the loop — sign in, sign out, delete, ten times over: nothing piles up" do
+      for i <- 1..10 do
+        u = user("so-loop")
+        Hoodride.TestHelpers.socket_token_for(u.id)
+        :ok = Accounts.mark_logged_out(u.id)
+        Hoodride.TestHelpers.socket_token_for(u.id)
+        :ok = AccountDeletion.delete(u.id)
+        assert Accounts.get_user(u.id) == nil, "round #{i}"
+      end
 
-    test "the Sweeper's tick sweeps it" do
-      SignOuts.put(4_294_967_341, now_ms() - 31 * @day_ms)
-      Hoodride.Sweeper.sweep_now()
-      assert :ets.lookup(:sign_outs, 4_294_967_341) == []
-    end
-
-    test "no table (never loaded): the check raises — a connect is refused, never let in" do
-      assert_raise ArgumentError, fn -> SignOuts.allowed?(4_294_967_351, 1, :no_such_table) end
-    end
-  end
-
-  describe "start-up" do
-    test "the load runs after the migrations and before the web server" do
-      # which_children lists the most recently started first
-      ids = for {id, _, _, _} <- Supervisor.which_children(Hoodride.Supervisor), do: id
-      pos = fn id -> Enum.find_index(ids, &(&1 == id)) end
-      assert pos.(HoodrideWeb.Endpoint) < pos.(Hoodride.SignOuts)
-      assert pos.(Hoodride.SignOuts) < pos.(Ecto.Migrator)
-    end
-
-    test "the index on users.logged_out_at exists (the start-up load stays fast)" do
-      {:ok, %{rows: rows}} = Hoodride.Repo.query("PRAGMA index_list(users)")
-      names = Enum.map(rows, &Enum.at(&1, 1))
-
-      assert Enum.any?(names, fn name ->
-               {:ok, %{rows: cols}} = Hoodride.Repo.query("PRAGMA index_info(#{name})")
-               Enum.map(cols, &Enum.at(&1, 2)) == ["logged_out_at"]
-             end)
+      assert kept("sign_outs") == 0
+      assert kept("user_tokens") == 0
+      assert kept("users WHERE provider_id = 'so-loop'") == 0
+      assert :ets.whereis(:sign_outs) == :undefined, "no sign-out list in memory"
     end
   end
 
