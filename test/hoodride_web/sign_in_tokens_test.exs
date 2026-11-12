@@ -69,6 +69,34 @@ defmodule HoodrideWeb.SignInTokensTest do
       assert me(recycle(opened))["id"] == u.id
     end
 
+    # the key fix (owner, 2026-11-12): a script replaying the same week-old
+    # cookie made a new sign-in on EVERY request — the server's memory
+    # filled (~86k a day per account), and filled again at start-up
+    test "the same week-old cookie replayed 30 times: one replacement, still signed in" do
+      u = user("tk-replay")
+      conn = signed_in(u, 8 * @day)
+
+      replies = for _ <- 1..30, do: get(conn, "/api/state")
+      assert Enum.all?(replies, &(json_response(&1, 200)["user"]["id"] == u.id))
+      assert tokens(u) == [[2]]
+
+      # the reply that got the new cookie: it works, and using it means a
+      # replay never takes it back
+      [new] =
+        for r <- replies,
+            t = get_session(r, :user_token),
+            t != get_session(conn, :user_token),
+            do: t
+
+      in_use = init_test_session(build_conn(), %{get_session(conn) | "user_token" => new})
+      assert me(in_use)["id"] == u.id
+      # more than a minute on (past the lost-reply wait): used, so kept
+      TestHelpers.age_sign_in(%{"user_token" => new}, 61_000, 0)
+      for _ <- 1..5, do: get(conn, "/api/state")
+      assert me(in_use)["id"] == u.id
+      assert tokens(u) == [[2]]
+    end
+
     test "younger than a week: nothing replaced" do
       u = user("tk-young")
       conn = signed_in(u, 6 * @day)

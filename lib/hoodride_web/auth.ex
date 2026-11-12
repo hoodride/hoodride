@@ -36,6 +36,9 @@ defmodule HoodrideWeb.Auth do
     with {:ok, token} <- SessionTokens.lookup(get(session, "user_token")),
          id when id == token.user_id <- get(session, "user_id"),
          name when is_binary(name) <- get(session, "name") do
+      # a renewal's new token used: its reply arrived (SessionTokens.rotate/1)
+      SessionTokens.used(token.hash)
+
       %{
         id: id,
         name: name,
@@ -127,7 +130,12 @@ defmodule HoodrideWeb.Auth do
   def token_user(token) when is_binary(token) do
     case Phoenix.Token.verify(HoodrideWeb.Endpoint, @token_salt, token, max_age: @token_max_s) do
       {:ok, %{u: id, t: hash, n: name, p: photo}} when is_integer(id) and is_binary(hash) ->
-        if signed_in?(id, hash), do: %{id: id, name: name, photo: photo, token_hash: hash}
+        # a connect naming a renewal's new token: its reply arrived — an app
+        # kept open on its socket makes no other request (review, 2026-11-12)
+        if signed_in?(id, hash) do
+          SessionTokens.used(hash)
+          %{id: id, name: name, photo: photo, token_hash: hash}
+        end
 
       _ ->
         nil
