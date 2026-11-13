@@ -19,9 +19,11 @@ defmodule HoodrideWeb.MapBatchTest do
   import TestClient, only: [request: 4]
 
   @cell "882a1072c7fffff"
-  @cell2 "882a1072cffffff"
+  @cell2 "882a1072c9fffff"
   @spot "892a1072c63ffff"
   @spot2 "892a1072c67ffff"
+  # a block in @cell2 (the server works the cell out from the block)
+  @spot_b "892a1072c97ffff"
 
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Hoodride.Repo)
@@ -43,6 +45,8 @@ defmodule HoodrideWeb.MapBatchTest do
         photo: nil
       })
 
+    # anyone here may go online: a car needs a car (step 5)
+    :ok = Hoodride.TestHelpers.give_car(u.id)
     u
   end
 
@@ -122,7 +126,7 @@ defmodule HoodrideWeb.MapBatchTest do
       name = rider.name
       assert_receive {^name, :pushed, _}
       # … and the car crosses X → Y: "left X" queued behind the sync
-      drive(driver, @cell2, @spot2)
+      drive(driver, @cell2, @spot_b)
       :sys.resume(pid)
       frames = flushed(rider)
 
@@ -152,7 +156,7 @@ defmodule HoodrideWeb.MapBatchTest do
       send(driver.pid, {:push, self(), "world", "sync", %{"geo" => [@cell2]}})
       name = driver.name
       assert_receive {^name, :pushed, _}
-      hand(rider, @cell2, @spot2)
+      hand(rider, @cell2, @spot_b)
       :sys.resume(pid)
       frames = flushed(driver)
 
@@ -299,7 +303,7 @@ defmodule HoodrideWeb.MapBatchTest do
 
       drive(driver, @cell, @spot)
       # left @cell, then appeared in @cell2: the newer message wins
-      drive(driver, @cell2, "892a1072cc3ffff")
+      drive(driver, @cell2, "892a1072c83ffff")
       assert [{"driver_update", %{cell: @cell2}}] = car_items(flushed(rider))
     end
 

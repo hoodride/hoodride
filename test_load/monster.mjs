@@ -736,8 +736,7 @@ class Agent {
       this.spot = spot;
       if (F.shouldSend(this.lastGeo, Date.now(), this.pos, spot, F.BROWSE_MIN_METERS)) {
         this.lastGeo = F.stamp(this.pos, spot, Date.now(), rnd);
-        const { cell, parents } = F.cellsOf(spot, h3, 8, [7, 5]);
-        this.castTo(`user:${this.id}`, "driver_update", { cell, spot, parents });
+        this.castTo(`user:${this.id}`, "driver_update", { spot });
         if (!this.carSent) {
           this.carSent = true;
           this.mark();
@@ -804,8 +803,7 @@ class Agent {
       this.pos = { ...this.home };
       const spot = F.stickySpot(this.spot, { ...this.pos, accuracy: 10 }, h3, 9);
       this.spot = spot;
-      const { cell, parents } = F.cellsOf(spot, h3, 8, [7, 5]);
-      this.castTo(user, "hand_up", { cell, spot, parents });
+      this.castTo(user, "hand_up", { spot });
       this.hand = true;
       this.mark();
       bump("hands_up");
@@ -1020,6 +1018,12 @@ async function login(name) {
     body: JSON.stringify({ agree_terms: true, name }),
   });
   const cookie = r.headers.get("set-cookie").split(";")[0];
+  // going online needs a car on file (the server checks, step 5)
+  await fetch(`${BASE}/api/car`, {
+    method: "POST",
+    headers: { "content-type": "application/json", cookie },
+    body: JSON.stringify({ color: "Blue", make: "Toyota", model: "Camry" }),
+  });
   const me = (await (await fetch(`${BASE}/api/me`, { headers: { cookie } })).json()).user;
   return { cookie, me };
 }
@@ -1040,7 +1044,7 @@ async function observe() {
   const carCount = carIds.length;
   // become an online driver far away, to be allowed to see hands
   const far = h3.latLngToCell(CENTER.lat + 1, CENTER.lng, 9);
-  conn.cast(`user:${a.id}`, "driver_update", { cell: h3.cellToParent(far, 8), spot: far, parents: [] });
+  conn.cast(`user:${a.id}`, "driver_update", { spot: far });
   await conn.push(`user:${a.id}`, "__barrier__");
   await sleep(500);
   const hands = await conn.push("world", "sync", { geo: AREA.slice(0, -1), agg: [] });

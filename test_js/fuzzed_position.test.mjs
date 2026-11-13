@@ -86,13 +86,9 @@ test("no reported accuracy: just the hex you're in", () => {
   assert.equal(spotOf(A, { ...centre(B) }), B);
 });
 
-test("cell and parents are derived FROM the spot, so they can't flap at their own edges", () => {
-  const { cell, parents } = F.cellsOf(A, h3, 8, [7, 5]);
-  assert.equal(cell, h3.cellToParent(A, 8));
-  assert.deepEqual(parents, [h3.cellToParent(A, 7), h3.cellToParent(A, 5)]);
-  // one chain: the cell's own parents are the spot's
-  assert.equal(h3.cellToParent(cell, 7), parents[0]);
-});
+// (the neighborhood and count areas come FROM the spot on the server now —
+// Hoodride.H3, held to this same h3-js by Hoodride.H3Test — so they can't
+// flap at their own edges either)
 
 test("a browsing car sends on a new spot or the heartbeat — never for metres moved", () => {
   const here = centre(A);

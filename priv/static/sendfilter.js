@@ -82,15 +82,6 @@
     return dist(prev) - dist(here) > 2 * r ? here : prev;
   }
 
-  // the topic cell and the count-tier parents, derived FROM the spot: one
-  // chain, so none of them can flap at its own edges either
-  function cellsOf(spot, h3, cellRes, parentReses) {
-    return {
-      cell: h3.cellToParent(spot, cellRes),
-      parents: parentReses.map((res) => h3.cellToParent(spot, res)),
-    };
-  }
-
   // Without a real GPS fix the app is at a placeholder location: nothing
   // may be broadcast from it, and nothing may be switched ON (a car or a ✋
   // there would be in the wrong city). Switching OFF is always allowed —
@@ -293,7 +284,6 @@
     stamp,
     seed,
     stickySpot,
-    cellsOf,
     gpsAllows,
     noFixBanner,
     readingQuality,

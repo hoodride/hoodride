@@ -67,10 +67,16 @@ defmodule HoodrideWeb.DrawerFocusTest do
     assert @app =~ ~s[if (e.key === "Escape" && settingsOpen()) closeSettings(e);]
   end
 
-  # it used to drop focus on nothing (Chrome check, 2026-10-29)
+  # it used to drop focus on nothing (Chrome check, 2026-10-29). From
+  # Settings: back on its row — Settings stays open under the form (owner,
+  # 2026-11-13, as the language list; test_browser/settings.mjs)
   test "closing the car sheet returns focus to what opened it" do
     [open] = Regex.run(~r/function openCarSheet\(.*?\n}\n/s, @app)
-    assert open =~ ~s[carSheetOpener = goOnline ? $("btn-mode") : $("btn-account");]
+    assert open =~ ~s[carSheetOpener = goOnline ? $("btn-mode") : $("btn-car");]
+    refute open =~ "closeSettings()"
+    [nav] = Regex.run(~r/function openNavSheet\(.*?\n}\n/s, @app)
+    assert nav =~ ~s[navSheetOpener = target ? $("btn-navigate") : $("btn-navapp");]
+    refute nav =~ "closeSettings()"
     [close] = Regex.run(~r/function closeCarSheet\(.*?\n}\n/s, @app)
     assert close =~ "returnFocus(carSheetOpener, e);"
     assert @app =~ ~s[if (e.key === "Escape" && carSheetOpen()) closeCarSheet(e);]

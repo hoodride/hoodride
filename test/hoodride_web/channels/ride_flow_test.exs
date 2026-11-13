@@ -5,7 +5,12 @@ defmodule HoodrideWeb.RideFlowTest do
   import Phoenix.ChannelTest
   @endpoint HoodrideWeb.Endpoint
 
-  @cell "8f2830828052d25"
+  # a real neighborhood and two of its blocks (the server works the
+  # neighborhood out from the block — step 5)
+  @cell "882a1072c7fffff"
+  @car_spot "892a1072c63ffff"
+  @hand_spot "892a1072c67ffff"
+  @hand_wide "872a1072cffffff"
 
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Hoodride.Repo)
@@ -26,6 +31,8 @@ defmodule HoodrideWeb.RideFlowTest do
         provider_id: "driver-t",
         name: "DriverT"
       })
+
+    :ok = Hoodride.TestHelpers.give_car(driver.id)
 
     %{rider: rider, driver: driver}
   end
@@ -92,18 +99,18 @@ defmodule HoodrideWeb.RideFlowTest do
     assert_reply ref, :ok, %{geo: [%{cell: @cell, drivers: []}]}
 
     # a browsing car is its spot only: no position, no name (reveal on tap)
-    push(dchan, "driver_update", %{"cell" => @cell, "spot" => "spot9car"})
+    push(dchan, "driver_update", %{"cell" => @cell, "spot" => @car_spot})
     assert_push "driver_update", car
-    assert car == %{id: driver.id, cell: @cell, spot: "spot9car"}
+    assert car == %{id: driver.id, cell: @cell, spot: @car_spot}
 
     # rider raises a hand — cells only (coarse topic + finer display spot),
     # no exact point anywhere. A rider's map carries cars only, so their
     # own hand never comes back to them (drivers' maps carry hands)
-    push(rchan, "hand_up", %{"cell" => @cell, "spot" => "spot9abc"})
+    push(rchan, "hand_up", %{"cell" => @cell, "spot" => @hand_spot})
     # (a replying event as a barrier: hand_up itself sends no reply)
     ref = push(rchan, "cancel_request", %{})
     assert_reply ref, :ok
-    assert [{_, @cell, "spot9abc"}] = :ets.lookup(:geo_hands, rider.id)
+    assert [{_, @cell, @hand_spot}] = :ets.lookup(:geo_hands, rider.id)
     refute_push "hand_update", %{}
 
     # chat: routed through the recipient's user channel
@@ -186,13 +193,17 @@ defmodule HoodrideWeb.RideFlowTest do
     {:ok, _, dchan} = subscribe_and_join(dsock, "user:#{driver.id}", %{})
     # (another driver's map: the ✋ layer of this block and its count)
     HoodrideWeb.Endpoint.subscribe(Hoodride.Geo.geo_topic(:hands, @cell))
-    HoodrideWeb.Endpoint.subscribe(Hoodride.Geo.agg_topic(:hands, "c7-acc"))
+    HoodrideWeb.Endpoint.subscribe(Hoodride.Geo.agg_topic(:hands, @hand_wide))
 
-    push(dchan, "driver_update", %{"cell" => @cell, "spot" => "spot9car"})
-    push(rchan, "hand_up", %{"cell" => @cell, "spot" => "spot9abc", "parents" => ["c7-acc"]})
+    push(dchan, "driver_update", %{"cell" => @cell, "spot" => @car_spot})
+    # the car is on the map before the rider looks (it never waited: the
+    # car check, step 5, made the driver's side just slower than the rider's)
+    ref = push(dchan, "cancel_request", %{})
+    assert_reply ref, :ok
+    push(rchan, "hand_up", %{"cell" => @cell, "spot" => @hand_spot, "parents" => [@hand_wide]})
     assert_receive %Broadcast{topic: "geo:h:" <> _, event: "hand_update", payload: %{id: rid}}
     assert rid == rider.id
-    assert_receive %Broadcast{topic: "agg:h:c7-acc", payload: %{hands: 1}}
+    assert_receive %Broadcast{topic: "agg:h:872a1072cffffff", payload: %{hands: 1}}
 
     _ = watch(rsock, @cell)
     ref = push(rchan, "request_ride", %{"to" => driver.id})
@@ -201,7 +212,7 @@ defmodule HoodrideWeb.RideFlowTest do
     assert_reply ref, :ok
 
     assert_receive %Broadcast{topic: "geo:h:" <> _, event: "hand_left", payload: %{id: ^rid}}
-    assert_receive %Broadcast{topic: "agg:h:c7-acc", payload: %{hands: 0}}
+    assert_receive %Broadcast{topic: "agg:h:872a1072cffffff", payload: %{hands: 0}}
   end
 
   # a message whose reply was lost (the connection dropped right after it
@@ -217,7 +228,7 @@ defmodule HoodrideWeb.RideFlowTest do
     {:ok, _, rchan} = subscribe_and_join(rsock, "user:#{rider.id}", %{})
     {:ok, _, dchan} = subscribe_and_join(dsock, "user:#{driver.id}", %{})
     _ = watch(rsock, @cell)
-    push(dchan, "driver_update", %{"cell" => @cell, "spot" => "spot9car"})
+    push(dchan, "driver_update", %{"cell" => @cell, "spot" => @car_spot})
     assert_push "driver_update", %{}
 
     send = fn text, cid ->
@@ -268,7 +279,7 @@ defmodule HoodrideWeb.RideFlowTest do
     {:ok, _, rchan} = subscribe_and_join(rsock, "user:#{rider.id}", %{})
     {:ok, _, dchan} = subscribe_and_join(dsock, "user:#{driver.id}", %{})
     _ = watch(rsock, @cell)
-    push(dchan, "driver_update", %{"cell" => @cell, "spot" => "spot9car"})
+    push(dchan, "driver_update", %{"cell" => @cell, "spot" => @car_spot})
     assert_push "driver_update", %{}
 
     # 18 of the hour's 20 new chats already started
@@ -290,7 +301,7 @@ defmodule HoodrideWeb.RideFlowTest do
     {:ok, _, dchan} = subscribe_and_join(dsock, "user:#{driver.id}", %{})
 
     # requests need an on-map driver, on the rider's screen
-    push(dchan, "driver_update", %{"cell" => @cell, "lat" => 1.0, "lng" => 2.0})
+    push(dchan, "driver_update", %{"spot" => @car_spot, "lat" => 1.0, "lng" => 2.0})
     # driver_update sends no reply: a replying push proves it was processed
     # (without this, a busy machine let the request land first: "unavailable")
     ref = push(dchan, "cancel_request", %{})
@@ -318,7 +329,7 @@ defmodule HoodrideWeb.RideFlowTest do
     {:ok, _, dchan} = subscribe_and_join(dsock, "user:#{driver.id}", %{})
 
     # requests need an on-map driver, on the rider's screen
-    push(dchan, "driver_update", %{"cell" => @cell, "lat" => 1.0, "lng" => 2.0})
+    push(dchan, "driver_update", %{"spot" => @car_spot, "lat" => 1.0, "lng" => 2.0})
     # driver_update sends no reply: a replying push proves it was processed
     # (without this, a busy machine let the request land first: "unavailable")
     ref = push(dchan, "cancel_request", %{})

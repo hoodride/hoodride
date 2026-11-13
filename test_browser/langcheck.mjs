@@ -129,6 +129,9 @@ export async function walk(p, look, colorStart) {
     await look(p, "the car form");
     await p.click("car-cancel");
     await p.waitFor(`!carSheetOpen()`, "the car form closed");
+    // (back in Settings, as from the language list — owner, 2026-11-13)
+    await p.waitFor(`settingsOpen()`, "back in the menu");
+    await p.eval(`(closeSettings(), true)`);
     await p.eval(`openNavSheet({ lat: 40.71, lng: -74.0 }), true`);
     await p.waitFor(`!document.getElementById("nav-sheet").classList.contains("hidden")`, "the map-app box");
     await look(p, "the map-app box");

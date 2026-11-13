@@ -63,8 +63,6 @@ defmodule Hoodride.Limits do
     # ---------- the map ----------
     {:map, :map_cells_watched, 120, "Map areas (hexes) one screen may watch at once."},
     {:map, :cell_bytes, 24, "Bytes in one map area's name (a hex id)."},
-    {:map, :parent_cells, 4,
-     "Wider areas sent with a car's or a ✋'s position (zoomed-out counts)."},
     {:map, :presence_grace_ms, 5 * @minute,
      "How long someone who left stays (car, ✋, chats) before the sweeper removes them."},
     {:map, :position_stale_ms, 3 * @minute,

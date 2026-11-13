@@ -17,7 +17,7 @@ defmodule HoodrideWeb.CarPrivacyTest do
   import TestClient, only: [frames: 1, events: 1, request: 4]
 
   @cell "882a1072c7fffff"
-  @cell2 "882a1072cffffff"
+  @cell2 "882a1072c9fffff"
   @spot "892a1072c63ffff"
   @spot2 "892a1072c67ffff"
 
@@ -37,6 +37,8 @@ defmodule HoodrideWeb.CarPrivacyTest do
         photo: "https://example.test/#{key}.png"
       })
 
+    # anyone here may go online: a car needs a car (step 5)
+    :ok = Hoodride.TestHelpers.give_car(u.id)
     u
   end
 
@@ -101,14 +103,18 @@ defmodule HoodrideWeb.CarPrivacyTest do
       refute flat =~ "cp-d"
     end
 
-    test "no spot (an older app) → the car is shown at its cell" do
+    # (it used to be shown at its cell; every app since 2026-10-24 sends a
+    # spot, and the server now works the cell out FROM it — step 5)
+    test "no spot (an older app) → refused, not on the map" do
       rider = TestClient.start(:rider, user("cp-r"))
       driver = TestClient.start(:driver, user("cp-d"))
       assert {:ok, _} = sync(rider, %{"geo" => [@cell]})
 
-      drive(driver, %{"cell" => @cell, "lat" => 40.7, "lng" => -74.0})
+      assert {:error, %{reason: "bad_request"}} =
+               drive(driver, %{"cell" => @cell, "lat" => 40.7, "lng" => -74.0})
 
-      assert [{"driver_update", %{spot: @cell}}] = car_frames(frames(rider))
+      assert car_frames(frames(rider)) == []
+      refute Geo.driver_on_map?(driver.user.id)
     end
 
     test "a malformed spot is refused, never stored" do
@@ -153,7 +159,7 @@ defmodule HoodrideWeb.CarPrivacyTest do
     @tag :per_message
     test "a new cell: left in the old one, then the update in the new one",
          %{rider: rider, driver: driver} do
-      drive(driver, %{"cell" => @cell2, "spot" => "892a1072cc3ffff"})
+      drive(driver, %{"cell" => @cell2, "spot" => "892a1072c83ffff"})
 
       id = driver.user.id
 
@@ -212,7 +218,7 @@ defmodule HoodrideWeb.CarPrivacyTest do
 
     test "a driver can't reveal another car (drivers never see cars)", %{driver: driver} do
       other = TestClient.start(:other, user("cp-o"))
-      drive(other, %{"cell" => @cell2, "spot" => "892a1072cc3ffff"})
+      drive(other, %{"cell" => @cell2, "spot" => "892a1072c83ffff"})
       assert {:ok, _} = sync(other, %{"geo" => [@cell]})
 
       assert {:error, %{reason: "unavailable"}} =
@@ -236,7 +242,7 @@ defmodule HoodrideWeb.CarPrivacyTest do
     assert {:ok, _} = sync(watcher, %{"geo" => [@cell]})
 
     Geo.hand_up(800_001, @cell, @spot)
-    Geo.hand_up(800_001, @cell2, "892a1072cc3ffff")
+    Geo.hand_up(800_001, @cell2, "892a1072c83ffff")
 
     assert ["hand_update", "hand_left"] =
              watcher |> frames() |> events() |> Enum.filter(&String.starts_with?(&1, "hand"))

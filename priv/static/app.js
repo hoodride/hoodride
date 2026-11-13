@@ -888,8 +888,9 @@ function carSheetOpen() {
 }
 
 // goOnline: opened by Go online (no car yet) — saving then goes online
+// From Settings it opens OVER the drawer, which stays (owner, 2026-11-13: as
+// the language list does — closing it is back in Settings, not on the map)
 function openCarSheet({ goOnline = false } = {}) {
-  closeSettings();
   const car = state.myCar || {};
   $("car-color").value = car.color || "";
   $("car-make").value = car.make || "";
@@ -904,9 +905,9 @@ function openCarSheet({ goOnline = false } = {}) {
   $("car-save").textContent = goOnline ? t("Save & go online") : t("Save");
   $("car-save").disabled = false;
   $("car-sheet").dataset.goOnline = goOnline ? "1" : "";
-  // where focus goes back on close: Drive (going online), else the photo
-  // button (the drawer it came from is shut)
-  carSheetOpener = goOnline ? $("btn-mode") : $("btn-account");
+  // where focus goes back on close: Drive (going online), else its row in
+  // Settings (still open under it)
+  carSheetOpener = goOnline ? $("btn-mode") : $("btn-car");
   $("car-backdrop").classList.remove("hidden");
   $("car-sheet").classList.remove("hidden");
   // the title, not the color dropdown: on iPhone a focused <select> opens
@@ -2487,7 +2488,9 @@ function ensureRidePeerEntry(peer) {
 // point; exact positions go only to a ride partner. The spot is sticky
 // (HoodSendFilter.stickySpot) so an edge can't leak by flip-flopping, and
 // remembered on this device per user so a home on an edge shows in the same
-// block every day. The topic cell and the count parents come FROM the spot.
+// block every day. Only the spot is sent: the server works out the
+// neighborhood and the zoomed-out count areas from it (Hoodride.H3 — it
+// used to take our word for them, step 5).
 let mySpot = null;
 
 // localStorage, or null where touching it throws (some private modes)
@@ -2526,9 +2529,6 @@ function currentSpot() {
   }
   return spot;
 }
-function myCells(spot) {
-  return HoodSendFilter.cellsOf(spot, h3, H3_RES, AGG_RESES);
-}
 
 // when to send our position: sendfilter.js (HoodSendFilter) — on the browse
 // map a new SPOT or the jittered heartbeat; in a ride a distance filter.
@@ -2542,12 +2542,11 @@ function pushDriverUpdate() {
   // would be in the wrong city (the server drops a silent car in 3 min)
   if (!HoodSendFilter.gpsAllows(state.haveFix, "send")) return;
   const spot = currentSpot();
-  const { cell, parents } = myCells(spot);
   const now = Date.now();
   if (!HoodSendFilter.shouldSend(lastGeoSent, now, state.me, spot, HoodSendFilter.BROWSE_MIN_METERS))
     return;
   lastGeoSent = HoodSendFilter.stamp(state.me, spot, now, Math.random);
-  userChannel.push("driver_update", { cell, spot, parents });
+  userChannel.push("driver_update", { spot });
 }
 
 function pushDriverOffline() {
@@ -2592,8 +2591,7 @@ function pushHand(up) {
   if (up) {
     const spot = currentSpot();
     if (!spot) return; // no fix: the tap was already refused
-    const { cell, parents } = myCells(spot);
-    userChannel.push("hand_up", { cell, spot, parents });
+    userChannel.push("hand_up", { spot });
   } else {
     userChannel.push("hand_down", {});
   }
@@ -5189,8 +5187,9 @@ $("btn-navigate").addEventListener("click", (e) => {
 // changed from Settings. `target`: where Navigate goes — the choices are real
 // links there (the phone's app takes the tap); none: just choosing -----
 let navSheetOpener = null;
+// From Settings it opens OVER the drawer, which stays (owner, 2026-11-13: as
+// the language list does); from Navigate (a ride) Settings isn't open
 function openNavSheet(target = null) {
-  closeSettings();
   const offered = HoodNavLink.choices(PLATFORM);
   document.querySelectorAll(".nav-choice").forEach((a) => {
     const app = a.dataset.app;
@@ -5199,7 +5198,7 @@ function openNavSheet(target = null) {
     a.target = target ? HoodNavLink.target(PLATFORM) : "_self";
   });
   $("nav-sheet").dataset.going = target ? "1" : "";
-  navSheetOpener = target ? $("btn-navigate") : $("btn-account");
+  navSheetOpener = target ? $("btn-navigate") : $("btn-navapp");
   $("nav-backdrop").classList.remove("hidden");
   $("nav-sheet").classList.remove("hidden");
   $("nav-title").focus();

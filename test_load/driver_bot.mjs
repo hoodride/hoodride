@@ -10,7 +10,6 @@ let spot = null;
 
 const BASE = "http://127.0.0.1:4000";
 const WS = "ws://127.0.0.1:4000/socket/websocket?vsn=2.0.0";
-const RES = 8;
 
 // name and start offset configurable: node test_load/driver_bot.mjs [name] [dLat] [dLng]
 const BOT_NAME = process.argv[2] || "DeShawn-Bot";
@@ -99,6 +98,12 @@ async function main() {
     }),
   });
   const cookie = r.headers.get("set-cookie").split(";")[0];
+  // going online needs a car on file (the server checks, step 5)
+  await fetch(`${BASE}/api/car`, {
+    method: "POST",
+    headers: { "content-type": "application/json", cookie },
+    body: JSON.stringify({ color: "Blue", make: "Toyota", model: "Camry" }),
+  });
   const me = (await (await fetch(`${BASE}/api/me`, { headers: { cookie } })).json()).user;
   const token = (await (await fetch(`${BASE}/api/socket_token`, { headers: { cookie } })).json())
     .token;
@@ -170,8 +175,7 @@ async function main() {
         lng: pos.lng + (Math.random() - 0.5) * 0.0004,
       };
       spot = F.stickySpot(spot, { ...pos, accuracy: 10 }, h3, 9);
-      const { cell, parents } = F.cellsOf(spot, h3, RES, [7, 5]);
-      phx.fire(myTopic, "driver_update", { cell, spot, parents });
+      phx.fire(myTopic, "driver_update", { spot });
     } else if (state === "riding" && rideTopic) {
       const dest = target || riderPos || { lat: 40.7128, lng: -74.006 };
       pos = step(pos, dest, 40);

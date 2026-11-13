@@ -22,7 +22,9 @@ defmodule Hoodride.LimitsTest do
     "every_ms" => "how often the sweeper runs",
     "minute" => "a unit",
     "hour" => "a unit",
-    "protocol" => "the map's message format version"
+    "protocol" => "the map's message format version",
+    "spot_res" => "the map's block size (an H3 resolution — the app's, Hoodride.H3Test)",
+    "cell_res" => "the map's neighborhood size (likewise)"
   }
 
   defp lib_files, do: Path.wildcard("lib/**/*.ex") -- ["lib/hoodride/limits.ex"]

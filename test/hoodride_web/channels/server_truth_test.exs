@@ -14,6 +14,8 @@ defmodule HoodrideWeb.ServerTruthTest do
     {:ok, user} =
       Hoodride.Accounts.upsert_oauth_user(%{provider: "dev", provider_id: "st-u", name: "TruthU"})
 
+    :ok = Hoodride.TestHelpers.give_car(user.id)
+
     {:ok, peer} =
       Hoodride.Accounts.upsert_oauth_user(%{provider: "dev", provider_id: "st-p", name: "TruthP"})
 
@@ -38,7 +40,7 @@ defmodule HoodrideWeb.ServerTruthTest do
 
   test "driver_offline and hand_down work over the wire, not just at the engine",
        %{chan: chan, user: u} do
-    push(chan, "driver_update", %{"cell" => "cellW", "lat" => 1.0, "lng" => 2.0})
+    push(chan, "driver_update", %{"spot" => "892a1072c63ffff", "lat" => 1.0, "lng" => 2.0})
     ref = push(chan, "cancel_request", %{})
     assert_reply ref, :ok
     assert Hoodride.Geo.driver_on_map?(u.id)
@@ -48,7 +50,7 @@ defmodule HoodrideWeb.ServerTruthTest do
     assert_reply ref, :ok
     refute Hoodride.Geo.driver_on_map?(u.id)
 
-    push(chan, "hand_up", %{"cell" => "cellW", "spot" => "spotW"})
+    push(chan, "hand_up", %{"spot" => "892a1072c63ffff"})
     ref = push(chan, "cancel_request", %{})
     assert_reply ref, :ok
     assert [{_, _, _}] = :ets.lookup(:geo_hands, u.id)
@@ -173,21 +175,25 @@ defmodule HoodrideWeb.ServerTruthTest do
   test "a browsing car is cells only: bad spots are refused, coordinates never kept", %{
     chan: chan
   } do
-    for spot <- [123, nil, %{"x" => 1}, String.duplicate("x", 25)] do
-      ref = push(chan, "driver_update", %{"cell" => "cellT", "spot" => spot})
+    cell = "882a1072c7fffff"
+
+    for spot <- [123, nil, %{"x" => 1}, String.duplicate("x", 25), "cellT", cell] do
+      ref = push(chan, "driver_update", %{"cell" => cell, "spot" => spot})
       assert_reply ref, :error, %{reason: "bad_request"}
     end
 
-    assert Hoodride.Geo.cell_snapshot("cellT").drivers == []
+    assert Hoodride.Geo.cell_snapshot(cell).drivers == []
 
     # an older app's coordinates are simply ignored — even impossible ones
-    ref = push(chan, "driver_update", %{"cell" => "cellT", "lat" => 9999, "lng" => -180.5})
+    ref =
+      push(chan, "driver_update", %{"spot" => "892a1072c63ffff", "lat" => 9999, "lng" => -180.5})
+
     refute_reply ref, :error
     # sync barrier so the cast has been processed
     sync = push(chan, "cancel_request", %{})
     assert_reply sync, :ok
-    assert [car] = Hoodride.Geo.cell_snapshot("cellT").drivers
-    assert car.spot == "cellT"
+    assert [car] = Hoodride.Geo.cell_snapshot(cell).drivers
+    assert car.spot == "892a1072c63ffff"
     # no coordinate kept: no field IS one (nor any decimal at all) — not a
     # text search, which a random user id containing "9999" failed
     # (gate, 2026-11-02)

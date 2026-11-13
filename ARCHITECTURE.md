@@ -361,9 +361,10 @@ only what its **server-derived role** (`Hoodride.Roles`) allows:
     by r can shift that difference by 2r), r capped at half H3's average
     edge so a poor indoor fix can't freeze a moving car. The last spot is
     remembered on the device per user (cleared on logout; storage access
-    guarded), so a home on an edge shows in the same block every day. Cell
-    and count parents are derived FROM the spot (one chain: none of them
-    can flap at its own edges).
+    guarded), so a home on an edge shows in the same block every day. Only
+    the spot is sent: the SERVER derives the cell and count parents from it
+    (Hoodride.H3 — one chain, so none of them can flap at its own edges, and
+    nobody can claim areas they aren't in; step 5, 2026-11-13).
   - **Announced only on change.** A car's update is broadcast only when its
     spot or cell changes; a parked car's ~20 s heartbeat just refreshes
     `vouched_at` (the frozen-driver reap still works) and tells nobody
@@ -530,7 +531,7 @@ only what its **server-derived role** (`Hoodride.Roles`) allows:
 
 **Walls that exist (all tested):** channel ownership (user/ride topics refuse
 non-members), ride authority (rider-only pin, driver-only arrival, participant-only
-end), payload validation everywhere (coords, cell byte-caps, parents ≤4, msg ≤500),
+end), payload validation everywhere (coords, real block ids — every area derived server-side, msg ≤500),
 signed sessions + 1-day socket tokens (unforgeable, verified), OAuth state
 anti-CSRF (tested incl. forged state), prod dev_login explicitly off, self-action
 guards (message/request/ride yourself: impossible), no profile lookup by id
@@ -1702,6 +1703,14 @@ geo invariants (5–8) hold at quiesce BEFORE any sweep; one sweep → all 8 hol
   `geo_hands: user_id → cell`. Movement across a cell boundary = "left"/"update"
   events to the two topics. (Server-side H3 math only becomes necessary for the
   aggregate-counts tier — add the NIF then, or compute parents client-side too.)
+  **Superseded 2026-11-13 (step 5):** the client-computed parents were believed —
+  one car could count in 4 areas anywhere. The server now does the little H3 it
+  needs itself, without the NIF: `Hoodride.H3` (bit math on the 64-bit id —
+  validity, parent) checks the block id and derives the cell and the parents;
+  the app sends only `{spot}`. Held to the app's own h3-js by
+  `test/fixtures/h3_cases.json` (605 places incl. all 12 pentagons, 1,800 bad ids).
+  Going online also needs a car on file (`Accounts.has_car?`, asked once per
+  appearance, not per update).
 - Drivers subscribe to own cell + k-ring (demand near them, not where they scrolled).
 - **✋ demand is published at cell granularity (centroid)** — fuzzing is structural;
   the server never shares a rider's exact point pre-accept.
@@ -1710,7 +1719,8 @@ geo invariants (5–8) hold at quiesce BEFORE any sweep; one sweep → all 8 hol
   ~174 m edge — the location-privacy literature's ~200 m sweet spot). Deterministic
   cell-snapping deliberately chosen over random noise: snapping resists
   repeated-observation home-inference attacks (noise averages out; a snap never
-  sharpens). Server treats both cells as opaque strings.
+  sharpens). Server treats both cells as opaque strings. (2026-11-13: it now
+  derives the res-8 cell from the res-9 spot itself — see above.)
 - Edge cases to handle: boundary jitter (only change cells on meaningful GPS movement),
   screen-edge demand (k-ring, not strict viewport).
 

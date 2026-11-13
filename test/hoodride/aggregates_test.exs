@@ -15,6 +15,7 @@ defmodule Hoodride.AggregatesTest do
     {:ok, user} =
       Hoodride.Accounts.upsert_oauth_user(%{provider: "dev", provider_id: "agg-u", name: "AggU"})
 
+    :ok = Hoodride.TestHelpers.give_car(user.id)
     %{user: user}
   end
 
@@ -388,7 +389,10 @@ defmodule Hoodride.AggregatesTest do
     assert_reply ref, :error, %{reason: "read_only"}
   end
 
-  test "parents arrive via the user channel and malformed ones are dropped", %{user: user} do
+  # (the app used to send its own parents and the server tallied them —
+  # one car could count anywhere; step 5, 2026-11-13: worked out here)
+  test "over the user channel the parents come from the block; any sent are ignored",
+       %{user: user} do
     {:ok, socket} =
       connect(HoodrideWeb.UserSocket, %{},
         connect_info: %{session: Hoodride.TestHelpers.session_for(user.id)}
@@ -398,6 +402,7 @@ defmodule Hoodride.AggregatesTest do
 
     push(chan, "driver_update", %{
       "cell" => "cell8f",
+      "spot" => "892a1072c63ffff",
       "lat" => 1.0,
       "lng" => 2.0,
       "parents" => ["c7E", 123, String.duplicate("x", 500), "c5E"]
@@ -408,9 +413,11 @@ defmodule Hoodride.AggregatesTest do
     assert_reply ref, :ok
 
     Hoodride.Geo.recompute_aggregates()
-    # only the two well-formed parents tallied
-    assert Geo.agg_counts_for("c7E") == %{drivers: 1, hands: 0}
-    assert Geo.agg_counts_for("c5E") == %{drivers: 1, hands: 0}
+    # the block's own wider areas; nothing the app named
+    assert Geo.agg_counts_for("872a1072cffffff") == %{drivers: 1, hands: 0}
+    assert Geo.agg_counts_for("852a1073fffffff") == %{drivers: 1, hands: 0}
+    assert Geo.agg_counts_for("c7E") == %{drivers: 0, hands: 0}
+    assert Geo.agg_counts_for("c5E") == %{drivers: 0, hands: 0}
   end
 
   # two writer shards counting the same hex each broadcast the number they

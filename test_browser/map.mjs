@@ -81,6 +81,23 @@ await journey("map: a pile, zoomed-out counts, where the map opens", async (brow
   await rita.waitFor(`pileMarkers.size === 0`, "the car markers gone");
   // (drawn: a wanted cell's count, all answered — the app keeps counts it no longer draws)
   await rita.waitFor(`worldSync.settled() && [...aggData].some(([c, p]) => p.drivers === 3 && worldSync.wantedAggHas(c))`, "a count of 3 drivers drawn", 15000);
+  // …in the area that holds their block: the server works it out from the
+  // block itself (step 5, 2026-11-13 — it used to take the app's word)
+  const danSpot = await drivers[0].eval("mySpot");
+  check(await rita.eval(`[...aggData].some(([c, p]) => p.drivers === 3 && h3.cellToParent(${JSON.stringify(danSpot)}, h3.getResolution(c)) === c)`), "the count of 3 is where their block is", danSpot);
+
+  step("a car claiming far-away areas counts only where it is; no car on file, no car on the map");
+  // (as a cheater would: a hand-made message naming areas across the river)
+  const across = { lng: -73.95, lat: 40.65 };
+  const farAreas = await rita.eval(`[7, 5].map((r) => h3.latLngToCell(${across.lat}, ${across.lng}, r)).filter((c) => c !== h3.cellToParent(${JSON.stringify(danSpot)}, h3.getResolution(c)))`);
+  check(farAreas.length > 0, "an area that isn't Dan's", farAreas);
+  await drivers[0].eval(`userChannel.push("driver_update", { spot: mySpot, cell: ${JSON.stringify(farAreas[0])}, parents: ${JSON.stringify(farAreas)} }), true`);
+  await rita.eval(`map.jumpTo({ center: [${across.lng}, ${across.lat}], zoom: 11 }), true`);
+  await rita.waitFor(`worldSync.settled() && ${JSON.stringify(farAreas)}.some((c) => worldSync.wantedAggHas(c))`, "Rita looking at the far-away area");
+  await new Promise((r) => setTimeout(r, 1000));
+  check(await rita.eval(`${JSON.stringify(farAreas)}.every((c) => !(aggData.get(c)?.drivers > 0))`), "no car counted there", await rita.eval(`${JSON.stringify(farAreas)}.map((c) => aggData.get(c))`));
+  const refused = await rita.eval(`new Promise((ok) => userChannel.push("driver_update", { spot: ${JSON.stringify(danSpot)} }).receive("error", (e) => ok(e.reason)).receive("timeout", () => ok("timeout")))`);
+  check(refused === "no_car", "Rita (no car) sending a car by hand: refused", refused);
 
   step("back in: the pile is back");
   await rita.eval(`map.jumpTo({ center: [${view.lng}, ${view.lat}], zoom: ${view.zoom} }), true`);

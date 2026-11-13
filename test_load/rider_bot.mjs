@@ -94,7 +94,7 @@ async function main() {
   // Option B: one world channel, cells watched via sync
   await phx.send("world", "phx_join", {});
   await phx.send("world", "sync", { geo: [watchCell] }); // full desired set
-  phx.fire(myTopic, "hand_up", { cell: myCell, spot: mySpot, parents: [7, 5].map((r) => h3.latLngToCell(myPos.lat, myPos.lng, r)) }); // {:noreply} on the server â€” never await it
+  phx.fire(myTopic, "hand_up", { spot: mySpot }); // {:noreply} on the server â€” never await it
   log(`âœ‹ hand up in ${myCell}, watching ${watchCell} for a driver`);
 
   function engage(id) {
@@ -156,7 +156,7 @@ async function main() {
       driverId = null;
       replyIdx = 0;
       setTimeout(() => {
-        phx.fire(myTopic, "hand_up", { cell: myCell, spot: mySpot, parents: [7, 5].map((r) => h3.latLngToCell(myPos.lat, myPos.lng, r)) });
+        phx.fire(myTopic, "hand_up", { spot: mySpot });
         log("âœ‹ hand up again");
       }, 6000);
     }

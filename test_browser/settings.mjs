@@ -52,13 +52,50 @@ await journey("settings: the drawer, your car, Go online without one", async (br
   step("Settings: the car, as riders read it — no 'Other'");
   await dan.click("btn-account");
   await dan.waitFor(`document.getElementById("car-note").textContent === "Honda Civic"`, "Honda Civic");
+
+  // owner, 2026-11-13: "Your car" and "Navigation app" open OVER Settings,
+  // as the language list does — the drawer never slides away under them,
+  // and closing them is back in Settings, not on the map
+  step("Your car and Navigation app open over Settings; closing them is back in Settings");
+  // the drawer all the way open, and still so a few frames on (a slide
+  // away would have moved it by then: 0.2 s)
+  const drawerStays = async (what) => {
+    await dan.eval(`new Promise((ok) => setTimeout(() => ok(true), 300))`);
+    const d = await dan.eval(`({ open: settingsOpen(), left: Math.round(document.getElementById("settings-sheet").getBoundingClientRect().left) })`);
+    check(d.open && d.left === 0, `${what}: Settings still open under it, not sliding away`, d);
+  };
+  await dan.waitFor(`Math.abs(document.getElementById("settings-sheet").getBoundingClientRect().left) < 0.5`, "Settings all the way open");
+  await dan.click("btn-car");
+  await dan.waitFor(`carSheetOpen()`, "the car form, from Settings");
+  await drawerStays("the car form open");
+  await dan.click("car-cancel");
+  await dan.waitFor(`!carSheetOpen()`, "the car form cancelled");
+  await drawerStays("the car form cancelled");
+  await dan.click("btn-car");
+  await dan.waitFor(`carSheetOpen()`, "the car form again");
+  await dan.eval(`(document.getElementById("car-model").value = "Accord", document.getElementById("car-sheet").requestSubmit(), true)`);
+  await dan.waitFor(`!carSheetOpen()`, "saved");
+  await dan.waitFor(`document.getElementById("car-note").textContent === "Honda Accord"`, "Settings shows the new car");
+  await drawerStays("the car saved");
+  await dan.click("btn-navapp");
+  await dan.waitFor(`!document.getElementById("nav-sheet").classList.contains("hidden")`, "the map-app box, from Settings");
+  await drawerStays("the map-app box open");
+  const pick = await dan.eval(`(() => { const a = [...document.querySelectorAll(".nav-choice")].find((x) => !x.classList.contains("hidden")); a.click(); return a.textContent.trim(); })()`);
+  await dan.waitFor(`document.getElementById("nav-sheet").classList.contains("hidden")`, "an app picked");
+  await dan.waitFor(`document.getElementById("navapp-note").textContent === ${JSON.stringify(pick)}`, "Settings shows the app picked");
+  await drawerStays("an app picked");
+  await dan.click("btn-navapp");
+  await dan.waitFor(`!document.getElementById("nav-sheet").classList.contains("hidden")`, "the map-app box again");
+  await dan.click("nav-cancel");
+  await dan.waitFor(`document.getElementById("nav-sheet").classList.contains("hidden")`, "the map-app box cancelled");
+  await drawerStays("the map-app box cancelled");
   await dan.eval(`closeSettings(), true`);
 
-  step("Rita taps Dan's car: 'Honda Civic'");
+  step("Rita taps Dan's car: 'Honda Accord'");
   const danId = await dan.id();
   await sees(rita, danId);
   await rita.eval(`openMarkerCard(realPeersById.get(${danId}), "driver"), true`);
   await rita.waitFor(`document.getElementById("peer-card").textContent.includes("BT-Dan")`, "the card, named");
   const card = await rita.eval(`document.getElementById("peer-card").textContent`);
-  check(card.includes("Honda Civic") && !card.includes("Other"), "the card says Honda Civic", card);
+  check(card.includes("Honda Accord") && !card.includes("Other"), "the card says Honda Accord", card);
 });

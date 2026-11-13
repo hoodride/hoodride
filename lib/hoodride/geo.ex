@@ -3,14 +3,16 @@ defmodule Hoodride.Geo do
 
   @moduledoc """
   The live world: who is where, right now. All ETS, all ephemeral.
-  Cells are opaque strings (H3 computed client-side via h3-js) —
-  the server indexes and broadcasts by cell without doing H3 math.
+  Cells are opaque strings here: the server indexes and broadcasts by cell
+  without doing H3 math. Which cells a car or a ✋ belongs to is worked out
+  from its block at the door (HoodrideWeb.UserChannel, Hoodride.H3 — never
+  the app's word for it, step 5).
   """
 
   @drivers :geo_drivers
   @hands :geo_hands
   @presence :geo_presence
-  # client-computed coarse parent cells per user (opaque strings), for aggregates
+  # the wider cells each user counts in (worked out from the block: Hoodride.H3), for aggregates
   @parents :geo_parents
   # derived tallies per coarse cell: {agg_cell, drivers, hands} — a cache of the
   # parents table. Hybrid freshness: shifted instantly when a parents row changes

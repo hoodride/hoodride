@@ -82,6 +82,8 @@ defmodule Hoodride.OverloadTest do
   describe "a stuck map writer" do
     test "the user channel survives; its changes land once the writer resumes" do
       u = user("ov-chan")
+      # going online needs a car on file (step 5)
+      :ok = Hoodride.TestHelpers.give_car(u.id)
       chan = user_channel(u)
       ref = Process.monitor(chan.channel_pid)
 

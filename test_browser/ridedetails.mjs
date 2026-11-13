@@ -187,6 +187,10 @@ await journey("ride details: decline, too late, Navigate, the pin, I'm here", as
   await finn.click("nav-google");
   await finn.waitFor(`!(${sheetOpen}) && localStorage.getItem("hoodride_navapp") === "google"`, "Google Maps chosen");
   check(await finn.eval(`location.pathname === "/" && !!state.ride`), "still in the app, in the ride");
+  // back in Settings, its note the new app (owner, 2026-11-13: as from the
+  // language list) — then closed, to the map
+  await finn.waitFor(`settingsOpen() && document.getElementById("navapp-note").textContent === "Google Maps"`, "back in Settings: Google Maps");
+  await finn.eval(`(closeSettings(), true)`);
   check((await navigate(finn)) === `https://www.google.com/maps/dir/?api=1&destination=${pin.lat}%2C${pin.lng}`, "Navigate: Google Maps now, to the pin");
 
   step("Rita moves the 📍: Navigate follows the new spot");

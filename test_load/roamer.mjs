@@ -25,6 +25,12 @@ async function main() {
     body: JSON.stringify({ agree_terms: true, name: "Roamer-Bot" }),
   });
   const cookie = r.headers.get("set-cookie").split(";")[0];
+  // going online needs a car on file (the server checks, step 5)
+  await fetch(`${BASE}/api/car`, {
+    method: "POST",
+    headers: { "content-type": "application/json", cookie },
+    body: JSON.stringify({ color: "Blue", make: "Toyota", model: "Camry" }),
+  });
   const me = (await (await fetch(`${BASE}/api/me`, { headers: { cookie } })).json()).user;
   const token = (await (await fetch(`${BASE}/api/socket_token`, { headers: { cookie } })).json())
     .token;
@@ -42,8 +48,7 @@ async function main() {
 
   setInterval(() => {
     spot = F.stickySpot(spot, { ...pos, accuracy: 10 }, h3, 9);
-    const { cell, parents } = F.cellsOf(spot, h3, 8, [7, 5]);
-    send(`user:${me.id}`, "driver_update", { cell, spot, parents });
+    send(`user:${me.id}`, "driver_update", { spot });
   }, 1500);
 
   setTimeout(() => {

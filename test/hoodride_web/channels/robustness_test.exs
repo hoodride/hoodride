@@ -14,6 +14,8 @@ defmodule HoodrideWeb.RobustnessTest do
     {:ok, user} =
       Hoodride.Accounts.upsert_oauth_user(%{provider: "dev", provider_id: "rob", name: "Rob"})
 
+    :ok = Hoodride.TestHelpers.give_car(user.id)
+
     {:ok, socket} =
       connect(HoodrideWeb.UserSocket, %{},
         connect_info: %{session: Hoodride.TestHelpers.session_for(user.id)}
@@ -43,9 +45,9 @@ defmodule HoodrideWeb.RobustnessTest do
     end
 
     # channel is still alive and functional after all that abuse
-    ref = push(chan, "hand_up", %{"cell" => "cellZ"})
+    ref = push(chan, "hand_up", %{"spot" => "892a1072c63ffff"})
     refute_reply ref, :error
-    assert [%{id: _}] = Hoodride.Geo.cell_snapshot("cellZ").hands
+    assert [%{id: _}] = Hoodride.Geo.cell_snapshot("882a1072c7fffff").hands
   end
 
   test "the world channel is read-only (writes live on the user channel)",
@@ -71,18 +73,18 @@ defmodule HoodrideWeb.RobustnessTest do
       )
 
     {:ok, _, world} = subscribe_and_join(watcher_sock, "world", %{})
-    ref = push(world, "sync", %{"geo" => ["cellA", "cellB"]})
+    ref = push(world, "sync", %{"geo" => ["882a1072c7fffff", "882a1072c9fffff"]})
     assert_reply ref, :ok
 
-    push(chan, "driver_update", %{"cell" => "cellA", "spot" => "spotA"})
-    assert_push "driver_update", %{id: driver_id, spot: "spotA"}
+    push(chan, "driver_update", %{"spot" => "892a1072c63ffff"})
+    assert_push "driver_update", %{id: driver_id, spot: "892a1072c63ffff"}
     assert driver_id == u.id
 
-    push(chan, "driver_update", %{"cell" => "cellB", "spot" => "spotB"})
+    push(chan, "driver_update", %{"spot" => "892a1072c97ffff"})
     assert_push "driver_left", %{id: ^driver_id}
-    assert_push "driver_update", %{id: ^driver_id, spot: "spotB"}
+    assert_push "driver_update", %{id: ^driver_id, spot: "892a1072c97ffff"}
 
-    assert Hoodride.Geo.cell_snapshot("cellA").drivers == []
-    assert [%{spot: "spotB"}] = Hoodride.Geo.cell_snapshot("cellB").drivers
+    assert Hoodride.Geo.cell_snapshot("882a1072c7fffff").drivers == []
+    assert [%{spot: "892a1072c97ffff"}] = Hoodride.Geo.cell_snapshot("882a1072c9fffff").drivers
   end
 end

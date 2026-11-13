@@ -173,41 +173,22 @@ defmodule HoodrideWeb.UserChannel do
     end
   end
 
-  # driver broadcasting availability (only while online-as-driver): cells
-  # only, like a hand — `spot` is the block-level display hex the app chose.
-  # Any lat/lng an older app still sends is ignored: exact positions travel
-  # only inside a ride (RideChannel).
-  defp event("driver_update", %{"cell" => cell, "spot" => spot} = payload, socket)
-       when valid_cell(cell) and valid_cell(spot) do
-    driver_update(socket, cell, spot, payload)
-  end
-
-  defp event("driver_update", %{"cell" => cell} = payload, socket)
-       when valid_cell(cell) and not is_map_key(payload, "spot") do
-    driver_update(socket, cell, nil, payload)
+  # A car or a ✋ on the map: the app sends only its block (`spot`, the
+  # block-level display hex it chose) and the server works out every other
+  # area from it (Hoodride.H3) — the neighborhood it's filed under and the
+  # wider areas it's counted in. Anything else an older app still sends
+  # (`cell`, `parents`, lat/lng) is ignored: it used to be believed, so one
+  # car could count in 4 areas anywhere (step 5, owner 2026-11-13). Exact
+  # positions travel only inside a ride (RideChannel).
+  defp event(name, %{"spot" => spot}, socket) when name in ["driver_update", "hand_up"] do
+    case Hoodride.H3.areas(spot) do
+      {:ok, areas} -> place(name, areas, socket)
+      :error -> {:reply, {:error, %{reason: "bad_request"}}, socket}
+    end
   end
 
   defp event("driver_offline", _payload, socket) do
     Geo.driver_offline(socket.assigns.user_id)
-    {:noreply, socket}
-  end
-
-  # rider demand beacon — cell only, never an exact position
-  defp event("hand_up", %{"cell" => cell, "spot" => spot} = payload, socket)
-       when valid_cell(cell) and valid_cell(spot) do
-    if Hoodride.Rides.ride_id_of_user(socket.assigns.user_id) == nil do
-      Geo.hand_up(socket.assigns.user_id, cell, spot, valid_parents(payload))
-    end
-
-    {:noreply, socket}
-  end
-
-  defp event("hand_up", %{"cell" => cell} = payload, socket)
-       when valid_cell(cell) and not is_map_key(payload, "spot") do
-    if Hoodride.Rides.ride_id_of_user(socket.assigns.user_id) == nil do
-      Geo.hand_up(socket.assigns.user_id, cell)
-    end
-
     {:noreply, socket}
   end
 
@@ -331,13 +312,30 @@ defmodule HoodrideWeb.UserChannel do
     {:reply, {:error, %{reason: "bad_request"}}, socket}
   end
 
-  defp driver_update(socket, cell, spot, payload) do
-    # mid-ride users don't appear on the browse map, whatever their client says
-    if Hoodride.Rides.ride_id_of_user(socket.assigns.user_id) == nil do
-      Geo.driver_update(socket.assigns.user, cell, spot, valid_parents(payload))
-    end
+  # mid-ride users don't appear on the browse map, whatever their client says
+  defp place(name, areas, socket) do
+    me = socket.assigns.user_id
 
-    {:noreply, socket}
+    cond do
+      Hoodride.Rides.ride_id_of_user(me) != nil ->
+        {:noreply, socket}
+
+      name == "hand_up" ->
+        Geo.hand_up(me, areas.cell, areas.spot, areas.parents)
+        {:noreply, socket}
+
+      # a car needs a car on file — the app asks for one before going
+      # online; the server never checked (step 5). Asked of the DATABASE
+      # (a car saved after connecting counts) until it says yes, then
+      # remembered for this connection (a car can't be removed): the
+      # every-few-seconds update, and going online again, read nothing
+      socket.assigns[:has_car] == true or Hoodride.Accounts.has_car?(me) ->
+        Geo.driver_update(socket.assigns.user, areas.cell, areas.spot, areas.parents)
+        {:noreply, assign(socket, :has_car, true)}
+
+      true ->
+        {:reply, {:error, %{reason: "no_car"}}, socket}
+    end
   end
 
   # An older session being replaced: tell the app FIRST (so it turns off
@@ -420,16 +418,6 @@ defmodule HoodrideWeb.UserChannel do
 
   defp throttle(:ok, _reason), do: :ok
   defp throttle({:deny, retry_ms}, reason), do: {:error, %{reason: reason, retry_ms: retry_ms}}
-
-  # client-computed coarse parent cells for the aggregate tier — opaque strings,
-  # capped and size-checked; anything malformed is simply dropped
-  defp valid_parents(%{"parents" => parents}) when is_list(parents) do
-    parents
-    |> Enum.filter(&(is_binary(&1) and byte_size(&1) <= @max_cell_bytes))
-    |> Enum.take(Hoodride.Limits.parent_cells())
-  end
-
-  defp valid_parents(_), do: []
 
   # a message's client id: a short string, else none (then each send is new)
   defp client_id(%{"cid" => cid}) when is_binary(cid) and byte_size(cid) in 1..64, do: cid

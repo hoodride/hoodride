@@ -81,6 +81,16 @@ async function reloadWhileDriving(p, event, channel) {
 }
 
 const server = (p) => p.eval(`window.fetch("/api/state").then(r => r.json()).then(s => ({ hand: !!s.hand, onMap: !!s.on_map }))`);
+// "online" on her screen is sent the same instant; the server files it a
+// moment later (it first checks her car is on file — step 5). A request
+// before that finds no car: wait until the server has it
+async function onMapOnServer(p) {
+  for (let i = 0; i < 50; i++) {
+    if ((await server(p)).onMap) return;
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  check(false, `${p.name}'s car on the map (server)`);
+}
 
 await journey("tapreload: what you do while the app reloads stays done", async (browser) => {
   step("Sam (rider) taps ✋ while a reload is loading: up on his screen AND on the server");
@@ -223,6 +233,7 @@ await journey("tapreload: what you do while the app reloads stays done", async (
   await dora.waitFor(`!state.online && document.getElementById("btn-online") && !document.getElementById("btn-online").classList.contains("hidden")`, "Dora's GO ONLINE back");
   await dora.click("btn-online");
   await dora.waitFor(`state.online`, "Dora online again");
+  await onMapOnServer(dora);
 
   // the ride ends while Sam's map waits for his tap, and he only learns it
   // from a reload: no "Tap the map" left on screen
@@ -248,6 +259,7 @@ await journey("tapreload: what you do while the app reloads stays done", async (
   await dora.waitFor(`!state.online && !document.getElementById("btn-online").classList.contains("hidden")`, "Dora's GO ONLINE back");
   await dora.click("btn-online");
   await dora.waitFor(`state.online`, "Dora online again");
+  await onMapOnServer(dora);
 
   step("Dora goes offline while a reload is loading: offline on both");
   await duringReload(dora, () => dora.click("btn-online"));

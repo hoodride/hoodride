@@ -246,6 +246,12 @@ if (process.argv[2] === "shard") {
     });
     if (!r.ok) throw new Error(`dev_login ${r.status}`);
     const cookie = r.headers.get("set-cookie").split(";")[0];
+    // going online needs a car on file (the server checks, step 5)
+    await fetch(`${BASE}/api/car`, {
+      method: "POST",
+      headers: { "content-type": "application/json", cookie },
+      body: JSON.stringify({ color: "Blue", make: "Toyota", model: "Camry" }),
+    });
     const me = (await (await fetch(`${BASE}/api/me`, { headers: { cookie } })).json()).user;
     const { token } = await (await fetch(`${BASE}/api/socket_token`, { headers: { cookie } })).json();
     return { me, token, cookie, kind: Math.random() < DRIVER_SHARE ? "driver" : "rider" };
@@ -425,9 +431,8 @@ if (process.argv[2] === "shard") {
           this.spot = spot;
           if (F.shouldSend(this.lastGeo, Date.now(), this.pos, spot, F.BROWSE_MIN_METERS)) {
             this.lastGeo = F.stamp(this.pos, spot, Date.now(), Math.random);
-            const { cell, parents } = F.cellsOf(spot, h3, 8, [7, 5]);
             if (timed(this.user.me.id)) (delaySends[`${this.user.me.id}:${spot}`] ||= []).push(wall());
-            this.cast(`user:${this.user.me.id}`, "driver_update", { cell, spot, parents }, "1");
+            this.cast(`user:${this.user.me.id}`, "driver_update", { spot }, "1");
           }
           this.view = this.pos; // the driver's map follows the car
         });

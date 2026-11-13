@@ -87,6 +87,18 @@ defmodule Hoodride.TestHelpers do
     |> Phoenix.ConnTest.dispatch(HoodrideWeb.Endpoint, :post, path, Jason.encode!(body))
   end
 
+  @doc "A car on file for `user_id`: going online needs one (step 5)."
+  def give_car(user_id) do
+    {:ok, _} =
+      Hoodride.Accounts.set_car(user_id, %{
+        "color" => "Blue",
+        "make" => "Toyota",
+        "model" => "Camry"
+      })
+
+    :ok
+  end
+
   @doc "A connection pass (socket token) for `user_id`, from a fresh sign-in."
   def socket_token_for(user_id) do
     session_for(user_id) |> HoodrideWeb.Auth.session_user() |> HoodrideWeb.Auth.socket_token()

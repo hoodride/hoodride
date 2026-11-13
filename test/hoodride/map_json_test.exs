@@ -16,7 +16,7 @@ defmodule Hoodride.MapJsonTest do
   alias Hoodride.{Geo, TestClient}
 
   @cell "882a1072c7fffff"
-  @cell2 "882a1072cffffff"
+  @cell2 "882a1072c9fffff"
   @spot "892a1072c63ffff"
   @spot2 "892a1072c67ffff"
 
@@ -40,6 +40,8 @@ defmodule Hoodride.MapJsonTest do
         photo: nil
       })
 
+    # anyone here may go online: a car needs a car (step 5)
+    :ok = Hoodride.TestHelpers.give_car(u.id)
     u
   end
 
@@ -61,11 +63,11 @@ defmodule Hoodride.MapJsonTest do
     assert_receive %Phoenix.Socket.Broadcast{event: "driver_update"} = b
     assert exact!(b) == %{id: 11, cell: @cell, spot: @spot}
 
-    Geo.driver_update(profile(11), @cell2, "892a1072cc3ffff", [])
+    Geo.driver_update(profile(11), @cell2, "892a1072c83ffff", [])
     assert_receive %Phoenix.Socket.Broadcast{event: "driver_left"} = left
     assert exact!(left) == %{id: 11}
     assert_receive %Phoenix.Socket.Broadcast{event: "driver_update"} = moved
-    assert exact!(moved) == %{id: 11, cell: @cell2, spot: "892a1072cc3ffff"}
+    assert exact!(moved) == %{id: 11, cell: @cell2, spot: "892a1072c83ffff"}
 
     Geo.driver_offline(11)
     assert_receive %Phoenix.Socket.Broadcast{event: "driver_left"} = gone
