@@ -21,6 +21,7 @@ defmodule Hoodride.GeoWriter do
   while different users spread across cores. Raising capacity is raising N.
   """
   use GenServer
+  require Logger
 
   def start_link(_), do: GenServer.start_link(__MODULE__, nil)
 
@@ -42,7 +43,8 @@ defmodule Hoodride.GeoWriter do
   order, one writer per key. Since OTP 24 a late reply never reaches the
   caller (process aliases). Every reply is `:ok`; no caller needs it.
   No retries (a second copy) and no deadlines (a late "lower ✋" must still
-  happen). Other exits (a writer that's gone) still raise: a real fault.
+  happen). A writer that's gone: `{:error, :unavailable}`; an op that
+  failed inside it: `{:error, :failed}` (2026-11-13) — never a caller crash.
   """
   def exec(key, op, timeout \\ Application.get_env(:hoodride, :geo_call_timeout, 5_000)),
     do: call({:via, PartitionSupervisor, {Hoodride.GeoWriters, key}}, op, timeout)
@@ -52,50 +54,78 @@ defmodule Hoodride.GeoWriter do
     GenServer.call(writer, op, timeout)
   catch
     :exit, {:timeout, _} -> {:error, :timeout}
+    # the writer gone (crashed, restarting): the caller carries on — never
+    # crashing with it (owner, 2026-11-13; Hoodride.HardeningTest)
+    :exit, _ -> {:error, :unavailable}
   end
 
+  # Each op runs on its own: one that fails (a bug — no known input does)
+  # is logged and answered {:error, :failed}; the writer keeps running, so
+  # its other callers' ops still land and repeated failures can't add up to
+  # a supervisor giving up (owner, 2026-11-13, crash hardening;
+  # Hoodride.HardeningTest). What a failed op left half-done, the sweeper's
+  # reconcilers repair, as for any other bend.
   @impl true
-  def handle_call({:driver_update, user, cell, spot, parents}, _from, s) do
+  def handle_call(op, _from, s) do
+    {:reply, run(op), s}
+  rescue
+    e ->
+      Logger.error("map update failed: #{op_name(op)}: #{inspect(e.__struct__)}")
+      {:reply, {:error, :failed}, s}
+  catch
+    kind, _reason ->
+      Logger.error("map update failed: #{op_name(op)}: #{kind}")
+      {:reply, {:error, :failed}, s}
+  end
+
+  # only the op's name and the error's KIND are logged: an error's message
+  # can quote the person's record (a name)
+  defp op_name(op) when is_tuple(op) and tuple_size(op) > 0 and is_atom(elem(op, 0)),
+    do: elem(op, 0)
+
+  defp op_name(_), do: :unknown
+
+  defp run({:driver_update, user, cell, spot, parents}) do
     # race-proof twin of the channel's mid-ride guard: this check runs INSIDE
     # the serialized section, so it sees any ride start that already landed
     if Hoodride.Rides.ride_id_of_user(user.id) == nil do
       Hoodride.Geo.driver_update_now(user, cell, spot, parents)
     end
 
-    {:reply, :ok, s}
+    :ok
   end
 
-  def handle_call({:hand_up, user_id, cell, spot, parents}, _from, s) do
+  defp run({:hand_up, user_id, cell, spot, parents}) do
     if Hoodride.Rides.ride_id_of_user(user_id) == nil do
       Hoodride.Geo.hand_up_now(user_id, cell, spot, parents)
     end
 
-    {:reply, :ok, s}
+    :ok
   end
 
-  def handle_call({:driver_offline, user_id}, _from, s) do
+  defp run({:driver_offline, user_id}) do
     Hoodride.Geo.driver_offline_now(user_id)
-    {:reply, :ok, s}
+    :ok
   end
 
-  def handle_call({:hand_down, user_id}, _from, s) do
+  defp run({:hand_down, user_id}) do
     Hoodride.Geo.hand_down_now(user_id)
-    {:reply, :ok, s}
+    :ok
   end
 
-  def handle_call({:reindex, user_id}, _from, s) do
+  defp run({:reindex, user_id}) do
     Hoodride.Geo.reindex_user_now(user_id)
-    {:reply, :ok, s}
+    :ok
   end
 
-  def handle_call({:prune_orphan, user_id}, _from, s) do
+  defp run({:prune_orphan, user_id}) do
     Hoodride.Geo.prune_orphan_now(user_id)
-    {:reply, :ok, s}
+    :ok
   end
 
-  def handle_call({:rebuild_members, user_id}, _from, s) do
+  defp run({:rebuild_members, user_id}) do
     Hoodride.Geo.rebuild_members_now(user_id)
-    {:reply, :ok, s}
+    :ok
   end
 
   # The recount's pause (Geo.with_writers_held). A message, so it is only
@@ -120,4 +150,7 @@ defmodule Hoodride.GeoWriter do
 
   # a release that arrives after this shard already timed out of its hold
   def handle_info({:release, _token}, s), do: {:noreply, s}
+
+  # anything else (nothing known sends one): ignored, never a crash
+  def handle_info(_other, s), do: {:noreply, s}
 end

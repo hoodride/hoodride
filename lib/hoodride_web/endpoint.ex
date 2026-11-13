@@ -79,6 +79,11 @@ defmodule HoodrideWeb.Endpoint do
     event_prefix: [:phoenix, :endpoint],
     log: Application.compile_env(:hoodride, :request_log, :info)
 
+  # bodies over the limit refused unread; any other non-JSON body: the
+  # connection closed after the answer, so Bandit never reads its rest
+  # (up to 8 MB in memory per request — HoodrideWeb.BodyGate)
+  plug HoodrideWeb.BodyGate
+
   # ONLY small JSON (server review, 2026-11-08): forms and file uploads up
   # to 8 MB used to be read — uploads written to disk — on any address,
   # before any limit. Nothing in Hood Ride sends either. Read in pieces and

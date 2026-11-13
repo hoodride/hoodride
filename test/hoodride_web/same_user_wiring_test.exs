@@ -51,8 +51,11 @@ defmodule HoodrideWeb.SameUserWiringTest do
   test "apiFetch: the account shown, the header checked (never the body), the cover, no answer" do
     b = body("apiFetch")
     assert b =~ ~s[if (state.realUser) headers.set("x-hood-user", String(state.realUser.id));]
-    # looked up at each call (the journeys wrap window.fetch)
-    assert b =~ "window.fetch(url, { ...opts, headers })"
+    # looked up at each call (the journeys wrap window.fetch); with a time
+    # limit unless the caller brings its own (owner, 2026-11-13:
+    # test_browser/hungrequest.mjs)
+    assert b =~ "window.fetch(url, { ...opts, headers, signal })"
+    assert b =~ "setTimeout(() => stop.abort(), API_TIMEOUT_MS);"
     assert b =~ ~s[res.headers.get("x-hood-other-account") !== "1"]
     refute b =~ ".json()"
     refute b =~ "location.reload"

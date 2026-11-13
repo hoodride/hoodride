@@ -12,4 +12,18 @@ defmodule Hoodride.RateLimit do
   slip through across one key's window boundary.
   """
   use Hammer, backend: :ets, algorithm: :fix_window_per_key
+
+  @doc """
+  One taken back (Hoodride.Throttle's give-backs): the count down by one,
+  never below 0. Never starts a window: `inc(key, scale, -1)` on a window
+  that just ended would start a new one at -1 — a free extra. Gone (swept):
+  nothing to give back.
+  """
+  def give_back(key) do
+    # rows are {key, count, expires_at} (Hammer's fix_window_per_key)
+    :ets.update_counter(__MODULE__, key, {2, -1, 0, 0})
+    :ok
+  rescue
+    ArgumentError -> :ok
+  end
 end

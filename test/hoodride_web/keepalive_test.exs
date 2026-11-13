@@ -112,4 +112,40 @@ defmodule HoodrideWeb.KeepaliveTest do
            ) ==
              ["400", "200"]
   end
+
+  # crash review 2026-11-13 (HoodrideWeb.BodyGate): a body that isn't JSON
+  # was left unread, then READ by Bandit after the answer to reach the next
+  # request — up to 8 MB in memory, waiting up to 15 s per piece. Now the
+  # answer closes the connection: nothing more is read. Shown here with 1 MB
+  # declared and only a sliver sent: the answer, then the close, at once —
+  # not a connection held open waiting for the other 999,990 bytes.
+  test "a body that isn't JSON is never read to its end: answered, then closed at once", %{
+    port: port
+  } do
+    {:ok, s} = :gen_tcp.connect(~c"127.0.0.1", port, [:binary, active: false, nodelay: true])
+
+    :ok =
+      :gen_tcp.send(
+        s,
+        "POST /api/nothing-here HTTP/1.1
+Host: localhost
+Content-Type: text/plain
+" <>
+          "Content-Length: 1000000
+
+" <> String.duplicate("x", 10)
+      )
+
+    {:ok, answer} = :gen_tcp.recv(s, 0, 3_000)
+    assert answer =~ ~r/^HTTP\/1\.1 \d{3}/
+    assert answer =~ ~r/connection: close/i
+    assert {:error, :closed} = drain_until_closed(s, 1_000)
+  end
+
+  defp drain_until_closed(s, ms) do
+    case :gen_tcp.recv(s, 0, ms) do
+      {:ok, _} -> drain_until_closed(s, ms)
+      other -> other
+    end
+  end
 end

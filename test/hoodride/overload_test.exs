@@ -150,7 +150,7 @@ defmodule Hoodride.OverloadTest do
       refute Geo.driver_on_map?(driver.id)
     end
 
-    test "only a TIMEOUT is survived: a writer that's gone still crashes loudly" do
+    test "a stuck writer and a writer that's gone are both survived, each named" do
       # a stuck writer: survived
       pid = writer(4_294_967_500)
       :sys.suspend(pid)
@@ -161,11 +161,13 @@ defmodule Hoodride.OverloadTest do
         :sys.resume(pid)
       end
 
-      # a process that doesn't exist exits :noproc — a real fault, not overload
+      # a writer that's gone (crashed, restarting): "unavailable", the caller
+      # carries on (crash hardening, owner 2026-11-13 — it used to crash
+      # the caller too: Hoodride.HardeningTest)
       gone = spawn(fn -> :ok end)
       ref = Process.monitor(gone)
       assert_receive {:DOWN, ^ref, _, _, _}
-      assert {:noproc, _} = catch_exit(Hoodride.GeoWriter.call(gone, {:hand_down, 1}, 100))
+      assert Hoodride.GeoWriter.call(gone, {:hand_down, 1}, 100) == {:error, :unavailable}
     end
 
     test "the Sweeper finishes its pass" do

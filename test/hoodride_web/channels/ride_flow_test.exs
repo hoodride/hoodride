@@ -291,7 +291,7 @@ defmodule HoodrideWeb.RideFlowTest do
     end
 
     # counted once: the 19th — one left (counted twice, none would be)
-    assert Hoodride.Throttle.new_conversation_allowed(rider.id) == :ok
+    assert Hoodride.RateLimit.get({:new_conv, rider.id}, 3_600_000) == 19
   end
 
   test "cancel-vs-accept race: first action wins", %{rider: rider, driver: driver} do

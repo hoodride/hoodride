@@ -365,6 +365,6 @@ defmodule HoodrideWeb.LogoutAcceptRaceTest do
     assert channel =~
              "Hoodride.Requests.accept(socket.assigns.user, rider_id, still_signed_in(socket))"
 
-    assert channel =~ "shareable_spot(socket, payload),\n             still_signed_in(socket)\n"
+    assert channel =~ ~r/shareable_spot\(socket, payload\),\n\s+still_signed_in\(socket\)\n/
   end
 end

@@ -220,11 +220,22 @@ defmodule Hoodride.Avatars do
     do: %{id: __MODULE__, start: {__MODULE__, :start_link, []}, restart: :transient}
 
   @doc false
-  # the folder exists; files nothing points to go (then step aside)
+  # the folder exists; files nothing points to go (then step aside). Tidying:
+  # a folder that can't be made or read (permissions, a missing mount) is
+  # logged and the start goes on — it used to stop the whole app from
+  # starting (crash review 2026-11-13; Hoodride.BootResilienceTest). Photos
+  # then simply aren't kept until it's fixed; sign-in still works.
   # sobelow_skip ["Traversal.FileModule"]
   def start_link do
     File.mkdir_p!(dir())
     sweep_orphans(Hoodride.Accounts.photos_in_use())
     :ignore
+  rescue
+    e in [File.Error, Exqlite.Error, DBConnection.ConnectionError] ->
+      Logger.warning(
+        "start-up: profile photos folder not ready (#{Exception.message(e)}) — skipped"
+      )
+
+      :ignore
   end
 end

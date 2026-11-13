@@ -31,6 +31,7 @@ defmodule Hoodride.SessionTokens do
   2026-11-08). A pass now names its token, which the sign-out deletes.
   """
   import Ecto.Query
+  require Logger
 
   alias Hoodride.Repo
 
@@ -361,7 +362,18 @@ defmodule Hoodride.SessionTokens do
 
   @doc "Refill memory from the database (start-up): the valid tokens; expired rows deleted."
   def load(now \\ now()) do
-    prune_rows(now)
+    # tidying, not loading: a delete the database refuses (a full disk, a
+    # lock) is logged and skipped — the valid sign-ins still load and the
+    # app starts (it used to stop the start: crash review 2026-11-13;
+    # Hoodride.BootResilienceTest). The next sign-in prunes again.
+    try do
+      Application.get_env(:hoodride, :token_prune, &prune_rows/1).(now)
+    rescue
+      e in [Exqlite.Error, DBConnection.ConnectionError] ->
+        Logger.warning(
+          "start-up: couldn't delete expired sign-ins (#{Exception.message(e)}) — skipped"
+        )
+    end
 
     from(t in "user_tokens",
       select: {t.token_hash, t.user_id, t.inserted_at, t.authenticated_at}

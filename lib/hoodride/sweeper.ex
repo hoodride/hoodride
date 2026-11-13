@@ -33,6 +33,10 @@ defmodule Hoodride.Sweeper do
   # a shard's pause reply that landed after the recount gave up on it
   def handle_info({:held, _token, _shard}, state), do: {:noreply, state}
 
+  # anything else (nothing known sends one): ignored — a crash here would
+  # restart the cleanup and lose its schedule (crash hardening, 2026-11-13)
+  def handle_info(_other, state), do: {:noreply, state}
+
   # Every pass reads through Hoodride.ETS.each_match: the condition and the
   # projection run inside ETS, so a pass copies only the fields it uses of
   # the rows it acts on — a page at a time — never a whole table.

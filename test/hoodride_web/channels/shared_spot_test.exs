@@ -86,7 +86,7 @@ defmodule HoodrideWeb.SharedSpotTest do
       rider = TestClient.start(:rider, user("ss-r3"))
       driver = driver_seen_by("ss-d3", rider)
 
-      for bad <- [String.duplicate("8", 40), 123, %{}, ""] do
+      for bad <- [String.duplicate("8", 40), 123, %{}, ""] ++ not_a_block() do
         assert {:ok, _} = send_msg(rider, driver.user.id, %{"spot" => bad})
         assert %{spot: nil, text: "hi"} = got(driver, "msg")
       end
@@ -173,5 +173,30 @@ defmodule HoodrideWeb.SharedSpotTest do
       assert %{spot: nil} = got(driver, "request")
       assert [%{spot: nil}] = Requests.pending_for_driver(driver.user.id)
     end
+
+    test "only a real block is passed on: a pinpoint, a wider area or made-up text never", %{} do
+      for {bad, i} <- Enum.with_index(not_a_block()) do
+        rider = TestClient.start(:rider, user("ss-rb#{i}"))
+        driver = driver_seen_by("ss-db#{i}", rider)
+        assert {:ok, _} = ask(rider, driver.user.id, %{"spot" => bad})
+        assert %{spot: nil} = got(driver, "request"), inspect(bad)
+        assert [%{spot: nil}] = Requests.pending_for_driver(driver.user.id)
+      end
+    end
+  end
+
+  # crash review 2026-11-13: anything short was passed on as "their block" —
+  # a made-up place, or an id far more precise than a block (H3 res 15 is
+  # about a square meter), shown to the driver as the rider's rough area
+  defp not_a_block do
+    import Bitwise
+    {:ok, n} = Hoodride.H3.parse(@spot)
+    # the same place at res 15 (~1 m²): resolution 15, digits 10–15 set to 0
+    pin = (n &&& bnot(0xF <<< 52)) ||| 15 <<< 52
+    pin = Enum.reduce(10..15, pin, fn r, acc -> acc &&& bnot(7 <<< ((15 - r) * 3)) end)
+    pin = pin |> Integer.to_string(16) |> String.downcase()
+    15 = Hoodride.H3.resolution(pin)
+
+    [@cell, pin, String.upcase(@spot), "cellA", "892a1072c63fff7"]
   end
 end

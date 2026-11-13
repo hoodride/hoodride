@@ -8,15 +8,15 @@ defmodule Hoodride.Throttle do
   connects) are per user too, but need exact millisecond timing and atomic
   spends: Hoodride.RateBudget.
 
-  A REFUSED contact spends nothing (server review, 2026-11-08): the
-  allowances are looked at first (`*_allowed`) and charged only once the
-  request or message has gone through (`sent_message/2`,
-  `started_conversation/1`). They used to be charged before the refusals —
-  a rider tapping Request during a cooldown, or while waiting on another
-  driver, used up the hour's new contacts without reaching anyone. Looking
-  and charging are two steps: two live sessions of one account at the same
-  instant (only during a hand-over) can both pass at the last one, so the
-  limit can be passed by one per extra session. Never charged for nothing.
+  TAKEN FIRST, GIVEN BACK ON A REFUSAL (owner, 2026-11-13, step 7). An
+  allowance is taken in one atomic step (`take_*`: Hammer's `hit` adds and
+  checks at once) before the message or request goes, and given back
+  (`give_back_*`) if it doesn't — so a REFUSED contact still spends nothing
+  (server review, 2026-11-08: a rider tapping Request during a cooldown
+  used up the hour's new contacts without reaching anyone). It used to be
+  looked at first and charged after — two steps: two live sessions of one
+  account (a hand-over's moment) could both pass the last allowed contact.
+  Proven: HoodrideWeb.LimitRaceTest.
   """
 
   alias Hoodride.RateLimit
@@ -39,42 +39,36 @@ defmodule Hoodride.Throttle do
   @request_cooldown Hoodride.Limits.request_cooldown_ms()
 
   @doc """
-  May `from_id` message `to_id` now? Read-only: `:ok`, or `{:deny, ms}` —
-  when both the total and the per-person limit refuse, the LATER wait (the
-  real one).
+  Take one message (the total and the per-person allowance) for `from_id`
+  → `to_id`: `:ok` (taken), or `{:deny, ms}` with nothing taken — when both
+  refuse, the LATER wait (the real one).
   """
-  def message_allowed(from_id, to_id) do
-    latest([
-      peek({:msg, from_id}, @minute, @messages_per_minute),
-      peek({:msg_pair, from_id, to_id}, @minute, @pair_messages_per_minute)
+  def take_message(from_id, to_id) do
+    take_all([
+      {{:msg, from_id}, @minute, @messages_per_minute},
+      {{:msg_pair, from_id, to_id}, @minute, @pair_messages_per_minute}
     ])
   end
 
-  @doc "A message went: charge the total and the per-person allowance."
-  def sent_message(from_id, to_id) do
-    RateLimit.inc({:msg, from_id}, @minute)
-    RateLimit.inc({:msg_pair, from_id, to_id}, @minute)
-    :ok
+  @doc "The message didn't go after all: its allowance back."
+  def give_back_message(from_id, to_id) do
+    RateLimit.give_back({:msg, from_id})
+    RateLimit.give_back({:msg_pair, from_id, to_id})
   end
 
-  @doc "May `from_id` start a cold contact (someone new) now? Read-only."
-  def new_conversation_allowed(from_id),
-    do: peek({:new_conv, from_id}, @hour, @new_conversations_per_hour)
+  @doc "Take one cold contact (someone new): `:ok`, or `{:deny, ms}` with nothing taken."
+  def take_new_conversation(from_id),
+    do: take_all([{{:new_conv, from_id}, @hour, @new_conversations_per_hour}])
 
-  @doc "A cold contact went through (a first message, or a request): charge it."
-  def started_conversation(from_id) do
-    RateLimit.inc({:new_conv, from_id}, @hour)
-    :ok
-  end
+  @doc "The cold contact didn't go through after all: it back."
+  def give_back_new_conversation(from_id), do: RateLimit.give_back({:new_conv, from_id})
 
   @doc """
-  Look, and charge if allowed — in one call. Only for the browser journeys'
+  Take one, as a real contact would. Only for the browser journeys'
   `cold_used_up` (test/browser/journeys_test.exs), which spends the hour as
   if real contacts had been made.
   """
-  def new_conversation(from_id) do
-    with :ok <- new_conversation_allowed(from_id), do: started_conversation(from_id)
-  end
+  def new_conversation(from_id), do: take_new_conversation(from_id)
 
   @doc """
   Start the re-request cooldown for this pair. Called when a request ENDS
@@ -99,21 +93,19 @@ defmodule Hoodride.Throttle do
     end
   end
 
-  # the allowance used up (count at the limit): refused, with the wait
-  # until its window ends (never 0 or less: the window can end between the
-  # two reads)
-  defp peek(key, scale, limit) do
-    if RateLimit.get(key, scale) >= limit do
-      {:deny, max(RateLimit.expires_at(key, scale) - System.system_time(:millisecond), 1)}
-    else
-      :ok
-    end
-  end
+  # each allowance taken in one atomic step (`hit` adds, then compares —
+  # a refused hit still added: given back); any refused → all given back,
+  # the LATER wait named (never 0 or less)
+  defp take_all(limits) do
+    hits = for {key, scale, limit} <- limits, do: {key, RateLimit.hit(key, scale, limit)}
 
-  defp latest(results) do
-    case for({:deny, ms} <- results, do: ms) do
-      [] -> :ok
-      waits -> {:deny, Enum.max(waits)}
+    case for({_, {:deny, ms}} <- hits, do: ms) do
+      [] ->
+        :ok
+
+      waits ->
+        for {key, _} <- hits, do: RateLimit.give_back(key)
+        {:deny, max(Enum.max(waits), 1)}
     end
   end
 end

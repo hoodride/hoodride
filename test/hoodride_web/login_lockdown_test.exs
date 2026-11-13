@@ -750,6 +750,23 @@ defmodule HoodrideWeb.LoginLockdownTest do
       assert dev[:hoodride][HoodrideWeb.Endpoint][:check_origin] == :conn
     end
 
+    # crash review 2026-11-13: it fell back to "example.com" — the app started
+    # half-broken (every sign-in and live connection refused for the real
+    # address) and the deploy's own check still passed
+    test "prod refuses to start without PHX_HOST, as without the other must-haves" do
+      env = %{"DATABASE_PATH" => "/tmp/x.db", "SECRET_KEY_BASE" => String.duplicate("a", 64)}
+      for {k, v} <- env, do: System.put_env(k, v)
+      System.delete_env("PHX_HOST")
+
+      try do
+        assert_raise RuntimeError, ~r/PHX_HOST/, fn ->
+          Config.Reader.read!("config/runtime.exs", env: :prod)
+        end
+      after
+        for k <- Map.keys(env), do: System.delete_env(k)
+      end
+    end
+
     test "prod listens on 127.0.0.1 by default — reachable only through cloudflared" do
       env = %{
         "DATABASE_PATH" => "/tmp/x.db",

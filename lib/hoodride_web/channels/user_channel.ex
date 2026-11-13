@@ -44,8 +44,15 @@ defmodule HoodrideWeb.UserChannel do
   # (ARCHITECTURE.md "Distances") — a well-formed block, and NEVER an online
   # driver's: drivers are public as cars already, and a driver's messages
   # must not carry more about them. Anything else: nil, the message still goes.
+  # A REAL block (Hoodride.H3: a res-9 id) — anything else used to pass as
+  # "their block": a made-up place, or a ~1 m² id far finer than a block
+  # (crash review 2026-11-13; HoodrideWeb.SharedSpotTest)
   defp shareable_spot(socket, %{"spot" => spot}) when valid_cell(spot) and spot != "" do
-    if Geo.driver_on_map?(socket.assigns.user_id), do: nil, else: spot
+    cond do
+      Hoodride.H3.areas(spot) == :error -> nil
+      Geo.driver_on_map?(socket.assigns.user_id) -> nil
+      true -> spot
+    end
   end
 
   defp shareable_spot(_socket, _payload), do: nil
@@ -221,20 +228,29 @@ defmodule HoodrideWeb.UserChannel do
 
         # no "does this user exist?" check up front: it told anyone which
         # ids are real. A missing id simply isn't reachable (HoodrideWeb.Reach).
+        # the allowances TAKEN first (atomic: two live sessions can't both
+        # pass the last one — Hoodride.Throttle), given back if it doesn't go
         with {:ok, cold?} <- reach(socket, to_id),
              :ok <-
-               limits([
-                 {cold_allowed(cold?, me), "too_many_new_chats"},
-                 {Hoodride.Throttle.message_allowed(me, to_id), "rate_limited"}
-               ]),
-             :ok <- room_for_chat(me, to_id) do
-          spot = shareable_spot(socket, payload)
-          {:ok, receipt} = Hoodride.Chat.send_message(socket.assigns.user, to_id, text, spot)
-          Hoodride.Chat.remember_sent(me, client_id(payload), receipt)
-          # it went: only now are the allowances spent
-          Hoodride.Throttle.sent_message(me, to_id)
-          if cold?, do: Hoodride.Throttle.started_conversation(me)
-          {:reply, {:ok, receipt}, socket}
+               take([
+                 {cold?, fn -> Hoodride.Throttle.take_new_conversation(me) end,
+                  fn -> Hoodride.Throttle.give_back_new_conversation(me) end,
+                  "too_many_new_chats"},
+                 {true, fn -> Hoodride.Throttle.take_message(me, to_id) end,
+                  fn -> Hoodride.Throttle.give_back_message(me, to_id) end, "rate_limited"}
+               ]) do
+          case room_for_chat(me, to_id) do
+            :ok ->
+              spot = shareable_spot(socket, payload)
+              {:ok, receipt} = Hoodride.Chat.send_message(socket.assigns.user, to_id, text, spot)
+              Hoodride.Chat.remember_sent(me, client_id(payload), receipt)
+              {:reply, {:ok, receipt}, socket}
+
+            {:error, reply} ->
+              Hoodride.Throttle.give_back_message(me, to_id)
+              if cold?, do: Hoodride.Throttle.give_back_new_conversation(me)
+              {:reply, {:error, reply}, socket}
+          end
         else
           {:error, reply} -> {:reply, {:error, reply}, socket}
         end
@@ -247,23 +263,35 @@ defmodule HoodrideWeb.UserChannel do
 
     # reachability FIRST: a stranger's id learns nothing from the cooldown
     # or the request's own refusals
+    # a new contact TAKEN first (atomic — Hoodride.Throttle); given back on
+    # any refusal after it (the cooldown, waiting on another driver, the
+    # driver gone): a refusal spends nothing
     with {:ok, cold?} <- reach(socket, driver_id),
-         :ok <- limits([{cold_allowed(cold?, me), "too_many_new_chats"}]),
-         :ok <- request_cooldown(me, driver_id) do
-      case Hoodride.Requests.create(
-             socket.assigns.user,
-             driver_id,
-             shareable_spot(socket, payload),
-             still_signed_in(socket)
-           ) do
-        # it went: only now is a new contact spent (a refusal — waiting on
-        # another driver, the driver gone — spends nothing)
+         :ok <-
+           take([
+             {cold?, fn -> Hoodride.Throttle.take_new_conversation(me) end,
+              fn -> Hoodride.Throttle.give_back_new_conversation(me) end, "too_many_new_chats"}
+           ]) do
+      result =
+        with :ok <- request_cooldown(me, driver_id) do
+          case Hoodride.Requests.create(
+                 socket.assigns.user,
+                 driver_id,
+                 shareable_spot(socket, payload),
+                 still_signed_in(socket)
+               ) do
+            :ok -> :ok
+            {:error, reason} -> {:error, %{reason: reason_word(reason)}}
+          end
+        end
+
+      case result do
         :ok ->
-          if cold?, do: Hoodride.Throttle.started_conversation(me)
           {:reply, :ok, socket}
 
-        {:error, reason} ->
-          {:reply, {:error, %{reason: to_string(reason)}}, socket}
+        {:error, reply} ->
+          if cold?, do: Hoodride.Throttle.give_back_new_conversation(me)
+          {:reply, {:error, reply}, socket}
       end
     else
       {:error, reply} -> {:reply, {:error, reply}, socket}
@@ -279,7 +307,7 @@ defmodule HoodrideWeb.UserChannel do
        when is_integer(rider_id) do
     case Hoodride.Requests.accept(socket.assigns.user, rider_id, still_signed_in(socket)) do
       {:ok, _ride_id} -> {:reply, :ok, socket}
-      {:error, reason} -> {:reply, {:error, %{reason: to_string(reason)}}, socket}
+      {:error, reason} -> {:reply, {:error, %{reason: reason_word(reason)}}, socket}
     end
   end
 
@@ -329,12 +357,20 @@ defmodule HoodrideWeb.UserChannel do
       # (a car saved after connecting counts) until it says yes, then
       # remembered for this connection (a car can't be removed): the
       # every-few-seconds update, and going online again, read nothing
-      socket.assigns[:has_car] == true or Hoodride.Accounts.has_car?(me) ->
-        Geo.driver_update(socket.assigns.user, areas.cell, areas.spot, areas.parents)
-        {:noreply, assign(socket, :has_car, true)}
-
+      # (the database busy: "busy" and when to try again — never a crash)
       true ->
-        {:reply, {:error, %{reason: "no_car"}}, socket}
+        case socket.assigns[:has_car] == true or Hoodride.Accounts.has_car?(me) do
+          true ->
+            Geo.driver_update(socket.assigns.user, areas.cell, areas.spot, areas.parents)
+            {:noreply, assign(socket, :has_car, true)}
+
+          false ->
+            {:reply, {:error, %{reason: "no_car"}}, socket}
+
+          {:error, :unavailable} ->
+            {:reply, {:error, %{reason: "busy", retry_ms: Hoodride.Accounts.retry_wait_ms()}},
+             socket}
+        end
     end
   end
 
@@ -361,6 +397,11 @@ defmodule HoodrideWeb.UserChannel do
     push(socket, "restarting", window)
     {:noreply, socket}
   end
+
+  # anything else (nothing known sends one — a stray reply, a leftover
+  # timer): ignored, never a dropped connection (crash hardening,
+  # 2026-11-13; Hoodride.HardeningTest)
+  def handle_info(_other, socket), do: {:noreply, socket}
 
   @impl true
   def terminate(_reason, socket) do
@@ -392,17 +433,25 @@ defmodule HoodrideWeb.UserChannel do
       else: {:error, %{reason: "too_many_chats"}}
   end
 
-  defp cold_allowed(false, _me), do: :ok
-  defp cold_allowed(true, me), do: Hoodride.Throttle.new_conversation_allowed(me)
+  # a refusal's reason as the app reads it: a plain word as it is; anything
+  # else — a ride whose start-up crashed ({:start_failed, why}) — is
+  # "unavailable". `to_string` on that tuple crashed the driver's connection
+  # (crash review 2026-11-12; HoodrideWeb.AcceptStartFailedTest)
+  defp reason_word(reason) when is_atom(reason), do: Atom.to_string(reason)
+  defp reason_word(_), do: "unavailable"
 
-  # every limit is looked at (nothing charged); if several refuse, the one
-  # lifting LAST is named — its wait is the real one
-  defp limits(checks) do
-    case for({{:deny, ms}, reason} <- checks, do: {ms, reason}) do
+  # each applying limit TAKEN ({applies?, take, give_back, reason}); if any
+  # refuses, those taken are given back (a refused take took nothing) and
+  # the one lifting LAST is named — its wait is the real one
+  defp take(limits) do
+    results = for {true, take, back, reason} <- limits, do: {take.(), back, reason}
+
+    case for({{:deny, ms}, _, reason} <- results, do: {ms, reason}) do
       [] ->
         :ok
 
       refused ->
+        for {:ok, back, _} <- results, do: back.()
         {ms, reason} = Enum.max_by(refused, &elem(&1, 0))
         {:error, %{reason: reason, retry_ms: ms}}
     end

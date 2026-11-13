@@ -134,6 +134,10 @@ defmodule HoodrideWeb.RideChannel do
     end
   end
 
+  # anything else (nothing known sends one): ignored, never a dropped ride
+  # connection (crash hardening, 2026-11-13; Hoodride.HardeningTest)
+  def handle_info(_other, socket), do: {:noreply, socket}
+
   # "ended" is the ride's last word: deliver it, then close this channel
   # from the server side (a clean close — the app doesn't rejoin), so no
   # lingering subscriber can hear anything after the ride.

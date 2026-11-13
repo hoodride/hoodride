@@ -1210,10 +1210,28 @@ const steppedAside = () => !!document.getElementById("session-moved");
 // logout's own 409s carry a body its caller reads. The answer never comes
 // (the caller shows no error, and builds no socket). window.fetch looked up
 // at each call: the journeys wrap it.
+// EVERY request gives up after API_TIMEOUT_MS (owner, 2026-11-13): fetch has
+// no time limit of its own, and on a phone a connection can die silently
+// (wifi to mobile data, a lift) — a request then waited for ever, and
+// whatever waited on it with it: the loading screen (its retries wait on the
+// first try), Save greyed out, a reconnect that never caught up. Given up,
+// it fails like any network failure and the usual "try again" takes over
+// (test_browser/hungrequest.mjs). An AbortController and a timer — not
+// AbortSignal.timeout/any: those need iOS 16 / 17.4. A caller with its own
+// signal (the chat's load) keeps its own deadline. The timer is never
+// cleared: an abort after the answer has been read does nothing, and one
+// mid-body (a body still trickling in at the limit) is a failure too.
+const API_TIMEOUT_MS = 15_000;
 function apiFetch(url, opts = {}) {
   const headers = new Headers(opts.headers || {});
   if (state.realUser) headers.set("x-hood-user", String(state.realUser.id));
-  return window.fetch(url, { ...opts, headers }).then((res) => {
+  let signal = opts.signal;
+  if (!signal) {
+    const stop = new AbortController();
+    setTimeout(() => stop.abort(), API_TIMEOUT_MS);
+    signal = stop.signal;
+  }
+  return window.fetch(url, { ...opts, headers, signal }).then((res) => {
     if (res.headers.get("x-hood-other-account") !== "1") return res;
     onSessionMoved();
     return new Promise(() => {});

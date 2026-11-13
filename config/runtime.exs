@@ -72,7 +72,18 @@ if config_env() in [:prod, :loadtest] do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("PHX_HOST") || "example.com"
+  # the site's own address: sign-in links and the live connection's origin
+  # check are built from it. Missing in prod: refuse to start — it used to
+  # fall back to "example.com", start half-broken (every sign-in refused)
+  # and pass the deploy's check (2026-11-13). The load test isn't a site.
+  host =
+    System.get_env("PHX_HOST") ||
+      if config_env() == :prod,
+        do:
+          raise(
+            "environment variable PHX_HOST is missing (the site's address, like hoodride.app)"
+          ),
+        else: "localhost"
 
   bind_ip =
     case :inet.parse_strict_address(String.to_charlist(System.get_env("BIND_IP", "127.0.0.1"))) do

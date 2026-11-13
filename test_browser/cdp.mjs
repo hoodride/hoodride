@@ -329,6 +329,32 @@ function page(cdp, sessionId, name, browserContextId) {
         setTimeout(() => send("Fetch.continueRequest", { requestId: msg.params.requestId }).catch(() => {}), ms);
       });
     },
+    // hold every request whose address matches `urlPattern` (Chrome's
+    // wildcards: *) — no answer at all, as on a connection that died
+    // silently — until `release()`; `count()`: how many have been held
+    // (owner, 2026-11-13: a request with no time limit left the app stuck)
+    async holdRequests(urlPattern) {
+      let done = false;
+      let seen = 0;
+      const paused = [];
+      await send("Fetch.enable", { patterns: [{ urlPattern }] });
+      // (released: this one stops listening — a later hold's requests are
+      // that hold's, never let through by this one)
+      cdp.on((msg) => {
+        if (done || msg.sessionId !== sessionId || msg.method !== "Fetch.requestPaused") return;
+        seen++;
+        paused.push(msg.params.requestId);
+      });
+      return {
+        count: () => seen,
+        async release() {
+          done = true;
+          // (one the page gave up on is gone: continuing it fails, harmlessly)
+          for (const id of paused.splice(0)) await send("Fetch.continueRequest", { requestId: id }).catch(() => {});
+          await send("Fetch.disable", {}).catch(() => {});
+        },
+      };
+    },
     // a recording: every frame as Chrome paints it (JPEG bytes, and its time
     // in seconds) to `onFrame`, until the function this returns is called —
     // for videos of the app (screenshots are too slow to catch a zoom)

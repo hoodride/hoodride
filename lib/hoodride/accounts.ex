@@ -58,9 +58,16 @@ defmodule Hoodride.Accounts do
   owner 2026-11-13: the app asked, the server never checked). A car can't
   be removed once saved (all three fields are required), so a yes stays yes.
   """
+  # → true | false | {:error, :unavailable} (the database couldn't answer:
+  # it used to raise, and crashed the driver's connection — 2026-11-13)
   def has_car?(user_id) do
-    Repo.exists?(from(u in User, where: u.id == ^user_id and not is_nil(u.car_make)))
+    Application.get_env(:hoodride, :car_lookup, &car_on_file?/1).(user_id)
+  rescue
+    _ in [DBConnection.ConnectionError, Exqlite.Error] -> {:error, :unavailable}
   end
+
+  defp car_on_file?(user_id),
+    do: Repo.exists?(from(u in User, where: u.id == ^user_id and not is_nil(u.car_make)))
 
   @doc """
   The account agrees to the current Terms of Use (Hoodride.Terms): when and

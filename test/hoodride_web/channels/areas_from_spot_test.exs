@@ -173,6 +173,34 @@ defmodule HoodrideWeb.AreasFromSpotTest do
       assert Hoodride.Geo.driver_cell(later.id) == @cell
     end
 
+    # crash review 2026-11-13: the car check was the one database read on a
+    # channel with no guard — a busy database crashed the driver's whole
+    # connection, on every reconnect's first update
+    test "the database busy at the car check: 'busy', the connection stays, then it counts" do
+      driver = user!("afs-busy")
+      {:ok, _} = Hoodride.Accounts.set_car(driver.id, @car)
+      chan = join!(driver)
+
+      Application.put_env(:hoodride, :car_lookup, fn _ ->
+        raise DBConnection.ConnectionError, "connection not available"
+      end)
+
+      try do
+        ref = push(chan, "driver_update", %{"spot" => @spot})
+        assert_reply ref, :error, %{reason: "busy", retry_ms: wait}
+        assert is_integer(wait) and wait > 0
+      after
+        Application.delete_env(:hoodride, :car_lookup)
+      end
+
+      settled(chan)
+      assert Hoodride.Geo.driver_cell(driver.id) == nil
+
+      push(chan, "driver_update", %{"spot" => @spot})
+      settled(chan)
+      assert Hoodride.Geo.driver_cell(driver.id) == @cell
+    end
+
     test "a ✋ needs no car" do
       rider = user!("afs-rider2")
       chan = join!(rider)

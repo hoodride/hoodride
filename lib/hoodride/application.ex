@@ -65,7 +65,12 @@ defmodule Hoodride.Application do
       # in on an automatic reconnect: Hoodride.SessionStamp)
       {Registry, keys: :duplicate, name: Hoodride.SocketStamps},
       {DynamicSupervisor, strategy: :one_for_one, name: Hoodride.Rides.Supervisor},
-      {PartitionSupervisor, child_spec: Hoodride.GeoWriter, name: Hoodride.GeoWriters},
+      # one supervisor for ALL the map writers: its restart allowance is
+      # theirs together — the default 3 in 5 s let a few writer crashes in
+      # a row give up and soon restart the whole app (supervision review,
+      # 2026-11-13; Hoodride.HardeningTest). A real crash loop still stops.
+      {PartitionSupervisor,
+       child_spec: Hoodride.GeoWriter, name: Hoodride.GeoWriters, max_restarts: 50, max_seconds: 5},
       # shared per-user rate counters (Hoodride.Throttle); cleans itself
       {Hoodride.RateLimit, clean_period: :timer.minutes(1)},
       Hoodride.Sweeper,
