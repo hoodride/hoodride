@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "無法接受"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "無法檢查你的瀏覽器，請允許 challenges.cloudflare.com，或改用其他瀏覽器"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "無法複製"
 
@@ -671,6 +675,10 @@ msgstr "顯示或隱藏地圖版權資訊"
 msgid "Sign out"
 msgstr "登出"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "登入目前忙碌中，請稍後再試一次。"
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "登入中…"
@@ -713,6 +721,10 @@ msgstr "那位乘客已經不再找車了"
 msgid "That's a different Google account — sign out first to use it"
 msgstr "這是另一個 Google 帳戶，請先登出再使用"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "此瀏覽器無法顯示地圖，請在其設定中開啟硬體加速，或改用其他瀏覽器"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "這項操作無法復原。你的帳號將被刪除，你會從地圖上消失，你的對話將被關閉，而且你會在所有裝置上登出。日後再次登入將會建立新帳號。"
@@ -724,10 +736,6 @@ msgstr "這個網頁不存在。"
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "太晚了，請求已被撤回"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "你的網路登入失敗次數過多，請稍後再試。"
 
 #: priv/static/app.js
 msgid "Try again"

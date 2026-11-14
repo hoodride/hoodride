@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "לא ניתן היה לאשר"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "לא ניתן היה לבדוק את הדפדפן — כדאי לאפשר את challenges.cloudflare.com, או לנסות דפדפן אחר"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "לא ניתן היה להעתיק"
 
@@ -671,6 +675,10 @@ msgstr "הצגה או הסתרה של הקרדיטים של המפה"
 msgid "Sign out"
 msgstr "יציאה"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "הכניסה עמוסה כרגע — כדאי לנסות שוב בעוד רגע."
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "נכנסים…"
@@ -713,6 +721,10 @@ msgstr "הנוסע הזה כבר לא מחפש נסיעה"
 msgid "That's a different Google account — sign out first to use it"
 msgstr "זה חשבון Google אחר — כדי להשתמש בו, צריך לצאת קודם"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "הדפדפן הזה לא יכול להציג את המפה — כדאי להפעיל האצת חומרה בהגדרות שלו, או לנסות דפדפן אחר"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "אי אפשר לבטל את הפעולה הזו. החשבון יימחק, הוא יוסר מהמפה, השיחות ייסגרו ותתבצע יציאה בכל המכשירים. כניסה מחדש בהמשך תיצור חשבון חדש."
@@ -724,10 +736,6 @@ msgstr "הדף הזה לא קיים."
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "מאוחר מדי — הבקשה בוטלה"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "יותר מדי ניסיונות כניסה כושלים מהרשת שלך — כדאי לנסות שוב מאוחר יותר."
 
 #: priv/static/app.js
 msgid "Try again"

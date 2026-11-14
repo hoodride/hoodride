@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "സ്വീകരിക്കാനായില്ല"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "നിങ്ങളുടെ ബ്രൗസർ പരിശോധിക്കാനായില്ല — challenges.cloudflare.com അനുവദിക്കുക, അല്ലെങ്കിൽ മറ്റൊരു ബ്രൗസർ ശ്രമിക്കുക"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "പകർത്താനായില്ല"
 
@@ -671,6 +675,10 @@ msgstr "മാപ്പിന്റെ ക്രെഡിറ്റുകൾ ക�
 msgid "Sign out"
 msgstr "സൈൻ ഔട്ട് ചെയ്യുക"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "സൈൻ ഇൻ ഇപ്പോൾ തിരക്കിലാണ് — അൽപ്പം കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക."
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "സൈൻ ഇൻ ചെയ്യുന്നു…"
@@ -713,6 +721,10 @@ msgstr "ആ റൈഡർ ഇപ്പോൾ റൈഡ് തിരയുന്�
 msgid "That's a different Google account — sign out first to use it"
 msgstr "ഇത് മറ്റൊരു Google അക്കൗണ്ടാണ് — അത് ഉപയോഗിക്കാൻ ആദ്യം സൈൻ ഔട്ട് ചെയ്യുക"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "ഈ ബ്രൗസറിന് മാപ്പ് കാണിക്കാനാകില്ല — അതിന്റെ ക്രമീകരണങ്ങളിൽ ഹാർഡ്‌വെയർ ആക്സിലറേഷൻ ഓണാക്കുക, അല്ലെങ്കിൽ മറ്റൊരു ബ്രൗസർ ശ്രമിക്കുക"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "ഇത് പഴയപടിയാക്കാനാകില്ല. നിങ്ങളുടെ അക്കൗണ്ട് നീക്കം ചെയ്യും, മാപ്പിൽ നിന്ന് നിങ്ങളെ ഒഴിവാക്കും, നിങ്ങളുടെ സംഭാഷണങ്ങൾ അടയ്ക്കും, എല്ലാ ഉപകരണങ്ങളിൽ നിന്നും നിങ്ങളെ സൈൻ ഔട്ട് ചെയ്യും. പിന്നീട് വീണ്ടും സൈൻ ഇൻ ചെയ്താൽ പുതിയ അക്കൗണ്ട് തുടങ്ങും."
@@ -724,10 +736,6 @@ msgstr "ഈ പേജ് നിലവിലില്ല."
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "വൈകിപ്പോയി — അഭ്യർത്ഥന പിൻവലിച്ചു"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "നിങ്ങളുടെ നെറ്റ്‌വർക്കിൽ നിന്ന് വളരെയധികം സൈൻ ഇൻ ശ്രമങ്ങൾ പരാജയപ്പെട്ടു — പിന്നീട് വീണ്ടും ശ്രമിക്കുക."
 
 #: priv/static/app.js
 msgid "Try again"

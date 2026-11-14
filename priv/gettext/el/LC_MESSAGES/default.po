@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "Δεν ήταν δυνατή η αποδοχή"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "Δεν ήταν δυνατός ο έλεγχος του προγράμματος περιήγησής σου — επίτρεψε το challenges.cloudflare.com ή δοκίμασε άλλο πρόγραμμα περιήγησης"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "Δεν ήταν δυνατή η αντιγραφή"
 
@@ -671,6 +675,10 @@ msgstr "Εμφάνιση ή απόκρυψη των αναφορών του χά
 msgid "Sign out"
 msgstr "Αποσύνδεση"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "Η σύνδεση έχει πολύ κίνηση αυτή τη στιγμή — δοκίμασε ξανά σε λίγο."
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "Σύνδεση…"
@@ -713,6 +721,10 @@ msgstr "Αυτός ο επιβάτης δεν ψάχνει πια διαδρομ
 msgid "That's a different Google account — sign out first to use it"
 msgstr "Αυτός είναι διαφορετικός λογαριασμός Google — αποσυνδέσου πρώτα για να τον χρησιμοποιήσεις"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "Αυτό το πρόγραμμα περιήγησης δεν μπορεί να δείξει τον χάρτη — ενεργοποίησε την επιτάχυνση υλικού στις ρυθμίσεις του ή δοκίμασε άλλο πρόγραμμα περιήγησης"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Αυτό δεν αναιρείται. Ο λογαριασμός σου διαγράφεται, αφαιρείσαι από τον χάρτη, οι συνομιλίες σου κλείνουν και αποσυνδέεσαι από όλες τις συσκευές. Αν συνδεθείς ξανά αργότερα, θα ξεκινήσεις νέο λογαριασμό."
@@ -724,10 +736,6 @@ msgstr "Αυτή η σελίδα δεν υπάρχει."
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "Πολύ αργά — το αίτημα ανακλήθηκε"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "Πάρα πολλές αποτυχημένες συνδέσεις από το δίκτυό σου — δοκίμασε ξανά αργότερα."
 
 #: priv/static/app.js
 msgid "Try again"

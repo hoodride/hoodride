@@ -55,6 +55,8 @@ defmodule HoodrideWeb.NearCoversTest do
     "lang-sheet" => "the language choice: a dialog (mapOutOfSight)",
     # added by the app itself (document.body.appendChild)
     "session-moved" => "the \"Use here\" cover: over the whole map (mapOutOfSight)",
+    "map-unavailable" =>
+      "the \"can't show the map\" cover: up only when there's no map at all (initMap) — nothing to search",
     "nameless:area" => "the copy helper: an invisible text box, removed the moment it's used",
     "safe-probe" =>
       "never seen: its padding is the phone's safe-area insets — counted as covers (nearCovers)"
@@ -186,7 +188,7 @@ defmodule HoodrideWeb.NearCoversTest do
 
     # the map's credits button (the compact "i" in the corner) is drawn —
     # one of the map's own controls, all counted (.maplibregl-ctrl)
-    assert body("initMap") =~ "attributionControl: { compact: true },"
+    assert body("makeMap") =~ "attributionControl: { compact: true },"
   end
 
   test "what sits on the see-through top bar: every one of its things is counted" do
@@ -500,7 +502,7 @@ defmodule HoodrideWeb.NearCoversTest do
     assert u =~
              "return HoodNearby.markerStartZoom({ viewport: HoodViewport, h3, center: at, size: mapSize(), rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS, maxZoom: INTENT_ZOOM });"
 
-    assert @app =~ "else map.easeTo({ center: [pos.lng, pos.lat], zoom: usualZoom(pos) });"
+    assert @app =~ "map.easeTo({ center: [pos.lng, pos.lat], zoom: usualZoom(pos) });"
 
     assert body("centreOnYou") =~
              "else map.easeTo({ center: [at.lng, at.lat], zoom: Math.max(map.getZoom(), 15, usualZoom(at)) });"
@@ -944,7 +946,8 @@ defmodule HoodrideWeb.NearCoversTest do
   end
 
   test "the map never turns or tilts (the search's maths is north-up and flat)" do
-    i = body("initMap")
+    # (the map's options: makeMap; initMap makes it — 2026-11-14)
+    i = body("initMap") <> body("makeMap")
     assert i =~ "maxPitch: 0,"
     assert i =~ "dragRotate: false,"
     assert i =~ "pitchWithRotate: false,"

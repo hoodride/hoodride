@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "Prihvaćanje nije uspjelo"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "Tvoj preglednik nije moguće provjeriti – dopusti challenges.cloudflare.com ili isprobaj drugi preglednik"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "Kopiranje nije uspjelo"
 
@@ -671,6 +675,10 @@ msgstr "Prikaži ili sakrij izvore karte"
 msgid "Sign out"
 msgstr "Odjavi se"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "Prijava je trenutno preopterećena – pokušaj ponovno za trenutak."
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "Prijava…"
@@ -713,6 +721,10 @@ msgstr "Taj putnik više ne traži prijevoz"
 msgid "That's a different Google account — sign out first to use it"
 msgstr "To je drugi Google račun – odjavi se prvo ako ga želiš koristiti"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "Ovaj preglednik ne može prikazati kartu – uključi hardversko ubrzanje u njegovim postavkama ili isprobaj drugi preglednik"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Ovo se ne može poništiti. Račun ti se briše, nestaješ s karte, razgovori se zatvaraju i odjavljuješ se na svim uređajima. Ako se kasnije ponovno prijaviš, otvara se novi račun."
@@ -724,10 +736,6 @@ msgstr "Ova stranica ne postoji."
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "Prekasno – zahtjev je povučen"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "Previše neuspjelih prijava s tvoje mreže – pokušaj kasnije."
 
 #: priv/static/app.js
 msgid "Try again"

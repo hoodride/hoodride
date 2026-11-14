@@ -43,6 +43,7 @@ const ASSETS = [
   "googlerefresh.js",
   "langswitch.js",
   "nearby.js",
+  "turnstile.js",
   "translate.svg",
   "phoenix.min.js",
   "maplibre-gl.js",

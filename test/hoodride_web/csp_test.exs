@@ -57,11 +57,19 @@ defmodule HoodrideWeb.CSPTest do
           ],
           do: assert(p =~ rule, "missing: #{rule}")
 
-      # scripts: our own files, and Cloudflare Web Analytics' beacon, which
+      # scripts: our own files, Cloudflare Web Analytics' beacon, which
       # Cloudflare adds to the page (owner's pick, 2026-10-28 — named in the
-      # privacy policy). Exactly these two: nobody else's scripts.
+      # privacy policy), and Cloudflare Turnstile's check on the sign-in
+      # screen (2026-11-14, HoodrideWeb.Turnstile). Exactly these three:
+      # nobody else's scripts.
       [script] = Regex.run(~r/script-src [^;]+/, p)
-      assert script == "script-src 'self' https://static.cloudflareinsights.com"
+
+      assert script ==
+               "script-src 'self' https://static.cloudflareinsights.com https://challenges.cloudflare.com"
+
+      # frames: Turnstile's check runs in one — and nothing else
+      [frame] = Regex.run(~r/frame-src [^;]+/, p)
+      assert frame == "frame-src https://challenges.cloudflare.com"
 
       [connect] = Regex.run(~r/connect-src [^;]+/, p)
       assert connect =~ "'self'"
@@ -209,6 +217,20 @@ defmodule HoodrideWeb.CSPTest do
 
       log = capture_log(fn -> assert report(body, "application/reports+json").status == 204 end)
       assert log =~ "csp: connect-src blocked wss://evil.example"
+    end
+
+    test "a site name with a newline or junk: logged as 'other' — a report can't forge a log line" do
+      for uri <- ["https://a\n[error] forged line", "https://a b.example/", "https://\e[31mred/"] do
+        body =
+          Jason.encode!(%{
+            "csp-report" => %{"effective-directive" => "img-src", "blocked-uri" => uri}
+          })
+
+        log = capture_log(fn -> assert report(body, "application/csp-report").status == 204 end)
+        refute log =~ "forged"
+        refute log =~ "\e["
+        assert log =~ "csp: img-src blocked other", inspect(uri)
+      end
     end
 
     test "inline and eval reports name the kind, not a site" do

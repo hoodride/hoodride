@@ -1,20 +1,35 @@
 defmodule Hoodride.SignInFailures do
   @moduledoc """
-  Failed sign-ins per address — Google refusing the code we sent it
-  (2026-10-29). A made-up code still costs a call to Google, and a provider
-  may throttle an app that sends many invalid requests. RFC 6819
-  §4.4.1.12 ("DoS Using Manufactured Authorization 'codes'"): check
-  `state` before asking the provider (HoodrideWeb.AuthController), and cut
-  off senders of too many invalid codes. The numbers are GitLab's
-  published ones: 30 failures in 3 minutes → the address can't sign in
-  for 1 hour. Real people almost never cause a failed exchange, so a
-  shared address (a carrier's CGNAT) is rarely caught; anyone already
-  signed in is untouched.
+  Codes the providers refused, counted SITE-WIDE — to WATCH, never to
+  block (RFC 6819 §4.4.1.12, "DoS Using Manufactured Authorization
+  'codes'"). Only a refused CODE counts (HoodrideWeb.AuthController:
+  Google's `invalid_grant`, Facebook's code 100) — never our own setup
+  errors or their throttling.
 
-  `config :hoodride, :sign_in_failures, max:, window_ms:, block_ms:`;
-  nil = off (dev). Rows: `{address, count, window_start}` and
-  `{{:block, address}, until}`, monotonic ms; the Sweeper drops old ones.
+    * over `alert` in `alert_window_ms`: one warning in the log
+      ("sign-in: N codes refused…", deploy/errors.sh shows it) — someone
+      may be trying made-up codes; the time to switch Turnstile on. A
+      site-wide count that REFUSED sign-ins would be an off switch anyone
+      could flip (one address makes hundreds of refused codes an hour): a
+      known anti-pattern — global counts are telemetry, enforcement is per
+      source (the sign-in budget, per address);
+    * a provider throttling us (429, Facebook's 4/17/32/613): Google's own
+      rule — its Retry-After if it gave one, else truncated exponential
+      backoff with jitter (`backoff_ms` doubling to `backoff_max_ms`),
+      reset by the next success. Only the providers can start this pause.
+
+  It used to block an ADDRESS for an hour after 30 refused codes in 3
+  minutes: one person on a café's Wi-Fi blocked sign-in for everyone there,
+  and a Google outage counted too (review 2026-11-14 — OWASP: use IP limits
+  "with caution", prefer soft limits). With the state one-time
+  (Hoodride.SignInStates), each refused code needs a fresh sign-in start,
+  and those are limited per address (`:sign_in_budget`).
+
+  `config :hoodride, :sign_in_failures, alert:, alert_window_ms:,
+  backoff_ms:, backoff_max_ms:`; nil = off (dev, tests). Monotonic ms.
+  Rows: `{:alert, count, start}`, `{:backoff, level}`, `{:paused, until}`.
   """
+  require Logger
 
   @table :sign_in_failures
 
@@ -23,61 +38,120 @@ defmodule Hoodride.SignInFailures do
     :ok
   end
 
-  @doc "Google refused a code from `address`: count it; the max-th blocks the address."
-  def record(address, now \\ now()) do
+  @doc "A provider refused a code: counted; past the mark, one warning for the owner."
+  def record(now \\ now()) do
     case conf() do
       nil ->
         :ok
 
       c ->
-        count = bump(address, now, c[:window_ms])
-        if count >= c[:max], do: :ets.insert(@table, {{:block, address}, now + c[:block_ms]})
+        recent = bump(:alert, now, c[:alert_window_ms])
+
+        # once per window: the count reaching the mark, not every one past it
+        if recent == c[:alert],
+          do:
+            Logger.warning(
+              "sign-in: #{recent} codes refused in #{div(c[:alert_window_ms], 60_000)} min — " <>
+                "someone may be trying made-up codes (Turnstile stops it: GOOGLE_SETUP.md)"
+            )
+
         :ok
     end
   end
 
-  # ATOMIC — failures arrive at the same instant (made-up codes fired in
-  # parallel, each its own request on its own core). The first version read
-  # the row, then wrote it: parallel first failures each wrote "1" over the
-  # others, and a burst of 30 counted as low as 2 (measured, 2026-10-29) —
-  # parallel bursts dodged the block. Now: the first failure creates the
-  # row with `insert_new` (only one can); a finished window is restarted
-  # only if the row still holds what was read (compare-and-swap,
-  # `select_replace`, else read again); every other failure is one atomic
-  # `update_counter`. No failure is ever lost.
-  defp bump(address, now, window) do
-    if :ets.insert_new(@table, {address, 1, now}) do
+  @doc """
+  A provider throttling us: paused for its Retry-After (ms) if it gave one,
+  else the next step of truncated exponential backoff with jitter
+  (Google's rule: 1 s, 2 s, 4 s… at most 32 s).
+  """
+  def throttled(provider, retry_after_ms \\ nil, now \\ now()) do
+    case conf() do
+      nil ->
+        :ok
+
+      c ->
+        level = :ets.update_counter(@table, :backoff, {2, 1}, {:backoff, 0})
+        step = min(c[:backoff_max_ms], c[:backoff_ms] * Integer.pow(2, min(level - 1, 30)))
+        wait = retry_after_ms || step + :rand.uniform(c[:backoff_ms]) - 1
+        pause(wait, "#{provider} is throttling us", now)
+    end
+  end
+
+  @doc "A provider answered: the backoff starts over."
+  def answered do
+    :ets.delete(@table, :backoff)
+    :ok
+  end
+
+  @doc "Codes refused in the current alert window (tests, the log)."
+  def count do
+    case :ets.lookup(@table, :alert) do
+      [{_, n, _}] -> n
+      [] -> 0
+    end
+  end
+
+  @doc "Are calls to the providers paused right now?"
+  def paused?(now \\ now()), do: wait_ms(now) > 0
+
+  @doc "How long the pause still runs (ms), 0 when none."
+  def wait_ms(now \\ now()) do
+    case conf() != nil and :ets.lookup(@table, :paused) do
+      [{_, until}] when until > now -> until - now
+      _ -> 0
+    end
+  end
+
+  # one log line when a pause starts (not on each later failure)
+  defp pause(ms, why, now) do
+    until = now + ms
+
+    case :ets.lookup(@table, :paused) do
+      [{_, old}] when old >= until ->
+        :ok
+
+      [{_, old}] when old > now ->
+        :ets.insert(@table, {:paused, until})
+
+      _ ->
+        :ets.insert(@table, {:paused, until})
+        Logger.warning("sign-in: calls to Google and Facebook paused #{div(ms, 1000)} s — #{why}")
+    end
+
+    :ok
+  end
+
+  # ATOMIC — refusals arrive at the same instant (each its own request on
+  # its own core): the first creates the row (`insert_new`, only one can);
+  # a finished window is restarted only if the row still holds what was
+  # read (compare-and-swap); every other one is one `update_counter`. No
+  # count is lost (measured, 2026-10-29: a read-then-write lost most).
+  defp bump(key, now, window) do
+    if :ets.insert_new(@table, {key, 1, now}) do
       1
     else
-      case :ets.lookup(@table, address) do
+      case :ets.lookup(@table, key) do
         [{_, _, start} = old] when now - start >= window ->
-          if :ets.select_replace(@table, [{old, [], [{:const, {address, 1, now}}]}]) == 1,
+          if :ets.select_replace(@table, [{old, [], [{:const, {key, 1, now}}]}]) == 1,
             do: 1,
-            else: bump(address, now, window)
+            else: bump(key, now, window)
 
         [_] ->
-          :ets.update_counter(@table, address, {2, 1})
+          :ets.update_counter(@table, key, {2, 1})
 
-        # swept away in between: start over
         [] ->
-          bump(address, now, window)
+          bump(key, now, window)
       end
     end
   end
 
-  @doc "May `address` not sign in right now?"
-  def blocked?(address, now \\ now()) do
-    conf() != nil and
-      match?([{_, until}] when until > now, :ets.lookup(@table, {:block, address}))
-  end
-
-  @doc "Sweeper: forget lifted blocks and finished windows."
+  @doc "Sweeper: forget a pause that's over and a window that ended."
   def sweep(now \\ now()) do
-    window = (conf() || [window_ms: 0])[:window_ms]
+    c = conf() || [alert_window_ms: 0]
 
     :ets.select_delete(@table, [
-      {{{:block, :_}, :"$1"}, [{:"=<", :"$1", now}], [true]},
-      {{:_, :_, :"$1"}, [{:"=<", {:+, :"$1", window}, now}], [true]}
+      {{:paused, :"$1"}, [{:"=<", :"$1", now}], [true]},
+      {{:alert, :_, :"$1"}, [{:"=<", {:+, :"$1", c[:alert_window_ms]}, now}], [true]}
     ])
 
     :ok

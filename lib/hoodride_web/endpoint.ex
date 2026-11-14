@@ -12,10 +12,16 @@ defmodule HoodrideWeb.Endpoint do
     store: :cookie,
     key: "_hoodride_key",
     signing_salt: "e4AIm8XI",
+    # encrypted too, not only signed (review 2026-11-14): the PKCE verifier
+    # in it can't be read off a copy. (Changing it signed everyone out once.)
+    encryption_salt: "q7Rk2vNw",
     same_site: "Lax",
     max_age: 30 * 86_400,
     secure: Application.compile_env(:hoodride, :secure_cookie, false)
   ]
+
+  @doc false
+  def session_options, do: @session_options
 
   # auth_token: the app sends its socket token in the WebSocket protocol
   # header, not the URL — out of proxy access logs (UserSocket). A TOP-LEVEL

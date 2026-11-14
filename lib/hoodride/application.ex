@@ -5,14 +5,27 @@ defmodule Hoodride.Application do
 
   use Application
 
+  @doc """
+  The map writers need Erlang/OTP 28 or newer (priority messages, EEP 76:
+  Hoodride.GeoWriter). Older, every writer crashed at start with a cryptic
+  error; now the start stops at once and says so (crash review 2026-11-14).
+  """
+  def check_otp!(release) do
+    if String.to_integer(release) >= 28,
+      do: :ok,
+      else: raise("this app needs Erlang/OTP 28 or newer (this is OTP #{release})")
+  end
+
   @impl true
   def start(_type, _args) do
+    check_otp!(List.to_string(:erlang.system_info(:otp_release)))
     Hoodride.Geo.init_tables()
     Hoodride.Chat.init_tables()
     Hoodride.Requests.init_tables()
     Hoodride.Rides.init_tables()
     Hoodride.RateBudget.init_table()
     Hoodride.SignInFailures.init_table()
+    Hoodride.SignInStates.init_table()
     HoodrideWeb.UserSocket.init_table()
     Hoodride.SessionStamp.init_table()
     Hoodride.SessionTokens.init_table()

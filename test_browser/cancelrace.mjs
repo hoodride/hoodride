@@ -57,7 +57,10 @@ await journey("cancelrace: Cancel just after the Accept — never 'Request cance
   check(!banner.includes("Request cancelled"), "never 'Request cancelled'", banner);
   check(await rita.eval(`!!state.ride`), "her request isn't dropped");
 
-  step("the news arrives: Rita's in the ride");
-  await rita.eval(`(userChannel.trigger = window.__trigger, window.__held.forEach((a) => window.__trigger(...a)), true)`);
-  await rita.waitFor(`state.ride && state.ride.status === "connected"`, "Rita in the ride");
+  step("the news never reaches her phone: within seconds the app asks the server itself — Rita's in the ride");
+  // (crash review 2026-11-14: "accepted" and then nothing — the ride's start
+  // failed after all, or its news was lost — left the Cancel doing nothing)
+  await rita.waitFor(`state.ride && state.ride.status === "connected"`, "Rita in the ride, from the server", 15000);
+  check((await rita.eval(`window.__held.length`)) >= 1, "(the live news never got through)");
+  await rita.eval(`(userChannel.trigger = window.__trigger, true)`);
 });

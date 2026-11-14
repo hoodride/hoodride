@@ -45,7 +45,30 @@ defmodule HoodrideWeb.ClientErrorController do
         Hoodride.Limits.error_reports_per_minute()
       )
 
-    case Hoodride.RateLimit.inc(:client_errors, 60_000) do
+    # each address first gets a few (as many as the app ever sends a
+    # minute: Limits.app_error_reports_per_minute): one address
+    # could fill the whole minute's cap and drop everyone else's real
+    # reports (crash review 2026-11-14) — past its few, dropped silently.
+    # (the counters' table gone for a moment: counted as the first —
+    # Hoodride.RateLimit.guarded)
+    if own_share?(conn) do
+      log_capped(line, cap)
+    end
+
+    send_resp(conn, 204, "")
+  end
+
+  def create(conn, _params), do: send_resp(conn, 400, "")
+
+  @per_address Hoodride.Limits.app_error_reports_per_minute()
+
+  defp own_share?(conn) do
+    key = {:client_err, HoodrideWeb.ClientIp.budget_key(conn.remote_ip)}
+    match?({:ok, _}, Hoodride.RateBudget.spend(key, :client_err, @per_address, @per_address))
+  end
+
+  defp log_capped(line, cap) do
+    case Hoodride.RateLimit.guarded(fn -> Hoodride.RateLimit.inc(:client_errors, 60_000) end, 1) do
       n when n <= cap ->
         Logger.warning(line)
         :telemetry.execute([:hoodride, :client_error], %{count: 1}, %{line: line})
@@ -56,11 +79,7 @@ defmodule HoodrideWeb.ClientErrorController do
       _ ->
         :ok
     end
-
-    send_resp(conn, 204, "")
   end
-
-  def create(conn, _params), do: send_resp(conn, 400, "")
 
   @doc false
   # the app's rules (errors.js scrub), again: links, emails, numbers of 2+

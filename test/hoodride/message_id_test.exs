@@ -57,6 +57,22 @@ defmodule Hoodride.MessageIdTest do
     assert length(Enum.uniq(ids)) == length(ids)
   end
 
+  # (review 2026-11-14) a message into an EXISTING chat wrote the chat's row
+  # again: an "End chat" landing between the check and that write brought
+  # the ended chat back, uncounted (no "started by" row). Now it's touched
+  # in place — gone meanwhile: a new chat, counted as one
+  test "a message into an existing chat touches it in place; ended meanwhile: a new chat, counted" do
+    [_, send] = String.split(File.read!("lib/hoodride/chat.ex"), "def send_message(", parts: 2)
+    [send | _] = String.split(send, "\n  def ", parts: 2)
+    assert send =~ ":ets.update_element(@conversations, key, {2, now})"
+    refute send =~ ":ets.insert(@conversations, {key, now})"
+
+    # an ordinary exchange still works, in one chat
+    send!(@a, @b)
+    send!(@b, @a)
+    assert [_] = Chat.conversations_for(@a)
+  end
+
   test "a ride's id is random, not a count of rides" do
     src = File.read!("lib/hoodride/rides.ex")
     refute src =~ ~s(id = "r" <> Integer.to_string(System.unique_integer)

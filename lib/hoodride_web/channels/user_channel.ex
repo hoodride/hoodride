@@ -35,6 +35,10 @@ defmodule HoodrideWeb.UserChannel do
   # for any linguistic usage")
   @max_msg_bytes Hoodride.Limits.message_bytes()
   @stacked_marks ~r/\p{M}{31}/u
+  # …and marks split up by joiners, variation selectors or tags (not marks,
+  # but part of the same character): at most this many bytes in ONE
+  # character (crash review 2026-11-14)
+  @max_char_bytes Hoodride.Limits.message_char_bytes()
   # H3 cells are ~16 chars; anything bigger is garbage, not geography
   @max_cell_bytes Hoodride.Limits.cell_bytes()
 
@@ -215,7 +219,8 @@ defmodule HoodrideWeb.UserChannel do
       byte_size(text) > @max_msg_bytes or String.length(text) > @max_msg_chars ->
         {:reply, {:error, %{reason: "too_long"}}, socket}
 
-      Regex.match?(@stacked_marks, text) ->
+      Regex.match?(@stacked_marks, text) or
+          Enum.any?(String.graphemes(text), &(byte_size(&1) > @max_char_bytes)) ->
         {:reply, {:error, %{reason: "stacked_marks"}}, socket}
 
       # the same message again (the app's retry: its reply was lost): the

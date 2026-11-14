@@ -33,17 +33,13 @@ defmodule Hoodride.Rides do
       # every ride start in the city wait in one line: one start stuck on a
       # slow database held up every other driver's Accept.
       with {:ok, pid} <-
-             DynamicSupervisor.start_child(
-               Hoodride.Rides.Supervisor,
-               {Hoodride.Rides.Ride,
-                %{
-                  id: id,
-                  rider: rider_id,
-                  driver: driver_id,
-                  starter: self(),
-                  still_signed_in: still_signed_in
-                }}
-             ),
+             start_child(%{
+               id: id,
+               rider: rider_id,
+               driver: driver_id,
+               starter: self(),
+               still_signed_in: still_signed_in
+             }),
            :ok <- begin(pid) do
         {:ok, id}
       else
@@ -62,6 +58,16 @@ defmodule Hoodride.Rides do
     else
       {:error, :busy}
     end
+  end
+
+  # the ride's process, started — or an error if the rides' supervisor can't
+  # be reached (restarting): it used to EXIT here, crashing the driver's
+  # connection with both seats still claimed — both "in a ride" with no ride
+  # until the server restarted (crash review 2026-11-14; RestartGapsTest)
+  defp start_child(args) do
+    DynamicSupervisor.start_child(Hoodride.Rides.Supervisor, {Hoodride.Rides.Ride, args})
+  catch
+    :exit, reason -> {:error, {:start_failed, reason}}
   end
 
   # the ride's start-up, waited for (no limit, as the supervisor's start was:
@@ -474,6 +480,10 @@ defmodule Hoodride.Rides.Ride do
       end)
 
     {:noreply, %{state | lookup: {task.ref, attempt}}}
+  catch
+    # the helper restarting: asked again later — it used to crash the ride,
+    # ending it mid-trip (crash review 2026-11-14; RideBusyTest)
+    :exit, _ -> {:noreply, ask_again(state, attempt)}
   end
 
   def handle_info({ref, found}, %{lookup: {ref, attempt}} = state) do

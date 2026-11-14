@@ -73,8 +73,28 @@ const auth = {
   // nobody could really sign in. Demo mode is ?demo=1 only.
   async signIn(provider) {
     if (HoodSession.loginRoute(location.hostname) !== "dev") {
-      location.href = `/auth/${provider === "facebook" ? "facebook" : "google"}`;
-      return new Promise(() => {}); // leaving the page
+      // Cloudflare's check first, when it's on (HoodTurnstile; the server
+      // allows a start only with a passed one — HoodrideWeb.Turnstile)
+      const meta = document.querySelector('meta[name="hoodride-turnstile"]');
+      const go = await HoodTurnstile.start(provider, {
+        siteKey: meta && meta.content,
+        getTurnstile: () => HoodTurnstile.load(document, window),
+        container: $("turnstile-box"),
+        lang: HoodI18n.lang(),
+        post: async (body) =>
+          (
+            await apiFetch("/auth/start", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            })
+          ).json(),
+      });
+      if (go.url) {
+        location.href = go.url;
+        return new Promise(() => {}); // leaving the page
+      }
+      return { real: false, reason: go.error };
     }
     try {
       const res = await apiFetch("/api/dev_login", {
@@ -520,6 +540,10 @@ async function handleLogin(provider, button) {
     const result = await auth.signIn(provider);
     if (result.real) {
       await startSignedIn(result.state);
+    } else if (result.reason === "blocked") {
+      // the check couldn't run here (a blocker, a strict privacy setting)
+      label.textContent = t("Couldn't check your browser — allow challenges.cloudflare.com, or try another browser");
+      await new Promise((r) => setTimeout(r, 5000));
     } else {
       label.textContent = t("Couldn't sign in — try again");
       await new Promise((r) => setTimeout(r, 2000));
@@ -868,15 +892,23 @@ function closeSettings(e) {
 // before a driver first goes online (riders can't find "Driver"). Read from
 // the server only when needed — Settings, becoming a driver — and kept here:
 // undefined = not read yet, null = none set.
-async function loadMyCar() {
-  try {
-    const res = await apiFetch("/api/car");
-    if (!res.ok) return false;
-    state.myCar = (await res.json()).car;
-    return true;
-  } catch (_) {
-    return false;
-  }
+// one ask at a time: Settings redraws often while the car is unknown —
+// offline, every redraw sent another overlapping request (review
+// 2026-11-14). A second ask joins the one under way
+let carLoading = null;
+function loadMyCar() {
+  if (carLoading) return carLoading;
+  carLoading = (async () => {
+    try {
+      const res = await apiFetch("/api/car");
+      if (!res.ok) return false;
+      state.myCar = (await res.json()).car;
+      return true;
+    } catch (_) {
+      return false;
+    }
+  })().finally(() => (carLoading = null));
+  return carLoading;
 }
 
 function renderCarNote() {
@@ -1136,17 +1168,25 @@ function agreeToTerms() {
 async function startSignedIn(data) {
   state.realUser = data.user;
   if (data.terms_agreed === false) await agreeToTerms();
-  await enterApp();
+  // (no map possible here: said so, nothing more — enterApp)
+  if (!(await enterApp())) return;
   hydrate(data);
 }
 
+// → false when this browser can't draw the map (initMap): nothing more then
 async function enterApp() {
   if (!state.realUser) DEMO = true;
   show("screen-map");
   setAccountButton();
+  // the map FIRST: it needs no connection. Made after it, the map was blank
+  // for as long as the connection's pass took (up to 15 s on a weak
+  // signal), and a ◎ tap meanwhile lost the blue dot (crash review
+  // 2026-11-14; test_browser/mapstart.mjs). Once the world channel joins it
+  // asks for what's on the map (joinWorldChannel).
+  if (!map && !initMap()) return false;
   if (state.realUser && !socket) await connectSocket();
-  if (!map) initMap();
   requestWakeLock();
+  return true;
 }
 
 // ===== Real peers =====
@@ -1465,13 +1505,18 @@ async function connectSocket() {
 const LOADED_BUILD = (document.querySelector('meta[name="hoodride-build"]') || {}).content || null;
 let serverBuild = null;
 
-function checkForUpdate() {
-  const action = HoodUpdate.decide({
+// what to do about a newer build NOW: "reload" (quietly), "offer", or none
+function updateDecision() {
+  return HoodUpdate.decide({
     loadedBuild: LOADED_BUILD,
     serverBuild,
     hidden: document.visibilityState === "hidden",
     busy: HoodUpdate.isBusy(busyView()),
   });
+}
+
+function checkForUpdate() {
+  const action = updateDecision();
   if (action === "offer") showUpdateAvailable();
   else if (action === "reload") reloadForUpdate();
 }
@@ -1488,9 +1533,14 @@ function reloadForUpdate() {
   sw.then((r) => r && r.update())
     .catch(() => {})
     .finally(() => {
-      if (!steppedAside()) return location.reload();
+      // decided again: the update can finish once the person is BACK and
+      // using the page (a hidden phone freezes the page mid-update) — it
+      // reloaded under them, what they'd typed lost (review 2026-11-14).
+      // Still right: reload; else the offer, their tap
+      if (!steppedAside() && updateDecision() === "reload") return location.reload();
       // no stamp left behind for a later page load
       HoodSession.takeQuietReload(tabStorage());
+      if (!steppedAside() && updateDecision() === "offer") showUpdateAvailable();
     });
 }
 
@@ -1680,6 +1730,12 @@ function hydrate(st) {
 
   refreshControls();
   hydrated = true;
+  // the first reading came before this (its search couldn't know you were
+  // looking): looked now, as it would have — unless you've moved the map
+  // yourself or a search is under way (findnearestdriving journey)
+  const early = firstBeforeHydrate;
+  firstBeforeHydrate = null;
+  if (early && HoodNearby.lookingFor(state) && !movedByYou && !nearLooking) findNearest(early);
   checkRoleAgreement();
   if (reloadWhenHydrated) {
     reloadWhenHydrated = false;
@@ -1903,6 +1959,8 @@ function onServerRole(role, { rejoin = false } = {}) {
 // (The reverse — we're on duty, the server says viewer — is just the first
 // GPS fix not sent yet: nothing to fix.)
 let hydrated = false;
+// the first location reading, when it came before hydrate (onReading)
+let firstBeforeHydrate = null;
 let reloadWhenHydrated = false; // the user channel joined before the first hydrate
 let liveNews = 0; // live news received (HoodRehydrate.countsAsLive)
 let reloading = false; // one softReload at a time…
@@ -2969,25 +3027,19 @@ function initMap() {
     DEMO || !state.realUser ? null : HoodViewStore.read(storageOrNull(), state.realUser.id),
     DEFAULT_POS
   );
-  map = new maplibregl.Map({
-    container: "map",
-    style: "https://tiles.openfreemap.org/styles/liberty",
-    center: start.center,
-    zoom: start.zoom,
-    attributionControl: { compact: true },
-    // the map library's own words (screen-reader names) in the reader's
-    // language — the ones this map uses (languages journey, 2026-11-04)
-    locale: {
-      "Map.Title": t("Map"),
-      "Marker.Title": t("Map marker"),
-      "AttributionControl.ToggleAttribution": t("Show or hide the map's credits"),
-      "AttributionControl.MapFeedback": t("Map feedback"),
-    },
-    // flat, north-up, always: no tilt, no rotation
-    maxPitch: 0,
-    pitchWithRotate: false,
-    dragRotate: false,
-  });
+  // a browser that can't draw the map (WebGL off or blocked: hardware
+  // acceleration off, some privacy browsers, old Android) throws here.
+  // Everything after it used to be skipped — a blank screen, no word, the
+  // same on every reload, while the server saw the person online. Said
+  // plainly instead, and nothing connects (test_browser/mapstart.mjs)
+  try {
+    map = makeMap(start);
+  } catch (e) {
+    map = null;
+    showMapUnavailable();
+    reportError(e, "map");
+    return false;
+  }
   map.touchZoomRotate.disableRotation();
 
   // map tiles come from the internet: one that can't load (no signal) stays
@@ -3055,6 +3107,42 @@ function initMap() {
   }
   setInterval(tick, 1500);
   refreshControls();
+  return true;
+}
+
+function makeMap(start) {
+  return new maplibregl.Map({
+    container: "map",
+    style: "https://tiles.openfreemap.org/styles/liberty",
+    center: start.center,
+    zoom: start.zoom,
+    attributionControl: { compact: true },
+    // the map library's own words (screen-reader names) in the reader's
+    // language — the ones this map uses (languages journey, 2026-11-04)
+    locale: {
+      "Map.Title": t("Map"),
+      "Marker.Title": t("Map marker"),
+      "AttributionControl.ToggleAttribution": t("Show or hide the map's credits"),
+      "AttributionControl.MapFeedback": t("Map feedback"),
+    },
+    // flat, north-up, always: no tilt, no rotation
+    maxPitch: 0,
+    pitchWithRotate: false,
+    dragRotate: false,
+  });
+}
+
+// this browser can't draw the map (initMap): said plainly, over everything
+function showMapUnavailable() {
+  if (document.getElementById("map-unavailable")) return;
+  const el = document.createElement("div");
+  el.id = "map-unavailable";
+  el.style.cssText =
+    "position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;" +
+    "align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;" +
+    "background:rgba(17,17,17,.94);color:#fff;font:16px system-ui,sans-serif";
+  el.textContent = t("This browser can't show the map — turn on hardware acceleration in its settings, or try another browser");
+  document.body.appendChild(el);
 }
 
 // ===== Location (the logic: locator.js; the rules: sendfilter.js) =====
@@ -3085,7 +3173,13 @@ const loc = HoodLocator.create({
       // ✋ up: the nearest found too)
       if (first && !centre && !movedByYou) {
         if (HoodNearby.lookingFor(state)) findNearest(pos);
-        else map.easeTo({ center: [pos.lng, pos.lat], zoom: usualZoom(pos) });
+        else {
+          map.easeTo({ center: [pos.lng, pos.lat], zoom: usualZoom(pos) });
+          // before the server has said what you're doing (the map is made
+          // before the connection, 2026-11-14): a ✋ up or a shift online
+          // isn't known yet — asked again once it is (hydrate)
+          if (!hydrated) firstBeforeHydrate = pos;
+        }
       }
     },
     onGood(pos) {
@@ -4231,6 +4325,8 @@ $("chat-form").addEventListener("submit", (e) => {
           rate_limited: t("⏳ You're sending too fast — slow down a sec"),
           too_many_new_chats: t("You've started a lot of new chats — try again later"),
           too_many_chats: t("You've started too many chats — end one of them first"),
+          // (the server busy: your text stays — try again)
+          busy: t("Message didn't send — try again"),
         };
         unsay(msgs[e.reason] || t("Message didn't send — connection?"));
         // can't message them now (a first message): nothing to keep their
@@ -4339,6 +4435,7 @@ $("btn-ride-action").addEventListener("click", () => {
             request_cooldown: t("Give this driver a minute before asking again"),
             rate_limited: t("⏳ Slow down a sec"),
             too_many_new_chats: t("You've contacted a lot of new people — try again later"),
+            busy: t("Couldn't reach the server — try again"),
           };
           transientBanner(msgs[e.reason] || t("Couldn't send the request"));
         });
@@ -4428,6 +4525,10 @@ $("btn-decline").addEventListener("click", () => {
 
 $("btn-endride").addEventListener("click", endRide);
 
+// a Cancel answered "accepted": how long the ride's news gets before the
+// app asks the server (endRide)
+const ACCEPTED_WAIT_MS = 5000;
+
 function endRide() {
   if (!state.ride) return;
   if (!DEMO && !liveNow()) return transientBanner(CANT_REACH());
@@ -4447,7 +4548,16 @@ function endRide() {
           refreshControls();
         })
         .receive("error", (e) => {
-          if (e && e.reason === "accepted") return;
+          // the ride comes (ride_started). If it doesn't within a few
+          // seconds — its start failed after all, or the news was lost —
+          // the server says what's true (crash review 2026-11-14: the
+          // Cancel otherwise did nothing; test_browser/cancelrace.mjs)
+          if (e && e.reason === "accepted") {
+            setTimeout(() => {
+              if (state.ride === asked) softReload();
+            }, ACCEPTED_WAIT_MS);
+            return;
+          }
           if (e && e.reason === "rate_limited") return transientBanner(t("⏳ Slow down a sec"));
           // (anything else: the server knows best — as for a request)
           softReload();
@@ -5650,5 +5760,7 @@ if (DEMO) {
 }
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
+  // (a failed install — a flaky first visit, a private window — is let go:
+  // nothing to do, and no "unhandled" error report: crash review 2026-11-14)
+  navigator.serviceWorker.register("sw.js").catch(() => {});
 }

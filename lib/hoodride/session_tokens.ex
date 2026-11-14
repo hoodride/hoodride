@@ -91,7 +91,7 @@ defmodule Hoodride.SessionTokens do
 
     :ok
   rescue
-    _ in [DBConnection.ConnectionError, Exqlite.Error] -> :ok
+    e -> if Hoodride.Repo.down?(e), do: :ok, else: reraise(e, __STACKTRACE__)
   end
 
   @doc "The token's stored form (SHA-256)."
@@ -182,8 +182,8 @@ defmodule Hoodride.SessionTokens do
       {:ok, raw}
     end)
   rescue
-    _ in [DBConnection.ConnectionError, Exqlite.Error, Ecto.ConstraintError] ->
-      {:error, :unavailable}
+    _ in Ecto.ConstraintError -> {:error, :unavailable}
+    e -> if Hoodride.Repo.down?(e), do: {:error, :unavailable}, else: reraise(e, __STACKTRACE__)
   end
 
   defp previous_of(user_id, previous) do
@@ -251,7 +251,8 @@ defmodule Hoodride.SessionTokens do
         :error
     end
   rescue
-    _ in [DBConnection.ConnectionError, Exqlite.Error, Ecto.ConstraintError] -> :error
+    _ in Ecto.ConstraintError -> :error
+    e -> if Hoodride.Repo.down?(e), do: :error, else: reraise(e, __STACKTRACE__)
   end
 
   def rotate(_), do: :error
@@ -270,7 +271,7 @@ defmodule Hoodride.SessionTokens do
       {:ok, at}
     end)
   rescue
-    _ in [DBConnection.ConnectionError, Exqlite.Error] -> {:error, :failed}
+    e -> if Hoodride.Repo.down?(e), do: {:error, :failed}, else: reraise(e, __STACKTRACE__)
   end
 
   @doc """

@@ -53,7 +53,11 @@ defmodule HoodrideWeb.MapStartTest do
   test "the first reading centres on you at the usual view, unless you moved the map" do
     # (online or ✋ up: the nearest found too — intent_zoom_test.exs)
     assert @app =~
-             "if (first && !centre && !movedByYou) {\n        if (HoodNearby.lookingFor(state)) findNearest(pos);\n        else map.easeTo({ center: [pos.lng, pos.lat], zoom: usualZoom(pos) });"
+             "if (first && !centre && !movedByYou) {\n        if (HoodNearby.lookingFor(state)) findNearest(pos);\n        else {\n          map.easeTo({ center: [pos.lng, pos.lat], zoom: usualZoom(pos) });"
+
+    # (that first reading before the server said you're looking — the map is
+    # made before the connection: the search runs once it has, hydrate)
+    assert @app =~ "if (!hydrated) firstBeforeHydrate = pos;"
   end
 
   test "signing out (here, elsewhere, or deleting the account) forgets it" do

@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "Tidak dapat menerima"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "Browser Anda tidak dapat diperiksa — izinkan challenges.cloudflare.com, atau coba browser lain"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "Tidak dapat menyalin"
 
@@ -671,6 +675,10 @@ msgstr "Tampilkan atau sembunyikan kredit peta"
 msgid "Sign out"
 msgstr "Keluar"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "Proses masuk sedang sibuk — coba lagi sebentar lagi."
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "Sedang masuk…"
@@ -713,6 +721,10 @@ msgstr "Penumpang itu sudah tidak mencari tumpangan"
 msgid "That's a different Google account — sign out first to use it"
 msgstr "Itu akun Google yang lain — keluar dulu untuk menggunakannya"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "Browser ini tidak dapat menampilkan peta — aktifkan akselerasi perangkat keras di pengaturannya, atau coba browser lain"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Tindakan ini tidak dapat dibatalkan. Akun Anda dihapus, Anda dihilangkan dari peta, percakapan Anda ditutup, dan Anda dikeluarkan dari semua perangkat. Jika nanti masuk lagi, Anda akan memulai dengan akun baru."
@@ -724,10 +736,6 @@ msgstr "Halaman ini tidak ada."
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "Terlambat — permintaan sudah ditarik"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "Terlalu banyak upaya masuk yang gagal dari jaringan Anda — coba lagi nanti."
 
 #: priv/static/app.js
 msgid "Try again"

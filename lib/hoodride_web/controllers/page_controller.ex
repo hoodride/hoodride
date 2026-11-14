@@ -150,7 +150,20 @@ defmodule HoodrideWeb.PageController do
   def address(lang, rest), do: "/" <> lang <> rest
 
   defp query(%Plug.Conn{query_string: ""}), do: ""
-  defp query(%Plug.Conn{query_string: q}), do: "?" <> q
+  defp query(%Plug.Conn{query_string: q}), do: "?" <> safe_query(q)
+
+  # the query as sent, with what Phoenix refuses in a local redirect escaped
+  # (Phoenix.URL: a backslash, a tab, a newline, "/%09") — the same once
+  # read. Copied as sent, "?x=/%09" raised: a 500 and a full error in the
+  # log, for anyone (crash review 2026-11-14; HoodrideWeb.LangTest)
+  defp safe_query(q) do
+    q
+    |> String.replace("\\", "%5C")
+    |> String.replace("\t", "%09")
+    |> String.replace("\n", "%0A")
+    |> String.replace("\r", "%0D")
+    |> String.replace("/%09", "%2F%09")
+  end
 
   @doc """
   The page's alternates for search engines (Google's hreflang rules): the
@@ -376,11 +389,21 @@ defmodule HoodrideWeb.PageController do
   defp stamp_page(html) do
     providers = Enum.join(HoodrideWeb.AuthController.providers(), ",")
 
+    # Turnstile's PUBLIC site key, when it's on (HoodrideWeb.Turnstile)
+    turnstile =
+      case HoodrideWeb.Turnstile.on?() && HoodrideWeb.Turnstile.site_key() do
+        key when is_binary(key) ->
+          ~s(  <meta name="hoodride-turnstile" content="#{Plug.HTML.html_escape(key)}">\n)
+
+        _ ->
+          ""
+      end
+
     String.replace(
       StaticVersions.stamp(html),
       "</head>",
       ~s(  <meta name="hoodride-build" content="#{Build.current()}">\n) <>
-        ~s(  <meta name="hoodride-providers" content="#{providers}">\n</head>),
+        ~s(  <meta name="hoodride-providers" content="#{providers}">\n) <> turnstile <> "</head>",
       global: false
     )
   end

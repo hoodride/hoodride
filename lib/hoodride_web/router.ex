@@ -26,7 +26,7 @@ defmodule HoodrideWeb.Router do
   pipeline :session do
     plug :fetch_session
     plug HoodrideWeb.CurrentUser
-    plug HoodrideWeb.HttpBudget, config: :sign_in_budget, name: :sign_in
+    plug HoodrideWeb.HttpBudget, config: :sign_in_budget, name: :sign_in, by: :address
   end
 
   # one chat's messages when it's opened (light reload): its OWN budget, so
@@ -94,6 +94,14 @@ defmodule HoodrideWeb.Router do
 
     get "/:provider", AuthController, :request
     get "/:provider/callback", AuthController, :callback
+  end
+
+  # the sign-in's Turnstile pass, POSTed as JSON (never in the address,
+  # which ends up in logs) — from Hood Ride's own pages only
+  scope "/auth", HoodrideWeb do
+    pipe_through [:session, :own_pages]
+
+    post "/start", AuthController, :checked_start
   end
 
   # the PWA itself. Any other path: the app too — typos and stray links

@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "تعذّر القبول"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "تعذّر التحقق من متصفحك. اسمح بـ challenges.cloudflare.com، أو جرّب متصفحًا آخر"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "تعذّر النسخ"
 
@@ -671,6 +675,10 @@ msgstr "إظهار أو إخفاء مصادر الخريطة"
 msgid "Sign out"
 msgstr "تسجيل الخروج"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "تسجيل الدخول مزدحم الآن. حاول مرة أخرى بعد قليل."
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "جارٍ تسجيل الدخول…"
@@ -713,6 +721,10 @@ msgstr "لم يعد هذا الراكب يبحث عن توصيلة"
 msgid "That's a different Google account — sign out first to use it"
 msgstr "هذا حساب Google مختلف. سجّل الخروج أولًا لاستخدامه"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "لا يمكن لهذا المتصفح عرض الخريطة. فعّل تسريع الأجهزة من إعداداته، أو جرّب متصفحًا آخر"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "لا يمكن التراجع عن هذا الإجراء. سيُحذف حسابك، وتختفي من الخريطة، وتُغلق محادثاتك، ويُسجَّل خروجك من جميع الأجهزة. إذا سجّلت الدخول لاحقًا، فسيبدأ حساب جديد."
@@ -724,10 +736,6 @@ msgstr "هذه الصفحة غير موجودة."
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "فات الأوان، فقد تم سحب الطلب"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "محاولات تسجيل دخول فاشلة كثيرة جدًا من شبكتك. حاول مرة أخرى لاحقًا."
 
 #: priv/static/app.js
 msgid "Try again"

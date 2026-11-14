@@ -22,8 +22,12 @@ usermod -aG hoodride cloudflared
 echo "== /opt/hoodride: releases, built by $ADMIN"
 install -d -o "$ADMIN" -g "$ADMIN" -m 0755 /opt/hoodride /opt/hoodride/releases
 
-echo "== /etc/hoodride/env: settings and secrets (root:hoodride 0640)"
-install -d -o root -g hoodride -m 0750 /etc/hoodride
+# root's alone (review 2026-11-14): the tunnel's user is in group hoodride
+# for the socket, and the group could read every secret — the session key,
+# the release cookie that runs code as the app. Only root reads the file:
+# systemd's EnvironmentFile and the root-owned hoodride-host helper.
+echo "== /etc/hoodride/env: settings and secrets (root:root 0600)"
+install -d -o root -g root -m 0700 /etc/hoodride
 if [ ! -e /etc/hoodride/env ]; then
   sed -e "s|^SECRET_KEY_BASE=.*|SECRET_KEY_BASE=$(openssl rand -base64 48 | tr -d '\n')|" \
       -e "s|^RELEASE_COOKIE=.*|RELEASE_COOKIE=$(openssl rand -hex 32)|" \
@@ -32,8 +36,8 @@ if [ ! -e /etc/hoodride/env ]; then
 else
   echo "   exists — left as is"
 fi
-chown root:hoodride /etc/hoodride/env
-chmod 0640 /etc/hoodride/env
+chown root:root /etc/hoodride/env
+chmod 0600 /etc/hoodride/env
 
 echo "== cloudflared (Cloudflare's signed apt repo, to /usr/bin; patched by unattended-upgrades)"
 # a one-off .deb never updated itself (2 versions behind by 2026-10-29);
@@ -63,6 +67,17 @@ echo "== logs: kept 14 days, in daily files (the privacy policy's promise)"
 install -d -m 0755 /etc/systemd/journald.conf.d
 install -m 0644 "$HERE/journald-hoodride.conf" /etc/systemd/journald.conf.d/hoodride.conf
 systemctl restart systemd-journald
+
+echo "== the clock: the app starts only once it's synced (hoodride.service: time-sync.target)"
+systemctl enable systemd-time-wait-sync >/dev/null 2>&1
+# …at most 3 minutes, as chrony's own wait-for-sync (review 2026-11-14):
+# Ubuntu's wait has no limit, and
+# a reboot with no time server reachable kept the app — and the tunnel
+# after it — down for good. After the cap the app starts anyway (the
+# cleanup's clock-jump guard covers a late correction: Hoodride.Sweeper)
+install -d -m 0755 /etc/systemd/system/systemd-time-wait-sync.service.d
+printf '[Service]\nTimeoutStartSec=180\n' > /etc/systemd/system/systemd-time-wait-sync.service.d/hoodride.conf
+systemctl daemon-reload
 
 echo "== services"
 install -m 0644 "$HERE/hoodride.service" /etc/systemd/system/hoodride.service

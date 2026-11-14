@@ -77,7 +77,11 @@ defmodule Hoodride.Throttle do
   request time let a slow decline skip the cooldown entirely.)
   """
   def start_request_cooldown(rider_id, driver_id) do
-    RateLimit.set({:req_cd, rider_id, driver_id}, @request_cooldown, 1)
+    RateLimit.guarded(
+      fn -> RateLimit.set({:req_cd, rider_id, driver_id}, @request_cooldown, 1) end,
+      1
+    )
+
     :ok
   end
 
@@ -85,19 +89,27 @@ defmodule Hoodride.Throttle do
   def request_cooldown(rider_id, driver_id) do
     key = {:req_cd, rider_id, driver_id}
 
-    if RateLimit.get(key, @request_cooldown) >= 1 do
-      wait = RateLimit.expires_at(key, @request_cooldown) - System.system_time(:millisecond)
-      {:deny, max(wait, 1)}
-    else
+    # (the counters' table gone for a moment: no cooldown — RateLimit.guarded)
+    RateLimit.guarded(
+      fn ->
+        if RateLimit.get(key, @request_cooldown) >= 1 do
+          wait = RateLimit.expires_at(key, @request_cooldown) - System.system_time(:millisecond)
+          {:deny, max(wait, 1)}
+        else
+          :ok
+        end
+      end,
       :ok
-    end
+    )
   end
 
   # each allowance taken in one atomic step (`hit` adds, then compares —
   # a refused hit still added: given back); any refused → all given back,
   # the LATER wait named (never 0 or less)
   defp take_all(limits) do
-    hits = for {key, scale, limit} <- limits, do: {key, RateLimit.hit(key, scale, limit)}
+    hits =
+      for {key, scale, limit} <- limits,
+          do: {key, RateLimit.guarded(fn -> RateLimit.hit(key, scale, limit) end, {:allow, 0})}
 
     case for({_, {:deny, ms}} <- hits, do: ms) do
       [] ->

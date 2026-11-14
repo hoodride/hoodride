@@ -130,9 +130,16 @@ defmodule Hoodride.Chat do
 
     # a NEW conversation: this message started it (counted against the
     # sender's open chats — the caller checked room first, can_start?/2)
-    unless :ets.insert_new(@conversations, {key, now}),
-      do: :ets.insert(@conversations, {key, now}),
-      else: mark_started(from.id, key)
+    # An existing one is touched IN PLACE: writing its row again brought
+    # back a chat ended in that same instant ("End chat", the cleanup), and
+    # uncounted — no "started by" row (review 2026-11-14). Ended between
+    # the two checks: this message starts a new one after all, counted.
+    cond do
+      :ets.insert_new(@conversations, {key, now}) -> mark_started(from.id, key)
+      :ets.update_element(@conversations, key, {2, now}) -> :ok
+      :ets.insert_new(@conversations, {key, now}) -> mark_started(from.id, key)
+      true -> :ets.update_element(@conversations, key, {2, now})
+    end
 
     index(key)
     # only the text's own bytes: a slice of the incoming frame kept the WHOLE

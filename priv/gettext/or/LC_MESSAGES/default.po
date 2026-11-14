@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "ଗ୍ରହଣ କରିହେଲା ନାହିଁ"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "ଆପଣଙ୍କ ବ୍ରାଉଜର ଯାଞ୍ଚ କରିହେଲା ନାହିଁ — challenges.cloudflare.com କୁ ଅନୁମତି ଦିଅନ୍ତୁ, କିମ୍ବା ଅନ୍ୟ ବ୍ରାଉଜର ଚେଷ୍ଟା କରନ୍ତୁ"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "କପି କରିହେଲା ନାହିଁ"
 
@@ -671,6 +675,10 @@ msgstr "ମ୍ୟାପର କ୍ରେଡିଟ ଦେଖାନ୍ତୁ କି
 msgid "Sign out"
 msgstr "ସାଇନ ଆଉଟ କରନ୍ତୁ"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "ସାଇନ ଇନ ଏବେ ବ୍ୟସ୍ତ ଅଛି — ଟିକେ ପରେ ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।"
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "ସାଇନ ଇନ କରାଯାଉଛି…"
@@ -713,6 +721,10 @@ msgstr "ସେହି ଯାତ୍ରୀ ଆଉ ରାଇଡ ଖୋଜୁନା�
 msgid "That's a different Google account — sign out first to use it"
 msgstr "ଏହା ଅନ୍ୟ ଏକ Google ଆକାଉଣ୍ଟ — ଏହାକୁ ବ୍ୟବହାର କରିବାକୁ ପ୍ରଥମେ ସାଇନ ଆଉଟ କରନ୍ତୁ"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "ଏହି ବ୍ରାଉଜର ମାନଚିତ୍ର ଦେଖାଇପାରିବ ନାହିଁ — ଏହାର ସେଟିଂସରେ ହାର୍ଡୱେର ଆକ୍ସେଲେରେସନ ଚାଲୁ କରନ୍ତୁ, କିମ୍ବା ଅନ୍ୟ ବ୍ରାଉଜର ଚେଷ୍ଟା କରନ୍ତୁ"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "ଏହାକୁ ପୂର୍ବାବସ୍ଥାକୁ ଫେରାଇହେବ ନାହିଁ। ଆପଣଙ୍କ ଆକାଉଣ୍ଟ ହଟାଇଦିଆଯିବ, ଆପଣଙ୍କୁ ମ୍ୟାପରୁ ହଟାଇଦିଆଯିବ, ଆପଣଙ୍କ କଥାବାର୍ତ୍ତା ବନ୍ଦ ହୋଇଯିବ ଏବଂ ସମସ୍ତ ଡିଭାଇସରୁ ଆପଣଙ୍କୁ ସାଇନ ଆଉଟ କରାଯିବ। ପରେ ପୁଣି ସାଇନ ଇନ କଲେ ଏକ ନୂଆ ଆକାଉଣ୍ଟ ଆରମ୍ଭ ହେବ।"
@@ -724,10 +736,6 @@ msgstr "ଏହି ପେଜ ନାହିଁ।"
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "ବହୁତ ଡେରି ହୋଇଗଲା — ଅନୁରୋଧ ପ୍ରତ୍ୟାହାର କରାଯାଇଛି"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "ଆପଣଙ୍କ ନେଟୱାର୍କରୁ ଅତ୍ୟଧିକ ସାଇନ ଇନ ଚେଷ୍ଟା ବିଫଳ ହୋଇଛି — ପରେ ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।"
 
 #: priv/static/app.js
 msgid "Try again"

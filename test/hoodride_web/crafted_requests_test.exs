@@ -141,11 +141,12 @@ defmodule HoodrideWeb.CraftedRequestsTest do
       assert json_response(get(recycle(conn), "/api/me"), 200)["user"]["id"] == g.id
     end
 
-    test "a refresh: a refused code still COUNTS toward the address block", %{g: g} do
+    test "a refresh: a refused code still COUNTS (site-wide, watched)", %{g: g} do
       Application.put_env(:hoodride, :sign_in_failures,
-        max: 2,
-        window_ms: 180_000,
-        block_ms: 3_600_000
+        alert: 3,
+        alert_window_ms: 180_000,
+        backoff_ms: 1_000,
+        backoff_max_ms: 32_000
       )
 
       on_exit(fn -> Application.put_env(:hoodride, :sign_in_failures, nil) end)
@@ -165,7 +166,7 @@ defmodule HoodrideWeb.CraftedRequestsTest do
         assert redirected_to(conn, 302) == "/?refresh=failed"
       end
 
-      assert response(get(build_conn(), "/auth/google"), 429), "the refused codes were counted"
+      assert Hoodride.SignInFailures.count() == 2, "the refused codes were counted"
     end
 
     test "an ORDINARY sign-in by someone already signed in fails: back to the app, no note", %{

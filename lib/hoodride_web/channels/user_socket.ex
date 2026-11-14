@@ -73,21 +73,31 @@ defmodule HoodrideWeb.UserSocket do
   #     socket the session only with a CSRF token, which our page lacks).
   @impl true
   def connect(params, socket, connect_info) do
+    case user_of(params, connect_info) do
+      nil -> failed_attempt(connect_info)
+      user -> authorize(socket, user, params)
+    end
+  end
+
+  # THE TOKEN FIRST, then PER ADDRESS ONLY FOR FAILURES (OWASP's WebSocket
+  # guidance: per-user limits, per-IP only "where user identification isn't
+  # available"). Checking a token is a signature and a memory lookup — no
+  # database, forged or revoked alike (HoodrideWeb.Auth). A signed-in person
+  # connects on their account's own budget (authorize/3); only attempts that
+  # fail count against the address. Every attempt used to: junk from one
+  # person on a café's Wi-Fi drained the address and locked every signed-in
+  # person there out (review 2026-11-14; LoginLockdownTest). Over its
+  # failures the address is refused as "rate_limited" — a counter more than
+  # a shield (a refusal costs what a failure does); real flood control is
+  # Cloudflare's, at the edge. IPv6 per /64. `config :hoodride, :ws_budget`
+  # (nil = off: dev, the monster is one address).
+  defp failed_attempt(connect_info) do
     case handshake_budget(connect_info) do
-      :ok -> connect_checked(params, socket, connect_info)
+      :ok -> :error
       :deny -> {:error, :rate_limited}
     end
   end
 
-  # PER ADDRESS, BEFORE THE TOKEN (OWASP's WebSocket guidance: per-user limits
-  # first, per-IP "where user identification isn't available" — here, before
-  # the token is checked). Every attempt counts, valid or not: a real person
-  # connects about once per page load, so the signed-out HTTP budget's
-  # generous numbers fit a café on one Wi-Fi. A forged token costs ~6.5 µs to
-  # refuse; a replayed revoked one a database read — this caps both. IPv6 per
-  # /64. Cloudflare counts per data center; this one server sees every
-  # attempt. `config :hoodride, :ws_budget` (nil = off: dev, the monster is one
-  # address). The account's own connect budget still applies after.
   defp handshake_budget(%{peer_data: %{address: peer}} = connect_info) do
     case Hoodride.Limits.budget(:ws_budget) do
       nil ->
@@ -113,19 +123,14 @@ defmodule HoodrideWeb.UserSocket do
   # no peer data: a test calling connect/3 directly, never a real transport
   defp handshake_budget(_connect_info), do: :ok
 
-  defp connect_checked(params, socket, connect_info) do
-    user =
-      case connect_info do
-        %{auth_token: token} when is_binary(token) -> Auth.token_user(token)
-        _ when is_map_key(params, "token") -> Auth.token_user(params["token"])
-        %{session: session} when is_map(session) -> Auth.session_user(session)
-        _ -> nil
-      end
-
-    authorize(socket, user, params)
+  defp user_of(params, connect_info) do
+    case connect_info do
+      %{auth_token: token} when is_binary(token) -> Auth.token_user(token)
+      _ when is_map_key(params, "token") -> Auth.token_user(params["token"])
+      %{session: session} when is_map(session) -> Auth.session_user(session)
+      _ -> nil
+    end
   end
-
-  defp authorize(_socket, nil, _params), do: :error
 
   defp authorize(socket, user, params) do
     with {:ok, _} <- RateBudget.spend(user.id, :connect, @connects_per_minute, @connects_burst) do

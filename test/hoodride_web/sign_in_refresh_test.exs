@@ -11,10 +11,13 @@ defmodule HoodrideWeb.SignInRefreshTest do
   address or the sub string". Not during a ride (the page reload would
   interrupt it); 5 per 10 minutes per account.
 
-  Limits (RFC 6819 §4.4.1.12): `state` is checked before Google is asked
-  anything; sign-in starts have their own pool (30 a minute per address);
-  30 codes refused by Google in 3 minutes block the address for an hour
-  (GitLab's numbers) — Google isn't called while blocked.
+  Limits (RFC 6819 §4.4.1.12): `state` is checked — and used up, once —
+  before Google is asked anything; sign-in starts and returns have their
+  own pool per address. Codes Google refuses are counted site-wide and
+  WATCHED — no address is blocked any more (one person on a shared Wi-Fi
+  could block it for an hour: review 2026-11-14,
+  HoodrideWeb.SignInHardeningTest). Only Google or Facebook throttling us
+  pauses the calls to them.
   """
   use HoodrideWeb.ConnCase
 
@@ -156,25 +159,27 @@ defmodule HoodrideWeb.SignInRefreshTest do
     end
   end
 
-  # someone else's made-up codes can block a SHARED address (a carrier's
-  # CGNAT): a signed-in person refreshing there goes back to the app with a
-  # note — never stranded on the bare 429 text page (found in review)
-  describe "a blocked address, signed in" do
+  # Google or Facebook throttling us (their 429): calls to them wait a
+  # moment (their Retry-After, else backoff). Someone signed in and
+  # refreshing goes back to the app with a note — never stranded on a bare
+  # page; anyone else gets a short page saying try again in a moment
+  describe "the providers throttling us, signed in" do
     setup do
       Application.put_env(:hoodride, :sign_in_failures,
-        max: 1,
-        window_ms: 180_000,
-        block_ms: 3_600_000
+        alert: 3,
+        alert_window_ms: 180_000,
+        backoff_ms: 1_000,
+        backoff_max_ms: 32_000
       )
 
       on_exit(fn -> Application.put_env(:hoodride, :sign_in_failures, nil) end)
       :ok
     end
 
-    defp block_here, do: Hoodride.SignInFailures.record({127, 0, 0, 1})
+    defp throttled, do: Hoodride.SignInFailures.throttled("google", 60_000)
 
     test "a refresh goes back to the app with a note; Google isn't asked", %{conn: conn, g: g} do
-      block_here()
+      throttled()
 
       for mode <- ["1", "silent"] do
         c = conn |> signed_in(g) |> get("/auth/google?refresh=" <> mode)
@@ -182,38 +187,38 @@ defmodule HoodrideWeb.SignInRefreshTest do
       end
     end
 
-    test "any signed-in account refreshing there goes back to the app (not only Google)", %{
+    test "any signed-in account refreshing then goes back to the app (not only Google)", %{
       conn: conn,
       d: d
     } do
-      block_here()
+      throttled()
       c = conn |> signed_in(d) |> get("/auth/google?refresh=silent")
       assert redirected_to(c, 302) == "/?refresh=blocked"
     end
 
-    test "an ordinary sign-in there still gets the 429 page (no app to go back to)", %{conn: conn} do
-      block_here()
-      assert response(get(conn, "/auth/google"), 429) =~ "Too many failed sign-ins"
+    test "an ordinary sign-in gets the short 'busy' page, with Retry-After", %{conn: conn} do
+      throttled()
+      res = get(conn, "/auth/google")
+      assert response(res, 503) =~ "Sign-in is busy right now"
+      assert [_] = get_resp_header(res, "retry-after")
     end
 
-    test "blocked between leaving and coming back: back to the app, still signed in", %{
+    test "throttled between leaving and coming back: back to the app, still signed in", %{
       conn: conn,
       g: g
     } do
       conn = conn |> signed_in(g) |> get("/auth/google?refresh=silent")
       {_, q} = query(conn)
-      block_here()
+      throttled()
       conn = get(recycle(conn), "/auth/google/callback", %{"code" => "c", "state" => q["state"]})
       assert redirected_to(conn, 302) == "/?refresh=blocked"
       assert json_response(get(recycle(conn), "/api/me"), 200)["user"]["id"] == g.id
     end
 
-    test "an hour later the block has lifted: sign-in reaches Google again", %{conn: conn} do
-      block_here()
-      assert response(get(conn, "/auth/google"), 429)
-      # an hour passes: the block's end time is now in the past
-      now = System.monotonic_time(:millisecond)
-      :ets.insert(:sign_in_failures, {{:block, {127, 0, 0, 1}}, now - 1})
+    test "the wait over: sign-in reaches Google again", %{conn: conn} do
+      throttled()
+      assert response(get(conn, "/auth/google"), 503)
+      :ets.delete(:sign_in_failures, :paused)
       assert redirected_to(get(build_conn(), "/auth/google"), 302) =~ "accounts.google.com"
     end
   end
@@ -351,7 +356,7 @@ defmodule HoodrideWeb.SignInRefreshTest do
       {_, q} = query(started)
 
       oauth =
-        for k <- ["oauth_state", "oauth_verifier", "oauth_refresh"],
+        for k <- ["oauth_state", "oauth_verifier", "oauth_refresh", "oauth_provider", "oauth_at"],
             into: %{},
             do: {k, get_session(started, k)}
 
@@ -389,7 +394,9 @@ defmodule HoodrideWeb.SignInRefreshTest do
       conn = conn |> signed_in(g) |> get("/auth/google?refresh=1")
       {_, q} = query(conn)
       c = get(recycle(conn), "/auth/facebook/callback", %{"code" => "c", "state" => q["state"]})
-      assert redirected_to(c, 302) == "/?refresh=other"
+      # (2026-11-14: a state now belongs to its provider — refused before
+      # Facebook is even asked; still signed in as G, nothing written)
+      assert redirected_to(c, 302) == "/?refresh=failed"
       assert json_response(get(recycle(c), "/api/me"), 200)["user"]["id"] == g.id
 
       assert Hoodride.Repo.query!("SELECT count(*) FROM users WHERE provider = 'facebook'").rows ==
@@ -413,9 +420,10 @@ defmodule HoodrideWeb.SignInRefreshTest do
       g: g
     } do
       Application.put_env(:hoodride, :sign_in_failures,
-        max: 1,
-        window_ms: 180_000,
-        block_ms: 3_600_000
+        alert: 3,
+        alert_window_ms: 180_000,
+        backoff_ms: 1_000,
+        backoff_max_ms: 32_000
       )
 
       on_exit(fn -> Application.put_env(:hoodride, :sign_in_failures, nil) end)
@@ -428,16 +436,17 @@ defmodule HoodrideWeb.SignInRefreshTest do
       end)
 
       get(recycle(conn), "/auth/google/callback", %{"code" => "made-up", "state" => q["state"]})
-      assert response(get(build_conn(), "/auth/google"), 429)
+      assert Hoodride.SignInFailures.count() == 1
     end
   end
 
   describe "failed sign-ins (made-up codes)" do
     setup do
       Application.put_env(:hoodride, :sign_in_failures,
-        max: 3,
-        window_ms: 180_000,
-        block_ms: 3_600_000
+        alert: 3,
+        alert_window_ms: 180_000,
+        backoff_ms: 1_000,
+        backoff_max_ms: 32_000
       )
 
       on_exit(fn -> Application.put_env(:hoodride, :sign_in_failures, nil) end)
@@ -456,27 +465,13 @@ defmodule HoodrideWeb.SignInRefreshTest do
       get(recycle(conn), "/auth/google/callback", %{"code" => "made-up", "state" => q["state"]})
     end
 
-    test "codes Google refuses are counted; at the limit the address is blocked", %{conn: conn} do
-      for _ <- 1..3, do: assert(response(fake_code(build_conn()), 502))
-      # blocked: the start refuses, and Google isn't asked
-      blocked = get(conn, "/auth/google")
-      assert response(blocked, 429) =~ "Too many failed sign-ins"
-    end
+    defp reaches_google?,
+      do: redirected_to(get(build_conn(), "/auth/google"), 302) =~ "accounts.google.com"
 
-    test "while blocked, a callback is refused before Google is asked", %{conn: conn} do
-      started = get(conn, "/auth/google")
-      {_, q} = query(started)
-      for _ <- 1..3, do: fake_code(build_conn())
-      flush_google()
-
-      conn =
-        get(recycle(started), "/auth/google/callback", %{
-          "code" => "made-up",
-          "state" => q["state"]
-        })
-
-      assert response(conn, 429)
-      refute_received :google_called
+    test "codes Google refuses are counted (site-wide); the address is never blocked", %{conn: _} do
+      for _ <- 1..5, do: assert(response(fake_code(build_conn()), 502))
+      assert Hoodride.SignInFailures.count() == 5
+      assert reaches_google?()
     end
 
     test "a wrong state is refused before Google is asked (and isn't a Google failure)", %{
@@ -490,40 +485,29 @@ defmodule HoodrideWeb.SignInRefreshTest do
       end
 
       refute_received :google_called
-      # never reached Google, so nothing was counted
-      assert redirected_to(get(build_conn(), "/auth/google"), 302) =~ "accounts.google.com"
+      assert Hoodride.SignInFailures.count() == 0
     end
 
-    defp flush_google do
-      receive do
-        :google_called -> flush_google()
-      after
-        0 -> :ok
-      end
-    end
-
-    # only a code the provider REFUSES counts: Google down, a network error,
-    # or a failure after the code was accepted must never block a shared
-    # address (a carrier's CGNAT) for an hour
-    defp not_blocked?,
-      do: redirected_to(get(build_conn(), "/auth/google"), 302) =~ "accounts.google.com"
+    # only a code the provider REFUSES counts: Google down, a network
+    # error, or a failure after the code was accepted
+    defp not_counted?, do: Hoodride.SignInFailures.count() == 0
 
     test "Google down (5xx) isn't counted", %{conn: _} do
       Req.Test.stub(HoodrideWeb.Google, &(&1 |> Plug.Conn.put_status(503) |> Req.Test.json(%{})))
       for _ <- 1..5, do: assert(response(fake_code(build_conn()), 502))
-      assert not_blocked?()
+      assert not_counted?()
     end
 
     test "an 'OK' reply without a token (malformed) isn't counted", %{conn: _} do
       Req.Test.stub(HoodrideWeb.Google, &Req.Test.json(&1, %{}))
       for _ <- 1..5, do: assert(response(fake_code(build_conn()), 502))
-      assert not_blocked?()
+      assert not_counted?()
     end
 
     test "a network error isn't counted", %{conn: _} do
       Req.Test.stub(HoodrideWeb.Google, &Req.Test.transport_error(&1, :econnrefused))
       for _ <- 1..5, do: assert(response(fake_code(build_conn()), 502))
-      assert not_blocked?()
+      assert not_counted?()
     end
 
     test "a failure after Google accepted the code (reading the profile) isn't counted", %{
@@ -537,28 +521,10 @@ defmodule HoodrideWeb.SignInRefreshTest do
       end)
 
       for _ <- 1..5, do: assert(response(fake_code(build_conn()), 502))
-      assert not_blocked?()
+      assert not_counted?()
     end
 
-    # an IPv6 /64 is ONE address for the block (HoodrideWeb.ClientIp, as the
-    # other budgets): hopping inside it doesn't dodge the hour
-    test "IPv6: one /64 network is one address", %{conn: _} do
-      at = fn last -> %{build_conn() | remote_ip: {0x2001, 0xDB8, 1, 2, 0, 0, 0, last}} end
-
-      for n <- 1..3 do
-        started = get(at.(n), "/auth/google")
-        {_, q} = query(started)
-        cb = %{recycle(started) | remote_ip: {0x2001, 0xDB8, 1, 2, 0, 0, 0, n}}
-        get(cb, "/auth/google/callback", %{"code" => "made-up", "state" => q["state"]})
-      end
-
-      assert response(get(at.(99), "/auth/google"), 429), "another address in the same /64"
-
-      elsewhere = %{build_conn() | remote_ip: {0x2001, 0xDB8, 1, 3, 0, 0, 0, 1}}
-      assert redirected_to(get(elsewhere, "/auth/google"), 302) =~ "accounts.google.com"
-    end
-
-    test "Facebook's refused codes count the same way (for when it's switched on)", %{conn: conn} do
+    test "Facebook's refused codes count the same way (for when it's switched on)", %{conn: _} do
       Application.put_env(:hoodride, :facebook_app_id, "fb-app")
       Application.put_env(:hoodride, :facebook_app_secret, "fb-secret")
       Application.put_env(:hoodride, :facebook_req, plug: {Req.Test, HoodrideWeb.Facebook})
@@ -583,7 +549,7 @@ defmodule HoodrideWeb.SignInRefreshTest do
         })
       end
 
-      assert response(get(conn, "/auth/facebook"), 429)
+      assert Hoodride.SignInFailures.count() == 3
     end
   end
 
@@ -689,10 +655,19 @@ defmodule HoodrideWeb.SignInRefreshTest do
   end
 
   describe "the sweep" do
-    test "the server's regular sweep clears lifted sign-in blocks" do
-      Application.put_env(:hoodride, :sign_in_failures, max: 1, window_ms: 1, block_ms: 1)
+    test "the server's regular sweep forgets an ended pause and an old count" do
+      Application.put_env(:hoodride, :sign_in_failures,
+        alert: 99,
+        alert_window_ms: 1,
+        backoff_ms: 1,
+        backoff_max_ms: 1
+      )
+
       on_exit(fn -> Application.put_env(:hoodride, :sign_in_failures, nil) end)
-      Hoodride.SignInFailures.record({203, 0, 113, 9}, System.monotonic_time(:millisecond) - 10)
+      past = System.monotonic_time(:millisecond) - 10
+      Hoodride.SignInFailures.record(past)
+      Hoodride.SignInFailures.throttled("google", 1, past)
+      Hoodride.SignInFailures.answered()
       assert :ets.tab2list(:sign_in_failures) != []
       Hoodride.Sweeper.sweep_now()
       assert :ets.tab2list(:sign_in_failures) == []
@@ -707,10 +682,13 @@ defmodule HoodrideWeb.SignInRefreshTest do
       :ok
     end
 
-    test "30 starts from one address pass; the 31st is told to wait; the app's API isn't touched",
+    test "a burst of starts from one address passes; the one past it is told to wait; the app's API isn't touched",
          %{conn: conn} do
-      for _ <- 1..30, do: assert(redirected_to(get(build_conn(), "/auth/google"), 302))
-      assert response(get(build_conn(), "/auth/google"), 429)
+      burst = Hoodride.Limits.sign_in_budget()[:burst]
+      for _ <- 1..burst, do: assert(redirected_to(get(build_conn(), "/auth/google"), 302))
+      # (it refills while the burst runs: a few more, quickly, meet the wait)
+      codes = for _ <- 1..20, do: get(build_conn(), "/auth/google").status
+      assert 429 in codes
       assert json_response(get(conn, "/api/me"), 200)
     end
   end

@@ -26,4 +26,17 @@ defmodule Hoodride.RateLimit do
   rescue
     ArgumentError -> :ok
   end
+
+  @doc """
+  `fun` (a call on these counters), or `otherwise` while the table is gone:
+  it belongs to Hammer's process, and is made anew when that restarts —
+  in that moment every call raised, crashing each connection that sent a
+  message, a request, a cancel (crash review 2026-11-14; RestartGapsTest).
+  For that moment the limits let things through: a blip, not an outage.
+  """
+  def guarded(fun, otherwise) do
+    fun.()
+  rescue
+    ArgumentError -> otherwise
+  end
 end

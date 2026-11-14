@@ -26,6 +26,15 @@ defmodule HoodrideWeb.RideGuardsWiringTest do
     assert handler =~ "state.ride.peer.id !== by_id"
   end
 
+  # (review 2026-11-14) Settings asks for your car whenever it redraws while
+  # it's unknown — every message, every status change: offline, a stream of
+  # overlapping requests. One at a time now: a second ask joins the first
+  test "your car is asked for once at a time, however often Settings redraws" do
+    b = body("loadMyCar")
+    assert b =~ "if (carLoading) return carLoading;"
+    assert b =~ "carLoading = null"
+  end
+
   test "joining a ride's channel leaves the one still open first" do
     b = body("joinRideChannel")
     [before_join, _] = String.split(b, "socket.channel(`ride:", parts: 2)

@@ -50,7 +50,8 @@ security scan (Sobelow), the JavaScript tests (needs
 Hood Ride runs on one server (Ubuntu 24.04) behind a free Cloudflare
 Tunnel, which means no open ports and no certificates to manage.
 **[SELF_HOSTING.md](SELF_HOSTING.md)** walks through it step by step, and
-**[GOOGLE_SETUP.md](GOOGLE_SETUP.md)** covers the Google sign-in keys.
+**[GOOGLE_SETUP.md](GOOGLE_SETUP.md)** covers the Google sign-in keys (and
+the optional Cloudflare Turnstile bot check on sign-in).
 
 Please use your own name, logo, privacy policy and terms; the guide lists
 everything to change.

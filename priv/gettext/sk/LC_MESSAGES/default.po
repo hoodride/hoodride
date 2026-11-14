@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "Nepodarilo sa prijať"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "Tvoj prehliadač sa nepodarilo overiť – povoľ challenges.cloudflare.com, alebo skús iný prehliadač"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "Nepodarilo sa skopírovať"
 
@@ -671,6 +675,10 @@ msgstr "Zobraziť alebo skryť zdroje mapy"
 msgid "Sign out"
 msgstr "Odhlásiť sa"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "Prihlasovanie je teraz preťažené – skús to o chvíľu znova."
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "Prihlasovanie…"
@@ -713,6 +721,10 @@ msgstr "Tento spolujazdec už odvoz nehľadá"
 msgid "That's a different Google account — sign out first to use it"
 msgstr "Toto je iný účet Google – ak ho chceš použiť, najprv sa odhlás"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "Tento prehliadač nevie zobraziť mapu – zapni v jeho nastaveniach hardvérovú akceleráciu, alebo skús iný prehliadač"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Túto akciu nie je možné vrátiť späť. Tvoj účet sa odstráni, zmizneš z mapy, tvoje konverzácie sa uzavrú a na všetkých zariadeniach sa odhlásiš. Ak sa neskôr znova prihlásiš, vznikne nový účet."
@@ -724,10 +736,6 @@ msgstr "Táto stránka neexistuje."
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "Neskoro – žiadosť bola stiahnutá"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "Z tvojej siete bolo priveľa neúspešných pokusov o prihlásenie – skús to neskôr."
 
 #: priv/static/app.js
 msgid "Try again"

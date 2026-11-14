@@ -18,7 +18,7 @@ defmodule Hoodride.Accounts do
   def profile(id) do
     Application.get_env(:hoodride, :user_lookup, &get_user/1).(id)
   rescue
-    _ in [DBConnection.ConnectionError, Exqlite.Error] -> {:error, :unavailable}
+    e -> if Hoodride.Repo.down?(e), do: {:error, :unavailable}, else: reraise(e, __STACKTRACE__)
   end
 
   @doc """
@@ -50,7 +50,7 @@ defmodule Hoodride.Accounts do
       nil -> {:error, :unavailable}
     end
   rescue
-    _ in [DBConnection.ConnectionError, Exqlite.Error] -> {:error, :unavailable}
+    e -> if Hoodride.Repo.down?(e), do: {:error, :unavailable}, else: reraise(e, __STACKTRACE__)
   end
 
   @doc """
@@ -63,7 +63,7 @@ defmodule Hoodride.Accounts do
   def has_car?(user_id) do
     Application.get_env(:hoodride, :car_lookup, &car_on_file?/1).(user_id)
   rescue
-    _ in [DBConnection.ConnectionError, Exqlite.Error] -> {:error, :unavailable}
+    e -> if Hoodride.Repo.down?(e), do: {:error, :unavailable}, else: reraise(e, __STACKTRACE__)
   end
 
   defp car_on_file?(user_id),
@@ -84,14 +84,14 @@ defmodule Hoodride.Accounts do
       {0, _} -> {:error, :unavailable}
     end
   rescue
-    _ in [DBConnection.ConnectionError, Exqlite.Error] -> {:error, :unavailable}
+    e -> if Hoodride.Repo.down?(e), do: {:error, :unavailable}, else: reraise(e, __STACKTRACE__)
   end
 
   @doc "A driver's own car (Settings): `{:ok, car | nil}`, or `{:error, :unavailable}`."
   def car_of(user_id) do
     {:ok, user_id |> get_user() |> car()}
   rescue
-    _ in [DBConnection.ConnectionError, Exqlite.Error] -> {:error, :unavailable}
+    e -> if Hoodride.Repo.down?(e), do: {:error, :unavailable}, else: reraise(e, __STACKTRACE__)
   end
 
   @doc ~s(What riders read: "Gray Honda Civic" — or nil, none set \(the app says "Driver"\).)
@@ -164,7 +164,7 @@ defmodule Hoodride.Accounts do
 
     {:ok, Map.new(found, &{&1.id, &1})}
   rescue
-    _ in [DBConnection.ConnectionError, Exqlite.Error] -> {:error, :unavailable}
+    e -> if Hoodride.Repo.down?(e), do: {:error, :unavailable}, else: reraise(e, __STACKTRACE__)
   end
 
   @doc """

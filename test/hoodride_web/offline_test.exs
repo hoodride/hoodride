@@ -137,6 +137,13 @@ defmodule HoodrideWeb.OfflineTest do
   # Cloudflare answers with its own error page while the server is down: a
   # network-first worker that saved every answer replaced the good copy
   # (the behaviour: test_js/sw.test.mjs)
+  # (crash review 2026-11-14) installing the offline copy can fail (a flaky
+  # first visit, a private window that refuses it): nothing to do about it,
+  # and it must not reach the error reports as an "unhandled" failure
+  test "a failed install of the offline copy is let go quietly" do
+    assert @app =~ ~s[navigator.serviceWorker.register("sw.js").catch(() => {});]
+  end
+
   test "the offline copy keeps only good answers, never an error page" do
     # (the save: only inside the ok branch — a redirect or an error never)
     assert @sw =~ "if (res.ok) {

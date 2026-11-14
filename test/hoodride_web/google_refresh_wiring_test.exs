@@ -119,7 +119,8 @@ defmodule HoodrideWeb.GoogleRefreshWiringTest do
   # 2026-11-11: what was typed in it was lost; test_browser/carformupdate.mjs)
   test "both page-wiping paths ask the busy rule with the same view, the car form in it" do
     assert body("tryGoogleRefresh") =~ "busy: HoodUpdate.isBusy(busyView()),"
-    assert body("checkForUpdate") =~ "busy: HoodUpdate.isBusy(busyView()),"
+    assert body("updateDecision") =~ "busy: HoodUpdate.isBusy(busyView()),"
+    assert body("checkForUpdate") =~ "const action = updateDecision();"
     assert length(String.split(@app, "HoodUpdate.isBusy(")) - 1 == 2
     assert body("busyView") =~ "form: carSheetOpen(),"
     # the third: the reload on return while location is blocked (locator.js

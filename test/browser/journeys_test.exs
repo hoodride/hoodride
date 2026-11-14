@@ -51,6 +51,8 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     on_exit(fn -> :persistent_term.put(@build_key, build) end)
     # (and the Terms version, after server("terms_new"))
     on_exit(fn -> Application.delete_env(:hoodride, :terms_version) end)
+    # (and Turnstile, after server("turnstile_on"))
+    on_exit(fn -> turnstile_off() end)
 
     # the server's side of a failure: every socket connect and channel join,
     # when and how long it took (a join stuck "joining" under load, 2026-11-02).
@@ -222,9 +224,48 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     end
   end
 
+  # Cloudflare Turnstile on (HoodrideWeb.Turnstile): Cloudflare's public
+  # always-pass test keys, its check answered here ("passed", for this host
+  # and the sign-in action — nothing leaves the machine), and a Google
+  # client so a sign-in start goes to Google (the journey stops it there)
+  defp server("turnstile_on") do
+    Application.put_env(:hoodride, :turnstile_site_key, "1x00000000000000000000AA")
+    Application.put_env(:hoodride, :turnstile_secret, "1x0000000000000000000000000000000AA")
+
+    Application.put_env(:hoodride, :turnstile_req,
+      plug: fn conn ->
+        Req.Test.json(conn, %{
+          "success" => true,
+          "hostname" => HoodrideWeb.Endpoint.host(),
+          "action" => "signin"
+        })
+      end
+    )
+
+    Application.put_env(:hoodride, :google_client_id, "journey-client")
+    Application.put_env(:hoodride, :google_client_secret, "journey-secret")
+    "ok"
+  end
+
+  defp server("turnstile_off") do
+    turnstile_off()
+    "ok"
+  end
+
   defp server("new_build") do
     :persistent_term.put(@build_key, "journey-new-build")
     "ok"
+  end
+
+  defp turnstile_off do
+    for k <- [
+          :turnstile_site_key,
+          :turnstile_secret,
+          :turnstile_req,
+          :google_client_id,
+          :google_client_secret
+        ],
+        do: Application.delete_env(:hoodride, k)
   end
 
   # this person has no car saved (one account per tab: a refused save left

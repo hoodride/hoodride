@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "መቀበል አልተቻለም"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "አሳሽዎን ማረጋገጥ አልተቻለም — challenges.cloudflare.com ን ይፍቀዱ፣ ወይም ሌላ አሳሽ ይሞክሩ"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "መቅዳት አልተቻለም"
 
@@ -671,6 +675,10 @@ msgstr "የካርታውን ምንጮች ያሳዩ ወይም ይደብቁ"
 msgid "Sign out"
 msgstr "ይውጡ"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "መግባት አሁን ተጨናንቋል — ትንሽ ቆይተው እንደገና ይሞክሩ።"
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "በመግባት ላይ…"
@@ -713,6 +721,10 @@ msgstr "ያ ተሳፋሪ ከአሁን በኋላ ጉዞ እየፈለጉ አይደ
 msgid "That's a different Google account — sign out first to use it"
 msgstr "ይህ ሌላ የGoogle መለያ ነው — ለመጠቀም መጀመሪያ ይውጡ"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "ይህ አሳሽ ካርታውን ማሳየት አይችልም — በቅንብሮቹ ውስጥ የሃርድዌር ማፋጠንን ያብሩ፣ ወይም ሌላ አሳሽ ይሞክሩ"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "ይህ ሊቀለበስ አይችልም። አካውንትዎ ይሰረዛል፣ ከካርታው ይወገዳሉ፣ ውይይቶችዎ ይዘጋሉ፣ እና ከሁሉም መሣሪያዎች ይወጣሉ። በኋላ እንደገና ሲገቡ አዲስ አካውንት ይጀምራል።"
@@ -724,10 +736,6 @@ msgstr "ይህ ገጽ የለም።"
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "ዘግይቷል — ጥያቄው ተሰርዟል"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "ከአውታረ መረብዎ ብዙ ያልተሳኩ የመግቢያ ሙከራዎች አሉ — ቆየት ብለው ይሞክሩ።"
 
 #: priv/static/app.js
 msgid "Try again"

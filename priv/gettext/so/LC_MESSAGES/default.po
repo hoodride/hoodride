@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "Lama aqbali karin"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "Browser-kaaga lama hubin karin — u oggolow challenges.cloudflare.com, ama isku day browser kale"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "Lama koobiyeyn karin"
 
@@ -671,6 +675,10 @@ msgstr "Muuji ama qari tixraacyada khariidadda"
 msgid "Sign out"
 msgstr "Ka bax"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "Gelitaanku hadda waa mashquul — isku day mar kale wax yar kadib."
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "Galaya…"
@@ -713,6 +721,10 @@ msgstr "Rakaabkaas hadda safar ma raadinayo"
 msgid "That's a different Google account — sign out first to use it"
 msgstr "Kani waa akoon Google oo kale — marka hore ka bax si aad u isticmaasho"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "Browser-kan ma muujin karo khariidadda — dejimihiisa ka shid hardware acceleration, ama isku day browser kale"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Tan dib looma celin karo. Akoonkaaga waa la tirtirayaa, khariidadda waa lagaa saarayaa, sheekeysiyadaada waa la xirayaa, qalab kastana waa lagaa saarayaa. Haddii aad mar dambe gasho, akoon cusub ayaa bilaabmaya."
@@ -724,10 +736,6 @@ msgstr "Boggan ma jiro."
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "Waa goor dambe — codsiga waa la laabtay"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "Isku dayo gelitaan oo badan oo fashilmay ayaa ka yimid shabakaddaada — mar dambe isku day."
 
 #: priv/static/app.js
 msgid "Try again"

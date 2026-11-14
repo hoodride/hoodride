@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "承諾できませんでした"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "ブラウザを確認できませんでした。challenges.cloudflare.com を許可するか、別のブラウザをお試しください"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "コピーできませんでした"
 
@@ -671,6 +675,10 @@ msgstr "地図のクレジットを表示または非表示"
 msgid "Sign out"
 msgstr "ログアウト"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "現在ログインが混み合っています。少し待ってからもう一度お試しください。"
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "ログインしています…"
@@ -713,6 +721,10 @@ msgstr "その乗客はもう探していません"
 msgid "That's a different Google account — sign out first to use it"
 msgstr "別の Google アカウントです。使うには先にログアウトしてください"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "このブラウザでは地図を表示できません。設定でハードウェアアクセラレーションをオンにするか、別のブラウザをお試しください"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "この操作は元に戻せません。アカウントが削除され、地図から表示が消え、会話は終了し、すべてのデバイスでログアウトされます。後でもう一度ログインすると、新しいアカウントになります。"
@@ -724,10 +736,6 @@ msgstr "このページは存在しません。"
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "間に合いませんでした。リクエストは取り消されました"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "お使いのネットワークからのログイン失敗が多すぎます。後でもう一度お試しください。"
 
 #: priv/static/app.js
 msgid "Try again"

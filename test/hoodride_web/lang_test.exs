@@ -319,6 +319,29 @@ defmodule HoodrideWeb.LangTest do
       assert asking("ar") |> get("/?demo=1") |> redirected_to(302) == "/ar?demo=1"
     end
 
+    # (crash review 2026-11-14) the query was copied into the redirect as
+    # sent: Phoenix refuses a local redirect with a backslash, a tab or a
+    # newline after a slash ("/%09…") — an ArgumentError, a 500 and a full
+    # error in the log, for anyone, signed in or not
+    test "a redirect with an odd query still redirects — never a 500" do
+      for q <- ["x=/%09", "a=\\", "x=/\t", "x=%5C%5C", "u=/%0d%0aLocation:x"] do
+        for {conn, path, status} <- [
+              {build_conn(), "/en?" <> q, 301},
+              {build_conn(), "/JA?" <> q, 301},
+              {asking("ja"), "/?" <> q, 302}
+            ] do
+          res = get(conn, path)
+          assert res.status == status, "#{path}: #{res.status}"
+          to = redirected_to(res, status)
+          assert Phoenix.URL.classify_local_path(to) == :ok, "#{path} → #{to}"
+        end
+      end
+
+      # an ordinary query still goes along exactly
+      assert asking("ar") |> get("/?demo=1&refresh=failed") |> redirected_to(302) ==
+               "/ar?demo=1&refresh=failed"
+    end
+
     test "a language's address shows that language, whatever the cookie or the phone" do
       for path <- ["/ja", "/ja/privacy", "/ja/terms"] do
         conn = asking("de") |> put_req_cookie(Lang.cookie(), "es") |> get(path)
@@ -551,8 +574,8 @@ defmodule HoodrideWeb.LangTest do
   end
 
   describe "the server's words" do
-    test "the server's own words: the sign-in limit's message in the reader's language" do
-      msg = "Too many failed sign-ins from your network — try again later."
+    test "the server's own words: the sign-in's busy message in the reader's language" do
+      msg = "Sign-in is busy right now — try again in a moment."
       assert I18n.t("en-XA", msg) != msg
       # (the message as served: Hoodride.I18n.t, collected like the app's)
       assert File.read!("priv/gettext/default.pot") =~ ~s(msgid "#{msg}")

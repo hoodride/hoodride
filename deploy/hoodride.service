@@ -5,8 +5,12 @@
 # but Erlang's own node ports, on 127.0.0.1 (rel/vm.args.eex, rel/env.sh.eex).
 [Unit]
 Description=Hood Ride
-After=network-online.target
-Wants=network-online.target
+# …and the clock synced (with systemd-time-wait-sync on: setup.sh). Cars,
+# requests and sign-ins are aged by it — started with a wrong clock that
+# then jumped, the next cleanup took every car off the map, and a clock
+# far ahead at start deleted sign-ins for good (crash review 2026-11-14)
+After=network-online.target time-sync.target
+Wants=network-online.target time-sync.target
 
 [Service]
 User=hoodride

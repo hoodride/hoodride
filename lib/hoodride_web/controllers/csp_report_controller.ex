@@ -93,8 +93,14 @@ defmodule HoodrideWeb.CspReportController do
 
   defp site(b) when is_binary(b) do
     case URI.parse(b) do
+      # a plain site name only: URI.parse doesn't check the host, and a
+      # newline in it wrote a forged second log line (crash review 2026-11-14)
       %URI{scheme: s, host: h, port: p} when is_binary(s) and is_binary(h) and h != "" ->
-        if p in [nil, URI.default_port(s)], do: "#{s}://#{h}", else: "#{s}://#{h}:#{p}"
+        cond do
+          not Regex.match?(~r/\A[a-z0-9.-]{1,253}\z/i, h) -> "other"
+          p in [nil, URI.default_port(s)] -> "#{s}://#{h}"
+          true -> "#{s}://#{h}:#{p}"
+        end
 
       %URI{scheme: s} when s in ["data", "blob"] ->
         s

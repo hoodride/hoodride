@@ -79,9 +79,18 @@ defmodule HoodrideWeb.SameUserWiringTest do
 
     update = body("reloadForUpdate")
     assert update =~ ~r/\A[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*if \(steppedAside\(\)\) return;/
-    # and again when the worker update is done, leaving no stamp behind
-    assert update =~ "if (!steppedAside()) return location.reload();"
-    assert update =~ "HoodSession.takeQuietReload(tabStorage());"
+    # and again when the worker update is done, leaving no stamp behind —
+    # and only if the quiet reload is STILL right then: the update can
+    # finish once the person is back and using the page (a hidden phone
+    # freezes the page mid-update): decided again, else the offer (review
+    # 2026-11-14 — it reloaded under them, what they'd typed lost)
+    [_, done] = String.split(update, ".finally(() => {", parts: 2)
+
+    assert done =~
+             ~s[if (!steppedAside() && updateDecision() === "reload") return location.reload();]
+
+    assert done =~ "HoodSession.takeQuietReload(tabStorage());"
+    assert done =~ ~s[if (!steppedAside() && updateDecision() === "offer") showUpdateAvailable();]
     refute update =~ ".finally(() => location.reload())"
 
     [settings] = Regex.run(~r/    reload: \(\) => \{.*?\n    \},/s, @app)

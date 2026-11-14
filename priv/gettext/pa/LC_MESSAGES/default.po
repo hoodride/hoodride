@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "ਸਵੀਕਾਰ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "ਤੁਹਾਡੇ ਬ੍ਰਾਊਜ਼ਰ ਦੀ ਜਾਂਚ ਨਹੀਂ ਹੋ ਸਕੀ — challenges.cloudflare.com ਨੂੰ ਇਜਾਜ਼ਤ ਦਿਓ, ਜਾਂ ਕੋਈ ਹੋਰ ਬ੍ਰਾਊਜ਼ਰ ਅਜ਼ਮਾਓ"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "ਕਾਪੀ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਿਆ"
 
@@ -671,6 +675,10 @@ msgstr "ਨਕਸ਼ੇ ਦੇ ਕ੍ਰੈਡਿਟ ਦਿਖਾਓ ਜਾਂ �
 msgid "Sign out"
 msgstr "ਸਾਈਨ ਆਊਟ ਕਰੋ"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "ਸਾਈਨ ਇਨ ਇਸ ਵੇਲੇ ਰੁੱਝਿਆ ਹੋਇਆ ਹੈ — ਥੋੜ੍ਹੀ ਦੇਰ ਬਾਅਦ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "ਸਾਈਨ ਇਨ ਹੋ ਰਿਹਾ ਹੈ…"
@@ -713,6 +721,10 @@ msgstr "ਉਹ ਸਵਾਰੀ ਹੁਣ ਰਾਈਡ ਨਹੀਂ ਲੱਭ ਰ
 msgid "That's a different Google account — sign out first to use it"
 msgstr "ਇਹ ਕੋਈ ਹੋਰ Google ਖਾਤਾ ਹੈ — ਇਸਨੂੰ ਵਰਤਣ ਲਈ ਪਹਿਲਾਂ ਸਾਈਨ ਆਊਟ ਕਰੋ"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "ਇਹ ਬ੍ਰਾਊਜ਼ਰ ਨਕਸ਼ਾ ਨਹੀਂ ਦਿਖਾ ਸਕਦਾ — ਇਸਦੀਆਂ ਸੈਟਿੰਗਾਂ ਵਿੱਚ ਹਾਰਡਵੇਅਰ ਐਕਸੀਲਰੇਸ਼ਨ ਚਾਲੂ ਕਰੋ, ਜਾਂ ਕੋਈ ਹੋਰ ਬ੍ਰਾਊਜ਼ਰ ਅਜ਼ਮਾਓ"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "ਇਸਨੂੰ ਅਣਕੀਤਾ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਦਾ। ਤੁਹਾਡਾ ਖਾਤਾ ਹਟਾ ਦਿੱਤਾ ਜਾਵੇਗਾ, ਤੁਹਾਨੂੰ ਨਕਸ਼ੇ ਤੋਂ ਹਟਾ ਦਿੱਤਾ ਜਾਵੇਗਾ, ਤੁਹਾਡੀਆਂ ਗੱਲਬਾਤਾਂ ਬੰਦ ਹੋ ਜਾਣਗੀਆਂ ਅਤੇ ਤੁਹਾਨੂੰ ਹਰ ਡੀਵਾਈਸ ਤੋਂ ਸਾਈਨ ਆਊਟ ਕਰ ਦਿੱਤਾ ਜਾਵੇਗਾ। ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਸਾਈਨ ਇਨ ਕਰਨ ਨਾਲ ਨਵਾਂ ਖਾਤਾ ਸ਼ੁਰੂ ਹੋਵੇਗਾ।"
@@ -724,10 +736,6 @@ msgstr "ਇਹ ਪੰਨਾ ਮੌਜੂਦ ਨਹੀਂ ਹੈ।"
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "ਬਹੁਤ ਦੇਰ ਹੋ ਗਈ — ਬੇਨਤੀ ਵਾਪਸ ਲੈ ਲਈ ਗਈ"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "ਤੁਹਾਡੇ ਨੈੱਟਵਰਕ ਤੋਂ ਬਹੁਤ ਸਾਰੀਆਂ ਸਾਈਨ-ਇਨ ਕੋਸ਼ਿਸ਼ਾਂ ਅਸਫਲ ਹੋਈਆਂ — ਬਾਅਦ ਵਿੱਚ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।"
 
 #: priv/static/app.js
 msgid "Try again"

@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "รับงานไม่ได้"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "ตรวจสอบเบราว์เซอร์ของคุณไม่ได้ โปรดอนุญาต challenges.cloudflare.com หรือลองใช้เบราว์เซอร์อื่น"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "คัดลอกไม่ได้"
 
@@ -671,6 +675,10 @@ msgstr "แสดงหรือซ่อนเครดิตของแผน
 msgid "Sign out"
 msgstr "ออกจากระบบ"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "ขณะนี้มีผู้ลงชื่อเข้าใช้จำนวนมาก โปรดลองอีกครั้งในอีกสักครู่"
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "กำลังลงชื่อเข้าใช้…"
@@ -713,6 +721,10 @@ msgstr "ผู้โดยสารคนนั้นไม่ได้หาร
 msgid "That's a different Google account — sign out first to use it"
 msgstr "นี่เป็นบัญชี Google อื่น ออกจากระบบก่อนเพื่อใช้บัญชีนั้น"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "เบราว์เซอร์นี้แสดงแผนที่ไม่ได้ โปรดเปิดการเร่งด้วยฮาร์ดแวร์ในการตั้งค่า หรือลองใช้เบราว์เซอร์อื่น"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "การดำเนินการนี้ไม่สามารถยกเลิกได้ ระบบจะลบบัญชีของคุณ นำคุณออกจากแผนที่ ปิดการสนทนาทั้งหมด และออกจากระบบในทุกอุปกรณ์ หากลงชื่อเข้าใช้อีกครั้งในภายหลัง จะเป็นการเริ่มบัญชีใหม่"
@@ -724,10 +736,6 @@ msgstr "ไม่มีหน้านี้"
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "ช้าไปแล้ว คำขอถูกถอนแล้ว"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "มีการลงชื่อเข้าใช้ที่ไม่สำเร็จจากเครือข่ายของคุณมากเกินไป โปรดลองอีกครั้งในภายหลัง"
 
 #: priv/static/app.js
 msgid "Try again"

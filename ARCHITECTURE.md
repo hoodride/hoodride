@@ -748,7 +748,12 @@ Design notes:
     `plug_crypto` 2.2.0 → 2.2.1 (EEF-CVE-2026-105963: secret key base in
     stack traces).
   - **A per-address budget on every WebSocket handshake** (owner's choice,
-    2026-10-25, "option 3"): counted BEFORE the token is checked, every
+    2026-10-25, "option 3"). **Changed 2026-11-14:** the token is checked
+    FIRST (a signature and a memory lookup — no database now, revoked ones
+    included) and only FAILED attempts count against the address: counting
+    every attempt let one person on a café's Wi-Fi drain the address and
+    lock every signed-in person there out (LoginLockdownTest). As built in
+    2026-10-25: counted BEFORE the token is checked, every
     attempt (valid or not), IPv6 per /64, at the signed-out HTTP budget's
     numbers — 120 at once, then 1 a second (`:ws_budget`; off in dev, the
     monster is one address). Basis: OWASP's WebSocket cheat sheet (per-user
@@ -2659,3 +2664,102 @@ from another account, check spam — forwarded mail can be filtered or, now
 and then, rejected by Gmail. Google's consent screen keeps a Gmail support
 address (it must be on the Google account). PrivacyTest: no @gmail.com on
 the privacy page.
+
+## Hardening, 2026-11-13 – 2026-11-14
+
+Two rounds of reviews (crashes, then shared processes and abuse, then the
+plan checked against RFC 9700, OWASP, NIST 800-63B, Cloudflare's and
+Google's docs). Every change has a test that failed first; the tests named
+here say the rest.
+
+### When the server or the network struggles
+- **A ride slow to answer is "busy", not "gone"** (`Rides.call`): a phone
+  rejoining used to close a live ride. The ride channel's join answers
+  `busy` (the app retries it); `/api/state` answers 503. A ride looks up a
+  name it started without in `Hoodride.Rides.Lookups`, never in itself — a
+  slow database froze it (RideBusyTest).
+- **The Sweeper waits at most 1 s on the map writers**, then not at all for
+  the rest of the pass (`GeoWriter.short_waits/2`); changes still land, in
+  order (SweeperStallTest).
+- **The offline worker gives the network 4 s**, then shows the saved app
+  (Workbox's `networkTimeoutSeconds` pattern; `sw.js NETWORK_WAIT_MS`;
+  journey `weaksignal`).
+- **Clock jumps:** the app starts only once the clock is synced
+  (`time-sync.target`, with the wait capped at 3 minutes, as chrony's own — Ubuntu's has no
+  limit, and a reboot without a time server kept the site down); the
+  Sweeper skips its time-based steps for a pass after the wall clock jumped
+  against the steady one (OTP 29 follows clock jumps: `multi_time_warp`;
+  ClockJumpTest).
+- **A shared piece restarting** never crashes its callers: the rides'
+  supervisor (`start_child` exits caught, seats freed), the rate-limit
+  table's owner (`RateLimit.guarded`), the database's supervisor
+  (`Hoodride.Repo.down?/1` in every "unavailable" rescue) (RestartGapsTest).
+
+### Sign-in (the standard checked part by part)
+- **One-time `state`** (RFC 9700): the session is a cookie the browser
+  keeps, so a saved copy replayed the same state — each a call to Google.
+  Used up on the server before the provider is asked (`Hoodride.SignInStates`,
+  atomic, a fingerprint only, 15 minutes, at most 5,000 remembered), tied to
+  its provider. A repeat leaves the session alone and goes home.
+- **Only a refused CODE counts** — Google's `invalid_grant`, Facebook's
+  code 100 — never our own setup errors (logged: `sign-in: … refused our
+  request`) or their throttling.
+- **No address is blocked any more.** The old rule (30 refused codes in 3
+  minutes → the address blocked an hour, GitLab's numbers) let one person on
+  a shared network lock everyone there out. Per address: the sign-in budget
+  (120 a minute, burst 60), for every start and return, signed in or not —
+  the silent refresh excepted (its own per-account limit). Site-wide: a
+  WARNING only (`sign-in: N codes refused…`, 50 in 10 minutes) — a global
+  count that blocked would be an off switch anyone could flip (the
+  documented anti-pattern). The only pause: Google or Facebook throttling
+  us — their Retry-After, else Google's truncated exponential backoff
+  (1 s doubling to 32 s, jitter) (SignInHardeningTest, SignInFailuresTest).
+- **The session cookie is encrypted** too (`encryption_salt`): changing it
+  signed everyone out once.
+- **Cloudflare Turnstile** on sign-in START, off until its keys are set
+  (GOOGLE_SETUP.md, "Turnstile"). The page runs the check on the tap
+  (`turnstile.js`: execute on tap, interaction-only, the reader's language),
+  POSTs the pass as JSON to `/auth/start`; the server checks it with
+  Cloudflare (hostname, the `signin` action, the visitor's address, an
+  idempotency key; junk refused unasked) and allows ONE start for a minute.
+  Cloudflare unreachable: let through, logged; a failed check: never. Not on
+  the live connection or the API — a pass is single-use per action, and a
+  sign-in already guards those (TurnstileTest, journey `turnstile`).
+  **Before switching it on: a privacy-policy line about it.**
+
+### Abuse
+- **One character at most 100 bytes** in a message: marks split up by
+  joiners dodged the 30-in-a-row rule (ServerTruthTest).
+- **Error reports: a few per address a minute** under the site-wide 100, so
+  one address can't silence everyone's (ClientErrorTest).
+- **CSP reports:** a site name that isn't one is logged as "other" (no
+  forged log lines).
+- **Odd page addresses** (`/en?x=/%09`, a backslash) redirect instead of
+  500 (`PageController.safe_query`, LangTest).
+- **Ids count nothing:** a message's id is its send time in microseconds
+  (still in order); a ride's id is random (MessageIdTest).
+
+### The server's own permissions
+- **Deploy steps run root-owned helpers** in `/usr/local/sbin`
+  (`deploy/sudo_rules.sh`): the database copy, the site's name, the tunnel
+  check — never a file in the deploy user's folder (editable: it ran
+  anything as root), never open `curl` as cloudflared. The deploy refuses
+  when a helper isn't this version's (SudoRulesTest). The catch-all
+  `NOPASSWD: ALL` goes only once the account has a password (owner: not yet).
+- **The secrets file is root's alone** (0600; the tunnel's group could read
+  every secret) (ServerHardeningTest).
+
+### The app
+- The map is made BEFORE the connection (it was blank for as long as the
+  connection's pass took); a browser that can't draw it (no WebGL) says so
+  and doesn't connect (journey `mapstart`).
+- A Cancel just after the driver's Accept says "accepted" and the ride
+  comes — re-checked with the server after 5 s if it doesn't (journey
+  `cancelrace`).
+- A quiet update reload decides again once the worker update is done — it
+  reloaded under someone who'd come back (journey `updatereturn`).
+- Location: the "is it allowed?" check gets 2 s (journey `permhang`).
+- Signed out elsewhere: the saved block and the refresh flag go too
+  (journey `signedout`). Your car works in the demo, kept on the page.
+- Every file the page loads is on the server's served list
+  (StaticPathsTest — `turnstile.js` was missing, caught by its journey).

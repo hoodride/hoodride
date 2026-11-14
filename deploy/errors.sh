@@ -30,7 +30,7 @@ if ! log=$(ssh ${key[@]+"${key[@]}"} "$HOST" "id -nG | grep -qw systemd-journal 
 fi
 
 found=$(printf '%s\n' "$log" |
-  grep -E 'client error:|repair: |sweep step .* failed' |
+  grep -E 'client error:|repair: |sweep step .* failed|sign-in: ' |
   sed -E 's/^.*\[(warning|error)\] //; s/ build=[0-9a-f]+//' |
   sort | uniq -c | sort -rn | head -50)
 

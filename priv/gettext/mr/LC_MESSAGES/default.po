@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "स्वीकारता आले नाही"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "तुमचा ब्राउझर तपासता आला नाही. challenges.cloudflare.com ला परवानगी द्या, किंवा दुसरा ब्राउझर वापरून पहा"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "कॉपी करता आले नाही"
 
@@ -671,6 +675,10 @@ msgstr "नकाशाचे श्रेय दाखवा किंवा �
 msgid "Sign out"
 msgstr "साइन आउट करा"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "साइन इन सध्या व्यस्त आहे. थोड्या वेळाने पुन्हा प्रयत्न करा."
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "साइन इन करत आहे…"
@@ -713,6 +721,10 @@ msgstr "तो प्रवासी आता राइड शोधत ना�
 msgid "That's a different Google account — sign out first to use it"
 msgstr "हे दुसरे Google खाते आहे. ते वापरण्यासाठी आधी साइन आउट करा"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "हा ब्राउझर नकाशा दाखवू शकत नाही. त्याच्या सेटिंग्जमध्ये हार्डवेअर ॲक्सिलरेशन सुरू करा, किंवा दुसरा ब्राउझर वापरून पहा"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "हे पूर्ववत करता येणार नाही. तुमचे खाते काढून टाकले जाईल, तुम्हाला नकाशावरून काढले जाईल, तुमची संभाषणे बंद होतील आणि प्रत्येक डिव्हाइसवरून तुम्ही साइन आउट व्हाल. नंतर पुन्हा साइन इन केल्यास नवीन खाते सुरू होईल."
@@ -724,10 +736,6 @@ msgstr "हे पेज अस्तित्वात नाही."
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "खूप उशीर झाला: विनंती मागे घेतली गेली"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "तुमच्या नेटवर्कवरून साइन इनचे खूप प्रयत्न अयशस्वी झाले. नंतर पुन्हा प्रयत्न करा."
 
 #: priv/static/app.js
 msgid "Try again"

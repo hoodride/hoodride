@@ -124,6 +124,11 @@ if config_env() in [:prod, :loadtest] do
   config :hoodride, :google_client_id, System.get_env("GOOGLE_CLIENT_ID")
   config :hoodride, :google_client_secret, System.get_env("GOOGLE_CLIENT_SECRET")
 
+  # Cloudflare Turnstile on sign-in (GOOGLE_SETUP.md, Turnstile): off until
+  # both are set — the site key is public, the secret the server's only
+  config :hoodride, :turnstile_site_key, System.get_env("TURNSTILE_SITE_KEY")
+  config :hoodride, :turnstile_secret, System.get_env("TURNSTILE_SECRET_KEY")
+
   # Facebook sign-in (GOOGLE_SETUP.md, Facebook): its button shows only once set
   config :hoodride, :facebook_app_id, System.get_env("FACEBOOK_APP_ID")
   config :hoodride, :facebook_app_secret, System.get_env("FACEBOOK_APP_SECRET")

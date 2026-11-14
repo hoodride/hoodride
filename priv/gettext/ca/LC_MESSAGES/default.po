@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "No s'ha pogut acceptar"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "No s'ha pogut comprovar el teu navegador. Permet challenges.cloudflare.com o prova un altre navegador"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "No s'ha pogut copiar"
 
@@ -671,6 +675,10 @@ msgstr "Mostra o amaga els crèdits del mapa"
 msgid "Sign out"
 msgstr "Tanca la sessió"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "L'inici de sessió està saturat ara mateix. Torna-ho a provar d'aquí a un moment."
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "S'està iniciant la sessió…"
@@ -713,6 +721,10 @@ msgstr "Aquest passatger ja no busca viatge"
 msgid "That's a different Google account — sign out first to use it"
 msgstr "Aquest és un altre compte de Google. Tanca la sessió primer per fer-lo servir"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "Aquest navegador no pot mostrar el mapa. Activa l'acceleració per maquinari a la configuració o prova un altre navegador"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Aquesta acció no es pot desfer. Se suprimeix el teu compte, desapareixes del mapa, es tanquen les teves converses i es tanca la sessió a tots els dispositius. Si tornes a iniciar la sessió més endavant, començaràs amb un compte nou."
@@ -724,10 +736,6 @@ msgstr "Aquesta pàgina no existeix."
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "Massa tard: la sol·licitud s'ha retirat"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "Massa intents d'inici de sessió fallits des de la teva xarxa. Torna-ho a provar més tard."
 
 #: priv/static/app.js
 msgid "Try again"

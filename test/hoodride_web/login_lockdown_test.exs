@@ -616,13 +616,16 @@ defmodule HoodrideWeb.LoginLockdownTest do
     end
   end
 
-  # ---------- the WebSocket handshake: per address, before the token ----------
+  # ---------- the WebSocket handshake: per address, FAILED attempts only ----------
 
   # OWASP (WebSocket cheat sheet): per-user limits first, per-IP "where user
-  # identification isn't available" — the handshake, before the token is
-  # checked. Every attempt counts, valid or not (a real person connects about
-  # once per page load), at the signed-out HTTP budget's generous numbers.
-  # Cloudflare counts per data center; our one server sees every attempt.
+  # identification isn't available". The token is checked first (a signature
+  # and a memory lookup — no database); a signed-in person connects on their
+  # account's own budget. Only attempts that fail (no token, a forged or
+  # revoked one) count against the address. Every attempt used to count:
+  # junk from one person on a café's Wi-Fi drained the address and locked
+  # every signed-in person there out of the live connection (review
+  # 2026-11-14).
   describe "handshake budget" do
     setup do
       saved = for k <- [:ws_budget, :trusted_proxies], do: {k, Application.get_env(:hoodride, k)}
@@ -649,12 +652,22 @@ defmodule HoodrideWeb.LoginLockdownTest do
       assert {:ok, _} = handshake({198, 51, 100, 41}, token_for(u))
     end
 
-    test "every attempt counts, valid ones too (the budget is what makes it safe to be generous)",
-         %{conn: _} do
+    test "junk from an address can't lock out the signed-in people there", %{conn: _} do
       ip = {198, 51, 100, 42}
-      for _ <- 1..4, do: handshake(ip, "garbage")
+      for _ <- 1..10, do: handshake(ip, "garbage")
+      assert handshake(ip, "garbage") == {:error, :rate_limited}
+      # the same café, a real sign-in: in (its own account's budget)
       u = user("hs-valid")
-      assert handshake(ip, token_for(u)) == {:error, :rate_limited}
+      assert {:ok, _} = handshake(ip, token_for(u))
+      v = user("hs-valid2")
+      assert {:ok, _} = handshake(ip, token_for(v))
+    end
+
+    test "valid connects never spend the address's budget", %{conn: _} do
+      ip = {198, 51, 100, 43}
+      for i <- 1..6, do: assert({:ok, _} = handshake(ip, token_for(user("hs-many-#{i}"))))
+      # the junk allowance is still whole (burst 3: three refusals as :error first)
+      assert handshake(ip, "garbage") == :error
     end
 
     test "rotating inside one IPv6 /64 shares one budget", %{conn: _} do

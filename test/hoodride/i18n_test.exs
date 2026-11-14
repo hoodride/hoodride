@@ -126,7 +126,7 @@ defmodule Hoodride.I18nTest do
   end
 
   test "the server's own words: in the language's catalog, English if none" do
-    msg = "Too many failed sign-ins from your network — try again later."
+    msg = "Sign-in is busy right now — try again in a moment."
     assert I18n.t("en", msg) == msg
     assert I18n.t("en-XA", msg) == I18n.pseudo_text(msg)
     assert I18n.t("en-XA", "not one of ours") == "not one of ours"

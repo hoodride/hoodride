@@ -37,19 +37,23 @@ defmodule HoodrideWeb.CSP do
 
   @map "https://tiles.openfreemap.org"
   @web_analytics "https://static.cloudflareinsights.com"
+  # Cloudflare Turnstile on the sign-in screen: its script, and the frame
+  # its check runs in (Cloudflare's CSP page; HoodrideWeb.Turnstile)
+  @turnstile "https://challenges.cloudflare.com"
 
   @doc "The full policy."
   def policy do
     Enum.join(
       [
         "default-src 'self'",
-        "script-src 'self' #{@web_analytics}",
+        "script-src 'self' #{@web_analytics} #{@turnstile}",
         "style-src 'self'",
         "img-src 'self' data: blob:",
         "font-src 'self'",
         "connect-src 'self' #{socket_origin()} #{@map}",
         "worker-src 'self' blob:",
         "child-src blob:",
+        "frame-src #{@turnstile}",
         "manifest-src 'self'",
         "object-src 'none'",
         "base-uri 'none'",

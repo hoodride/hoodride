@@ -138,6 +138,41 @@ defmodule Hoodride.RideBusyTest do
     assert Process.alive?(pid)
   end
 
+  test "the lookup helper unavailable when a retry is due: the ride carries on and asks again" do
+    driver = user("rb-d6")
+    rider = user("rb-r6")
+    calls = :atomics.new(1, [])
+
+    # the start can't name the driver; later lookups work
+    Application.put_env(:hoodride, :user_lookup, fn id ->
+      if id == driver.id and :atomics.add_get(calls, 1, 1) == 1,
+        do: raise(DBConnection.ConnectionError, "connection not available"),
+        else: Accounts.get_user(id)
+    end)
+
+    # the helper's name away (as while it restarts) through the first retries
+    lookups = Process.whereis(Hoodride.Rides.Lookups)
+    Process.unregister(Hoodride.Rides.Lookups)
+
+    {ride_id, pid} =
+      try do
+        r = ride(driver, rider)
+        HoodrideWeb.Endpoint.subscribe("ride:" <> elem(r, 0))
+        # (the first retries come and find no helper: 30 ms, then 60 ms)
+        Process.sleep(150)
+        r
+      after
+        Process.register(lookups, Hoodride.Rides.Lookups)
+      end
+
+    # it crashed and ENDED the ride ("error") — now it carries on…
+    refute_received %Phoenix.Socket.Broadcast{event: "ended"}
+    assert Process.alive?(pid)
+    # …and the name follows once the helper's back
+    assert_receive %Phoenix.Socket.Broadcast{event: "peer", payload: %{name: "rb-d6"}}, 3_000
+    assert {:ok, %{id: ^ride_id}} = Rides.get(ride_id)
+  end
+
   test "joining a ride that's slow to answer: busy (retried), never gone" do
     driver = user("rb-d3")
     rider = user("rb-r3")

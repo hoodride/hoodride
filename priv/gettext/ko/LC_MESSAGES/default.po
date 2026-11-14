@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "수락하지 못했어요"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "브라우저를 확인하지 못했어요. challenges.cloudflare.com을 허용하거나 다른 브라우저를 사용해 주세요"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "복사하지 못했어요"
 
@@ -671,6 +675,10 @@ msgstr "지도 출처 표시 또는 숨기기"
 msgid "Sign out"
 msgstr "로그아웃"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "지금 로그인이 몰려 있어요. 잠시 후 다시 시도해 주세요."
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "로그인 중…"
@@ -713,6 +721,10 @@ msgstr "그 탑승자는 이제 차를 찾고 있지 않아요"
 msgid "That's a different Google account — sign out first to use it"
 msgstr "다른 Google 계정이에요. 사용하려면 먼저 로그아웃하세요"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "이 브라우저에서는 지도를 표시할 수 없어요. 설정에서 하드웨어 가속을 켜거나 다른 브라우저를 사용해 주세요"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "이 작업은 취소할 수 없어요. 계정이 삭제되고, 지도에서 사라지고, 대화가 종료되며, 모든 기기에서 로그아웃돼요. 나중에 다시 로그인하면 새 계정으로 시작해요."
@@ -724,10 +736,6 @@ msgstr "이 페이지는 존재하지 않아요."
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "너무 늦었어요. 요청이 취소됐어요"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "사용 중인 네트워크에서 로그인 실패가 너무 많아요. 나중에 다시 시도해 주세요."
 
 #: priv/static/app.js
 msgid "Try again"

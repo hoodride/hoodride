@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "Impossibile accettare"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "Impossibile verificare il tuo browser. Consenti challenges.cloudflare.com o prova un altro browser"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "Impossibile copiare"
 
@@ -671,6 +675,10 @@ msgstr "Mostra o nascondi i crediti della mappa"
 msgid "Sign out"
 msgstr "Esci"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "L'accesso è sovraccarico in questo momento. Riprova tra poco."
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "Accesso in corso…"
@@ -713,6 +721,10 @@ msgstr "Quel passeggero non cerca più un passaggio"
 msgid "That's a different Google account — sign out first to use it"
 msgstr "Questo è un altro account Google. Esci prima per usarlo"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "Questo browser non riesce a mostrare la mappa. Attiva l'accelerazione hardware nelle sue impostazioni o prova un altro browser"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Questa azione non può essere annullata. Il tuo account viene eliminato, sparisci dalla mappa, le tue conversazioni vengono chiuse ed esci da tutti i dispositivi. Se accedi di nuovo in futuro, inizierai con un nuovo account."
@@ -724,10 +736,6 @@ msgstr "Questa pagina non esiste."
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "Troppo tardi: la richiesta è stata ritirata"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "Troppi accessi non riusciti dalla tua rete. Riprova più tardi."
 
 #: priv/static/app.js
 msgid "Try again"

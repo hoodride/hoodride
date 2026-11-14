@@ -1,5 +1,6 @@
 defmodule HoodrideWeb.AuthController do
   use HoodrideWeb, :controller
+  require Logger
 
   alias Hoodride.{Accounts, Avatars}
   alias HoodrideWeb.Auth
@@ -37,17 +38,60 @@ defmodule HoodrideWeb.AuthController do
   def request(conn, %{"provider" => p} = params) when p in @providers do
     refreshing = params["refresh"] in ["1", "silent"] and conn.assigns[:current_user] != nil
 
+    # (no address is blocked any more — one person on a café's Wi-Fi could
+    # block sign-in there for an hour: the start budget per address and
+    # the one-time state limit made-up codes instead; review 2026-11-14)
     cond do
-      is_nil(client_id(p)) -> send_resp(conn, 503, not_configured(p))
-      # someone else's made-up codes can block a SHARED address: whoever is
-      # signed in and refreshing goes back to the app, not the bare page
-      Hoodride.SignInFailures.blocked?(address(conn)) and refreshing -> back(conn, "blocked")
-      Hoodride.SignInFailures.blocked?(address(conn)) -> too_many_failures(conn)
-      true -> start(conn, p, refresh(conn, p, params["refresh"]))
+      is_nil(client_id(p)) ->
+        send_resp(conn, 503, not_configured(p))
+
+      # Turnstile on: a start needs a passed check (POST /auth/start) — one
+      # each; without, back to the sign-in screen, whose tap runs it. The
+      # silent refresh of someone signed in is already known: none needed
+      HoodrideWeb.Turnstile.on?() and not refreshing and not checked?(conn) ->
+        redirect(conn, to: "/")
+
+      # the providers asked us to wait (throttling): said now, not after a
+      # trip to Google that would end the same way
+      Hoodride.SignInFailures.paused?() ->
+        busy(conn, refreshing, Hoodride.SignInFailures.wait_ms())
+
+      true ->
+        start(conn, p, refresh(conn, p, params["refresh"]))
     end
   end
 
   def request(conn, _), do: send_resp(conn, 404, "unknown provider")
+
+  # POST /auth/start — {provider, token}: the app's Turnstile pass, checked
+  # with Cloudflare (HoodrideWeb.Turnstile); passed, ONE sign-in start is
+  # allowed for a minute, and the app goes there. Off: straight there.
+  def checked_start(conn, %{"provider" => p} = params) when p in @providers do
+    cond do
+      not HoodrideWeb.Turnstile.on?() ->
+        json(conn, %{go: "/auth/" <> p})
+
+      HoodrideWeb.Turnstile.verify(params["token"], conn.remote_ip) == :ok ->
+        conn
+        |> put_session(
+          :turnstile_ok,
+          System.os_time(:second) + div(Hoodride.Limits.sign_in_check_ms(), 1000)
+        )
+        |> json(%{go: "/auth/" <> p})
+
+      true ->
+        conn |> put_status(403) |> json(%{error: "check_failed"})
+    end
+  end
+
+  def checked_start(conn, _), do: conn |> put_status(404) |> json(%{error: "unknown_provider"})
+
+  defp checked?(conn) do
+    case get_session(conn, :turnstile_ok) do
+      until when is_integer(until) -> until >= System.os_time(:second)
+      _ -> false
+    end
+  end
 
   # back to the app with the refresh's outcome (googlerefresh.js shows it)
   defp back(conn, why), do: redirect(conn, to: "/?refresh=" <> why)
@@ -96,22 +140,36 @@ defmodule HoodrideWeb.AuthController do
     end
   end
 
-  # the address the failed-code limit counts (IPv4, or IPv6 per /64)
-  defp address(conn), do: HoodrideWeb.ClientIp.budget_key(conn.remote_ip)
-
+  # Google or Facebook can't be asked right now (they're throttling us, or
+  # the used-state table is full): someone signed in goes back to the app;
+  # anyone else gets a short page in their language, with Retry-After. The
+  # session is left as it is — the same return works again after the wait
+  # (its state was given back).
   # sobelow_skip ["XSS.SendResp"]
-  defp too_many_failures(conn) do
-    # (plain text, in the reader's language — Hoodride.I18n.t)
-    lang = HoodrideWeb.Lang.pick(conn)
+  defp busy(conn, refreshing, wait_ms) do
+    conn = configure_session(conn, ignore: true)
+    signed_in = conn.assigns[:current_user] != nil
 
-    conn
-    |> HoodrideWeb.Lang.vary()
-    |> put_resp_header("cache-control", "no-store")
-    |> put_resp_content_type("text/plain")
-    |> send_resp(
-      429,
-      Hoodride.I18n.t(lang, "Too many failed sign-ins from your network — try again later.")
-    )
+    cond do
+      signed_in and refreshing ->
+        back(conn, "blocked")
+
+      signed_in ->
+        redirect(conn, to: "/")
+
+      true ->
+        lang = HoodrideWeb.Lang.pick(conn)
+
+        conn
+        |> HoodrideWeb.Lang.vary()
+        |> put_resp_header("cache-control", "no-store")
+        |> put_resp_header("retry-after", Integer.to_string(max(div(wait_ms + 999, 1000), 1)))
+        |> put_resp_content_type("text/plain")
+        |> send_resp(
+          503,
+          Hoodride.I18n.t(lang, "Sign-in is busy right now — try again in a moment.")
+        )
+    end
   end
 
   defp start(conn, _p, {:back, why}), do: back(conn, why)
@@ -140,8 +198,14 @@ defmodule HoodrideWeb.AuthController do
       |> URI.encode_query()
 
     conn
+    # a passed check allows one start: this one
+    |> delete_session(:turnstile_ok)
     |> put_session(:oauth_state, state)
     |> put_session(:oauth_verifier, verifier)
+    # which provider it's for, and when it started: a state is good once,
+    # for 15 minutes, at its own provider's return (Hoodride.SignInStates)
+    |> put_session(:oauth_provider, p)
+    |> put_session(:oauth_at, System.os_time(:second))
     # a refresh's outcome is reported back to the app ("/?refresh=failed")
     |> put_session(:oauth_refresh, mode)
     |> redirect(external: @auth_urls[p] <> "?" <> params)
@@ -153,69 +217,23 @@ defmodule HoodrideWeb.AuthController do
     expected = get_session(conn, :oauth_state)
     verifier = get_session(conn, :oauth_verifier)
     refreshing = get_session(conn, :oauth_refresh) != nil
-    conn = forget_sign_in(conn)
+    issued = get_session(conn, :oauth_at)
 
-    cond do
-      # Google isn't asked anything while this address is blocked — a
-      # refresh (still signed in) goes back to the app…
-      Hoodride.SignInFailures.blocked?(address(conn)) and refreshing ->
-        back(conn, "blocked")
-
-      Hoodride.SignInFailures.blocked?(address(conn)) ->
-        too_many_failures(conn)
-
-      # …nor without the state this browser was given (RFC 6819 §4.4.1.12).
-      # Only TEXT: a crafted `state[]=x` or `code[]=x` used to crash the
-      # request (server review, 2026-11-08)
-      not (is_binary(expected) and is_binary(verifier) and is_binary(state) and
-             is_binary(code) and Plug.Crypto.secure_compare(expected, state)) ->
-        failed(conn, refreshing, 403, "Sign-in session mismatch — go back and try again.")
-
-      true ->
-        case exchange(conn, p, code, verifier, refresh_only(conn, refreshing)) do
-          # a REFRESH completes only as the account signed in NOW (A2,
-          # 2026-11-11): the hint is only a hint — at Google's picker someone
-          # with two Google accounts can pick the other. Then no one is
-          # signed in and no account is made or changed (exchange stops
-          # before writing). Signed out everywhere meanwhile (another
-          # device): no one — the refresh mustn't sign this browser back in
-          :other_account when conn.assigns.current_user != nil ->
-            back(conn, "other")
-
-          :other_account ->
-            redirect(conn, to: "/")
-
-          # an ACCOUNT, nothing else: a provider's error reply also comes back
-          # as {:ok, response} (Req), and was once signed in — a crash (500)
-          # instead of the friendly page when Google was down
-          {:ok, %Accounts.User{} = user} ->
-            case Auth.sign_in(conn, user) do
-              {:ok, conn} ->
-                redirect(conn, to: "/")
-
-              :error ->
-                failed(
-                  conn,
-                  refreshing,
-                  503,
-                  "#{@labels[p]} sign-in failed — go back and try again."
-                )
-            end
-
-          # our database couldn't save you: the same friendly page, not a raw error
-          :db_failed ->
-            failed(conn, refreshing, 503, "#{@labels[p]} sign-in failed — go back and try again.")
-
-          # the provider refused the code (made up, used, expired): counted —
-          # a refresh's too (someone signed in could otherwise try made-up
-          # codes without ever being blocked)
-          {:error, :rejected} ->
-            Hoodride.SignInFailures.record(address(conn))
-            failed(conn, refreshing, 502, "#{@labels[p]} sign-in failed — go back and try again.")
-
-          _ ->
-            failed(conn, refreshing, 502, "#{@labels[p]} sign-in failed — go back and try again.")
-        end
+    # the provider isn't asked anything without the state this browser was
+    # given (RFC 6819 §4.4.1.12) — for THIS provider, under 15 minutes old.
+    # Only TEXT: a crafted `state[]=x` or `code[]=x` used to crash the
+    # request (server review, 2026-11-08)
+    if is_binary(expected) and is_binary(verifier) and is_binary(state) and is_binary(code) and
+         get_session(conn, :oauth_provider) == p and Hoodride.SignInStates.fresh?(issued) and
+         Plug.Crypto.secure_compare(expected, state) do
+      once(conn, p, code, state, issued, verifier, refreshing)
+    else
+      failed(
+        forget_sign_in(conn),
+        refreshing,
+        403,
+        "Sign-in session mismatch — go back and try again."
+      )
     end
   end
 
@@ -226,6 +244,91 @@ defmodule HoodrideWeb.AuthController do
     refresh = get_session(conn, :oauth_refresh)
     conn = forget_sign_in(conn)
     if refresh, do: redirect(conn, to: "/?refresh=failed"), else: redirect(conn, to: "/")
+  end
+
+  # The state, used up ONCE (RFC 9700) before the provider is asked: the
+  # session is a cookie the browser keeps, so a saved copy replayed the same
+  # state — each time a call to Google (Hoodride.SignInStates). A repeat (a
+  # double submit, a lost reply and a retry) goes home and leaves the
+  # session alone: rewriting it could sign out the one that won.
+  defp once(conn, p, code, state, issued, verifier, refreshing) do
+    case Hoodride.SignInStates.consume(state, issued) do
+      :used ->
+        conn |> configure_session(ignore: true) |> redirect(to: "/")
+
+      :full ->
+        busy(conn, refreshing, 5_000)
+
+      :ok ->
+        if Hoodride.SignInFailures.paused?() do
+          # the providers asked us to wait: not used after all
+          Hoodride.SignInStates.give_back(state)
+          busy(conn, refreshing, Hoodride.SignInFailures.wait_ms())
+        else
+          exchanged(forget_sign_in(conn), p, code, verifier, refreshing)
+        end
+    end
+  end
+
+  defp exchanged(conn, p, code, verifier, refreshing) do
+    case exchange(conn, p, code, verifier, refresh_only(conn, refreshing)) do
+      # a REFRESH completes only as the account signed in NOW (A2,
+      # 2026-11-11): the hint is only a hint — at Google's picker someone
+      # with two Google accounts can pick the other. Then no one is
+      # signed in and no account is made or changed (exchange stops
+      # before writing). Signed out everywhere meanwhile (another
+      # device): no one — the refresh mustn't sign this browser back in
+      :other_account when conn.assigns.current_user != nil ->
+        back(conn, "other")
+
+      :other_account ->
+        redirect(conn, to: "/")
+
+      # an ACCOUNT, nothing else: a provider's error reply also comes back
+      # as {:ok, response} (Req), and was once signed in — a crash (500)
+      # instead of the friendly page when Google was down
+      {:ok, %Accounts.User{} = user} ->
+        case Auth.sign_in(conn, user) do
+          {:ok, conn} ->
+            redirect(conn, to: "/")
+
+          :error ->
+            failed(
+              conn,
+              refreshing,
+              503,
+              "#{@labels[p]} sign-in failed — go back and try again."
+            )
+        end
+
+      # our database couldn't save you: the same friendly page, not a raw error
+      :db_failed ->
+        failed(conn, refreshing, 503, "#{@labels[p]} sign-in failed — go back and try again.")
+
+      # the provider refused THE CODE (made up, used, expired): counted
+      # site-wide — watched, never blocking (Hoodride.SignInFailures)
+      {:error, :rejected} ->
+        Hoodride.SignInFailures.record()
+        failed(conn, refreshing, 502, "#{@labels[p]} sign-in failed — go back and try again.")
+
+      # the provider throttling us: its wait, or backoff (Google's rule)
+      {:throttled, retry_ms} ->
+        Hoodride.SignInFailures.throttled(p, retry_ms)
+        busy(conn, refreshing, Hoodride.SignInFailures.wait_ms())
+
+      # OUR request refused (a wrong secret, a changed redirect…): never
+      # counted against anyone — the owner must look (deploy/errors.sh)
+      {:setup, status, error} ->
+        Logger.error(
+          "sign-in: #{p} refused our request (#{status} #{error}) — " <>
+            "check its keys and settings (GOOGLE_SETUP.md)"
+        )
+
+        failed(conn, refreshing, 502, "#{@labels[p]} sign-in failed — go back and try again.")
+
+      _ ->
+        failed(conn, refreshing, 502, "#{@labels[p]} sign-in failed — go back and try again.")
+    end
   end
 
   # A sign-in that didn't work. Someone still signed in goes back to the app
@@ -249,26 +352,66 @@ defmodule HoodrideWeb.AuthController do
     |> delete_session(:oauth_state)
     |> delete_session(:oauth_verifier)
     |> delete_session(:oauth_refresh)
+    |> delete_session(:oauth_provider)
+    |> delete_session(:oauth_at)
   end
 
-  # the token endpoint's answer: a token; the code REFUSED (a 4xx — made
-  # up, used, expired: counted, Hoodride.SignInFailures); or anything else
-  # (the provider down, a network error) — not counted
-  # (only a token that is TEXT: anything else crashed the next request —
-  # and it isn't the code being refused either, so it isn't counted)
-  defp token({:ok, %{status: 200, body: %{"access_token" => token}}}) when is_binary(token),
-    do: {:token, token}
+  # The token endpoint's answer (review 2026-11-14 — only a refused CODE
+  # counts; anything else said what it is):
+  #   * a token (TEXT only: anything else crashed the next request);
+  #   * THE CODE refused — Google's `invalid_grant` (RFC 6749 §5.2), and
+  #     Facebook's code 100 (it never says invalid_grant): {:error, :rejected};
+  #   * throttling — a 429, Facebook's 4, 17, 32, 613: {:throttled, ms | nil};
+  #   * any other 4xx: OUR request refused (a wrong secret, a changed
+  #     redirect address) — {:setup, status, error};
+  #   * anything else (the provider down, a network error): as it is.
+  defp token(_p, {:ok, %{status: 200, body: %{"access_token" => token}}}) when is_binary(token) do
+    Hoodride.SignInFailures.answered()
+    {:token, token}
+  end
 
-  defp token({:ok, %{status: 200}} = malformed), do: malformed
-  defp token({:ok, %{status: status}}) when status in 400..499, do: {:error, :rejected}
-  defp token(other), do: other
+  defp token(_p, {:ok, %{status: 200}} = malformed), do: malformed
+  defp token(_p, {:ok, %{status: 429} = r}), do: {:throttled, retry_after_ms(r)}
+
+  defp token("google", {:ok, %{status: 400, body: %{"error" => "invalid_grant"}}}),
+    do: {:error, :rejected}
+
+  defp token("facebook", {:ok, %{status: 400, body: %{"error" => %{"code" => 100}}}}),
+    do: {:error, :rejected}
+
+  defp token("facebook", {:ok, %{body: %{"error" => %{"code" => c}}} = r})
+       when c in [4, 17, 32, 613],
+       do: {:throttled, retry_after_ms(r)}
+
+  defp token(_p, {:ok, %{status: status, body: body}}) when status in 400..499,
+    do: {:setup, status, error_word(body)}
+
+  defp token(_p, other), do: other
+
+  # the provider's Retry-After (seconds), as ms — or nil
+  defp retry_after_ms(r) do
+    with [v | _] <- Req.Response.get_header(r, "retry-after"),
+         {s, ""} when s >= 0 and s <= 3600 <- Integer.parse(String.trim(v)) do
+      s * 1000
+    else
+      _ -> nil
+    end
+  end
+
+  # the provider's error, as one plain word for the log (never its text)
+  defp error_word(%{"error" => e}) when is_binary(e), do: safe_word(e)
+  defp error_word(%{"error" => %{"code" => c}}) when is_integer(c), do: "code #{c}"
+  defp error_word(_), do: "?"
+
+  defp safe_word(e),
+    do: if(Regex.match?(~r/\A[a-z_]{1,40}\z/, e), do: e, else: "?")
 
   # only the database being unable to answer is caught; any other error (a
   # bug) still crashes visibly
   defp exchange(conn, p, code, verifier, only) do
     exchange_code(conn, p, code, verifier, only)
   rescue
-    _ in [DBConnection.ConnectionError, Exqlite.Error] -> :db_failed
+    e -> if Hoodride.Repo.down?(e), do: :db_failed, else: reraise(e, __STACKTRACE__)
   end
 
   # A refresh: the Google ID it must come back as — the account signed in
@@ -297,6 +440,7 @@ defmodule HoodrideWeb.AuthController do
   defp exchange_code(conn, "google", code, verifier, only) do
     with {:token, token} <-
            token(
+             "google",
              Req.post(
                @google_token,
                [
@@ -340,6 +484,7 @@ defmodule HoodrideWeb.AuthController do
   defp exchange_code(conn, "facebook", code, verifier, only) do
     with {:token, token} <-
            token(
+             "facebook",
              Req.post(
                @fb_token,
                [
@@ -441,8 +586,10 @@ defmodule HoodrideWeb.AuthController do
       _ -> conn |> put_status(503) |> json(%{error: "unavailable"})
     end
   rescue
-    _ in [DBConnection.ConnectionError, Exqlite.Error] ->
-      conn |> put_status(503) |> json(%{error: "unavailable"})
+    e ->
+      if Hoodride.Repo.down?(e),
+        do: conn |> put_status(503) |> json(%{error: "unavailable"}),
+        else: reraise(e, __STACKTRACE__)
   end
 
   @loopback [{127, 0, 0, 1}, {0, 0, 0, 0, 0, 0, 0, 1}]
@@ -543,7 +690,7 @@ defmodule HoodrideWeb.AuthController do
   defp account_terms(user_id) do
     Accounts.get_user(user_id) || %{}
   rescue
-    _ in [DBConnection.ConnectionError, Exqlite.Error] -> %{}
+    e -> if Hoodride.Repo.down?(e), do: %{}, else: reraise(e, __STACKTRACE__)
   end
 
   defp person(%{id: id, name: name, photo: photo}), do: %{id: id, name: name, photo: photo}

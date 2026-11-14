@@ -18,7 +18,17 @@ defmodule HoodrideWeb.ClientErrorTest do
     "browser" => "Chrome/Android"
   }
 
+  # each report from its own address (a few per address a minute: the
+  # per-address test sets its own) — so the other tests' reports all count
+  defp post_report(%{remote_ip: {127, 0, 0, 1}} = conn, body),
+    do: post(%{conn | remote_ip: fresh_ip()}, "/api/client-error", body)
+
   defp post_report(conn, body), do: post(conn, "/api/client-error", body)
+
+  defp fresh_ip do
+    n = System.unique_integer([:positive])
+    {10, rem(div(n, 65_536), 256), rem(div(n, 256), 256), rem(n, 256)}
+  end
 
   test "a report: 204, ONE log line with what broke", %{conn: conn} do
     log = capture_log(fn -> assert post_report(conn, @good).status == 204 end)
@@ -60,6 +70,28 @@ defmodule HoodrideWeb.ClientErrorTest do
 
     assert length(Regex.scan(~r/client error: TypeError: flood/, log)) == 3
     assert length(Regex.scan(~r/client error: over 3 a minute/, log)) == 1
+  end
+
+  # (crash review 2026-11-14) one address used to be able to fill the whole
+  # minute's cap — every real report from everyone else dropped. Now each
+  # address gets a few (the app itself sends at most 5 a minute), so the
+  # rest of the cap stays for everyone else
+  test "one address can't fill the minute: past its few, others still get through", %{conn: conn} do
+    Hoodride.TestHelpers.scrub_live_state()
+    flood = %{conn | remote_ip: {203, 0, 113, 7}}
+    other = %{build_conn() | remote_ip: {198, 51, 100, 9}}
+
+    log =
+      capture_log(fn ->
+        for i <- 1..100,
+            do: assert(post_report(flood, Map.put(@good, "message", "flood #{i}x")).status == 204)
+
+        assert post_report(other, Map.put(@good, "message", "real one")).status == 204
+      end)
+
+    flooded = length(Regex.scan(~r/client error: TypeError: flood/, log))
+    assert flooded >= 5 and flooded <= 10, "logged from the one address: #{flooded}"
+    assert log =~ "client error: TypeError: real one"
   end
 
   # (mutation kills, 2026-11-10)

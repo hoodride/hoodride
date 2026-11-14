@@ -218,6 +218,10 @@ msgid "Couldn't accept"
 msgstr "Imeshindwa kukubali"
 
 #: priv/static/app.js
+msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr "Imeshindwa kukagua kivinjari chako — ruhusu challenges.cloudflare.com, au jaribu kivinjari kingine"
+
+#: priv/static/app.js
 msgid "Couldn't copy"
 msgstr "Imeshindwa kunakili"
 
@@ -671,6 +675,10 @@ msgstr "Onyesha au ficha wachangiaji wa ramani"
 msgid "Sign out"
 msgstr "Ondoka"
 
+#: lib/hoodride_web/controllers/auth_controller.ex
+msgid "Sign-in is busy right now — try again in a moment."
+msgstr "Kuingia kuna msongamano sasa hivi — jaribu tena baada ya muda mfupi."
+
 #: priv/static/app.js
 msgid "Signing in…"
 msgstr "Inaingia…"
@@ -713,6 +721,10 @@ msgstr "Abiria huyo hatafuti usafiri tena"
 msgid "That's a different Google account — sign out first to use it"
 msgstr "Hiyo ni akaunti nyingine ya Google — ondoka kwanza ili uitumie"
 
+#: priv/static/app.js
+msgid "This browser can't show the map — turn on hardware acceleration in its settings, or try another browser"
+msgstr "Kivinjari hiki hakiwezi kuonyesha ramani — washa uongezaji kasi wa maunzi kwenye mipangilio yake, au jaribu kivinjari kingine"
+
 #: priv/static/index.html
 msgid "This can't be undone. Your account is removed, you're taken off the map, your conversations are closed, and you're signed out on every device. Signing in again later starts a new account."
 msgstr "Hatua hii haiwezi kutenduliwa. Akaunti yako itafutwa, utaondolewa kwenye ramani, mazungumzo yako yatafungwa na utatolewa kwenye vifaa vyote. Ukiingia tena baadaye, utaanza akaunti mpya."
@@ -724,10 +736,6 @@ msgstr "Ukurasa huu haupo."
 #: priv/static/app.js
 msgid "Too late — the request was withdrawn"
 msgstr "Umechelewa — ombi limeondolewa"
-
-#: lib/hoodride_web/controllers/auth_controller.ex
-msgid "Too many failed sign-ins from your network — try again later."
-msgstr "Majaribio mengi mno ya kuingia yameshindwa kutoka kwenye mtandao wako — jaribu tena baadaye."
 
 #: priv/static/app.js
 msgid "Try again"

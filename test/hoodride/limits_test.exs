@@ -15,6 +15,10 @@ defmodule Hoodride.LimitsTest do
     "page" => "rows read per step when walking a table (Hoodride.ETS)",
     "repair_fresh_s" => "the index repair skips rows written this recently (a write in flight)",
     "max_pause_ms" => "the map recount pauses the writers at most this long",
+    "reach_wait" =>
+      "how long the map channel gets to say whether someone is on your screen (HoodrideWeb.ReachBusyTest)",
+    "clock_skew_s" =>
+      "the wall clock moving this far apart from the steady one between two cleanup passes counts as a jump (Hoodride.ClockJumpTest)",
     "writer_wait" =>
       "the cleanup pass waits on a map writer at most this long (Hoodride.SweeperStallTest)",
     "pause_target_us" => "…aiming for this per pause",

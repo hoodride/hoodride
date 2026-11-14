@@ -108,3 +108,70 @@ keys are set. (hoodride.app doesn't use it.)
 
 Built to Facebook's documentation but not yet tried against real Facebook:
 sign in once yourself before inviting anyone.
+
+## Turnstile: a bot check on sign-in (optional, recommended)
+
+Cloudflare Turnstile tells a person from a script when someone taps
+**Continue with Google** (or Facebook). For nearly everyone it's invisible;
+now and then it shows one "Verify you are human" checkbox. Scripts can't
+start sign-ins in bulk, so they can't make your server send Google made-up
+codes, or crowd out real people on a shared network (a café, a campus). It's
+free, with no limit on checks (Cloudflare's plans page).
+
+It's **off until both keys are set**, so you can deploy first and add the
+keys whenever you like. Signing in works exactly as before until then.
+
+**Before you switch it on:** add a line to your privacy policy, for example:
+"The sign-in screen uses Cloudflare Turnstile to tell people from automated
+programs. Cloudflare processes technical information about your browser
+and connection for this check, under its own privacy policy." (Have your
+own wording reviewed; the privacy page exists in every language you offer.)
+
+1. **Cloudflare dashboard → Turnstile → Add widget.**
+   - Widget name: anything, e.g. `Hood Ride sign-in`.
+   - Hostnames: your domain (e.g. `hoodride.app`).
+   - Widget mode: **Managed** (invisible unless Cloudflare wants a click).
+   - Pre-clearance: **No**.
+   - Create. Copy the **Site Key** and the **Secret Key**.
+2. **On the server**, add both to the settings file (it's root's alone, so
+   edit it with sudo):
+
+   ```bash
+   sudoedit /etc/hoodride/env
+   ```
+
+   ```
+   TURNSTILE_SITE_KEY=0x4AAAA…   # public: it's put on the page
+   TURNSTILE_SECRET_KEY=0x4AAAA… # the server's only: never share it
+   ```
+
+3. **Restart:** `sudo systemctl restart hoodride` (or deploy).
+4. **Check it's on:** open your site signed out. The page's source has
+   `<meta name="hoodride-turnstile" …>`, and tapping **Continue with Google**
+   still takes you to Google (after a second's check). Typing
+   `https://YOUR-DOMAIN/auth/google` straight into the address bar now
+   lands back on the sign-in screen: a start needs a passed check.
+
+**Turning it off:** remove the two lines and restart.
+
+**If something's wrong:**
+
+- *"Couldn't check your browser — allow challenges.cloudflare.com…"*: that
+  browser blocks Cloudflare's check (an ad blocker, a strict privacy
+  setting). Allowing `challenges.cloudflare.com`, or another browser, fixes it.
+- *Sign-in goes back to the sign-in screen every time*: the hostname in the
+  widget doesn't match your site (step 1), or the secret key is wrong. The
+  server's log says nothing in that case (a failed check isn't an error);
+  check both keys.
+- *Cloudflare's check itself is down*: sign-in is let through, and the log
+  says `turnstile: Cloudflare's check unavailable` (`deploy/errors.sh`
+  shows it). It never locks people out.
+
+**For tests:** Cloudflare publishes test keys: site key
+`1x00000000000000000000AA` with secret `1x0000000000000000000000000000000AA`
+always pass; `2x00000000000000000000AB` always fails. The app's own tests
+(`test/hoodride_web/turnstile_test.exs`, `test_browser/turnstile.mjs`) use
+them with Cloudflare's answer stood in, so they never leave the machine.
+
+**Where it lives:** `lib/hoodride_web/turnstile.ex` (the server's check),
+`priv/static/turnstile.js` (the page's), ARCHITECTURE.md "Sign-in".

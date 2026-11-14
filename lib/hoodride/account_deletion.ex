@@ -68,7 +68,7 @@ defmodule Hoodride.AccountDeletion do
 
     {:ok, photo}
   rescue
-    _ in [DBConnection.ConnectionError, Exqlite.Error] -> {:error, :failed}
+    e -> if Hoodride.Repo.down?(e), do: {:error, :failed}, else: reraise(e, __STACKTRACE__)
   end
 
   defp after_erase(user_id) do

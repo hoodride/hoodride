@@ -13,6 +13,21 @@ defmodule Hoodride.Sweeper do
   @every_ms 60_000
   @request_ttl div(Hoodride.Limits.request_expiry_ms(), 1000)
   @presence_grace div(Hoodride.Limits.presence_grace_ms(), 1000)
+  # the longest the pass waits on a map writer (a ride's start waits as long:
+  # :ride_geo_timeout)
+  @writer_wait 1_000
+  # how far the wall clock may move apart from the steady one between two
+  # passes before it counts as a jump
+  @clock_skew_s 30
+  # the steps that judge by the wall clock — skipped in a pass after it
+  # jumped (handle_info :sweep)
+  @timed_steps [
+    :sign_in_states,
+    :expire_stale_requests,
+    :sweep_stale_geo,
+    :sweep_empty_room_chats,
+    :session_tokens
+  ]
 
   def start_link(opts) do
     every =
@@ -25,9 +40,21 @@ defmodule Hoodride.Sweeper do
   def init(every), do: {:ok, schedule(every)}
 
   @impl true
-  def handle_info(:sweep, %{every: every}) do
-    sweep_now()
-    {:noreply, schedule(every)}
+  def handle_info(:sweep, %{every: every} = state) do
+    now = clock()
+    jump = clock_jump_s(state.clock, now)
+
+    if jump > @clock_skew_s do
+      Logger.warning(
+        "clock jumped #{jump} s since the last pass — its time-based cleanup skipped"
+      )
+
+      Hoodride.GeoWriter.short_waits(@writer_wait, fn -> run_steps(steps(skip_timed: true)) end)
+    else
+      sweep_now()
+    end
+
+    {:noreply, %{schedule(every) | clock: now}}
   end
 
   # a shard's pause reply that landed after the recount gave up on it
@@ -49,10 +76,6 @@ defmodule Hoodride.Sweeper do
   @request_pairs [{{:"$1", :"$2", :_}, [], [{{:"$1", :"$2"}}]}]
   @conversation_keys [{{:"$1", :_}, [], [:"$1"]}]
 
-  # the longest the pass waits on a map writer (a ride's start waits as long:
-  # :ride_geo_timeout)
-  @writer_wait 1_000
-
   @doc """
   One synchronous sweep — used by the timer and by tests. Its map-writer
   waits are short (#{@writer_wait} ms, then none once one runs out:
@@ -68,7 +91,13 @@ defmodule Hoodride.Sweeper do
   sign-ins, rate rows, chats piling up on a 1 GB server; the recount
   never running).
   """
-  def steps do
+  def steps(opts \\ []) do
+    if opts[:skip_timed],
+      do: Enum.reject(all_steps(), fn {name, _} -> name in @timed_steps end),
+      else: all_steps()
+  end
+
+  defp all_steps do
     [
       {:expire_stale_requests, &expire_stale_requests/0},
       {:heal_orphan_ride_slots, &heal_orphan_ride_slots/0},
@@ -84,6 +113,8 @@ defmodule Hoodride.Sweeper do
       {:rate_budget, &Hoodride.RateBudget.sweep/0},
       # lifted sign-in blocks and finished failure windows
       {:sign_in_failures, &Hoodride.SignInFailures.sweep/0},
+      # sign-in states past their 15 minutes
+      {:sign_in_states, &Hoodride.SignInStates.sweep/0},
       # sign-ins past their 30 days (or their year): gone from memory
       {:session_tokens, &Hoodride.SessionTokens.sweep/0},
       # session-stamp rows of accounts with no device connected for a day
@@ -197,15 +228,19 @@ defmodule Hoodride.Sweeper do
   # Resolution reuses the normal paths, so everyone gets the normal notice.
   @doc false
   def heal_unlawful_requests do
-    # "has a seat" is a yes/no question: member/2 answers it without copying
-    # the seat row (same meaning as ride_id_of_user(id) != nil)
+    # in a REAL ride — not one still starting (:pending): its start can
+    # still fail, and its own start-up withdraws what it must. Counted as a
+    # ride, a pass in those milliseconds cancelled the person's other
+    # request (their app went on showing it) or declined the riders waiting
+    # on them, before a start that then failed (crash review 2026-11-14;
+    # StartingRideHealTest)
     each_match(:ride_requests, @request_pairs, fn {rider_id, driver_id} ->
       cond do
-        :ets.member(:rides_by_user, rider_id) ->
+        in_ride?(rider_id) ->
           repaired("unlawful request")
           Hoodride.Requests.cancel(rider_id)
 
-        :ets.member(:rides_by_user, driver_id) or not Hoodride.Geo.driver_on_map?(driver_id) ->
+        in_ride?(driver_id) or not Hoodride.Geo.driver_on_map?(driver_id) ->
           repaired("unlawful request")
           Hoodride.Requests.decline(driver_id, rider_id)
 
@@ -245,8 +280,23 @@ defmodule Hoodride.Sweeper do
     :ok
   end
 
-  defp schedule(:manual), do: %{every: :manual, timer: nil}
-  defp schedule(ms), do: %{every: ms, timer: Process.send_after(self(), :sweep, ms)}
+  defp schedule(:manual), do: %{every: :manual, timer: nil, clock: clock()}
+
+  defp schedule(ms),
+    do: %{every: ms, timer: Process.send_after(self(), :sweep, ms), clock: clock()}
+
+  # A JUMP of the wall clock (crash review 2026-11-14): cars, requests and
+  # chats are aged by it, so when it steps — booting with a wrong clock that
+  # time sync then corrects — every age jumps at once, and a pass took every
+  # car off the map, expired every request, closed chats. The steady clock
+  # never jumps: the wall clock's move since the last pass, less the steady
+  # clock's, is the jump. Over @clock_skew_s, that pass skips its
+  # time-based steps; live cars and rides refresh their times within
+  # seconds, so the next pass judges by the new clock (ClockJumpTest).
+  defp clock, do: {System.system_time(:second), System.monotonic_time(:second)}
+
+  @doc false
+  def clock_jump_s({wall0, mono0}, {wall1, mono1}), do: abs(wall1 - wall0 - (mono1 - mono0))
 
   @doc false
   def expire_stale_requests do
@@ -310,6 +360,8 @@ defmodule Hoodride.Sweeper do
       end
     end)
   end
+
+  defp in_ride?(user_id), do: is_binary(Hoodride.Rides.ride_id_of_user(user_id))
 
   defp ride_between?(a, b) do
     ride_a = Hoodride.Rides.ride_id_of_user(a)

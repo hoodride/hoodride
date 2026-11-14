@@ -146,6 +146,15 @@ html.resuming #screen-login .boot-status {
   to { visibility: visible; }
 }
 
+/* Cloudflare's check (HoodTurnstile): only takes room when it shows */
+.turnstile-box:empty {
+  display: none;
+}
+.turnstile-box {
+  display: flex;
+  justify-content: center;
+}
+
 .auth-buttons {
   display: flex;
   flex-direction: column;

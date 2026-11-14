@@ -104,7 +104,11 @@ defmodule HoodrideWeb.ServerTruthTest do
             String.duplicate("👨‍👩‍👧‍👦", 500),
             String.duplicate("🏴󠁧󠁢󠁥󠁮󠁧󠁿", 500),
             String.duplicate("👩🏻‍❤️‍💋‍👨🏼", 500),
-            String.duplicate("க்ஷ்", 250),
+            # (with spaces, as written: run together with no break, 250 of
+            # these join into ONE 3,000-byte character by Unicode's rules —
+            # past the one-character limit, and no real text: 2026-11-14)
+            String.duplicate("க்ஷ் ", 200),
+            "நீங்கள் எங்கே இருக்கிறீர்கள்?",
             String.duplicate("क्ष्म्य", 500)
           ] do
         ref = push(chan, "send_msg", %{"to" => p.id, "text" => text})
@@ -129,6 +133,31 @@ defmodule HoodrideWeb.ServerTruthTest do
 
       ref = push(chan, "send_msg", %{"to" => p.id, "text" => "hi a" <> String.duplicate("́", 30)})
       assert_reply ref, :ok
+    end
+
+    # (crash review 2026-11-14) the 30-in-a-row rule was dodged by breaking
+    # the row with characters that aren't marks but still join the same
+    # letter (a zero-width joiner, variation selectors, tags): ~9,000 marks
+    # on one letter, under 20 KB. Now one character can't be over 100 bytes
+    # — the heaviest real emoji is 35, a flag 28
+    test "marks split up by joiners on one letter: refused; the heaviest real emoji pass",
+         %{chan: chan, peer: p} do
+      for joiner <- ["\u200D", "\u200C", "\uFE0F", "\u{E0041}"] do
+        text = "a" <> String.duplicate(String.duplicate("\u0301", 30) <> joiner, 300)
+        assert byte_size(text) < Hoodride.Limits.message_bytes()
+        ref = push(chan, "send_msg", %{"to" => p.id, "text" => text})
+        assert_reply ref, :error, %{reason: "stacked_marks"}
+      end
+
+      for real <- [
+            "\u{1F469}\u{1F3FB}\u200D\u2764\uFE0F\u200D\u{1F48B}\u200D\u{1F468}\u{1F3FC}",
+            "\u{1F3F4}\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F}",
+            "\u{1F468}\u{1F3FB}\u200D\u{1F469}\u{1F3FB}\u200D\u{1F467}\u{1F3FB}\u200D\u{1F466}\u{1F3FB}",
+            "\u0915\u094D\u0937\u094D\u092E\u094D\u092F"
+          ] do
+        ref = push(chan, "send_msg", %{"to" => p.id, "text" => "hi " <> real})
+        assert_reply ref, :ok
+      end
     end
   end
 

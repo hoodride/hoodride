@@ -28,17 +28,36 @@ defmodule HoodrideWeb.HttpBudget do
   def call(conn, opts) do
     case Hoodride.Limits.budget(opts[:config]) do
       nil -> conn
-      limits -> check(conn, limits[:per_minute], limits[:burst], opts[:name])
+      limits -> check(conn, limits[:per_minute], limits[:burst], opts[:name], key(conn, opts))
     end
   end
 
-  defp check(conn, per_minute, burst, name) do
-    key =
-      case conn.assigns[:current_user] do
-        %{id: id} -> {:http_user, id}
-        _ -> {:http, HoodrideWeb.ClientIp.budget_key(conn.remote_ip)}
-      end
+  # `by: :address` (sign-in): the ADDRESS, signed in or not — signed in,
+  # each account had its own budget there, so a few accounts could flood an
+  # address with sign-in starts (review 2026-11-14). The silent refresh of
+  # someone signed in excepted: it has its own per-account limit
+  # (AuthController, :refresh_budget).
+  defp key(conn, opts) do
+    user = conn.assigns[:current_user]
 
+    cond do
+      opts[:by] == :address and not (user != nil and refresh?(conn)) -> address(conn)
+      user != nil -> {:http_user, user.id}
+      true -> address(conn)
+    end
+  end
+
+  defp address(conn), do: {:http, HoodrideWeb.ClientIp.budget_key(conn.remote_ip)}
+
+  # a refresh's start (`?refresh=`) or its return (the session remembers it)
+  defp refresh?(conn) do
+    conn = fetch_query_params(conn)
+
+    conn.query_params["refresh"] in ["1", "silent"] or
+      get_session(conn, :oauth_refresh) != nil
+  end
+
+  defp check(conn, per_minute, burst, name, key) do
     case Hoodride.RateBudget.spend(key, name, per_minute, burst) do
       {:ok, _} ->
         conn

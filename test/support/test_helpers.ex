@@ -20,6 +20,7 @@ defmodule Hoodride.TestHelpers do
     :geo_members,
     :rate_budgets,
     :sign_in_failures,
+    :sign_in_states,
     :socket_slots,
     :session_highest
   ]

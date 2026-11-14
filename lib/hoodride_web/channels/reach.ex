@@ -25,15 +25,35 @@ defmodule HoodrideWeb.Reach do
 
   alias Hoodride.{Geo, Roles}
 
+  # how long the map channel gets to say "on your screen?" (a quick ETS
+  # read normally; slow only while it waits on the database for a name)
+  @reach_wait 1_000
+
   @spec check(Phoenix.Socket.t(), integer) :: :related | :cold | {:error, map}
   def check(socket, other) do
     me = socket.assigns.user_id
 
     cond do
       Hoodride.Chat.exists?(me, other) or Hoodride.Requests.open_between?(me, other) -> :related
-      on_screen?(socket, me, other) -> :cold
-      out_of_view?(me, other) -> {:error, %{reason: "out_of_view"}}
-      true -> {:error, %{reason: "unavailable"}}
+      true -> cold(socket, me, other)
+    end
+  end
+
+  # the map channel busy (a name tap waiting on a slow database): "busy" —
+  # try again, nothing lost. It used to wait 5 s and count as "no":
+  # "unavailable", the message box cleared (review 2026-11-14; ReachBusyTest)
+  defp cold(socket, me, other) do
+    case on_screen?(socket, me, other) do
+      true ->
+        :cold
+
+      :busy ->
+        {:error, %{reason: "busy", retry_ms: Hoodride.Accounts.retry_wait_ms()}}
+
+      false ->
+        if out_of_view?(me, other),
+          do: {:error, %{reason: "out_of_view"}},
+          else: {:error, %{reason: "unavailable"}}
     end
   end
 
@@ -69,8 +89,10 @@ defmodule HoodrideWeb.Reach do
          ) do
       [pid | _] ->
         try do
-          GenServer.call(pid, {:holding?, topic})
+          GenServer.call(pid, {:holding?, topic}, @reach_wait)
         catch
+          # slow to answer: busy, not "no"; gone (it ended): no
+          :exit, {:timeout, _} -> :busy
           :exit, _ -> false
         end
 

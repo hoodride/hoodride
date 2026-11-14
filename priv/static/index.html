@@ -33,6 +33,9 @@
     <p id="boot-status" class="boot-status" role="status" data-t>Connecting…</p>
 
     <div id="auth-buttons" class="auth-buttons hidden">
+      <!-- Cloudflare's "a person, not a script?" check, when it's on and
+           wants a click (HoodTurnstile): shown here, under the buttons -->
+      <div id="turnstile-box" class="turnstile-box"></div>
       <!-- hidden until Facebook sign-in exists (the server has no provider) -->
       <button id="btn-facebook" class="btn btn-facebook hidden">
         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
@@ -341,6 +344,7 @@
   <script src="googlerefresh.js"></script>
   <script src="langswitch.js"></script>
   <script src="nearby.js"></script>
+  <script src="turnstile.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

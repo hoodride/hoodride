@@ -23,6 +23,27 @@ defmodule Hoodride.ServerHardeningTest do
     assert setting?("RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK")
   end
 
+  # (review 2026-11-14) the tunnel's user is in group hoodride for the
+  # socket — and the group could read every secret (the session key, the
+  # release cookie that runs code as the app). Only root reads the file:
+  # systemd's EnvironmentFile and the root-owned hoodride-host helper
+  test "the secrets file: root's alone — not the tunnel's, not the app's group" do
+    assert @setup =~ "install -d -o root -g root -m 0700 /etc/hoodride"
+    assert @setup =~ "chown root:root /etc/hoodride/env"
+    assert @setup =~ "chmod 0600 /etc/hoodride/env"
+    refute @setup =~ "chmod 0640 /etc/hoodride/env"
+    refute @setup =~ "-g hoodride -m 0750 /etc/hoodride"
+  end
+
+  # (review 2026-11-14) Ubuntu's wait for the clock has no time limit: a
+  # reboot without a time server kept the app — and the tunnel after it —
+  # down for good. Capped: after it, the app starts anyway (the Sweeper's
+  # clock-jump guard covers a late correction)
+  test "the wait for the clock is capped" do
+    assert @setup =~ "/etc/systemd/system/systemd-time-wait-sync.service.d"
+    assert @setup =~ "TimeoutStartSec=180"
+  end
+
   test "never MemoryDenyWriteExecute: the BEAM's JIT writes the code it runs" do
     refute @service =~ ~r/^MemoryDenyWriteExecute=true/m
   end
