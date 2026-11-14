@@ -5731,6 +5731,8 @@ const booting = HoodBoot.create({
     document.documentElement.classList.remove("resuming");
     $("boot-status").classList.add("hidden");
     $("auth-buttons").classList.remove("hidden");
+    // Cloudflare's check, fetched now — not on the tap (HoodTurnstile)
+    if (document.querySelector('meta[name="hoodride-turnstile"]')) HoodTurnstile.preload(document, window);
     auth.signOut(); // signed out: clear any leftover of the old fake sign-in
     // (?demo=1 never gets here: it starts the pretend world without asking
     // the server — see the end of this file)

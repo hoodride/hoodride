@@ -146,16 +146,22 @@ html.resuming #screen-login .boot-status {
   to { visibility: visible; }
 }
 
-/* Cloudflare's check (HoodTurnstile): only takes room when it shows */
-.turnstile-box:empty {
-  display: none;
-}
+/* Cloudflare's check (HoodTurnstile): OUT of the layout, under the buttons
+   — even invisible it puts its own box in while it checks, which pushed
+   the buttons down and back (owner, 2026-11-14). Seen only when it wants
+   a click (.shown). */
 .turnstile-box {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 14px;
   display: flex;
   justify-content: center;
 }
 
 .auth-buttons {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 14px;

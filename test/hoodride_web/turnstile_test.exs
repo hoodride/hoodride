@@ -71,7 +71,11 @@ defmodule HoodrideWeb.TurnstileTest do
   describe "off (no keys)" do
     test "sign-in as before; the page offers no check" do
       assert redirected_to(get(build_conn(), "/auth/google"), 302) =~ "accounts.google.com"
-      refute html_response(get(build_conn(), "/"), 200) =~ "hoodride-turnstile"
+      page = html_response(get(build_conn(), "/"), 200)
+      refute page =~ "hoodride-turnstile"
+
+      refute page =~ "challenges.cloudflare.com",
+             "no connection to Cloudflare's check when it's off"
 
       assert json_response(start(build_conn(), %{"provider" => "google"}), 200) == %{
                "go" => "/auth/google"
@@ -88,6 +92,8 @@ defmodule HoodrideWeb.TurnstileTest do
     test "the page carries the site key (public), never the secret" do
       page = html_response(get(build_conn(), "/"), 200)
       assert page =~ ~s(<meta name="hoodride-turnstile" content="#{@site}">)
+      # the connection to Cloudflare opened early (the tap doesn't wait)
+      assert page =~ ~s(<link rel="preconnect" href="https://challenges.cloudflare.com">)
       refute page =~ @secret
     end
 
@@ -182,6 +188,20 @@ defmodule HoodrideWeb.TurnstileTest do
 
       assert redirected_to(conn, 302) =~ "accounts.google.com"
     end
+  end
+
+  # (owner, 2026-11-14: sign-in got slower) Cloudflare's script is fetched
+  # when the sign-in buttons appear — not on the tap
+  test "the app fetches Cloudflare's script as the sign-in screen shows" do
+    app = File.read!("priv/static/app.js")
+
+    [shown] =
+      Regex.run(
+        ~r/\$\("auth-buttons"\)\.classList\.remove\("hidden"\);[^\n]*\n(?:[^\n]*\n){0,3}/,
+        app
+      )
+
+    assert shown =~ "HoodTurnstile.preload(document, window)"
   end
 
   test "the page's rules let Cloudflare's check run (its script and its frame)" do

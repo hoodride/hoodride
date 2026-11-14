@@ -133,10 +133,22 @@ defmodule HoodrideWeb.PrivacyTest do
     # change this date with it (2026-10-29: Google only, one area wording,
     # Refresh from Google; 2026-10-30: which messages you've read;
     # 2026-10-31: sign-out takes you off the map, "open Settings";
-    # 2026-11-05: the language cookie, kept only if you choose)
+    # 2026-11-05: the language cookie, kept only if you choose;
+    # 2026-11-14: Cloudflare Turnstile on the sign-in screen)
     test "the effective date is the date of the last change", %{conn: conn} do
       html = conn |> get("/privacy") |> html_response(200)
-      assert html =~ "Effective November 5, 2026"
+      assert html =~ "Effective November 14, 2026"
+    end
+
+    # Cloudflare's "a person, not a program?" check on sign-in (owner,
+    # 2026-11-14): named, what it looks at, and why (legitimate interests)
+    test "names Cloudflare Turnstile: what it checks, and why", %{conn: conn} do
+      html = conn |> get("/privacy") |> html_response(200)
+      assert html =~ "<strong>Cloudflare Turnstile</strong>"
+      assert html =~ "technical signals from your browser and connection, not who you are"
+
+      assert html =~
+               "checking that sign-ins come from people, not automated programs (Cloudflare Turnstile)"
     end
 
     # the language switch (owner, 2026-11-05): its cookie listed, and kept

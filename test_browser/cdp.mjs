@@ -98,10 +98,13 @@ export function check(ok, what, got) {
 }
 
 // ---- one debugging connection to the browser; pages are sessions on it ----
+// (every call still unanswered, for a stuck journey's report: which call,
+// with what, how long — 2026-11-14, a journey hung silently till its limit)
+const unanswered = new Map();
 function connect(url) {
   const ws = new WebSocket(url);
   let next = 0;
-  const waiting = new Map();
+  const waiting = unanswered;
   const listeners = new Set();
   ws.onmessage = (ev) => {
     const msg = JSON.parse(ev.data);
@@ -122,7 +125,8 @@ function connect(url) {
     send(method, params = {}, sessionId) {
       const id = ++next;
       ws.send(JSON.stringify({ id, method, params, sessionId }));
-      return new Promise((resolve, reject) => waiting.set(id, { resolve, reject, method }));
+      const what = `${method} ${JSON.stringify(params).slice(0, 160)}`;
+      return new Promise((resolve, reject) => waiting.set(id, { resolve, reject, method, what, since: Date.now() }));
     },
     on: (f) => listeners.add(f),
     close: () => ws.close(),
@@ -352,20 +356,24 @@ function page(cdp, sessionId, name, browserContextId) {
     // wildcards: *) — no answer at all, as on a connection that died
     // silently — until `release()`; `count()`: how many have been held
     // (owner, 2026-11-13: a request with no time limit left the app stuck)
-    async holdRequests(urlPattern) {
+    // (one pattern, or several at once — each Fetch.enable replaces the
+    // last one's patterns, so two holds can't run side by side; count(start)
+    // counts only the requests whose address starts so)
+    async holdRequests(urlPatterns) {
       let done = false;
-      let seen = 0;
+      const urls = [];
       const paused = [];
-      await send("Fetch.enable", { patterns: [{ urlPattern }] });
+      const patterns = [].concat(urlPatterns).map((urlPattern) => ({ urlPattern }));
+      await send("Fetch.enable", { patterns });
       // (released: this one stops listening — a later hold's requests are
       // that hold's, never let through by this one)
       cdp.on((msg) => {
         if (done || msg.sessionId !== sessionId || msg.method !== "Fetch.requestPaused") return;
-        seen++;
+        urls.push(msg.params.request.url);
         paused.push(msg.params.requestId);
       });
       return {
-        count: () => seen,
+        count: (start = "") => urls.filter((u) => u.startsWith(start)).length,
         async release() {
           done = true;
           // (one the page gave up on is gone: continuing it fails, harmlessly)
@@ -577,6 +585,13 @@ function page(cdp, sessionId, name, browserContextId) {
 export async function journey(title, body) {
   console.log(`journey: ${title}`);
   watchTheTest();
+  // stuck (the test gives up at 170 s, saying nothing): say what it waits on
+  setTimeout(() => {
+    const now = Date.now();
+    const calls = [...unanswered.values()].map((c) => `${Math.round((now - c.since) / 1000)} s: ${c.what}`);
+    console.log(`  stuck — the browser hasn't answered:\n    ${calls.join("\n    ") || "(nothing — waiting in the script itself)"}`);
+    process.exit(1);
+  }, 150_000).unref();
   let browser;
   try {
     browser = await launch();
@@ -587,7 +602,9 @@ export async function journey(title, body) {
     await browser.close();
     process.exit(0);
   } catch (e) {
-    console.log(`  ${e.message}`);
+    // (a check's own words; anything else whole — an error with no message
+    // once failed a run with a blank line, 2026-11-14)
+    console.log(`  ${(e && e.message) || (e && e.stack) || JSON.stringify(e)}`);
     if (browser) await browser.close();
     process.exit(1);
   }

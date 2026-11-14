@@ -392,8 +392,11 @@ defmodule HoodrideWeb.PageController do
     # Turnstile's PUBLIC site key, when it's on (HoodrideWeb.Turnstile)
     turnstile =
       case HoodrideWeb.Turnstile.on?() && HoodrideWeb.Turnstile.site_key() do
+        # (and the connection to Cloudflare opened early: the sign-in tap
+        # doesn't wait for it — owner, 2026-11-14)
         key when is_binary(key) ->
-          ~s(  <meta name="hoodride-turnstile" content="#{Plug.HTML.html_escape(key)}">\n)
+          ~s(  <meta name="hoodride-turnstile" content="#{Plug.HTML.html_escape(key)}">\n) <>
+            ~s(  <link rel="preconnect" href="https://challenges.cloudflare.com">\n)
 
         _ ->
           ""

@@ -114,3 +114,46 @@ test("Cloudflare's script: loaded once, from Cloudflare only, explicit rendering
   const already = { turnstile: { id: 1 } };
   assert.equal(await T.load({}, already), already.turnstile);
 });
+
+// (owner, 2026-11-14: the button jumped down and back while the invisible
+// check ran) the box takes no room until Cloudflare actually needs a click
+test("the box is marked shown only while Cloudflare needs a click", async () => {
+  const ts = fakeTurnstile("silent");
+  const classes = new Set();
+  const container = { classList: { add: (c) => classes.add(c), remove: (c) => classes.delete(c) } };
+  const r = T.start("google", { siteKey: "k", getTurnstile: async () => ts, container, post: async () => ({ go: "/auth/google" }) });
+  await new Promise((ok) => setImmediate(ok));
+  assert.ok(!classes.has("shown"), "invisible: no room taken");
+  ts.seen.opts["before-interactive-callback"]();
+  assert.ok(classes.has("shown"), "a click needed: shown");
+  ts.seen.opts["after-interactive-callback"]();
+  assert.ok(!classes.has("shown"), "clicked: hidden again");
+  ts.seen.opts.callback("TOK");
+  assert.deepEqual(await r, { url: "/auth/google" });
+});
+
+// (owner, 2026-11-14: sign-in got slower) Cloudflare's script is fetched
+// when the sign-in screen shows — not on the tap
+test("preload: fetches Cloudflare's script ahead, quietly (a blocker isn't an error yet)", async () => {
+  const added = [];
+  const doc = { readyState: "complete", head: { appendChild: (s) => (added.push(s), setImmediate(() => s.onerror())) }, createElement: () => ({}) };
+  await T.preload(doc, {});
+  assert.equal(added.length, 1);
+  assert.equal(added[0].src, T.SCRIPT);
+});
+
+// a script added while the page still loads holds up its load event (a
+// journey caught it, 2026-11-14): ahead of the tap, but only once loaded
+test("preload: waits for the page to finish loading first", async () => {
+  const added = [];
+  let onLoad = null;
+  const doc = { readyState: "interactive", head: { appendChild: (s) => (added.push(s), setImmediate(() => s.onerror())) }, createElement: () => ({}) };
+  const win = { addEventListener: (ev, f, opts) => ev === "load" && opts && opts.once && (onLoad = f) };
+  const r = T.preload(doc, win);
+  await new Promise((ok) => setImmediate(ok));
+  assert.equal(added.length, 0, "nothing fetched while the page loads");
+  doc.readyState = "complete";
+  onLoad();
+  await r;
+  assert.equal(added.length, 1, "fetched once it has loaded");
+});
