@@ -298,9 +298,16 @@ defmodule HoodrideWeb.UserChannel do
     end
   end
 
+  # nothing to cancel because the driver's Accept just took it — the ride
+  # starting: say so (it used to answer "ok", and the app said "Request
+  # cancelled" just before the ride opened — HoodrideWeb.CancelAcceptRaceTest).
+  # Nothing to cancel and no ride: "ok", nothing to undo.
   defp event("cancel_request", _payload, socket) do
-    Hoodride.Requests.cancel(socket.assigns.user_id)
-    {:reply, :ok, socket}
+    uid = socket.assigns.user_id
+
+    if Hoodride.Requests.cancel(uid) == :ok or is_nil(Hoodride.Rides.ride_id_of_user(uid)),
+      do: {:reply, :ok, socket},
+      else: {:reply, {:error, %{reason: "accepted"}}, socket}
   end
 
   defp event("accept_request", %{"rider_id" => rider_id}, socket)

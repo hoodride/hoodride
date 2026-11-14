@@ -140,12 +140,12 @@ defmodule HoodrideWeb.OfflineTest do
   test "the offline copy keeps only good answers, never an error page" do
     # (the save: only inside the ok branch — a redirect or an error never)
     assert @sw =~ "if (res.ok) {
-          const copy = res.clone();"
+        const copy = res.clone();"
 
     [saving] =
       Regex.run(
         ~r/if \(res\.ok\) \{.*?
-        \}/s,
+      \}/s,
         @sw
       )
 

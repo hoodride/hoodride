@@ -21,8 +21,11 @@ if [ -n "${HOODRIDE_KEY:-}" ]; then key=(-i "$HOODRIDE_KEY"); fi
 # (quoted for the remote shell: a ' in it can't run anything there)
 since_q=$(printf '%q' "$SINCE")
 # shellcheck disable=SC2029 # expanded here on purpose, quoted for there
-if ! log=$(ssh ${key[@]+"${key[@]}"} "$HOST" "sudo -n journalctl -u hoodride --since $since_q -o cat --no-pager"); then
-  echo "FAIL: couldn't read the server's log (ssh or sudo refused) — nothing checked"
+# read as a member of systemd-journal (deploy/sudo_rules.sh), no sudo. Not a
+# member: journalctl would show NOTHING and this would say "nothing went
+# wrong" — so that's a failure too
+if ! log=$(ssh ${key[@]+"${key[@]}"} "$HOST" "id -nG | grep -qw systemd-journal && journalctl -u hoodride --since $since_q -o cat --no-pager"); then
+  echo "FAIL: couldn't read the server's log (ssh refused, or not in systemd-journal: deploy/sudo_rules.sh) — nothing checked"
   exit 2
 fi
 

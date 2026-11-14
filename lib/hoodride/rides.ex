@@ -23,7 +23,9 @@ defmodule Hoodride.Rides do
       # a claimed seat (even :pending) means "in a ride": no more map for either
       Hoodride.Roles.changed(rider_id)
       Hoodride.Roles.changed(driver_id)
-      id = "r" <> Integer.to_string(System.unique_integer([:positive]))
+      # random: a counter ("r4675") told both people how many rides the
+      # whole server had started (leftovers review, 2026-11-13)
+      id = "r" <> Base.url_encode64(:crypto.strong_rand_bytes(12), padding: false)
 
       # the supervisor only STARTS the process (instant); the start-up — both
       # name lookups in the database, the announcements — runs in the ride,
@@ -147,14 +149,22 @@ defmodule Hoodride.Rides do
     end
   end
 
-  defp call(id, msg, timeout \\ 5_000) do
+  # a ride that's there but didn't answer in time is BUSY, not gone: read as
+  # gone, a phone rejoining closed a ride that went on (Hoodride.RideBusyTest)
+  defp call(id, msg, timeout \\ nil) do
+    timeout = timeout || Application.get_env(:hoodride, :ride_call_timeout, 5_000)
+
     case Registry.lookup(Hoodride.Rides.Registry, id) do
       [{pid, _}] ->
         # the process can die between lookup and call — that's still "gone"
         try do
           GenServer.call(pid, msg, timeout)
         catch
-          :exit, _ -> {:error, :gone}
+          :exit, {:timeout, _} ->
+            if Process.alive?(pid), do: {:error, :busy}, else: {:error, :gone}
+
+          :exit, _ ->
+            {:error, :gone}
         end
 
       [] ->
@@ -307,7 +317,9 @@ defmodule Hoodride.Rides.Ride do
        positions: %Positions{},
        # people shown as "Neighbor" (their lookup failed at the start): the
        # real name follows on the ride channel once the database answers
-       unnamed: unnamed
+       unnamed: unnamed,
+       # the name lookup under way ({task ref, attempt}), or nil
+       lookup: nil
      }}
   end
 
@@ -447,33 +459,52 @@ defmodule Hoodride.Rides.Ride do
 
   # "Neighbor" used to stay for the whole ride (only a reload fixed it):
   # ask again; tell the ride channel ("peer") once the name is known; an
-  # account gone meanwhile is simply dropped
-  def handle_info({:name_retry, attempt}, state) do
-    still =
-      Enum.filter(state.unnamed, fn uid ->
-        case Hoodride.Accounts.profile(uid) do
-          %{} = p ->
-            broadcast(
-              state.id,
-              "peer",
-              person(p, if(uid == state.driver, do: :driver, else: :rider))
-            )
+  # account gone meanwhile is simply dropped.
+  # The lookups run OUTSIDE the ride (Hoodride.Rides.Lookups): asked here,
+  # a slow database froze the ride for seconds — every question to it then
+  # timed out, and a phone rejoining was told the ride was gone (server
+  # review, 2026-11-13; Hoodride.RideBusyTest). A lookup that crashes is
+  # simply asked again later.
+  def handle_info({:name_retry, attempt}, %{lookup: nil} = state) do
+    unnamed = state.unnamed
 
-            false
-
-          nil ->
-            false
-
-          {:error, :unavailable} ->
-            true
-        end
+    task =
+      Task.Supervisor.async_nolink(Hoodride.Rides.Lookups, fn ->
+        Enum.map(unnamed, &{&1, Hoodride.Accounts.profile(&1)})
       end)
 
-    if still != [],
-      do: Process.send_after(self(), {:name_retry, attempt + 1}, name_retry_ms(attempt + 1))
-
-    {:noreply, %{state | unnamed: still}}
+    {:noreply, %{state | lookup: {task.ref, attempt}}}
   end
+
+  def handle_info({ref, found}, %{lookup: {ref, attempt}} = state) do
+    Process.demonitor(ref, [:flush])
+
+    still =
+      for {uid, result} <- found, uid in state.unnamed, reduce: [] do
+        still ->
+          case result do
+            %{} = p ->
+              broadcast(
+                state.id,
+                "peer",
+                person(p, if(uid == state.driver, do: :driver, else: :rider))
+              )
+
+              still
+
+            nil ->
+              still
+
+            _unavailable ->
+              still ++ [uid]
+          end
+      end
+
+    {:noreply, ask_again(%{state | unnamed: still, lookup: nil}, attempt)}
+  end
+
+  def handle_info({:DOWN, ref, :process, _, _}, %{lookup: {ref, attempt}} = state),
+    do: {:noreply, ask_again(%{state | lookup: nil}, attempt)}
 
   # its starter died before the start-up: nobody was told anything — the
   # two-seat claim freed (only if still the claim), and gone. (Once started,
@@ -487,6 +518,13 @@ defmodule Hoodride.Rides.Ride do
   end
 
   def handle_info(_unknown, state), do: {:noreply, state}
+
+  defp ask_again(%{unnamed: []} = state, _attempt), do: state
+
+  defp ask_again(state, attempt) do
+    Process.send_after(self(), {:name_retry, attempt + 1}, name_retry_ms(attempt + 1))
+    state
+  end
 
   @impl true
   def handle_cast(_unknown, state), do: {:noreply, state}

@@ -26,6 +26,8 @@ const answer = (status, body = `status ${status}`) => ({
 function worker({ network, saved = {} }) {
   const store = new Map(Object.entries(saved).map(([path, body]) => [ORIGIN + path, answer(200, body)]));
   const listeners = {};
+  // the worker's timers, fired only when a test says so (`fire()`)
+  const timers = [];
   const cache = {
     put: async (req, res) => void store.set(req.url, res),
     addAll: async () => {},
@@ -51,21 +53,33 @@ function worker({ network, saved = {} }) {
     },
     URL,
     Promise,
+    setTimeout: (fn, ms) => timers.push({ fn, ms }),
+    clearTimeout: () => {},
   };
   vm.runInNewContext(SRC, context);
 
   // → the answer the page gets, or null (the worker left it to the browser)
   // `mode`: "navigate" for a page opened, as the browser marks it
   async function get(path, method = "GET", mode = "cors") {
-    let responded = null;
-    listeners.fetch({ request: { url: ORIGIN + path, method, mode }, respondWith: (p) => (responded = p) });
+    const responded = start(path, method, mode);
     if (!responded) return null;
     const res = await responded;
     await new Promise((r) => setImmediate(r)); // let a save finish
     return res;
   }
+  // the answer's promise itself, not waited for (null: left to the browser)
+  function start(path, method = "GET", mode = "cors") {
+    let responded = null;
+    listeners.fetch({
+      request: { url: ORIGIN + path, method, mode },
+      respondWith: (p) => (responded = p),
+      waitUntil: () => {},
+    });
+    return responded;
+  }
+  const fire = () => timers.splice(0).forEach((t) => t.fn());
   const savedBody = (path) => store.get(ORIGIN + path)?.body;
-  return { get, savedBody };
+  return { get, start, fire, timers, savedBody };
 }
 
 test("a good answer: shown, and saved as the offline copy", async () => {
@@ -157,4 +171,44 @@ test("offline and no home saved yet: the English page (index.html)", async () =>
   assert.equal((await w.get("/", "GET", "navigate")).body, "English");
   // a file isn't a page: never answered with the page
   assert.equal(await w.get("/app.js?vsn=1", "GET", "cors"), undefined);
+});
+
+// ----- a weak signal (server review, 2026-11-13): connected, but nothing
+// gets through — the request neither answers nor fails, and the browser
+// gives up only after a minute or more: a white screen all that time. The
+// network gets a few seconds, then the saved copy is shown (Workbox's
+// NetworkFirst "networkTimeoutSeconds") — and the fresh copy, if it ever
+// comes, is still saved for next time -----
+const settled = (p) => Promise.race([p.then((v) => ({ v })), new Promise((r) => setImmediate(() => r("pending")))]);
+
+test("a weak signal: after a few seconds, the saved copy", async () => {
+  let answerLate;
+  const w = worker({ network: () => new Promise((r) => (answerLate = r)), saved: { "/": "saved app" } });
+  const res = w.start("/", "GET", "navigate");
+  assert.equal(await settled(res), "pending", "answered before the network had its chance");
+  const limit = w.timers.map((t) => t.ms);
+  assert.ok(limit.length === 1 && limit[0] >= 3000 && limit[0] <= 5000, `the wait: ${limit}`);
+  w.fire();
+  assert.equal((await res).body, "saved app");
+  // the network answers in the end: kept for next time
+  answerLate(answer(200, "new app"));
+  await new Promise((r) => setImmediate(r));
+  await new Promise((r) => setImmediate(r));
+  assert.equal(w.savedBody("/"), "new app");
+});
+
+test("a weak signal and nothing saved: it keeps waiting for the network", async () => {
+  let answerLate;
+  const w = worker({ network: () => new Promise((r) => (answerLate = r)) });
+  const res = w.start("/app.js?vsn=1");
+  w.fire();
+  assert.equal(await settled(res), "pending", "gave up with nothing to show");
+  answerLate(answer(200, "the file"));
+  assert.equal((await res).body, "the file");
+});
+
+test("a quick answer never waits for the timer", async () => {
+  const w = worker({ network: () => answer(200, "new app"), saved: { "/": "saved app" } });
+  const res = w.start("/");
+  assert.equal((await settled(res)).v.body, "new app");
 });

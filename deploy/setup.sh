@@ -75,19 +75,10 @@ echo "   hoodride enabled (starts at boot once a release is deployed)"
 echo "   cloudflared: enable after the tunnel is set up — systemctl enable --now cloudflared"
 
 # deploy.sh stops/starts the app, copies its database while stopped (and
-# puts the copy back if the new version fails — db_copy.sh), and checks it
-# as cloudflared: just those, no password. (db_copy.sh lives in your own
-# folder: whoever can edit it can run anything as root — as with any deploy
-# user that restarts services; keep that account to yourself.)
-cat > /etc/sudoers.d/hoodride-deploy <<EOF
-$ADMIN ALL=(root) NOPASSWD: /usr/bin/systemctl restart hoodride
-$ADMIN ALL=(root) NOPASSWD: /usr/bin/systemctl stop hoodride
-$ADMIN ALL=(root) NOPASSWD: /usr/bin/systemctl start hoodride
-$ADMIN ALL=(root) NOPASSWD: /usr/bin/bash $HERE/db_copy.sh *
-$ADMIN ALL=(cloudflared) NOPASSWD: /usr/bin/curl
-EOF
-chmod 0440 /etc/sudoers.d/hoodride-deploy
-visudo -cf /etc/sudoers.d/hoodride-deploy >/dev/null
+# puts the copy back if the new version fails), and checks it as
+# cloudflared: just those, no password, through root-owned helpers — and
+# nothing else (sudo_rules.sh)
+bash "$HERE/sudo_rules.sh"
 
 if [ "${1:-}" = "--harden" ]; then
   echo "== firewall: SSH in, nothing else (the tunnel needs no open port)"

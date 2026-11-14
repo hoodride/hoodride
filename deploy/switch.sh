@@ -29,11 +29,11 @@ set -euo pipefail
 
 NEW="${1:?usage: switch.sh RELEASE_DIR}"
 APP="${HOODRIDE_APP:-/opt/hoodride}"
-SOCK=/run/hoodride/app.sock
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SYSTEMCTL=(sudo /usr/bin/systemctl)
-# (a full path: the server's sudo rule names it exactly — setup.sh)
-DBCOPY=(sudo /usr/bin/bash "$HERE/db_copy.sh")
+# (root-owned copies the server's sudo rules name exactly — sudo_rules.sh;
+# never a file in your own folder: editable, it would run anything as root)
+DBCOPY=(sudo /usr/local/sbin/hoodride-db-copy)
 # (the tests' stand-ins: one program each, no arguments of their own)
 if [ -n "${HOODRIDE_SYSTEMCTL:-}" ]; then SYSTEMCTL=("$HOODRIDE_SYSTEMCTL"); fi
 if [ -n "${HOODRIDE_DBCOPY:-}" ]; then DBCOPY=("$HOODRIDE_DBCOPY"); fi
@@ -68,8 +68,7 @@ healthy() {
     return
   fi
   for _ in $(seq 1 30); do
-    code="$(sudo -u cloudflared /usr/bin/curl -s -o /dev/null -w '%{http_code}' --max-time 2 \
-      --unix-socket "$SOCK" -H 'x-forwarded-proto: https' http://localhost/api/me || true)"
+    code="$(sudo -u cloudflared /usr/local/sbin/hoodride-socket-get --status /api/me || true)"
     [ "$code" = 200 ] && return 0
     sleep 1
   done

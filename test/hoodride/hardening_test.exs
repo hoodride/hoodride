@@ -92,6 +92,12 @@ defmodule Hoodride.HardeningTest do
     end
 
     assert Process.whereis(Hoodride.GeoWriters) == sup
+
+    # each writer's priority address: one row per LIVE writer — a restart
+    # left the dead one's row behind for good (leftovers review, 2026-11-13)
+    live = for {_, pid, _, _} <- PartitionSupervisor.which_children(Hoodride.GeoWriters), do: pid
+    rows = :ets.tab2list(:geo_writer_aliases) |> Enum.map(&elem(&1, 0))
+    assert Enum.sort(rows) == Enum.sort(live)
   end
 
   # the writer for key `i` once it's a new process (the lookup can name the

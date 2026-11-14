@@ -268,6 +268,26 @@ await journey("visitor: the signed-out screen, signing in, the demo", async (bro
   // (owner, 2026-11-02: "Sign out" did nothing in the demo — no account)
   await dee.click("btn-account");
   await dee.waitFor(`document.getElementById("settings-sheet").classList.contains("open")`, "Settings open");
+
+  // Your car, in the demo too (owner, 2026-11-13): the same form and checks,
+  // kept on this page only — nothing sent to the server
+  await dee.eval(`(() => { window.__apiCalls = []; const f = window.fetch; window.fetch = (u, ...a) => { if (String(u).includes("/api/")) window.__apiCalls.push(String(u)); return f(u, ...a); }; return true; })()`);
+  check(await dee.eval(`getComputedStyle(document.getElementById("btn-car")).display !== "none"`), "Your car is in the demo's menu");
+  check((await dee.eval(`document.getElementById("car-note").textContent`)) === "Add it before you drive", "no car yet", await dee.eval(`document.getElementById("car-note").textContent`));
+  await dee.click("btn-car");
+  await dee.waitFor(`carSheetOpen()`, "the car form");
+  await dee.eval(`(() => { document.getElementById("car-color").value = "Blue"; document.getElementById("car-make").value = "Honda"; document.getElementById("car-model").value = ""; return true; })()`);
+  await dee.click("car-save");
+  await dee.waitFor(`!document.getElementById("car-error").classList.contains("hidden")`, "the same checks: the model is missing");
+  check(await dee.eval(`carSheetOpen()`), "the form stays open to fix it");
+  await dee.eval(`(document.getElementById("car-model").value = "Civic", true)`);
+  await dee.click("car-save");
+  await dee.waitFor(`!carSheetOpen()`, "saved: the form closes");
+  const note = await dee.eval(`document.getElementById("car-note").textContent`);
+  check(note.includes("Honda Civic"), "Settings shows the car", note);
+  check(await dee.eval(`state.myCar && state.myCar.model === "Civic"`), "kept on the page");
+  check((await dee.eval(`window.__apiCalls.length`)) === 0 && (await dee.eval(`!socket`)), "nothing sent to the server", await dee.eval(`window.__apiCalls`));
+
   const row = await dee.eval(`({ label: document.querySelector("#btn-logout .settings-label").textContent, note: document.getElementById("logout-note").textContent, enabled: !document.getElementById("btn-logout").disabled, del: getComputedStyle(document.getElementById("delete-wrap")).display, legal: document.querySelector(".drawer-legal").innerText.trim() })`);
   check(row.label === "Leave demo" && row.note === "Back to the sign-in page" && row.enabled, "the row: Leave demo, back to the sign-in page", row);
   check(row.del === "none" && row.legal === "Terms · Privacy Policy", "no Delete account (no account): just Terms · Privacy Policy", row);

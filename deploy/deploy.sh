@@ -13,6 +13,17 @@ APP=/opt/hoodride
 . "$HOME/beam/env.sh"   # Erlang + Elixir (deploy/install_beam.sh)
 cd "$(dirname "$0")/.."
 
+# the root-owned helpers (sudo_rules.sh) must be THIS version's — an old
+# database copy step with a new deploy could copy the wrong files. Stopped
+# before anything is built: reinstalling them asks for your password.
+for pair in db_copy.sh:hoodride-db-copy host.sh:hoodride-host socket_get.sh:hoodride-socket-get; do
+  if ! cmp -s "deploy/${pair%%:*}" "/usr/local/sbin/${pair#*:}"; then
+    echo "deploy: /usr/local/sbin/${pair#*:} isn't this version's deploy/${pair%%:*} — run first:"
+    echo "  sudo bash $PWD/deploy/sudo_rules.sh"
+    exit 1
+  fi
+done
+
 NEW="$APP/releases/$(date -u +%Y%m%d-%H%M%S)"
 export MIX_ENV=prod
 mix deps.get --only prod
@@ -36,7 +47,7 @@ mix hoodride.minify --in-place "$STATIC" --keep "$HOME/.cache/hoodride"
 echo "server: up since $(uptime -s)$([ -f /var/run/reboot-required ] && echo ' · a security fix needs a restart: at 10:00 UTC')"
 
 # the newest 3 database copies kept — one per release kept below
-sudo /usr/bin/bash "$PWD/deploy/db_copy.sh" prune 3
+sudo /usr/local/sbin/hoodride-db-copy prune 3
 
 # keep the newest 3 (never the live one)
 live="$(readlink -f "$APP/current")"

@@ -64,6 +64,9 @@ defmodule Hoodride.Application do
       # live sockets: user_id → the stamp of the tab behind each (who gets
       # in on an automatic reconnect: Hoodride.SessionStamp)
       {Registry, keys: :duplicate, name: Hoodride.SocketStamps},
+      # rides look up a name they started without HERE, never in the ride
+      # itself (a slow database froze it: Hoodride.RideBusyTest)
+      {Task.Supervisor, name: Hoodride.Rides.Lookups},
       {DynamicSupervisor, strategy: :one_for_one, name: Hoodride.Rides.Supervisor},
       # one supervisor for ALL the map writers: its restart allowance is
       # theirs together — the default 3 in 5 s let a few writer crashes in

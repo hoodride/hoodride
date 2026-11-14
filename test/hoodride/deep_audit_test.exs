@@ -187,9 +187,10 @@ defmodule Hoodride.DeepAuditTest do
 
     push(chan, "driver_update", %{"cell" => "cellQ", "lat" => 1.0, "lng" => 2.0})
     push(chan, "hand_up", %{"cell" => "cellQ"})
-    # sync: a replying push proves the previous casts were processed
-    ref = push(chan, "cancel_request", %{})
-    assert_reply ref, :ok
+    # sync: a replying push proves the previous casts were processed (not
+    # Cancel: in a ride it answers "accepted" — HoodrideWeb.CancelAcceptRaceTest)
+    ref = push(chan, "made_up_event", %{})
+    assert_reply ref, :error, %{reason: "bad_request"}
 
     assert Geo.cell_snapshot("cellQ") == %{drivers: [], hands: []}
   end

@@ -28,7 +28,22 @@
   const { t } = I18n;
   const WATCH_OPTIONS = { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 };
 
-  function create({ geolocation, queryPermission, now, h3, rules, platform, browser = null, standalone, app }) {
+  // how long the browser gets to say whether location is allowed
+  const PERMISSION_WAIT_MS = 2000;
+
+  function create({
+    geolocation,
+    queryPermission,
+    now,
+    h3,
+    rules,
+    platform,
+    browser = null,
+    standalone,
+    app,
+    setTimer = (fn, ms) => setTimeout(fn, ms),
+    clearTimer = (id) => clearTimeout(id),
+  }) {
     const s = {
       status: "idle", // idle | watching | denied | unavailable
       watchId: null,
@@ -49,11 +64,22 @@
     // taps waiting for a good reading: they complete by themselves
     const pending = { online: false, hand: false };
 
+    // A check that never answers (reported on some iPhones) used to wait
+    // for ever — and every later check was skipped while it "ran": a shift
+    // or ride resumed after a reload never started GPS. Past
+    // PERMISSION_WAIT_MS it's "unknown", which starts the watch, as when a
+    // browser has no check at all (leftovers review, 2026-11-13).
     async function permission() {
+      let timer;
       try {
-        return await queryPermission();
+        return await Promise.race([
+          queryPermission(),
+          new Promise((r) => (timer = setTimer(() => r("unknown"), PERMISSION_WAIT_MS))),
+        ]);
       } catch (_) {
         return "unknown";
+      } finally {
+        clearTimer(timer);
       }
     }
     function notePermission() {

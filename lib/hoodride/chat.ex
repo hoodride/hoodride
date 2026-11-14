@@ -61,7 +61,31 @@ defmodule Hoodride.Chat do
     Hoodride.ETS.new(@spots, [:named_table, :public, :set])
     Hoodride.ETS.new(@sent_ids, [:named_table, :public, :set])
     Hoodride.ETS.new(@started, [:named_table, :public, :bag])
+    # the last message id handed out (next_id/0)
+    :persistent_term.put({__MODULE__, :last_id}, :atomics.new(1, signed: true))
     :ok
+  end
+
+  # A message's id: the time it's sent, in microseconds — one more than the
+  # last if two land in the same instant (or the clock steps back). In order
+  # (the app sorts and pages by it), and it tells only the time, which the
+  # message's `ts` already says. It was one counter for the whole server:
+  # two of your own ids told how many messages EVERYONE sent in between
+  # (leftovers review, 2026-11-13; Hoodride.MessageIdTest). Fits a
+  # JavaScript number exactly until the year 2255.
+  @doc false
+  def next_id do
+    ref = :persistent_term.get({__MODULE__, :last_id})
+    claim_id(ref, :atomics.get(ref, 1))
+  end
+
+  defp claim_id(ref, last) do
+    id = max(System.os_time(:microsecond), last + 1)
+
+    case :atomics.compare_exchange(ref, 1, last, id) do
+      :ok -> id
+      newer -> claim_id(ref, newer)
+    end
   end
 
   def pair_key(a, b), do: {min(a, b), max(a, b)}
@@ -102,7 +126,7 @@ defmodule Hoodride.Chat do
   def send_message(from, to_id, text, spot \\ nil) do
     key = pair_key(from.id, to_id)
     now = System.system_time(:second)
-    id = System.unique_integer([:positive, :monotonic])
+    id = next_id()
 
     # a NEW conversation: this message started it (counted against the
     # sender's open chats — the caller checked room first, can_start?/2)

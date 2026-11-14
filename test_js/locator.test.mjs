@@ -31,6 +31,8 @@ function phone({ perm = "prompt", mode = "rider" } = {}) {
     getCurrentPosition: (ok, err, opts) => lookups.push({ ok, err, opts }),
   };
   const st = { mode, online: false, ride: null, handRaised: false, typing: false };
+  // the locator's timers: fired only when a test says so
+  const timers = [];
   const log = [];
   const app = {
     state: () => st,
@@ -55,11 +57,15 @@ function phone({ perm = "prompt", mode = "rider" } = {}) {
   };
   const loc = create({
     geolocation,
-    // "throws": a browser whose permission check fails
+    // "throws": a browser whose permission check fails; "hangs": one whose
+    // check never answers at all (reported on some iPhones)
     queryPermission: async () => {
       if (t.perm === "throws") throw new TypeError("permissions.query is not supported");
+      if (t.perm === "hangs") return new Promise(() => {});
       return t.perm;
     },
+    setTimer: (fn, ms) => timers.push({ fn, ms }),
+    clearTimer: () => {},
     now: () => t.now,
     h3,
     rules,
@@ -73,6 +79,8 @@ function phone({ perm = "prompt", mode = "rider" } = {}) {
     st,
     log,
     loc,
+    timers,
+    fireTimers: () => timers.splice(0).forEach((x) => x.fn()),
     watches,
     lookups,
     // feed every live watch a reading / an error
@@ -680,4 +688,30 @@ test("GO ONLINE completes only from a reading taken for it — never a cached on
   assert.equal(p.st.online, false, "not online from a cached answer");
   p.fix(12);
   assert.equal(p.st.online, true, "the watch's own reading: online");
+});
+
+// A permission check that never answers (leftovers review, 2026-11-13;
+// reported on some iPhones): the check waited for ever, and every later one
+// was skipped while it "ran" — a shift or ride resumed after a reload never
+// started GPS, the partner never saw them. Now it's "unknown" after a
+// couple of seconds — which starts the watch, as when there's no check at all.
+test("a permission check that never answers: after a couple of seconds, 'unknown' — GPS still starts", async () => {
+  const p = phone({ perm: "hangs" });
+  p.st.ride = { status: "connected" };
+  const resumed = p.loc.resumeAtLoad();
+  await flush();
+  const waits = p.timers.map((x) => x.ms);
+  assert.ok(waits.length === 1 && waits[0] >= 1000 && waits[0] <= 5000, `the wait: ${waits}`);
+  p.fireTimers();
+  await Promise.race([resumed, new Promise((r) => setTimeout(r, 200))]);
+  assert.equal(p.watches.size, 1, "GPS started");
+});
+
+test("a permission check that answers in time: its answer, the timer cleared", async () => {
+  const p = phone({ perm: "denied" });
+  p.st.ride = { status: "connected" };
+  await p.loc.reconcile();
+  p.fireTimers();
+  await flush();
+  assert.equal(p.watches.size, 0, "blocked stays blocked (the timer's 'unknown' never wins late)");
 });

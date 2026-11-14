@@ -261,6 +261,25 @@ const WHY = `(() => ({
 function page(cdp, sessionId, name, browserContextId) {
   // the profile's offline workers (sw.js): their own network, cut with the page's
   const workers = new Map();
+  // the network conditions of every offline worker of this person's profile
+  // (attached as found: a stopped worker starts afresh on the next request)
+  const workersNetwork = async (conditions) => {
+    const { targetInfos } = await cdp.send("Target.getTargets");
+    for (const t of targetInfos) {
+      if (t.type !== "service_worker" || t.browserContextId !== browserContextId) continue;
+      try {
+        if (!workers.has(t.targetId)) {
+          const { sessionId: ws } = await cdp.send("Target.attachToTarget", { targetId: t.targetId, flatten: true });
+          workers.set(t.targetId, ws);
+          await cdp.send("Network.enable", {}, ws);
+        }
+        await cdp.send("Network.emulateNetworkConditions", conditions, workers.get(t.targetId));
+      } catch (_) {
+        // (a worker that just stopped: its session gone — found again next try)
+        workers.delete(t.targetId);
+      }
+    }
+  };
   const errors = [];
   let loads = 0;
   cdp.on((msg) => {
@@ -506,6 +525,15 @@ function page(cdp, sessionId, name, browserContextId) {
       await send("Network.enable");
       await send("Network.clearBrowserCache");
     },
+    // a weak signal: connected, but every request (the page's AND the
+    // offline worker's) takes `latencyMs` to answer — one bar, a café wifi
+    // waiting for its login. Put back with offline(false)
+    async weakSignal(latencyMs) {
+      const conditions = { offline: false, latency: latencyMs, downloadThroughput: -1, uploadThroughput: -1 };
+      await send("Network.enable");
+      await send("Network.emulateNetworkConditions", conditions);
+      await workersNetwork(conditions);
+    },
     async throttle(bytesPerSec) {
       await send("Network.enable");
       await send("Network.emulateNetworkConditions", { offline: false, latency: 0, downloadThroughput: bytesPerSec, uploadThroughput: bytesPerSec });
@@ -520,23 +548,7 @@ function page(cdp, sessionId, name, browserContextId) {
       // passed that never were (found 2026-11-11, U1). Found afresh on each
       // try below: a worker the browser had stopped starts again on the
       // next request — a new one, its network to be cut too
-      const toWorkers = async () => {
-        const { targetInfos } = await cdp.send("Target.getTargets");
-        for (const t of targetInfos) {
-          if (t.type !== "service_worker" || t.browserContextId !== browserContextId) continue;
-          try {
-            if (!workers.has(t.targetId)) {
-              const { sessionId: ws } = await cdp.send("Target.attachToTarget", { targetId: t.targetId, flatten: true });
-              workers.set(t.targetId, ws);
-              await cdp.send("Network.enable", {}, ws);
-            }
-            await cdp.send("Network.emulateNetworkConditions", conditions, workers.get(t.targetId));
-          } catch (_) {
-            // (a worker that just stopped: its session gone — found again next try)
-            workers.delete(t.targetId);
-          }
-        }
-      };
+      const toWorkers = () => workersNetwork(conditions);
       await toWorkers();
       // Chrome can answer before the switch has taken effect — a tap right
       // after then still reached the server offline, or failed back online

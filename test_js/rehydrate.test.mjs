@@ -77,6 +77,8 @@ test("a ride join refusal ends the ride only when the ride is really gone", () =
   assert.equal(R.rideJoinLost({ reason: "gone" }), true);
   assert.equal(R.rideJoinLost({ reason: "not_yours" }), true);
   assert.equal(R.rideJoinLost({ reason: "rate_limited", retry_ms: 2000 }), false);
+  // a ride alive but slow to answer (the server struggling): retried, kept
+  assert.equal(R.rideJoinLost({ reason: "busy", retry_ms: 1000 }), false);
   assert.equal(R.rideJoinLost({}), false);
   assert.equal(R.rideJoinLost(undefined), false);
 });

@@ -479,8 +479,10 @@ defmodule HoodrideWeb.AuthController do
     # Never stored by a browser or a proxy (chats, a ride, who you are).
     conn = conn |> Auth.keep_signed_in() |> put_resp_header("cache-control", "no-store")
 
-    with %{} = u <- conn.assigns.current_user do
-      ride = ride_of(u.id)
+    with %{} = u <- conn.assigns.current_user,
+         # a ride too busy to answer: retried like a busy database, never
+         # "no ride" (the app would close it: Hoodride.RideBusyTest)
+         ride when ride != :busy <- ride_of(u.id) do
       convos = Hoodride.Chat.conversations_for(u.id)
       open = Hoodride.Requests.open_request_of(u.id)
       pending = Hoodride.Requests.pending_for_driver(u.id)
@@ -516,6 +518,7 @@ defmodule HoodrideWeb.AuthController do
           conn |> put_status(503) |> json(%{error: "busy"})
       end
     else
+      :busy -> conn |> put_status(503) |> json(%{error: "busy"})
       _ -> json(conn, %{user: nil})
     end
   end
@@ -553,12 +556,13 @@ defmodule HoodrideWeb.AuthController do
       |> Map.put(:car, Accounts.car_label(d))
       |> Map.put(:car_parts, Accounts.car_parts(d))
 
-  # {ride state, partner id}, or nil
+  # {ride state, partner id}, nil, or :busy (alive but slow to answer)
   defp ride_of(user_id) do
     with ride_id when not is_nil(ride_id) <- Hoodride.Rides.ride_id_of_user(user_id),
          {:ok, st} <- Hoodride.Rides.get(ride_id) do
       {st, if(st.rider == user_id, do: st.driver, else: st.rider)}
     else
+      {:error, :busy} -> :busy
       _ -> nil
     end
   end

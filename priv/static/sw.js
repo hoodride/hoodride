@@ -135,26 +135,44 @@ self.addEventListener("fetch", (e) => {
       return caches.match(new Request(url.origin + "/")).then((h) => h || caches.match(new Request(url.origin + "/index.html")));
     });
 
-  e.respondWith(
-    fetch(e.request)
-      .then((res) => {
-        // only a good answer: while the server is down Cloudflare answers
-        // with its own error page, which must never replace the good copy.
-        // (A redirect is never ok here: never saved)
-        if (res.ok) {
-          const copy = res.clone();
-          const again = home ? res.clone() : null;
-          caches.open(CACHE).then((c) => {
-            c.put(e.request, copy);
-            if (again) c.put(new Request(url.origin + "/"), again);
-          });
-        }
-        // the server down (Cloudflare's 502/530 page, a restart's 503): the
-        // saved app instead — it says "Can't reach Hood Ride — retrying…" and
-        // comes back by itself. A 4xx is a real answer: passed on
-        if (res.status >= 500) return saved().then((hit) => hit || res);
-        return res;
-      })
-      .catch(() => saved())
-  );
+  const network = fetch(e.request)
+    .then((res) => {
+      // only a good answer: while the server is down Cloudflare answers
+      // with its own error page, which must never replace the good copy.
+      // (A redirect is never ok here: never saved)
+      if (res.ok) {
+        const copy = res.clone();
+        const again = home ? res.clone() : null;
+        caches.open(CACHE).then((c) => {
+          c.put(e.request, copy);
+          if (again) c.put(new Request(url.origin + "/"), again);
+        });
+      }
+      // the server down (Cloudflare's 502/530 page, a restart's 503): the
+      // saved app instead — it says "Can't reach Hood Ride — retrying…" and
+      // comes back by itself. A 4xx is a real answer: passed on
+      if (res.status >= 500) return saved().then((hit) => hit || res);
+      return res;
+    })
+    .catch(() => saved());
+
+  // A weak signal: connected, but nothing gets through — the request
+  // neither answers nor fails, and the browser gives up only after a minute
+  // or more: a white screen all that time (server review, 2026-11-13). So
+  // the network gets NETWORK_WAIT_MS, then the saved copy is shown (it
+  // reconnects by itself, as offline); with nothing saved, it keeps waiting.
+  // The standard form: Workbox's NetworkFirst `networkTimeoutSeconds`.
+  // (sw.test.mjs "a weak signal")
+  let timer;
+  const slow = new Promise((r) => (timer = setTimeout(r, NETWORK_WAIT_MS)))
+    .then(() => saved())
+    .then((hit) => hit || network);
+  network.then(() => clearTimeout(timer));
+
+  // the fresh copy, if it comes after all, is still saved for next time
+  e.waitUntil(network);
+  e.respondWith(Promise.race([network, slow]));
 });
+
+// how long the network gets before the saved copy is shown
+const NETWORK_WAIT_MS = 4000;

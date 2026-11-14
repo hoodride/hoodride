@@ -396,7 +396,7 @@ defmodule Hoodride.DeployRollbackTest do
 
       [_, after_switch] = String.split(after_build, ~s(switch.sh" "$NEW"), parts: 2)
       assert after_switch =~ "cloudflare_check.sh"
-      assert after_switch =~ ~s(db_copy.sh" prune 3)
+      assert after_switch =~ "sudo /usr/local/sbin/hoodride-db-copy prune 3"
       refute d =~ "systemctl", "deploy.sh itself never stops or starts the app (switch.sh does)"
       assert d =~ "set -euo pipefail"
     end

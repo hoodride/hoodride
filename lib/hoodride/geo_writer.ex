@@ -30,6 +30,12 @@ defmodule Hoodride.GeoWriter do
     # a priority alias (OTP 28+, EEP 76): the recount's holds, sent through
     # it with :priority, skip ahead of every queued update
     :ets.insert(:geo_writer_aliases, {self(), :erlang.alias([:priority])})
+    # a writer this one replaces left its row behind: gone (one row per
+    # writer — a handful — so a plain walk; Hoodride.HardeningTest)
+    for {pid, _} <- :ets.tab2list(:geo_writer_aliases),
+        not Process.alive?(pid),
+        do: :ets.delete(:geo_writer_aliases, pid)
+
     {:ok, nil}
   end
 
@@ -46,17 +52,48 @@ defmodule Hoodride.GeoWriter do
   happen). A writer that's gone: `{:error, :unavailable}`; an op that
   failed inside it: `{:error, :failed}` (2026-11-13) — never a caller crash.
   """
-  def exec(key, op, timeout \\ Application.get_env(:hoodride, :geo_call_timeout, 5_000)),
-    do: call({:via, PartitionSupervisor, {Hoodride.GeoWriters, key}}, op, timeout)
+  def exec(key, op, timeout \\ nil),
+    do: call({:via, PartitionSupervisor, {Hoodride.GeoWriters, key}}, op, timeout || wait())
+
+  @short_wait :hoodride_geo_short_wait
+
+  # how long a caller waits: inside short_waits/2 its own budget, else
+  # :geo_call_timeout (5 s)
+  defp wait,
+    do: Process.get(@short_wait) || Application.get_env(:hoodride, :geo_call_timeout, 5_000)
+
+  @doc """
+  Run `fun` with this process's writer waits (those not given a time of
+  their own) at most `ms` — and once one has run out, none at all for the
+  rest of `fun`: the writers are backed up, so waiting on each in turn only
+  stalls the caller (the cleanup pass waited ~5 s per stale car: 100 of
+  them, 8 minutes — Hoodride.SweeperStallTest). Nothing is lost: each
+  change is already queued and lands in order. Only this process, only
+  for `fun`.
+  """
+  def short_waits(ms, fun) do
+    previous = Process.put(@short_wait, ms)
+
+    try do
+      fun.()
+    after
+      if previous, do: Process.put(@short_wait, previous), else: Process.delete(@short_wait)
+    end
+  end
 
   @doc false
   def call(writer, op, timeout) do
     GenServer.call(writer, op, timeout)
   catch
-    :exit, {:timeout, _} -> {:error, :timeout}
+    :exit, {:timeout, _} ->
+      # inside short_waits: the writers are backed up — stop waiting on them
+      if Process.get(@short_wait), do: Process.put(@short_wait, 0)
+      {:error, :timeout}
+
     # the writer gone (crashed, restarting): the caller carries on — never
     # crashing with it (owner, 2026-11-13; Hoodride.HardeningTest)
-    :exit, _ -> {:error, :unavailable}
+    :exit, _ ->
+      {:error, :unavailable}
   end
 
   # Each op runs on its own: one that fails (a bug — no known input does)

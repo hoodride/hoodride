@@ -725,8 +725,9 @@ function renderSettings() {
   $("btn-delete").disabled = busy;
   // a ride started while the confirmation was open: back out of it
   if (busy) hideDeleteConfirm();
-  // your car: read when Settings opens, not on every page load
-  $("btn-car").classList.toggle("hidden", DEMO);
+  // your car: read when Settings opens, not on every page load. In the
+  // demo too (owner, 2026-11-13): kept on the page, never sent (saveCar)
+  if (DEMO && state.myCar === undefined) state.myCar = null;
   renderCarNote();
   renderNavAppNote();
   if (!DEMO && state.myCar === undefined) loadMyCar().then(renderCarNote);
@@ -944,6 +945,12 @@ async function saveCar(e) {
   const car = HoodCar.tidy({ color: $("car-color").value, make: $("car-make").value, model: $("car-model").value });
   const wrong = HoodCar.problems(car);
   if (wrong.length) return carError(carFieldsMessage(wrong), wrong);
+  // the demo: the same checks, kept on this page only — no account, no server
+  if (DEMO) {
+    state.myCar = car;
+    closeCarSheet();
+    return renderCarNote();
+  }
   $("car-save").disabled = true;
   let res;
   try {
@@ -1401,8 +1408,12 @@ async function connectSocket() {
     }
   });
 
-  userChannel.on("request_declined", () => {
-    if (state.ride && state.ride.status === "requested") state.ride = null;
+  // about ONE driver's request (by_id): a late one for an older request
+  // never wipes a newer (HoodrideWeb.RideGuardsWiringTest)
+  userChannel.on("request_declined", ({ by_id } = {}) => {
+    if (!state.ride || state.ride.status !== "requested") return;
+    if (by_id != null && state.ride.peer.id !== by_id) return;
+    state.ride = null;
     transientBanner(t("Driver can't take this one — try another"));
     refreshControls();
   });
@@ -2535,6 +2546,20 @@ function forgetStoredSpot() {
     if (spotKey()) localStorage.removeItem(spotKey());
   } catch (_) {}
 }
+// signed out with no account known (expired, signed out on another device):
+// every account's block goes — a rough home or work area, left on a shared
+// phone (leftovers review, 2026-11-13; test_browser/signedout.mjs)
+function forgetAllSpots(storage) {
+  if (!storage) return;
+  try {
+    const spots = [];
+    for (let i = 0; i < storage.length; i++) {
+      const k = storage.key(i);
+      if (k && k.startsWith("hoodride_spot_")) spots.push(k);
+    }
+    spots.forEach((k) => storage.removeItem(k));
+  } catch (_) {}
+}
 // the spot to broadcast now, or null at a placeholder location (no GPS fix)
 function currentSpot() {
   if (!state.haveFix) return null;
@@ -2714,6 +2739,9 @@ function startRealRide(r) {
 function joinRideChannel() {
   if (!state.ride || !state.ride.id || !socket) return;
   lastRidePosSent = null; // a fresh ride always announces immediately
+  // one ride channel at a time: an old one left open could clean up THIS
+  // ride with its "ended" or its join error (HoodrideWeb.RideGuardsWiringTest)
+  if (rideChannel) rideChannel.leave();
   rideChannel = ownNews(socket.channel(`ride:${state.ride.id}`));
 
   // live, or — right after we (re)join — the partner's LAST position with
@@ -4406,10 +4434,26 @@ function endRide() {
 
   if (!DEMO) {
     if (state.ride.status === "requested") {
-      userChannel.push("cancel_request", {});
-      state.ride = null;
-      transientBanner(t("Request cancelled"));
-      refreshControls();
+      // cancelled once the server says so: a Cancel just after the driver's
+      // Accept finds the ride already starting — "accepted": the ride comes
+      // (ride_started), never a "Request cancelled" before it
+      // (test_browser/cancelrace.mjs)
+      const asked = state.ride;
+      userChannel
+        .push("cancel_request", {})
+        .receive("ok", () => {
+          if (state.ride === asked) state.ride = null;
+          transientBanner(t("Request cancelled"));
+          refreshControls();
+        })
+        .receive("error", (e) => {
+          if (e && e.reason === "accepted") return;
+          if (e && e.reason === "rate_limited") return transientBanner(t("⏳ Slow down a sec"));
+          // (anything else: the server knows best — as for a request)
+          softReload();
+        })
+        // slow, not necessarily failed: the server may have it — ask it
+        .receive("timeout", () => softReload());
     } else {
       // right after a reload the ride is known before its channel is set up
       // (that waits for the socket): join it now — the push waits for the
@@ -5569,6 +5613,9 @@ const booting = HoodBoot.create({
     // signed out (here or from another device): no remembered map area left
     HoodViewStore.forgetAll(storageOrNull());
     HoodReadStore.forgetAll(storageOrNull());
+    // …and the rest the Sign out button clears: the block, a refresh due
+    forgetAllSpots(storageOrNull());
+    HoodGoogleRefresh.forget(storageOrNull());
     // the sign-in really over (expired, signed out elsewhere): the page
     // started neutral for a signed-in visitor — now the sign-in screen, whole
     document.documentElement.classList.remove("resuming");

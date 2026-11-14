@@ -52,13 +52,19 @@ defmodule Hoodride.AccountDeletion do
 
   # the database step: all or nothing. Only the database being unable to
   # answer becomes {:error, :failed}; any other error (a bug) still crashes.
+  # IMMEDIATE: the write lock from the start. It read first, then deleted —
+  # started as a reader (SQLite's default), a write saved in between failed
+  # the deletion at once, busy_timeout or not (Hoodride.DeletionBusyTest)
   defp erase(user_id) do
     {:ok, photo} =
-      Repo.transaction(fn ->
-        user = Accounts.get_user(user_id)
-        if user, do: Repo.delete!(user)
-        user && user.photo
-      end)
+      Repo.transaction(
+        fn ->
+          user = Accounts.get_user(user_id)
+          if user, do: Repo.delete!(user)
+          user && user.photo
+        end,
+        mode: :immediate
+      )
 
     {:ok, photo}
   rescue

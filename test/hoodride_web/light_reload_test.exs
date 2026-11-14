@@ -159,8 +159,7 @@ line two	tab"
 
       :ets.insert(
         :chat_messages,
-        {key, System.unique_integer([:positive, :monotonic]), eve.id, "m#{cap + 1}",
-         System.system_time(:second)}
+        {key, Chat.next_id(), eve.id, "m#{cap + 1}", System.system_time(:second)}
       )
 
       c = by_peer(list(me), eve)

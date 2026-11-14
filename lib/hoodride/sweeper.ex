@@ -49,8 +49,17 @@ defmodule Hoodride.Sweeper do
   @request_pairs [{{:"$1", :"$2", :_}, [], [{{:"$1", :"$2"}}]}]
   @conversation_keys [{{:"$1", :_}, [], [:"$1"]}]
 
-  @doc "One synchronous sweep — used by the timer and by tests."
-  def sweep_now, do: run_steps(steps())
+  # the longest the pass waits on a map writer (a ride's start waits as long:
+  # :ride_geo_timeout)
+  @writer_wait 1_000
+
+  @doc """
+  One synchronous sweep — used by the timer and by tests. Its map-writer
+  waits are short (#{@writer_wait} ms, then none once one runs out:
+  Hoodride.GeoWriter.short_waits/2) — waiting 5 s on each stale car with
+  the writers backed up stalled every later step for minutes.
+  """
+  def sweep_now, do: Hoodride.GeoWriter.short_waits(@writer_wait, fn -> run_steps(steps()) end)
 
   @doc """
   The sweep's steps, in order — each {name, fun}. Run one by one by
