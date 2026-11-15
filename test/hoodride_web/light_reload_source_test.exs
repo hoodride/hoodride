@@ -32,7 +32,10 @@ defmodule HoodrideWeb.LightReloadSourceTest do
   end
 
   test "a reload's chat: in full → loaded; a summary → not loaded, its summary kept" do
-    h = body("hydrate")
+    # (each chat in its own function since the chat list came in pages —
+    # owner, 2026-11-14: a page of older chats is applied the same way)
+    assert body("hydrate") =~ "(st.conversations || []).forEach(applyConversation);"
+    h = body("applyConversation")
     assert h =~ "if (Array.isArray(c.messages)) {"
     assert h =~ "chat.loaded = true;"
     assert h =~ "chat.loaded = false;"

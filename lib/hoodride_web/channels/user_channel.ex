@@ -102,6 +102,12 @@ defmodule HoodrideWeb.UserChannel do
       # a planned restart is announced here first (HoodrideWeb.RestartNotice)
       Phoenix.PubSub.subscribe(Hoodride.PubSub, HoodrideWeb.RestartNotice.topic())
 
+      # this connection really opened: its stamp now counts — an automatic
+      # reconnect with a lower one is told it moved (Hoodride.SessionStamp).
+      # Not at connect: a connect can fail after it (UserSocket close_strays)
+      if is_integer(socket.assigns[:stamp]),
+        do: Hoodride.SessionStamp.saw(socket.assigns.user_id, socket.assigns.stamp)
+
       # NEWEST WINS: one live session per account. Register FIRST (so
       # presence never lapses during the hand-over), then kick every older
       # session. A reload's stale socket dies now instead of after a ~60s
@@ -344,6 +350,18 @@ defmodule HoodrideWeb.UserChannel do
 
       true ->
         {:reply, {:error, %{reason: "none"}}, socket}
+    end
+  end
+
+  # "Read up to" (owner, 2026-11-14 — the chat list in pages): the app
+  # read this chat up to their message `id` sent at `ts`. Kept on the
+  # server so the 💬 badge counts chats not loaded yet (Hoodride.Chat
+  # .mark_read: only one of the partner's messages there; never back)
+  defp event("read", %{"peer" => peer_id, "ts" => ts, "id" => id}, socket)
+       when is_integer(peer_id) and is_integer(ts) and is_integer(id) do
+    case Hoodride.Chat.mark_read(socket.assigns.user_id, peer_id, ts, id) do
+      :ok -> {:reply, :ok, socket}
+      {:error, reason} -> {:reply, {:error, %{reason: Atom.to_string(reason)}}, socket}
     end
   end
 

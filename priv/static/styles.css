@@ -146,6 +146,28 @@ html.resuming #screen-login .boot-status {
   to { visibility: visible; }
 }
 
+/* a desktop (HoodDevice): the QR box instead of the sign-in — the
+   brand and what Hood Ride is stay above it (owner, 2026-11-14) */
+html.desktop #screen-login .boot-status,
+html.desktop #auth-buttons,
+html.desktop #screen-login .fineprint {
+  display: none !important;
+}
+.desktop-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 340px;
+  text-align: center;
+}
+.desktop-title { font-size: 18px; font-weight: 700; margin: 0; }
+/* black on white with its own border: scanned reliably on a dark page */
+.desktop-qr { width: 200px; height: 200px; padding: 10px; background: #fff; border-radius: 12px; }
+.desktop-line { color: var(--muted); margin: 0; font-size: 14px; }
+.desktop-links { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+.desktop-links a { color: var(--muted); }
+
 /* Cloudflare's check (HoodTurnstile): OUT of the layout, under the buttons
    — even invisible it puts its own box in while it checks, which pushed
    the buttons down and back (owner, 2026-11-14). Seen only when it wants
@@ -747,6 +769,8 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   cursor: pointer;
 }
 .chat-item:hover { background: #2c2c2e; }
+/* the list's last row while older chats are still to come (owner, 2026-11-14) */
+.chat-more { padding: 14px 10px; text-align: center; font-size: 13px; cursor: pointer; }
 .avatar-mini { width: 40px; height: 40px; border-width: 2px; flex-shrink: 0; }
 .chat-item-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .chat-item-info .muted { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

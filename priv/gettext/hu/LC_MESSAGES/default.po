@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "Nem sikerült betölteni az üzeneteket. Próbáld újra."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "Nem sikerült betölteni a régebbi csevegéseket – koppints az újrapróbáláshoz"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Nem érhető el a Hood Ride – ellenőrizd a kapcsolatot, és próbáld újra."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "A Hood Ride-ot megnyitották egy másik eszközön"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "A Hood Ride a telefonodon működik"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "Elfogadom"
 
@@ -411,6 +419,10 @@ msgstr "Nyelv"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Kilépés a bemutatóból"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "Régebbi csevegések betöltése…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "Mentés"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Mentés, és online leszek"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "Olvasd be ezt a telefonod kamerájával a megnyitáshoz."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "nyisd meg: {app} › ⋮ › Beállítások › Webhelybeállítások �
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "nyisd meg: ⋮ › Beállítások › Webhelyengedélyek › Hely › Engedélykérés"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "vagy nyisd meg a hoodride.app oldalt a telefonodon"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

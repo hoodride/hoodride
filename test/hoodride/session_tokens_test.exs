@@ -339,19 +339,52 @@ defmodule Hoodride.SessionTokensTest do
     assert {:ok, _} = SessionTokens.lookup(again)
   end
 
-  test "the cap drops expired (unswept) and unused replacements before anything in use" do
+  # (parked 2026-11-14, fixed in the same batch) a sign-in and its renewal
+  # no request has used yet are ONE device: its phone may hold either — the
+  # renewal's reply arrived and the app was closed right after, or the
+  # reply was lost. The cap used to drop that renewal first, and the phone
+  # holding it was signed out the next time it opened the app.
+  test "the cap never splits a sign-in from its unused renewal: the oldest device goes" do
+    u = user("st-cap-renewed")
+    old = week_old(u)
+
+    # (the phone's own first sign-in is the OLDEST of all — 8 days — but it
+    # renewed just now: devices rank by their latest renewal)
+    others =
+      for i <- 1..8 do
+        {:ok, raw} = SessionTokens.create(u.id)
+        age(raw, (8 - i) * @day + 1_000, 0)
+        raw
+      end
+
+    # the phone renews, gets the reply, and the app is closed
+    {:ok, renewed} = SessionTokens.rotate(old)
+    assert count(u.id) == 10
+
+    # an 11th sign-in somewhere
+    {:ok, _} = SessionTokens.create(u.id)
+    assert count(u.id) <= 10
+    assert {:ok, _} = SessionTokens.lookup(renewed), "the phone's renewal kept"
+    assert {:ok, _} = SessionTokens.lookup(old), "…and the token before it (a lost reply)"
+    assert SessionTokens.lookup(hd(others)) == :error, "the oldest device went instead"
+  end
+
+  test "the cap drops expired (unswept) sign-ins first; a device's renewal goes with it" do
     u = user("st-cap-order")
     {:ok, expired} = SessionTokens.create(u.id)
     age(expired, 31 * @day)
     other_old = week_old(u)
     {:ok, orphan} = SessionTokens.rotate(other_old)
+    # the renewal pair is the OLDEST device: its renewal 10 days ago
+    age(orphan, 10 * @day, 100 * @day)
     for _ <- 1..8, do: SessionTokens.create(u.id)
     # expired, other_old, orphan + 8: the 11th went (the expired one); one more
     {:ok, _} = SessionTokens.create(u.id)
-    assert count(u.id) == 10
+    assert count(u.id) <= 10
     assert rows(u.id) |> List.flatten() |> Enum.member?(SessionTokens.hash(expired)) == false
-    assert SessionTokens.lookup(orphan) == :error, "the unused replacement went"
-    assert {:ok, _} = SessionTokens.lookup(other_old), "its device's token kept"
+    # the whole device, both tokens — never one of the two
+    assert SessionTokens.lookup(orphan) == :error
+    assert SessionTokens.lookup(other_old) == :error
   end
 
   test "signing in again from the same browser at the cap: still 10, the old one replaced" do

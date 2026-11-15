@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "Δεν ήταν δυνατή η φόρτωση των μηνυμάτων. Δοκίμασε ξανά."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "Δεν ήταν δυνατή η φόρτωση παλαιότερων συνομιλιών — πάτησε για να δοκιμάσεις ξανά"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Δεν ήταν δυνατή η σύνδεση με το Hood Ride — έλεγξε τη σύνδεσή σου και δοκίμασε ξανά."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Το Hood Ride άνοιξε σε άλλη συσκευή"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Το Hood Ride λειτουργεί στο κινητό σου"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "Συμφωνώ"
 
@@ -411,6 +419,10 @@ msgstr "Γλώσσα"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Έξοδος από την επίδειξη"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "Φόρτωση παλαιότερων συνομιλιών…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "Αποθήκευση"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Αποθήκευση και έναρξη υπηρεσίας"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "Σάρωσε αυτόν τον κωδικό με την κάμερα του κινητού σου για να το ανοίξεις."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "άνοιξε το {app} › ⋮ › Ρυθμίσεις › Ρυθμίσ�
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "άνοιξε το ⋮ › Ρυθμίσεις › Άδειες ιστοτόπων › Τοποθεσία › Ερώτηση για άδεια"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "ή πήγαινε στο hoodride.app από το κινητό σου"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

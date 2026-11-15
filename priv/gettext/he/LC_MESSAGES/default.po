@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "לא ניתן לטעון את ההודעות. נסה שוב."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "אי אפשר לטעון צ'אטים ישנים יותר — אפשר להקיש כדי לנסות שוב"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "אין חיבור ל-Hood Ride — כדאי לבדוק את החיבור לאינטרנט ולנסות שוב."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride נפתח במכשיר אחר"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride עובד בטלפון שלך"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "אני מסכים/ה"
 
@@ -411,6 +419,10 @@ msgstr "שפה"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "יציאה מההדגמה"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "טוען צ'אטים ישנים יותר…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "שמירה"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "שמירה והתחברות"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "אפשר לסרוק את זה עם מצלמת הטלפון כדי לפתוח."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "פותחים את {app} › ⋮ › הגדרות › הגדרות לאת
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "פותחים את ⋮ › הגדרות › הגדרות אתר › מיקום › לבקש לאפשר"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "או להיכנס ל-hoodride.app בטלפון"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "无法加载消息，请重试。"
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "无法加载更早的聊天，轻触重试"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "无法连接 Hood Ride，请检查网络连接后重试。"
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride 已在另一台设备上打开"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride 需在手机上使用"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "我同意"
 
@@ -411,6 +419,10 @@ msgstr "语言"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "退出演示"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "正在加载更早的聊天…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "保存"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "保存并上线"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "用手机相机扫描此码即可打开。"
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "打开 {app} › ⋮ › 设置 › 网站设置 › 位置信息 › �
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "打开 ⋮ › 设置 › 网站权限 › 位置 › 询问是否允许"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "或在手机上访问 hoodride.app"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

@@ -630,7 +630,9 @@ defmodule HoodrideWeb.AuthController do
          # a ride too busy to answer: retried like a busy database, never
          # "no ride" (the app would close it: Hoodride.RideBusyTest)
          ride when ride != :busy <- ride_of(u.id) do
-      convos = Hoodride.Chat.conversations_for(u.id)
+      wanted = chats_wanted(params)
+      page = chat_page(u.id, wanted)
+      convos = page.conversations
       open = Hoodride.Requests.open_request_of(u.id)
       pending = Hoodride.Requests.pending_for_driver(u.id)
 
@@ -649,7 +651,13 @@ defmodule HoodrideWeb.AuthController do
             # (and gets no connection token until then)
             terms_agreed: terms_agreed,
             ride: ride_state(ride, u.id, people),
-            conversations: conversation_state(convos, people, chats_wanted(params), u.id),
+            conversations: conversation_state(convos, people, wanted, u.id),
+            # the chat list in pages (owner, 2026-11-14): where the next
+            # starts (GET /api/chats?before=), and the unread in the rest
+            more: cursor_text(page.more),
+            unread_more: page.unread_rest |> Map.values() |> Enum.sum(),
+            unread_rest: page.unread_rest,
+            read_known: page.read_known,
             open_request: open_request_state(open, people),
             pending_requests: pending_request_state(pending, people),
             # live map presence, so a reload RESUMES a raised hand or an
@@ -737,6 +745,41 @@ defmodule HoodrideWeb.AuthController do
 
   defp chats_wanted(_params), do: :full
 
+  # the light reload: the first page (and the chat on screen); in full (an
+  # older app copy): every chat, as before
+  defp chat_page(user_id, :full),
+    do: %{
+      conversations: Hoodride.Chat.conversations_for(user_id),
+      more: nil,
+      unread_rest: %{},
+      read_known: false
+    }
+
+  defp chat_page(user_id, {:list, open}),
+    do: Hoodride.Chat.page(user_id, nil, Hoodride.Limits.chat_page(), id_of(open))
+
+  defp id_of(text) when is_binary(text) do
+    case Integer.parse(text) do
+      {n, ""} -> n
+      _ -> nil
+    end
+  end
+
+  defp id_of(_), do: nil
+
+  # a page's cursor as text: "<last activity>.<partner id>" (ids are random
+  # 64-bit numbers: up to 19 digits)
+  defp cursor_text(nil), do: nil
+  defp cursor_text({last, peer}), do: "#{last}.#{peer}"
+
+  defp cursor_of(text) when is_binary(text) do
+    with [_, last, peer] <- Regex.run(~r/\A(\d{1,19})\.(\d{1,19})\z/, text),
+         do: {String.to_integer(last), String.to_integer(peer)},
+         else: (_ -> nil)
+  end
+
+  defp cursor_of(_), do: nil
+
   # a summary, unless it's the full answer or the chat on screen
   defp summary?(:full, _peer_id), do: false
   defp summary?({:list, open}, peer_id), do: open != Integer.to_string(peer_id)
@@ -745,7 +788,13 @@ defmodule HoodrideWeb.AuthController do
     for c <- convos, peer = people[c.peer_id], peer != nil do
       # the partner's latest block, if they shared one (not driving) — with
       # its age on the server's clock (ARCHITECTURE.md "Distances")
-      base = %{peer: person(peer), last_activity: c.last_activity, peer_spot: c.peer_spot}
+      base = %{
+        peer: person(peer),
+        last_activity: c.last_activity,
+        peer_spot: c.peer_spot,
+        # my "read up to" here, kept on the server (Hoodride.Chat.mark_read)
+        read: Map.get(c, :read)
+      }
 
       if summary?(wanted, c.peer_id) do
         s = Hoodride.Chat.summary(c, user_id)
@@ -780,6 +829,38 @@ defmodule HoodrideWeb.AuthController do
               :none -> conn |> put_status(404) |> json(%{error: "none"})
             end
         end
+    end
+  end
+
+  # GET /api/chats?before=<cursor> — the chat list's next page (owner,
+  # 2026-11-14): older chats as the list is scrolled, as summaries. The
+  # same budget and checks as /api/chat.
+  def chats(conn, params) do
+    conn = put_resp_header(conn, "cache-control", "no-store")
+
+    with {:user, %{} = user} <- {:user, conn.assigns.current_user},
+         {:terms, true} <- {:terms, Hoodride.Terms.agreed?(user)},
+         {:cursor, {_, _} = cursor} <- {:cursor, cursor_of(params["before"])} do
+      page = Hoodride.Chat.page(user.id, cursor, Hoodride.Limits.chat_page())
+
+      case Accounts.profiles(Enum.map(page.conversations, & &1.peer_id)) do
+        {:ok, people} ->
+          json(conn, %{
+            conversations: conversation_state(page.conversations, people, {:list, nil}, user.id),
+            more: cursor_text(page.more),
+            unread_more: page.unread_rest |> Map.values() |> Enum.sum(),
+            unread_rest: page.unread_rest,
+            read_known: page.read_known,
+            now: System.system_time(:millisecond)
+          })
+
+        {:error, :unavailable} ->
+          conn |> put_status(503) |> json(%{error: "busy"})
+      end
+    else
+      {:user, _} -> conn |> put_status(401) |> json(%{error: "unauthenticated"})
+      {:terms, _} -> conn |> put_status(403) |> json(%{error: "terms"})
+      {:cursor, _} -> conn |> put_status(400) |> json(%{error: "bad_cursor"})
     end
   end
 

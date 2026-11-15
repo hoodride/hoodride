@@ -26,6 +26,7 @@ defmodule Hoodride.OpenSourceTest do
           {"h3-js.umd.js", "h3-js.LICENSE.txt",
            "Apache License\n                           Version 2.0, January 2004"},
           {"phoenix.min.js", "phoenix.LICENSE.txt", "Copyright (c) 2014 Chris McCord"},
+          {"bowser.js", "bowser.LICENSE.txt", "Copyright 2015, Dustin Diaz"},
           {"icons.js", "fluent-emoji.LICENSE.txt", "Copyright (c) Microsoft Corporation."},
           {"translate.svg", "material-symbols.LICENSE.txt", "Apache License"},
           {"fonts/NotoSansEthiopic-Regular.ttf", "fonts/noto-sans-ethiopic.OFL.txt",

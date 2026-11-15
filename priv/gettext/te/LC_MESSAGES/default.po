@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "సందేశాలను లోడ్ చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "పాత చాట్‌లను లోడ్ చేయడం సాధ్యపడలేదు. మళ్లీ ట్రై చేయడానికి ట్యాప్ చేయండి"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Rideకు కనెక్ట్ కాలేకపోయింది. మీ కనెక్షన్‌ను చెక్ చేసి, మళ్లీ ట్రై చేయండి."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride మరో పరికరంలో తెరవబడింది"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride మీ ఫోన్‌లో పనిచేస్తుంది"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "నేను అంగీకరిస్తున్నాను"
 
@@ -411,6 +419,10 @@ msgstr "భాష"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "డెమో నుండి నిష్క్రమించండి"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "పాత చాట్‌లు లోడ్ అవుతున్నాయి…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "సేవ్ చేయండి"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "సేవ్ చేసి ఆన్‌లైన్‌కు వెళ్లండి"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "తెరవడానికి మీ ఫోన్ కెమెరాతో దీన్ని స్కాన్ చేయండి."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "{app}ను తెరవండి › ⋮ › సెట్టింగ�
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "⋮ను తెరవండి › సెట్టింగ్‌లు › సైట్ అనుమతులు › లొకేషన్ › అనుమతించడానికి అడగండి"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "లేదా మీ ఫోన్‌లో hoodride.app కి వెళ్లండి"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

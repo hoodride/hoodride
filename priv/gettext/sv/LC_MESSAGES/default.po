@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "Det gick inte att ladda meddelandena. Försök igen."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "Det gick inte att ladda äldre chattar. Tryck för att försöka igen"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Det gick inte att nå Hood Ride. Kontrollera anslutningen och försök igen."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride öppnades på en annan enhet"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride fungerar i din mobil"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "Jag godkänner"
 
@@ -411,6 +419,10 @@ msgstr "Språk"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Lämna demon"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "Laddar äldre chattar…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "Spara"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Spara och gå online"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "Skanna den här med mobilens kamera för att öppna den."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "öppna {app} › ⋮ › Inställningar › Webbplatsinställningar › 
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "öppna ⋮ › Inställningar › Webbplatsbehörigheter › Plats › Fråga för att tillåta"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "eller gå till hoodride.app i mobilen"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

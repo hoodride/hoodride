@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "ಸಂದೇಶಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "ಹಳೆಯ ಚಾಟ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಲು ಟ್ಯಾಪ್ ಮಾಡಿ"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Ride ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — ನಿಮ್ಮ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride ಅನ್ನು ಇನ್ನೊಂದು ಸಾಧನದಲ್ಲಿ ತೆರೆಯಲಾಗಿದೆ"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ ಕೆಲಸ ಮಾಡುತ್ತದೆ"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "ನಾನು ಒಪ್ಪುತ್ತೇನೆ"
 
@@ -411,6 +419,10 @@ msgstr "ಭಾಷೆ"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "ಡೆಮೊದಿಂದ ನಿರ್ಗಮಿಸಿ"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "ಹಳೆಯ ಚಾಟ್‌ಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "ಉಳಿಸಿ"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "ಉಳಿಸಿ ಮತ್ತು ಆನ್‌ಲೈನ್ ಆಗಿ"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "ತೆರೆಯಲು ನಿಮ್ಮ ಫೋನ್‌ನ ಕ್ಯಾಮರಾದಿಂದ ಇದನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "{app} ತೆರೆಯಿರಿ › ⋮ › ಸೆಟ್ಟಿಂಗ್�
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "⋮ ತೆರೆಯಿರಿ › ಸೆಟ್ಟಿಂಗ್‌ಗಳು › ಸೈಟ್ ಅನುಮತಿಗಳು › ಸ್ಥಳ › ಅನುಮತಿಸಲು ಕೇಳಿ"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "ಅಥವಾ ನಿಮ್ಮ ಫೋನ್‌ನಲ್ಲಿ hoodride.app ಗೆ ಹೋಗಿ"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

@@ -115,5 +115,20 @@
     } catch (_) {}
   }
 
-  return { key, newer, reconcile, seen, read, save, forget, forgetAll };
+  // the server's "read up to" ({peerId: [ts, id]}, owner 2026-11-14 — the
+  // chat list in pages) merged into this phone's note: the later of the
+  // two per chat. A phone with no note yet takes the server's (a new
+  // phone: not "everything read"); with neither, still the first run (null)
+  function merge(note, server) {
+    const marks = clean(server);
+    if (!Object.keys(marks).length) return note;
+    const out = { ...(note || {}) };
+    for (const [k, mark] of Object.entries(marks)) {
+      const mine = out[k];
+      if (!mine || newer({ ts: mark[0], id: mark[1] }, mine)) out[k] = mark;
+    }
+    return out;
+  }
+
+  return { key, newer, newest, reconcile, seen, merge, read, save, forget, forgetAll };
 });

@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "Không tải được tin nhắn. Hãy thử lại."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "Không thể tải các cuộc trò chuyện cũ hơn — nhấn để thử lại"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Không kết nối được với Hood Ride — hãy kiểm tra kết nối mạng và thử lại."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride đã được mở trên thiết bị khác"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride dùng trên điện thoại của bạn"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "Tôi đồng ý"
 
@@ -411,6 +419,10 @@ msgstr "Ngôn ngữ"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Thoát bản demo"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "Đang tải các cuộc trò chuyện cũ hơn…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "Lưu"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Lưu và bật nhận chuyến"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "Quét mã này bằng camera điện thoại để mở."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "mở {app} › ⋮ › Cài đặt › Cài đặt trang web › Vị tr
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "mở ⋮ › Cài đặt › Quyền của trang web › Vị trí › Hỏi để cho phép"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "hoặc truy cập hoodride.app trên điện thoại"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

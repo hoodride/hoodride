@@ -71,3 +71,7 @@ config :hoodride, :languages, :all
 # property tests (StreamData): 100 random cases each by default; a deeper
 # search when asked — PROP_RUNS=2000 mix test test/hoodride_web/properties_test.exs
 config :stream_data, max_runs: String.to_integer(System.get_env("PROP_RUNS", "100"))
+
+# the app opens on a computer too (HoodDevice — phones and tablets only in
+# production; owner, 2026-11-14)
+config :hoodride, :any_device, true

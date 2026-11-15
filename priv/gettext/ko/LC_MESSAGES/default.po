@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "메시지를 불러오지 못했어요. 다시 시도해 주세요."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "이전 채팅을 불러올 수 없어요. 탭해서 다시 시도해 주세요"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Ride에 연결하지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "다른 기기에서 Hood Ride가 열렸어요"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride는 휴대폰에서 이용할 수 있어요"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "동의합니다"
 
@@ -411,6 +419,10 @@ msgstr "언어"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "데모 나가기"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "이전 채팅 불러오는 중…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "저장"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "저장하고 온라인 전환"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "휴대폰 카메라로 이 코드를 스캔해서 열어 보세요."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "{app} 열기 › ⋮ › 설정 › 사이트 설정 › 위치 › Hood
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "⋮ 열기 › 설정 › 사이트 권한 › 위치 › 허용 여부 확인"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "또는 휴대폰에서 hoodride.app에 접속하세요"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

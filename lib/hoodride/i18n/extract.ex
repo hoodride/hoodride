@@ -19,7 +19,7 @@ defmodule Hoodride.I18n.Extract do
 
   # code the app ships that isn't ours (THIRD-PARTY.md), and the helper
   # itself (its comments show calls as examples)
-  @not_ours ~w(maplibre-gl.js h3-js.umd.js phoenix.min.js i18n.js)
+  @not_ours ~w(maplibre-gl.js h3-js.umd.js phoenix.min.js bowser.js i18n.js)
 
   @doc "Our scripts in `dir`, sorted (relative paths)."
   def sources(dir \\ "priv/static") do

@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "No se pudieron cargar los mensajes. Inténtalo de nuevo."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "No se pudieron cargar los chats anteriores. Toca para intentarlo de nuevo"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "No se pudo conectar con Hood Ride. Revisa tu conexión e inténtalo de nuevo."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride se abrió en otro dispositivo"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride funciona en tu teléfono"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "Acepto"
 
@@ -411,6 +419,10 @@ msgstr "Idioma"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Salir de la demo"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "Cargando chats anteriores…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "Guardar"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Guardar y conectarse"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "Escanea esto con la cámara de tu teléfono para abrirlo."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "abre {app} › ⋮ › Configuración › Configuración de sitios › U
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "abre ⋮ › Ajustes › Configuración del sitio › Ubicación › Pedir permiso"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "o ve a hoodride.app en tu teléfono"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

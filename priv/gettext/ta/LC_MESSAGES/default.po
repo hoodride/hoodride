@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "செய்திகளை ஏற்ற முடியவில்லை. மீண்டும் முயலவும்."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "பழைய அரட்டைகளை ஏற்ற முடியவில்லை. மீண்டும் முயல தட்டவும்"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Ride உடன் இணைக்க முடியவில்லை. உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride வேறொரு சாதனத்தில் திறக்கப்பட்டது"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride உங்கள் ஃபோனில் இயங்கும்"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "ஏற்கிறேன்"
 
@@ -411,6 +419,10 @@ msgstr "மொழி"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "டெமோவிலிருந்து வெளியேறு"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "பழைய அரட்டைகளை ஏற்றுகிறது…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "சேமி"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "சேமித்து ஆன்லைனுக்குச் செல்"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "திறக்க, உங்கள் ஃபோன் கேமராவால் இதை ஸ்கேன் செய்யவும்."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "{app} ஐத் திறக்கவும் › ⋮ › அமைப�
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "⋮ ஐத் திறக்கவும் › அமைப்புகள் › தள அனுமதிகள் › இருப்பிடம் › அனுமதிக்கக் கேள்"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "அல்லது உங்கள் ஃபோனில் hoodride.app க்குச் செல்லவும்"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

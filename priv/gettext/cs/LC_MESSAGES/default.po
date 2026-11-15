@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "Zprávy se nepodařilo načíst. Zkus to znovu."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "Starší chaty se nepodařilo načíst – klepnutím to zkus znovu"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Nepodařilo se spojit s Hood Ride – zkontroluj připojení a zkus to znovu."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride je teď otevřený na jiném zařízení"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride funguje v telefonu"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "Souhlasím"
 
@@ -411,6 +419,10 @@ msgstr "Jazyk"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Ukončit demo"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "Načítání starších chatů…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "Uložit"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Uložit a přejít online"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "Naskenuj tento kód fotoaparátem telefonu a otevři ho."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "otevři {app} › ⋮ › Nastavení › Nastavení webu › Poloha › 
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "otevři ⋮ › Nastavení › Oprávnění serverů › Poloha › Vždy se zeptat"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "nebo v telefonu otevři hoodride.app"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

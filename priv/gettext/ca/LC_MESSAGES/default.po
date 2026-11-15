@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "No s'han pogut carregar els missatges. Torna-ho a provar."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "No s'han pogut carregar els xats més antics. Toca per tornar-ho a provar"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "No s'ha pogut connectar amb Hood Ride. Comprova la connexió i torna-ho a provar."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride s'ha obert en un altre dispositiu"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride funciona al teu mòbil"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "Hi estic d'acord"
 
@@ -411,6 +419,10 @@ msgstr "Idioma"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Surt de la demo"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "S'estan carregant xats més antics…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "Desa"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Desa i connecta't"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "Escaneja això amb la càmera del mòbil per obrir-lo."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "obre {app} › ⋮ › Configuració › Configuració del lloc web › 
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "obre ⋮ › Paràmetres › Paràmetres del lloc › Ubicació › Demana-m’ho"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "o ves a hoodride.app des del mòbil"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

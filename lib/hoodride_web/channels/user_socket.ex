@@ -160,9 +160,10 @@ defmodule HoodrideWeb.UserSocket do
 
     case SessionStamp.decide(choice?, stamp, SessionStamp.highest(user_id), live) do
       :take_over ->
+        # (the stamp counts from the JOIN — HoodrideWeb.UserChannel: a
+        # connect that never opens must not fence the other device out)
         stamp = if choice?, do: SessionStamp.issue(), else: stamp
-        SessionStamp.saw(user_id, stamp)
-        take_over(user_id)
+        close_strays(user_id)
         {:ok, _} = Registry.register(Hoodride.SocketStamps, user_id, stamp)
         start_join_deadline(user_id)
         assign(socket, :stamp, stamp)
@@ -201,34 +202,25 @@ defmodule HoodrideWeb.UserSocket do
 
   defp socket_topic(user_id), do: "user_socket:#{user_id}"
 
-  # replace every older socket of this account (see the moduledoc)
-  defp take_over(user_id) do
+  # Close the account's older sockets that never joined a user channel
+  # (idle, or a script's). One that DID join — a device in use — is left
+  # alone here: it is handed over when this socket joins (UserChannel
+  # hand_over). Phoenix runs connect/3 before it checks the upgrade request
+  # is complete, so a request a broken proxy stripped gets this far and then
+  # fails: kicking the other device here made a "Use here" ping-pong
+  # between your own devices (parked 2026-11-14, fixed in the same batch).
+  defp close_strays(user_id) do
     topic = socket_topic(user_id)
+    olds = for {pid, _} <- Registry.lookup(Hoodride.PubSub, topic), do: pid
 
-    case for({pid, _} <- Registry.lookup(Hoodride.PubSub, topic), do: pid) do
-      [] ->
-        :ok
+    joined =
+      for {_chan, transport} <- Registry.lookup(Hoodride.UserChannels, user_id), do: transport
 
-      olds ->
-        # the hand-over for sockets that hold a user channel: that channel
-        # tells its app, then closes its own socket
-        handed =
-          for {chan, transport} <- Registry.lookup(Hoodride.UserChannels, user_id),
-              transport in olds do
-            send(chan, :session_moved)
-            transport
-          end
-
-        for transport <- olds -- handed do
-          send(transport, %Phoenix.Socket.Broadcast{
-            topic: topic,
-            event: "disconnect",
-            payload: %{}
-          })
-        end
-
-        :ok
+    for transport <- olds -- joined do
+      send(transport, %Phoenix.Socket.Broadcast{topic: topic, event: "disconnect", payload: %{}})
     end
+
+    :ok
   end
 
   # Only the LATEST connect's deadline counts: a newer connect replaced this

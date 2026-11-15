@@ -40,7 +40,8 @@ defmodule HoodrideWeb.SameUserWiringTest do
       refute src =~ ~r/window\.fetch\(\s*["'`]\/api/, "#{f} calls /api without apiFetch"
     end
 
-    assert length(Regex.scan(~r/apiFetch\("\/api\//, @app)) == 11
+    # (12: + the chat list's older pages, /api/chats — owner, 2026-11-14)
+    assert length(Regex.scan(~r/apiFetch\("\/api\//, @app)) == 12
     # (the one exception, and only once: the error report, with no account)
     assert length(Regex.scan(~r/fetch\("\/api\/client-error"/, @app)) == 1
     refute @app =~ ~r/x-hood-user[^

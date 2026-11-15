@@ -342,6 +342,13 @@ function page(cdp, sessionId, name, browserContextId) {
     async phone(width, height, scale = 2) {
       await send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: scale, mobile: true });
     },
+    // this page as another device: what it says it is, and its touchscreen
+    // (touch points; none = a desktop's) — for phones-and-tablets-only
+    // (HoodDevice: journey `desktopqr`). Before goto: the next load sees it
+    async asDevice({ userAgent, touchPoints = 0 }) {
+      await send("Emulation.setUserAgentOverride", { userAgent });
+      await send("Emulation.setTouchEmulationEnabled", { enabled: touchPoints > 0, maxTouchPoints: Math.max(touchPoints, 1) });
+    },
     // hold back every request whose address matches `urlPattern` (Chrome's
     // wildcards: *) for `ms`, then let it through — to see what a slow
     // network does (e.g. the map server's fonts)

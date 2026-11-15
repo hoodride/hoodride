@@ -402,11 +402,19 @@ defmodule HoodrideWeb.PageController do
           ""
       end
 
+    # any device (development, the tests' browsers — desktops): the app
+    # opens on a computer too (HoodDevice); never in production
+    any_device =
+      if Application.get_env(:hoodride, :any_device, false),
+        do: ~s(  <meta name="hoodride-any-device" content="1">\n),
+        else: ""
+
     String.replace(
       StaticVersions.stamp(html),
       "</head>",
       ~s(  <meta name="hoodride-build" content="#{Build.current()}">\n) <>
-        ~s(  <meta name="hoodride-providers" content="#{providers}">\n) <> turnstile <> "</head>",
+        ~s(  <meta name="hoodride-providers" content="#{providers}">\n) <>
+        turnstile <> any_device <> "</head>",
       global: false
     )
   end

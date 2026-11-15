@@ -53,6 +53,13 @@ defmodule Hoodride.Chat do
   # with the conversation; a stray from a send racing a delete goes at the
   # sweeper's repair pass (heal_index)
   @started :chat_started
+  # "read up to", per person per chat (owner, 2026-11-14 — the chat list in
+  # pages): {{pair_key, user_id}, ts, id} — the same [time, id] bookmark
+  # the phone keeps (HoodReadStore), always one of the partner's messages
+  # in that chat, never moving back. Unread in the chats a page doesn't
+  # bring is counted from it. Deleted with the conversation; a stray from a
+  # read racing a delete goes at the sweeper's repair pass (heal_index)
+  @reads :chat_reads
 
   def init_tables do
     Hoodride.ETS.new(@conversations, [:named_table, :public, :set])
@@ -61,6 +68,7 @@ defmodule Hoodride.Chat do
     Hoodride.ETS.new(@spots, [:named_table, :public, :set])
     Hoodride.ETS.new(@sent_ids, [:named_table, :public, :set])
     Hoodride.ETS.new(@started, [:named_table, :public, :bag])
+    Hoodride.ETS.new(@reads, [:named_table, :public, :set])
     # the last message id handed out (next_id/0)
     :persistent_term.put({__MODULE__, :last_id}, :atomics.new(1, signed: true))
     :ok
@@ -298,6 +306,122 @@ defmodule Hoodride.Chat do
 
   def conversation_messages(_user_id, _peer), do: :none
 
+  # ---------- the chat list in pages (owner, 2026-11-14) ----------
+
+  @doc """
+  One page of `user_id`'s chats, the most recent first — by last activity,
+  then the partner's id (two chats in the same second keep one order).
+  `before`: `{last_activity, peer_id}` — only chats older than that one;
+  nil for the first page. `open_peer` (an id or nil): the chat on screen,
+  added even when it's older than the page.
+
+  → `%{conversations: [as conversations_for/1], more: cursor | nil,
+  unread_rest: %{peer_id => n}}` — `more`: where the next page starts (this
+  page's last chat); `unread_rest`: the partner's messages past your "read
+  up to" in each chat after this page that has any — the 💬 badge counts them unloaded. Only the
+  page's chats are read in full; the rest by their ids.
+  """
+  def page(user_id, before, limit, open_peer \\ nil) do
+    mine =
+      for {{^user_id, {a, b} = key}} <- :ets.match_object(@by_user, {{user_id, :_}}),
+          [{^key, last}] <- [:ets.lookup(@conversations, key)] do
+        {last, if(a == user_id, do: b, else: a), key}
+      end
+      |> Enum.sort(:desc)
+
+    after_cursor =
+      case before do
+        nil -> mine
+        cursor -> Enum.filter(mine, fn {last, peer, _} -> {last, peer} < cursor end)
+      end
+
+    {shown, rest} = Enum.split(after_cursor, limit)
+
+    extra =
+      for {_, peer, _} = c <- mine, peer == open_peer, c not in shown, do: c
+
+    %{
+      conversations: Enum.map(shown ++ extra, &conversation(user_id, &1)),
+      more:
+        case {rest, List.last(shown)} do
+          {[], _} -> nil
+          {_, {last, peer, _}} -> {last, peer}
+        end,
+      # per chat, only those with any: a chat not loaded that gets a new
+      # message takes its own over in the app, and they go when it's read
+      # (owner, 2026-11-14 — one total stayed after that chat was read)
+      unread_rest:
+        for(
+          {_, peer, key} <- rest,
+          n = unread(user_id, peer, key),
+          n > 0,
+          into: %{},
+          do: {peer, n}
+        ),
+      # any "read up to" in any of my chats: then a phone with no bookmarks
+      # of its own starts from the server's, not "everything read"
+      read_known: Enum.any?(mine, fn {_, _, key} -> :ets.member(@reads, {key, user_id}) end)
+    }
+  end
+
+  defp conversation(user_id, {last, peer_id, key}) do
+    %{
+      peer_id: peer_id,
+      last_activity: last,
+      messages: messages_of(key),
+      peer_spot: spot_of(key, peer_id),
+      read: read_of(user_id, key)
+    }
+  end
+
+  # the partner's kept messages past my "read up to" (all of them: none yet)
+  defp unread(user_id, peer_id, key) do
+    mark = read_of(user_id, key)
+
+    @messages
+    |> :ets.lookup(key)
+    |> Enum.sort_by(fn {_, id, _, _, _} -> id end)
+    |> Enum.take(-@max_history)
+    |> Enum.count(fn {_, id, sender, _, ts} -> sender == peer_id and past?([ts, id], mark) end)
+  end
+
+  defp past?(_m, nil), do: true
+  defp past?([ts, id], [mts, mid]), do: ts > mts or (ts == mts and id > mid)
+
+  @doc "My \"read up to\" in this chat: `[ts, id]`, or nil."
+  def read_of(user_id, {_, _} = key) do
+    case :ets.lookup(@reads, {key, user_id}) do
+      [{_, ts, id}] -> [ts, id]
+      [] -> nil
+    end
+  end
+
+  @doc """
+  "I've read this chat up to their message `id` (sent at `ts`)": kept if
+  it is one of the PARTNER's messages in our chat and later than what's
+  kept — never back. `:ok`, or `{:error, :none}` (no such chat or message).
+  """
+  def mark_read(user_id, peer_id, ts, id)
+      when is_integer(peer_id) and is_integer(ts) and is_integer(id) do
+    key = pair_key(user_id, peer_id)
+
+    cond do
+      user_id == peer_id or not :ets.member(@conversations, key) ->
+        {:error, :none}
+
+      :ets.match_object(@messages, {key, id, peer_id, :_, ts}) == [] ->
+        {:error, :none}
+
+      true ->
+        if past?([ts, id], read_of(user_id, key)),
+          do: :ets.insert(@reads, {{key, user_id}, ts, id})
+
+        :ok
+    end
+  end
+
+  def mark_read(_user_id, _peer_id, _ts, _id), do: {:error, :none}
+
   defp messages_of(key) do
     @messages
     |> :ets.lookup(key)
@@ -378,6 +502,8 @@ defmodule Hoodride.Chat do
         :ets.delete(@spots, {key, b})
         :ets.delete_object(@started, {a, key})
         :ets.delete_object(@started, {b, key})
+        :ets.delete(@reads, {key, a})
+        :ets.delete(@reads, {key, b})
         extra = if by, do: %{ended_by: by}, else: %{}
         HoodrideWeb.Endpoint.broadcast("user:#{a}", "chat_closed", Map.put(extra, :peer_id, b))
         HoodrideWeb.Endpoint.broadcast("user:#{b}", "chat_closed", Map.put(extra, :peer_id, a))
@@ -428,6 +554,11 @@ defmodule Hoodride.Chat do
     # a block whose conversation is gone (a send racing a delete) goes too
     each_match(@spots, [{{{:"$1", :_}, :_, :_}, [], [:"$_"]}], fn {{key, _}, _, _} = row ->
       unless :ets.member(@conversations, key), do: :ets.delete_object(@spots, row)
+    end)
+
+    # …and a "read up to" whose conversation is gone
+    each_match(@reads, [{{{:"$1", :_}, :_, :_}, [], [:"$_"]}], fn {{key, _}, _, _} = row ->
+      unless :ets.member(@conversations, key), do: :ets.delete_object(@reads, row)
     end)
 
     # …and a "who started it" row whose conversation is gone

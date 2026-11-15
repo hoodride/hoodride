@@ -504,4 +504,63 @@ defmodule HoodrideWeb.SessionStampTest do
     {_, {:ok, %{stamp: s}}} = List.keyfind(t.joins, "world", 0)
     assert s == stamp_of(t)
   end
+
+  # ---------- a connect that never opens (the half-open upgrade) ----------
+
+  # its connection failed (the upgrade never completed): the process is
+  # simply gone — it was never told anything
+  defp failed(tab) do
+    Process.unlink(tab.pid)
+    ref = Process.monitor(tab.pid)
+    Process.exit(tab.pid, :kill)
+    assert_receive {:DOWN, ^ref, :process, _, _}
+  end
+
+  # Phoenix runs connect/3 BEFORE it checks the WebSocket upgrade request is
+  # complete (Phoenix.Transports.WebSocket: connect, then upgrade). A
+  # request a broken proxy stripped got through connect, kicked the other
+  # device, then failed — the app retried, kicked again: a "Use here"
+  # ping-pong between your own devices (crash review, parked 2026-11-14).
+  # Now nothing that affects another device happens before a JOIN — which
+  # only a connection that really opened can make.
+  describe "a connect that never joins" do
+    test "doesn't kick your other device", %{u: u} do
+      laptop = choose(:laptop, u)
+      assert admitted?(laptop)
+
+      half = connected(:half, u, %{"takeover" => "true"})
+      refute told_moved?(laptop)
+      refute closed?(laptop)
+
+      # it never got anywhere: gone
+      failed(half)
+      refute told_moved?(laptop)
+    end
+
+    test "doesn't fence your other device out of its next reconnect", %{u: u} do
+      laptop = choose(:laptop, u)
+      s = stamp_of(laptop)
+
+      half = connected(:half, u, %{"takeover" => "true"})
+      failed(half)
+
+      # the laptop's Wi-Fi blips: its automatic reconnect still gets in
+      gone(laptop)
+      back = auto(:back, u, s)
+      assert admitted?(back), "fenced out by a stamp from a connection that never opened"
+    end
+
+    test "once it joins, it takes over as before", %{u: u} do
+      laptop = choose(:laptop, u)
+      s = stamp_of(laptop)
+
+      phone = connected(:phone, u, %{"takeover" => "true"})
+      assert {:ok, _} = join_now(phone, "user:#{u.id}")
+      assert told_moved?(laptop)
+
+      # and its stamp now counts: the laptop's reconnect is told it moved
+      gone(laptop)
+      assert moved?(auto(:back, u, s))
+    end
+  end
 end

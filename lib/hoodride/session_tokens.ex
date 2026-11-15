@@ -306,10 +306,15 @@ defmodule Hoodride.SessionTokens do
   end
 
   # the account's tokens to drop so that, with `added` more, it holds at
-  # most @max_per_account — never one in `keep`. In order: expired ones
-  # (not swept yet); replacements no request ever used (their device has
-  # the token they replaced — that one is kept); replaced ones (their
-  # device moved on); then the oldest
+  # most @max_per_account — never one of a device in `keep`. A DEVICE is a
+  # token, or a token and its replacement no request has used yet: the
+  # phone may hold either (the reply arrived and the app was closed, or
+  # the reply was lost), so the two go together or not at all — the cap
+  # used to drop the unused replacement first, signing that phone out the
+  # next time it opened the app (parked 2026-11-14, fixed). In order:
+  # expired ones (not swept yet); replaced ones whose replacement is in use
+  # (their device moved on); then whole devices, the least recently
+  # renewed first.
   defp over_cap(user_id, added, keep) do
     now = now()
     mine = :ets.select(@table, [{{:"$1", user_id, :"$2", :"$3"}, [], [{{:"$1", :"$2", :"$3"}}]}])
@@ -319,19 +324,47 @@ defmodule Hoodride.SessionTokens do
       []
     else
       mine
-      |> Enum.reject(fn {h, _, _} -> h in keep end)
-      |> Enum.sort_by(fn {h, ins, auth} -> {drop_order(h, ins, auth, now), ins} end)
-      |> Enum.take(excess)
-      |> Enum.map(&elem(&1, 0))
+      |> devices(now)
+      |> Enum.reject(fn {_, _, hashes} -> Enum.any?(hashes, &(&1 in keep)) end)
+      |> Enum.sort_by(fn {order, at, _} -> {order, at} end)
+      |> Enum.reduce_while([], fn {_, _, hashes}, dropped ->
+        dropped = hashes ++ dropped
+        if length(dropped) >= excess, do: {:halt, dropped}, else: {:cont, dropped}
+      end)
     end
   end
 
-  defp drop_order(h, ins, auth, now) do
-    cond do
-      not valid?(ins, auth, now) -> 0
-      :ets.member(@fresh, h) -> 1
-      :ets.member(@links, h) -> 2
-      true -> 3
+  # {drop order, when last made, its tokens}
+  defp devices(mine, now) do
+    made = Map.new(mine, fn {h, ins, _} -> {h, ins} end)
+
+    # a valid token → its replacement, present and not used yet
+    pending =
+      for {h, ins, auth} <- mine,
+          valid?(ins, auth, now),
+          [{^h, succ, _}] <- [:ets.lookup(@links, h)],
+          Map.has_key?(made, succ),
+          :ets.member(@fresh, succ),
+          into: %{},
+          do: {h, succ}
+
+    paired = MapSet.new(Map.values(pending))
+
+    for {h, ins, auth} <- mine, not MapSet.member?(paired, h) do
+      cond do
+        not valid?(ins, auth, now) -> {0, ins, [h]}
+        succ = pending[h] -> {2, max(ins, made[succ]), [h, succ]}
+        moved_on?(h, made) -> {1, ins, [h]}
+        true -> {2, ins, [h]}
+      end
+    end
+  end
+
+  # replaced, and its replacement is here and in use: the device has it
+  defp moved_on?(h, made) do
+    case :ets.lookup(@links, h) do
+      [{^h, succ, _}] -> Map.has_key?(made, succ) and not :ets.member(@fresh, succ)
+      [] -> false
     end
   end
 

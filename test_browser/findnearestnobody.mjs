@@ -7,7 +7,7 @@
 // from far out. Helpers and the rule: cover.mjs.
 import { journey, step, check } from "./cdp.mjs";
 import { typing,
-  demo, freeze, riderLooking, box, place, at, half, inside, below, above, longBanner, moveTo, nobodyAround, onlyTheSecondLook, allLooksBack, staysNobody, clearsWithin, sleep, HUGE, looksFrom, search,
+  demo, freeze, riderLooking, box, place, at, half, inside, below, above, longBanner, moveTo, nobodyAround, farAway, onlyTheSecondLook, allLooksBack, staysNobody, clearsWithin, sleep, HUGE, looksFrom, search,
 } from "./cover.mjs";
 
 await journey("findnearestnobody: 'nobody nearby yet' — looked at again, never behind a drawer, and what clears it", async (browser) => {
@@ -219,10 +219,20 @@ await journey("findnearestnobody: 'nobody nearby yet' — looked at again, never
   // wrapping (1 line → 3 → 2 on the owner's iPhone, 2026-11-10). Chrome never
   // showed it; this keeps the property, and no leftover style
   step("'nobody nearby yet' gone: the banner back to the short message's own size, nothing left over");
+  // (the car of the step before is out of sight first: "nobody nearby yet"
+  // set below starts the once-a-second look, which saw that car and cleared
+  // it again — under load before the banner was measured; precommit,
+  // 2026-11-14. This step is the banner's size only)
+  await farAway(n);
   // (measured after the banner's frames: its balancing back on, then fitted)
   const frames = (k) => "new Promise((ok) => { let i = 0; const f = () => (++i >= " + k + " ? ok(true) : requestAnimationFrame(f)); requestAnimationFrame(f); })";
+  // (measured once the banner is FITTED — the app's own word, no .fitting —
+  // not after a set number of frames: under load the once-a-second look
+  // changed the text inside those frames and the fitting started over, so a
+  // half-fitted banner was measured — precommit, 2026-11-14)
   const size = async () => {
     await n.eval(frames(6));
+    await n.waitFor(`!document.getElementById("banner").classList.contains("fitting")`, "the banner fitted");
     return n.eval(`(() => { const r = document.getElementById("banner").getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height) }; })()`);
   };
   // the box against its lines: how much wider than its widest line + padding

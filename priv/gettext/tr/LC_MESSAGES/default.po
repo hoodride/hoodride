@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "Mesajlar yüklenemedi. Tekrar dene."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "Eski sohbetler yüklenemedi. Tekrar denemek için dokun"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Ride'a bağlanılamadı. Bağlantını kontrol edip tekrar dene."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride başka bir cihazda açıldı"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride telefonunda çalışır"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "Kabul ediyorum"
 
@@ -411,6 +419,10 @@ msgstr "Dil"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Demodan çık"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "Eski sohbetler yükleniyor…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "Kaydet"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Kaydet ve çevrimiçi ol"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "Açmak için bunu telefonunun kamerasıyla tara."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "{app} uygulamasını aç › ⋮ › Ayarlar › Site ayarları › Konu
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "⋮ menüsünü aç › Ayarlar › Site izinleri › Konum › İzin vermek için sor"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "ya da telefonunda hoodride.app adresine git"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

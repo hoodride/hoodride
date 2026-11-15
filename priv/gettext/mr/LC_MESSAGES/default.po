@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "मेसेज लोड करता आले नाहीत. पुन्हा प्रयत्न करा."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "जुनी चॅट्स लोड करता आली नाहीत. पुन्हा प्रयत्न करण्यासाठी टॅप करा"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Ride शी कनेक्ट होता आले नाही. तुमचे कनेक्शन तपासा आणि पुन्हा प्रयत्न करा."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride दुसऱ्या डिव्हाइसवर उघडले गेले"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride तुमच्या फोनवर चालते"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "मी सहमत आहे"
 
@@ -411,6 +419,10 @@ msgstr "भाषा"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "डेमोमधून बाहेर पडा"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "जुनी चॅट्स लोड होत आहेत…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "सेव्ह करा"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "सेव्ह करा आणि ऑनलाइन व्हा"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "उघडण्यासाठी हे तुमच्या फोनच्या कॅमेऱ्याने स्कॅन करा."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "{app} उघडा › ⋮ › सेटिंग्ज › साइट
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "⋮ उघडा › सेटिंग्ज › साइट परवानग्या › स्थान › अनुमती देण्यासाठी विचारा"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "किंवा तुमच्या फोनवर hoodride.app वर जा"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

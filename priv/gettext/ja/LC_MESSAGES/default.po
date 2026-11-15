@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "メッセージを読み込めませんでした。もう一度お試しください。"
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "以前のチャットを読み込めませんでした。タップしてもう一度お試しください"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Ride に接続できませんでした。接続を確認して、もう一度お試しください。"
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride が別のデバイスで開かれました"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride はスマートフォンで使えます"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "同意する"
 
@@ -411,6 +419,10 @@ msgstr "言語"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "デモを終了"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "以前のチャットを読み込み中…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "保存"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "保存してオンラインにする"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "スマートフォンのカメラでこれを読み取って開いてください。"
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "{app} を開く › ⋮ › 設定 › サイトの設定 › 位置情�
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "⋮ を開く › 設定 › サイトの許可設定 › 位置情報 › 許可を確認"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "またはスマートフォンで hoodride.app を開いてください"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

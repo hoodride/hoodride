@@ -141,8 +141,9 @@ defmodule HoodrideWeb.ChatRebuildTest do
   describe "4. unread across a reconnect or reopening the app" do
     test "messages keep the server's time and id (rebuild and live alike)" do
       h = body("hydrate")
-      # (one builder for a server message — a reload, and a chat's opening)
-      assert h =~ "chat.msgs = c.messages.map(fromServer);"
+      # (one builder for a server message — a reload, a page of older
+      # chats, and a chat's opening)
+      assert body("applyConversation") =~ "chat.msgs = c.messages.map(fromServer);"
       f = body("fromServer")
       assert f =~ "ts: m.ts,"
       assert f =~ "id: m.id,"
@@ -160,8 +161,14 @@ defmodule HoodrideWeb.ChatRebuildTest do
       assert body("hydrate") =~ "applyReadState();"
       a = body("applyReadState")
       assert a =~ "if (DEMO) return;"
-      assert a =~ "HoodReadStore.reconcile(HoodReadStore.read(s, state.realUser.id), convs, null)"
-      assert a =~ "if (c.server) c.unread = r.unread[p.id] || 0;"
+      # this phone's bookmarks merged with the server's (owner, 2026-11-14)
+      assert a =~ "const mine = HoodReadStore.read(s, state.realUser.id);"
+      assert a =~ "HoodReadStore.merge(mine === null && readKnown ? {} : mine, fromServer)"
+      assert a =~ "HoodReadStore.reconcile(note, convs, null)"
+      # (+ a chat not loaded yet: the server's count from before its new message)
+      assert a =~
+               "if (c.server) c.unread = (r.unread[p.id] || 0) + (c.loaded === false ? c.restUnread || 0 : 0);"
+
       refute body("softReload") =~ "unread.get(p.id)"
     end
 

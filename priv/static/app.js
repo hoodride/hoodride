@@ -261,6 +261,36 @@ const pileMarkers = new Map(); // "type:spot" → { marker, el, type, ids }
 const realPeersById = new Map(); // user_id → stable peer object (chat identity)
 let zoomedOutWarned = false;
 
+// the chat list in pages (owner, 2026-11-14 — loadOlderChats): where the
+// next page starts (null: none), the unread in the chats not loaded yet
+// (counted on the server), and the next page's fetch
+let chatsMore = null;
+let unreadMore = 0;
+// …per chat, only those with any (Map<peer id, n>): a chat not loaded that
+// gets a new message takes its own over (receiveMsg — owner, 2026-11-14:
+// one total stayed after that chat was read)
+let unreadRest = new Map();
+function setUnreadRest(byPeer) {
+  unreadRest = new Map();
+  if (byPeer && typeof byPeer === "object")
+    for (const [k, n] of Object.entries(byPeer)) if (/^\d+$/.test(k) && Number.isFinite(n) && n > 0) unreadRest.set(Number(k), n);
+  unreadMore = [...unreadRest.values()].reduce((a, n) => a + n, 0);
+}
+function takeUnreadRest(peerId) {
+  const n = unreadRest.get(peerId) || 0;
+  unreadRest.delete(peerId);
+  unreadMore -= n;
+  return n;
+}
+let olderLoading = false;
+let olderFailed = false;
+// the account has a "read up to" on the server somewhere: then this phone,
+// with no bookmarks of its own, starts from the server's — not the first
+// run's "everything there is read" (a second phone showed 0 unread where
+// the server counted 4: the chat-pages journey, 2026-11-14)
+let readKnown = false;
+// (watches the "Loading older chats…" row come into view)
+let olderSeen = null;
 // chats: Map<peer object, { msgs, unread, replyIdx, server, draft }>
 // server: the server holds this conversation (from a reload, or a ride's —
 // which exists from ride start even if nobody types), so it's never pruned
@@ -1645,6 +1675,82 @@ function settleLast(c) {
   }
 }
 
+// the chat list's last row while there are older chats: "Loading…", or
+// after a failure "tap to try again"; fetches the next page in view
+function olderChatsRow() {
+  const row = document.createElement("div");
+  row.className = "chat-more muted";
+  row.textContent = olderFailed ? t("Couldn't load older chats — tap to try again") : t("Loading older chats…");
+  row.addEventListener("click", () => loadOlderChats());
+  if (olderSeen) olderSeen.disconnect();
+  if (!olderFailed && "IntersectionObserver" in window) {
+    olderSeen = new IntersectionObserver(
+      (seen) => {
+        if (seen.some((e) => e.isIntersecting)) loadOlderChats();
+      },
+      { root: $("chat-messages"), rootMargin: "200px" }
+    );
+    olderSeen.observe(row);
+  }
+  return row;
+}
+
+// one chat from the server (/api/state, or a page of /api/chats)
+function applyConversation(c) {
+  const peer = ensurePeer(c.peer);
+  const chat = chatFor(peer);
+  chat.server = true;
+  chat.emptyAt = HoodChatList.localAt(c.last_activity, chatSkew);
+  // "read up to", as the server keeps it (merged with this phone's: applyReadState)
+  chat.serverRead = Array.isArray(c.read) ? c.read : null;
+  if (Array.isArray(c.messages)) {
+    // in full: the chat on screen (open_peer), or an older server
+    chat.msgs = c.messages.map(fromServer);
+    chat.loaded = true;
+    chat.summary = null;
+  } else {
+    // a summary (light reload): its messages come when it's opened
+    // (loadChat); meanwhile what arrives is held in msgs, not drawn
+    chat.msgs = [];
+    chat.loaded = false;
+    chat.summary = { last: c.last || null, theirs: c.theirs || [] };
+  }
+  // its place in the list: the last message's time and server id (which
+  // of two same-second chats is newer)
+  settleLast(chat);
+  if (c.peer_spot) rememberShared(peer, c.peer_spot);
+}
+
+// the chat list's next page (owner, 2026-11-14): fetched when its last row
+// comes into view; one at a time
+async function loadOlderChats() {
+  if (DEMO || !chatsMore || olderLoading) return;
+  olderLoading = true;
+  olderFailed = false;
+  const cursor = chatsMore;
+  try {
+    const res = await apiFetch("/api/chats?before=" + encodeURIComponent(cursor));
+    if (!res.ok) throw new Error(`chats ${res.status}`);
+    const body = await res.json();
+    // a reload meanwhile started the list again: this page is not its next
+    if (chatsMore !== cursor) return;
+    // (a chat already here — news since, or the one on screen — is newer than the page's)
+    (body.conversations || []).forEach((c) => {
+      const known = c.peer && realPeersById.get(c.peer.id);
+      if (!(known && chats.has(known) && chats.get(known).server)) applyConversation(c);
+    });
+    chatsMore = typeof body.more === "string" ? body.more : null;
+    setUnreadRest(body.unread_rest);
+    applyReadState();
+  } catch (_) {
+    olderFailed = true;
+  } finally {
+    olderLoading = false;
+  }
+  if (!$("chat").classList.contains("hidden") && state.chatView === "list") renderChat();
+  refreshControls();
+}
+
 function hydrate(st) {
   loadStoredSpot();
   // the mode last picked on this device (HoodModeStore) — the server's
@@ -1656,28 +1762,13 @@ function hydrate(st) {
   if (state.mode === "driver" && state.myCar === undefined) loadMyCar();
   // message times are the server's; this phone's clock may be off
   chatSkew = HoodChatList.skew(st.now, Date.now());
-  (st.conversations || []).forEach((c) => {
-    const peer = ensurePeer(c.peer);
-    const chat = chatFor(peer);
-    chat.server = true;
-    chat.emptyAt = HoodChatList.localAt(c.last_activity, chatSkew);
-    if (Array.isArray(c.messages)) {
-      // in full: the chat on screen (open_peer), or an older server
-      chat.msgs = c.messages.map(fromServer);
-      chat.loaded = true;
-      chat.summary = null;
-    } else {
-      // a summary (light reload): its messages come when it's opened
-      // (loadChat); meanwhile what arrives is held in msgs, not drawn
-      chat.msgs = [];
-      chat.loaded = false;
-      chat.summary = { last: c.last || null, theirs: c.theirs || [] };
-    }
-    // its place in the list: the last message's time and server id (which
-    // of two same-second chats is newer)
-    settleLast(chat);
-    if (c.peer_spot) rememberShared(peer, c.peer_spot);
-  });
+  (st.conversations || []).forEach(applyConversation);
+  // the chat list in pages (owner, 2026-11-14): where the next page starts
+  // (loadOlderChats), and the unread in the chats not loaded yet — the 💬
+  // badge counts them too
+  chatsMore = typeof st.more === "string" ? st.more : null;
+  setUnreadRest(st.unread_rest);
+  readKnown = st.read_known === true;
   applyReadState();
 
   (st.pending_requests || []).forEach((r) => {
@@ -2124,6 +2215,9 @@ async function softReload() {
 // peer objects behind map markers, and the socket are kept)
 function resetMirror() {
   chats.clear();
+  // (and the chat list's pages: hydrate sets them again)
+  chatsMore = null;
+  setUnreadRest(null);
   state.chatPeer = null;
   realPeersById.forEach((p) => {
     p.pending = false;
@@ -3651,6 +3745,9 @@ function renderChat() {
       item.addEventListener("click", () => openChat(peer));
       box.appendChild(item);
     });
+    // more chats than this page (owner, 2026-11-14): the next page comes when
+    // this row scrolls into view; a failed one is tried again on a tap
+    if (chatsMore) box.appendChild(olderChatsRow());
     chatScrollTo(listTop);
     hideChatJump();
     return;
@@ -3880,9 +3977,17 @@ function applyReadState() {
   if (DEMO) return;
   const s = storageOrNull();
   const convs = [...chats].filter(([, c]) => c.server).map(([p]) => ({ peerId: p.id, theirs: theirMsgs(p) }));
-  const r = HoodReadStore.reconcile(HoodReadStore.read(s, state.realUser.id), convs, null);
+  // this phone's bookmarks and the server's (another device's reading): the later
+  const fromServer = {};
   chats.forEach((c, p) => {
-    if (c.server) c.unread = r.unread[p.id] || 0;
+    if (c.server && c.serverRead) fromServer[p.id] = c.serverRead;
+  });
+  const mine = HoodReadStore.read(s, state.realUser.id);
+  const note = HoodReadStore.merge(mine === null && readKnown ? {} : mine, fromServer);
+  const r = HoodReadStore.reconcile(note, convs, null);
+  chats.forEach((c, p) => {
+    // (+ a chat not loaded yet: what the server counted before its new message)
+    if (c.server) c.unread = (r.unread[p.id] || 0) + (c.loaded === false ? c.restUnread || 0 : 0);
   });
   HoodReadStore.save(s, state.realUser.id, r.note);
 }
@@ -3891,7 +3996,19 @@ function applyReadState() {
 function markSeen(peer) {
   if (DEMO) return;
   const s = storageOrNull();
-  HoodReadStore.save(s, state.realUser.id, HoodReadStore.seen(HoodReadStore.read(s, state.realUser.id) || {}, peer.id, theirMsgs(peer)));
+  const theirs = theirMsgs(peer);
+  HoodReadStore.save(s, state.realUser.id, HoodReadStore.seen(HoodReadStore.read(s, state.realUser.id) || {}, peer.id, theirs));
+  // …and the server's (owner, 2026-11-14): the 💬 badge counts chats not
+  // loaded yet from it. Only when it moves; a failed send is caught up by
+  // the next read of this chat
+  const top = HoodReadStore.newest(theirs);
+  const c = chatFor(peer);
+  const sent = c.serverRead;
+  if (!top || !liveNow() || (sent && !HoodReadStore.newer({ ts: top[0], id: top[1] }, sent))) return;
+  userChannel.push("read", { peer: peer.id, ts: top[0], id: top[1] }).receive("ok", () => {
+    const now = chatFor(peer);
+    if (!now.serverRead || HoodReadStore.newer({ ts: top[0], id: top[1] }, now.serverRead)) now.serverRead = top;
+  });
 }
 
 function openChat(peer) {
@@ -4144,7 +4261,19 @@ $("chat-messages").addEventListener(
 // meta: the server's {ts, id} for a real message (none for the demo's or a
 // local note like "📩 requested a ride")
 function receiveMsg(peer, text, meta) {
+  // a chat not loaded yet (older than the list's pages so far): not a new,
+  // empty one — its earlier messages come when it's opened, and its unread
+  // counted on the server moves to it (owner, 2026-11-14: it opened with
+  // only the new message, and the badge kept its old unread after reading)
+  const older = !DEMO && !chats.has(peer) && chatsMore !== null;
   const c = chatFor(peer);
+  if (older) {
+    c.server = true;
+    c.loaded = false;
+    c.summary = { last: null, theirs: [] };
+    c.restUnread = takeUnreadRest(peer.id);
+    c.unread = c.restUnread;
+  }
   const id = meta ? meta.id : null;
   // already here — a message a reload or a chat's opening brought, heard
   // live too: once (counted once, no banner). Local notes have no id: never
@@ -5569,6 +5698,8 @@ $("btn-mode").addEventListener("click", () => {
       mockHand = null;
     }
     chats.clear();
+    chatsMore = null;
+    setUnreadRest(null);
     state.chatPeer = null;
     closeChat();
   }
@@ -5625,7 +5756,8 @@ function refreshControls() {
   toggle("btn-navigate", !rider && inRide && state.ride.status === "connected");
   toggle("btn-arrived", !rider && inRide && state.ride.status === "connected");
 
-  const unread = [...chats.values()].reduce((s, c) => s + c.unread, 0);
+  // (+ the chats not loaded yet: counted on the server — owner, 2026-11-14)
+  const unread = [...chats.values()].reduce((s, c) => s + c.unread, 0) + unreadMore;
   toggle("btn-chat", chats.size > 0 && !chatOpen);
   setIconText($("btn-chat"), unread ? t("💬 Chat ({count})", { count: unread }) : t("💬 Chat"));
   toggle("btn-endride", !!inRide || !!requested);
@@ -5637,7 +5769,7 @@ function refreshControls() {
   // 2026-11-05: iPhone Messages, Telegram) — mid-ride too, where others'
   // messages pop no banner; messages, like "💬 Chat (n)"; 99+ past 99
   const others = msgView
-    ? [...chats.entries()].reduce((s, [p, c]) => (p === state.chatPeer ? s : s + c.unread), 0)
+    ? [...chats.entries()].reduce((s, [p, c]) => (p === state.chatPeer ? s : s + c.unread), 0) + unreadMore
     : 0;
   $("chat-back-count").textContent = HoodChatList.unreadLabel(others);
   toggle("chat-back-count", others > 0);
@@ -5750,7 +5882,14 @@ const booting = HoodBoot.create({
 // the server (owner, 2026-11-07: signed in, the demo ALSO connected as you,
 // and the server's first answer closed a card tapped right after load).
 // "Leave demo" goes to the normal page, signed in as before.
-if (DEMO) {
+// Phones and tablets only (owner, 2026-11-14 — HoodDevice): a desktop
+// gets "Hood Ride works on your phone" and the QR code; nothing else
+// starts — no map, no /api/state, no connection.
+if (!HoodDevice.here(window)) {
+  document.documentElement.classList.remove("resuming");
+  document.documentElement.classList.add("desktop");
+  $("desktop-box").classList.remove("hidden");
+} else if (DEMO) {
   enterApp();
 } else {
   booting.start();

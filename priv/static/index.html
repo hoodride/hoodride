@@ -56,6 +56,17 @@
       <div id="turnstile-box" class="turnstile-box"></div>
     </div>
 
+    <!-- a desktop (owner, 2026-11-14 — phones and tablets only, HoodDevice):
+         this instead of the sign-in; the app never starts there. The privacy
+         policy and Terms stay open on any device (Google's review reads them) -->
+    <div id="desktop-box" class="desktop-box hidden">
+      <p class="desktop-title" data-t>Hood Ride works on your phone</p>
+      <img class="desktop-qr" src="qr-hoodride.svg" width="200" height="200" alt="" />
+      <p class="desktop-line" data-t>Scan this with your phone's camera to open it.</p>
+      <p class="desktop-line" data-t>or go to hoodride.app on your phone</p>
+      <p class="desktop-links"><a href="/terms" data-t>Terms</a> · <a href="/privacy" data-t>Privacy Policy</a></p>
+    </div>
+
     <p class="fineprint" data-t>By continuing, you agree to our <a href="/terms" data-t data-t-slot="terms">Terms</a> and <a href="/privacy" data-t data-t-slot="privacy">Privacy Policy</a>.</p>
     <!-- the code is public, and the community (owner, 2026-11-04): GitHub's
          and Discord's own white marks, unchanged and small, as their brand
@@ -346,6 +357,9 @@
   <script src="langswitch.js"></script>
   <script src="nearby.js"></script>
   <script src="turnstile.js"></script>
+  <!-- Bowser 2.15.0, vendored (npm sha512 verified; license in bowser.LICENSE.txt): which kind of device (HoodDevice) -->
+  <script src="bowser.js"></script>
+  <script src="device.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

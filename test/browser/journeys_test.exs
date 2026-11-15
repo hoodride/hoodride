@@ -228,6 +228,18 @@ defmodule HoodrideWeb.BrowserJourneysTest do
   # always-pass test keys, its check answered here ("passed", for this host
   # and the sign-in action — nothing leaves the machine), and a Google
   # client so a sign-in start goes to Google (the journey stops it there)
+  # phones and tablets only, as in production (HoodDevice) — every other
+  # journey's browser is a desktop, so it's on only here
+  defp server("any_device_off") do
+    Application.put_env(:hoodride, :any_device, false)
+    "ok"
+  end
+
+  defp server("any_device_on") do
+    Application.put_env(:hoodride, :any_device, true)
+    "ok"
+  end
+
   defp server("turnstile_on") do
     Application.put_env(:hoodride, :turnstile_site_key, "1x00000000000000000000AA")
     Application.put_env(:hoodride, :turnstile_secret, "1x0000000000000000000000000000000AA")
@@ -397,6 +409,38 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     for i <- 1..String.to_integer(n),
         do: {:ok, _} = Hoodride.Chat.send_message(sender, String.to_integer(to), "#{prefix}#{i}")
 
+    "ok"
+  end
+
+  # `n` new people each message this person once — BT-C1 the quietest, a
+  # second apart (the chat list in pages: owner, 2026-11-14)
+  defp server("chat_crowd " <> args) do
+    [n, id] = args |> String.split() |> Enum.map(&String.to_integer/1)
+    now = System.system_time(:second)
+
+    for i <- 1..n do
+      name = "BT-C#{i}"
+
+      {:ok, u} =
+        Hoodride.Accounts.upsert_oauth_user(%{provider: "dev", provider_id: name, name: name})
+
+      {:ok, _} = Hoodride.Chat.send_message(u, id, "hi from #{name}")
+      key = Hoodride.Chat.pair_key(u.id, id)
+      true = :ets.update_element(:chat_conversations, key, {2, now - (n - i)})
+    end
+
+    "ok"
+  end
+
+  # BT-C<i> (of chat_crowd) writes this person again
+  defp server("crowd_says " <> args) do
+    [i, id | words] = String.split(args)
+    name = "BT-C#{i}"
+
+    {:ok, u} =
+      Hoodride.Accounts.upsert_oauth_user(%{provider: "dev", provider_id: name, name: name})
+
+    {:ok, _} = Hoodride.Chat.send_message(u, String.to_integer(id), Enum.join(words, " "))
     "ok"
   end
 

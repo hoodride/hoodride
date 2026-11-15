@@ -77,3 +77,7 @@ config :hoodride, :ws_budget, nil
 
 # phone-on-LAN testing: Google's redirect URI from the request's own host
 config :hoodride, :oauth_redirect_from_request, true
+
+# the app opens on a computer too (HoodDevice — phones and tablets only in
+# production; owner, 2026-11-14)
+config :hoodride, :any_device, true

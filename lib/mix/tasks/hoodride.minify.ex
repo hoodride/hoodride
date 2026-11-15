@@ -23,7 +23,7 @@ defmodule Mix.Tasks.Hoodride.Minify do
   """
   use Mix.Task
 
-  @skip ~w(maplibre-gl.js phoenix.min.js h3-js.umd.js sw.js)
+  @skip ~w(maplibre-gl.js phoenix.min.js h3-js.umd.js bowser.js sw.js)
 
   @doc "The files minified: our own JS that's served."
   # (and not the languages' catalogs, i18n-<lang>.js: generated, already

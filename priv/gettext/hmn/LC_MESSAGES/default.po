@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "Thauj tsis tau cov lus. Sim dua."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "Thauj cov kev sib tham qub tsis tau — kov kom sim dua"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Txuas tsis tau Hood Ride — kuaj koj kev txuas thiab sim dua."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride raug qhib rau lwm lub cuab yeej"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride siv tau hauv koj lub xov tooj"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "Kuv pom zoo"
 
@@ -411,6 +419,10 @@ msgstr "Hom lus"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Tawm ntawm kev sim saib"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "Tab tom thauj cov kev sib tham qub…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "Khaws"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Khaws & mus online"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "Siv koj lub xov tooj lub koob yees duab scan qhov no kom qhib tau."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "qhib {app} › ⋮ › Settings › Site settings › Location › cia H
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "qhib ⋮ › Settings › Site settings › Location › Ask to allow"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "los sis mus rau hoodride.app hauv koj lub xov tooj"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

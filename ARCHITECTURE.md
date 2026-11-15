@@ -555,7 +555,7 @@ first-action-wins atomics (no double-booking, mutation-verified).
 | messages to one person | 15/min | per pair | `rate_limited` |
 | cold contact (first message OR request to someone with no conversation and no open request) | 20/hour | per account | `too_many_new_chats` |
 | re-asking a driver after a decline or cancel | 60 s from the moment of the "no" (or the cancel) | per rider→driver pair | `request_cooldown` + `retry_ms` |
-| user-channel sessions | **1 per account, newest wins** (also on join) | presence Registry | old app told `session_moved`, then its socket closes |
+| user-channel sessions | **1 per account, newest wins** — at JOIN (since 2026-11-14; a connect only closes sockets that never joined) | presence Registry | old app told `session_moved`, then its socket closes |
 | map channels | **1 per account, the device chosen last** (2026-10-23; by stamp since 2026-11-08) | `Hoodride.WorldChannels` Registry + the sockets' stamps | an OLDER device's map join is refused (`session_moved`); an older device's map already there goes with its whole connection (a map closed under a live connection never comes back); equal or unknown stamps are left alone. "Newest map join wins" let an older device's LATE join shut down the newer device's map (server review). Without a limit, world-only sockets multiplied the per-connection sync and reveal budgets |
 
 Design notes:
@@ -591,6 +591,16 @@ Design notes:
   convention), which also settles two tabs loading in the same instant.
   What's left per account is one socket; the number of accounts is the
   login lockdown's job (real Google accounts instead of `dev_login`).
+  **Changed 2026-11-14:** a connect closes only the account's sockets that
+  never joined a user channel. A device IN USE is handed over when the new
+  socket JOINS (`UserChannel.hand_over`), and the new socket's stamp counts
+  only then (`SessionStamp.saw` at join). Phoenix runs connect/3 before it
+  checks the WebSocket upgrade request is complete, so a request a broken
+  proxy stripped got through connect, kicked the other device, then failed
+  — and the app retried: a "Use here" ping-pong between your own devices.
+  A join can only come over a connection that really opened; the join
+  deadline (above) still closes the ones that never do
+  (SessionStampTest "a connect that never joins").
 - **A refused ride join doesn't end the ride**: the app ends it only for
   `gone`/`not_yours` (`HoodRehydrate.rideJoinLost`); `rate_limited` is
   retried by Phoenix.
@@ -2432,6 +2442,42 @@ a message from the oldest chat moves it to the top, bold, "now", "1"; a
 "now" became "2m" at the 30 s redraw; opening it clears the bold; a real
 conversation reloaded 1.14 min after its message reads "1m".
 
+**In pages (owner, 2026-11-14).** Nothing capped how many chats OTHER
+people start with you, and every app open and reconnect brought them all.
+Now `/api/state?chats=list` brings the 30 most recent (`Limits.chat_page`,
+by last activity, then the partner's id) plus `more`, a cursor — "older
+than this chat" (`<last activity>.<partner id>`), not "page 2", so chats
+moving to the top meanwhile cause no duplicates or gaps. `GET
+/api/chats?before=<cursor>` brings the next page (the chat API's budget and
+checks); the app asks when the list's last row, "Loading older chats…",
+comes into view (`loadOlderChats`; a failure says "tap to try again"). The
+chat on screen always comes, however old. A reconnect starts the list
+again from the first page. No ceiling on how many chats you're in (owner:
+the per-account limits already bound memory; paging bounds each reload;
+spam is the block button's job).
+
+**"Read up to" on the server too.** The 💬 badge counts unread messages,
+and chats not loaded yet must count. The app keeps its per-chat bookmark
+([time, id] of their newest message you've seen — HoodReadStore) and now
+sends it (`read` on the user channel) as you read. The server keeps it in
+memory beside the chat (`:chat_reads`, deleted with it; only one of the
+PARTNER's messages in that chat; never moves back — Chat.mark_read). Each
+chat in a page carries yours (`read`); `unread_rest` counts their messages
+past it in each chat after the page that has any (`unread_more`: their
+sum). A new message in a chat not loaded yet makes it a chat "not loaded"
+(its earlier messages come when it's opened), and its count moves over
+from `unread_rest` — read, it's gone with it (owner asked "it's
+accurate?", 2026-11-14: it wasn't — such a chat opened with only the new
+message, and its old unread stayed in the total). `read_known` says whether the
+account has one anywhere — then a phone with no bookmarks of its own (a
+new phone) starts from the server's, not the first run's "everything
+read". The phone's and the server's are merged, the later per chat
+(HoodReadStore.merge). Tests: ChatPagingTest (15), readstore.test.mjs;
+journey `chatpages` (35 chats: 30 + 5 on scroll, the badge 35 throughout;
+the server's bookmark counted on a phone without its own; a chat not loaded
+writes again: its whole history, the badge right before and after reading,
+and after the older chats load).
+
 ## Browser journeys (2026-10-30, BUILT)
 
 The glue in `app.js` can't be loaded by the Node tests, and the Elixir tests
@@ -2716,6 +2762,16 @@ here say the rest.
   (1 s doubling to 32 s, jitter) (SignInHardeningTest, SignInFailuresTest).
 - **The session cookie is encrypted** too (`encryption_salt`): changing it
   signed everyone out once.
+- **The 10-sign-in cap never splits a device** (2026-11-14): a sign-in and
+  its renewal no request has used yet are one device — its phone may hold
+  either (the reply arrived and the app was closed, or the reply was lost).
+  The cap dropped that renewal first, signing the phone out the next time
+  it opened the app. Now, in order: expired sign-ins, replaced ones whose
+  replacement is in use, then whole devices, the least recently renewed
+  first (SessionTokensTest).
+- **A connect that never opens kicks no one** (2026-11-14): the hand-over to
+  your other device, and your new stamp, wait for the JOIN — see "One
+  socket per account" above.
 - **Cloudflare Turnstile** on sign-in START, off until its keys are set
   (GOOGLE_SETUP.md, "Turnstile"). The page runs the check on the tap
   (`turnstile.js`: execute on tap, interaction-only, the reader's language),
@@ -2725,7 +2781,13 @@ here say the rest.
   Cloudflare unreachable: let through, logged; a failed check: never. Not on
   the live connection or the API — a pass is single-use per action, and a
   sign-in already guards those (TurnstileTest, journey `turnstile`).
-  **Before switching it on: a privacy-policy line about it.**
+  **On since 2026-11-14**, with its privacy-policy line (all 51 pages).
+  The box sits out of the layout under the buttons and shows only when
+  Cloudflare wants a click (before/after-interactive callbacks — even
+  invisible, it inserts its own box while it checks, which pushed the
+  button down and back). Its script is fetched once the sign-in screen
+  shows, after the page's load event (a script added earlier holds that
+  event up), with a preconnect to challenges.cloudflare.com.
 
 ### Abuse
 - **One character at most 100 bytes** in a message: marks split up by
@@ -2763,3 +2825,32 @@ here say the rest.
   (journey `signedout`). Your car works in the demo, kept on the page.
 - Every file the page loads is on the server's served list
   (StaticPathsTest — `turnstile.js` was missing, caught by its journey).
+
+### Phones and tablets only (2026-11-14)
+- A desktop gets "Hood Ride works on your phone" and a QR code
+  (`qr-hoodride.svg`, made once with eqrcode — not shipped — as one path, no
+  inline style: the site's CSP) instead of the sign-in; the app never starts
+  there — no map, no `/api/state`, no connection. The privacy policy and
+  Terms open on any device (Google's review reads them), and the screen
+  keeps what Hood Ride is (Google's home-page rule).
+- **Which device: Bowser** (vendored `bowser.js`, 2.15.0, MIT, no
+  dependencies; THIRD-PARTY.md) — its platform type mobile or tablet — plus
+  the two gaps every user-agent library has, checked by what the device can
+  do (MDN): an iPad that says it's a Mac (iPadOS 13+: "Macintosh" with more
+  than one touch point) and a big Android tablet in Chrome's desktop mode
+  ("Linux": touch its main input, `pointer: coarse`). Chrome's own word
+  (`userAgentData.mobile`) counts too. `device.js` (HoodDevice); Bowser
+  failing falls back to the phone words — a phone is never turned away.
+- **Why not a server-side library:** UAInspector needs hackney 1.x, which
+  had 5 open advisories (one critical) fixed only in 4.9 — it would have
+  shipped in the release. A server also can't see a touchscreen, so the
+  iPad check is in the page either way. ua-parser-js was ruled out (its
+  2021 account hijack; v2 is AGPL).
+- Not a lock: any browser can claim to be a phone. Development and the
+  tests' browsers (desktops) open it anyway: `config :hoodride,
+  :any_device` (dev, test — never production or the load test, which
+  runs production's settings; DeviceGateTest).
+- Tests: device.test.mjs (real user agents with their touch values; 7
+  breaks), DeviceGateTest, journey `desktopqr` (Windows → QR and no
+  request at all, privacy and Terms open; iPhone and an iPad-as-Mac → the
+  app; a real Mac → QR).

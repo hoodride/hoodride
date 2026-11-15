@@ -70,6 +70,8 @@ defmodule HoodrideWeb.Router do
     pipe_through :chat_api
 
     get "/chat", AuthController, :chat
+    # the chat list's next page (owner, 2026-11-14)
+    get "/chats", AuthController, :chats
   end
 
   scope "/api", HoodrideWeb do

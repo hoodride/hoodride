@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "Nou pa t ka chaje mesaj yo. Eseye ankò."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "Pa ka chaje ansyen chat yo — tape pou eseye ankò"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Pa t ka jwenn Hood Ride — verifye koneksyon ou epi eseye ankò."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride louvri sou yon lòt aparèy"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride mache sou telefòn ou"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "Mwen dakò"
 
@@ -411,6 +419,10 @@ msgstr "Lang"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Kite demo a"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "Ap chaje ansyen chat yo…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "Anrejistre"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Anrejistre epi antre an liy"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "Eskane sa a ak kamera telefòn ou pou louvri l."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "louvri {app} › ⋮ › Settings › Site settings › Location › pè
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "louvri ⋮ › Settings › Site settings › Location › Ask to allow"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "oswa ale sou hoodride.app nan telefòn ou"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

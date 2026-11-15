@@ -7,6 +7,7 @@ files written by others, each under its own license:
 |---|---|---|---|
 | `maplibre-gl.js`, `maplibre-gl.css` | [MapLibre GL JS](https://github.com/maplibre/maplibre-gl-js) 4.7.1 | BSD-3-Clause | `maplibre-gl.LICENSE.txt` |
 | `h3-js.umd.js` | [h3-js](https://github.com/uber/h3-js) 4.5.0 (Uber) | Apache-2.0 | `h3-js.LICENSE.txt` |
+| `bowser.js` (its `es5.js`, unchanged; npm's sha512 checked) | [Bowser](https://github.com/bowser-js/bowser) 2.15.0 — which kind of device (phones and tablets only, `device.js`) | MIT | `bowser.LICENSE.txt` |
 | `phoenix.min.js` | [Phoenix](https://github.com/phoenixframework/phoenix) 1.8 | MIT | `phoenix.LICENSE.txt` |
 | `hand.svg`, `pin.svg`, `compass.svg`, `chat.svg`, `person.svg`, `hand-avatar.svg` (from `icons.js`) | [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) | MIT | `fluent-emoji.LICENSE.txt` |
 | `fonts/NotoSansEthiopic-Regular.ttf`, `fonts/NotoSansEthiopic-Bold.ttf` (Amharic's script, unchanged; fetched only for Ethiopic letters a phone lacks) | [Noto Sans Ethiopic](https://github.com/notofonts/ethiopic) (Google's Noto project) | SIL Open Font License 1.1 | `fonts/noto-sans-ethiopic.OFL.txt` |

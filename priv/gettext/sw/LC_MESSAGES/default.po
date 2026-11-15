@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "Imeshindwa kupakia ujumbe. Jaribu tena."
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "Imeshindwa kupakia mazungumzo ya zamani — gusa ili ujaribu tena"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Imeshindwa kufikia Hood Ride — angalia muunganisho wako kisha ujaribu tena."
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride imefunguliwa kwenye kifaa kingine"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride inafanya kazi kwenye simu yako"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "Nakubali"
 
@@ -411,6 +419,10 @@ msgstr "Lugha"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "Ondoka kwenye onyesho"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "Inapakia mazungumzo ya zamani…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "Hifadhi"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "Hifadhi na uanze kazi"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "Changanua hii kwa kamera ya simu yako ili uifungue."
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "fungua {app} › ⋮ › Mipangilio › Mipangilio ya tovuti › Mahali 
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "fungua ⋮ › Mipangilio › Ruhusa za tovuti › Mahali › Uliza ili kuruhusu"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "au nenda hoodride.app kwenye simu yako"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

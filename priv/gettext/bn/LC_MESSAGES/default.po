@@ -238,6 +238,10 @@ msgid "Couldn't load messages — try again"
 msgstr "মেসেজ লোড করা যায়নি। আবার চেষ্টা করুন।"
 
 #: priv/static/app.js
+msgid "Couldn't load older chats — tap to try again"
+msgstr "পুরোনো চ্যাট লোড করা যায়নি — আবার চেষ্টা করতে ট্যাপ করুন"
+
+#: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
 msgstr "Hood Ride-এর সাথে কানেক্ট করা যায়নি — আপনার কানেকশন দেখে আবার চেষ্টা করুন।"
 
@@ -397,6 +401,10 @@ msgid "Hood Ride was opened on another device"
 msgstr "Hood Ride অন্য একটি ডিভাইসে খোলা হয়েছে"
 
 #: priv/static/index.html
+msgid "Hood Ride works on your phone"
+msgstr "Hood Ride আপনার ফোনে চলে"
+
+#: priv/static/index.html
 msgid "I agree"
 msgstr "আমি সম্মত"
 
@@ -411,6 +419,10 @@ msgstr "ভাষা"
 #: priv/static/app.js
 msgid "Leave demo"
 msgstr "ডেমো থেকে বেরিয়ে যান"
+
+#: priv/static/app.js
+msgid "Loading older chats…"
+msgstr "পুরোনো চ্যাট লোড হচ্ছে…"
 
 #: priv/static/app.js
 msgid "Loading…"
@@ -638,6 +650,10 @@ msgstr "সেভ করুন"
 #: priv/static/app.js
 msgid "Save & go online"
 msgstr "সেভ করে অনলাইনে যান"
+
+#: priv/static/index.html
+msgid "Scan this with your phone's camera to open it."
+msgstr "খুলতে আপনার ফোনের ক্যামেরা দিয়ে এটি স্ক্যান করুন।"
 
 #: priv/static/index.html
 msgid "Search languages"
@@ -916,6 +932,10 @@ msgstr "{app} খুলুন › ⋮ › সেটিংস › সাইট �
 #: priv/static/sendfilter.js
 msgid "open ⋮ › Settings › Site settings › Location › Ask to allow"
 msgstr "⋮ খুলুন › সেটিংস › সাইটের অনুমতি › লোকেশন › অনুমতি দেওয়ার জন্য জিজ্ঞাসা করুন"
+
+#: priv/static/index.html
+msgid "or go to hoodride.app on your phone"
+msgstr "অথবা আপনার ফোনে hoodride.app-এ যান"
 
 #: priv/static/sendfilter.js
 msgctxt "why location is needed"

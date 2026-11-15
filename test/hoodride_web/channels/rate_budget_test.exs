@@ -246,14 +246,15 @@ defmodule HoodrideWeb.RateBudgetTest do
       assert closed?(old)
     end
 
-    test "an older socket WITH a user channel gets the hand-over, not a bare close",
-         %{a: a} do
+    # (2026-11-14) a device in use is handed over when the new socket JOINS,
+    # not at connect: a connect can still fail after connect/3 (a stripped
+    # upgrade request) — SessionStampTest "a connect that never joins"
+    test "an older socket WITH a user channel is left alone at connect", %{a: a} do
       old = fake_socket(a)
       chan = fake_user_channel(a, old)
       connect_as(a)
 
-      assert {:socket_got, ^chan, :session_moved} = next_from(chan)
-      # its own channel closes it after telling the app — never we, first
+      assert next_from(chan) == nil
       assert next_from(old) == nil
     end
 

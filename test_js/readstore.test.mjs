@@ -220,3 +220,30 @@ test("forgetAll removes every account's even when it's the last key (none skippe
   assert.equal(R.read(s, 2), null);
   assert.equal(s.length, 1);
 });
+
+// (owner, 2026-11-14 — the chat list in pages) the server keeps a "read up
+// to" too: merged with this phone's, the later of the two per chat
+test("merge: the later bookmark of the phone's and the server's, per chat", () => {
+  const phone = { 1: [100, 5], 2: [200, 9] };
+  const server = { 1: [150, 7], 2: [190, 99], 3: [50, 1] };
+  assert.deepEqual(R.merge(phone, server), { 1: [150, 7], 2: [200, 9], 3: [50, 1] });
+  assert.deepEqual(phone, { 1: [100, 5], 2: [200, 9] }, "the phone's note untouched");
+});
+
+test("merge: a new phone with the server's bookmarks starts from them, not 'all read'", () => {
+  assert.deepEqual(R.merge(null, { 4: [10, 2] }), { 4: [10, 2] });
+});
+
+test("merge: nothing from the server — the phone's note as it was (null stays first run)", () => {
+  assert.equal(R.merge(null, {}), null);
+  assert.deepEqual(R.merge({ 1: [1, 1] }, {}), { 1: [1, 1] });
+});
+
+test("merge: a server bookmark that isn't one is ignored", () => {
+  assert.deepEqual(R.merge({ 1: [1, 1] }, { 1: "x", 2: [1], x: [5, 5] }), { 1: [1, 1] });
+});
+
+test("newest: the latest of their messages as a bookmark, or null", () => {
+  assert.deepEqual(R.newest([{ ts: 5, id: 1 }, { ts: 9, id: 3 }, { ts: 9, id: 2 }]), [9, 3]);
+  assert.equal(R.newest([]), null);
+});
