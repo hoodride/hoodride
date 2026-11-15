@@ -2846,6 +2846,8 @@ here say the rest.
   shipped in the release. A server also can't see a touchscreen, so the
   iPad check is in the page either way. ua-parser-js was ruled out (its
   2021 account hijack; v2 is AGPL).
+- The demo (`?demo`) opens on any device — the pretend world, which never
+  asks the server (owner, 2026-11-15; journey `desktopqr`).
 - Not a lock: any browser can claim to be a phone. Development and the
   tests' browsers (desktops) open it anyway: `config :hoodride,
   :any_device` (dev, test — never production or the load test, which

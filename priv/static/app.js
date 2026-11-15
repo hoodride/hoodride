@@ -5884,8 +5884,9 @@ const booting = HoodBoot.create({
 // "Leave demo" goes to the normal page, signed in as before.
 // Phones and tablets only (owner, 2026-11-14 — HoodDevice): a desktop
 // gets "Hood Ride works on your phone" and the QR code; nothing else
-// starts — no map, no /api/state, no connection.
-if (!HoodDevice.here(window)) {
+// starts — no map, no /api/state, no connection. The demo (?demo) opens
+// anywhere: the pretend world, never the server (owner, 2026-11-15)
+if (!DEMO && !HoodDevice.here(window)) {
   document.documentElement.classList.remove("resuming");
   document.documentElement.classList.add("desktop");
   $("desktop-box").classList.remove("hidden");

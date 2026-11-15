@@ -37,6 +37,18 @@ await journey("desktopqr: a desktop gets the QR code, a phone or tablet the app"
     check(!paths.some((x) => x.startsWith("/api/")), "the app never asked the server anything", paths.filter((x) => x.startsWith("/api")));
     check(await dee.eval(`typeof map === "undefined" || !map`), "no map made");
 
+    step("…but the demo (?demo, as the README links it) opens on it: the pretend world, anywhere (owner, 2026-11-15)");
+    const demo = await browser.visitor("BT-DeskDemo");
+    await demo.asDevice({ userAgent: WINDOWS });
+    await demo.goto(`${BASE}/?demo`);
+    await demo.waitFor(`document.getElementById("screen-map").classList.contains("active")`, "the demo's map", 15000);
+    check(!(await demo.eval(`document.documentElement.classList.contains("desktop")`)), "not the desktop screen");
+    check(!(await shown(demo, "desktop-box")), "no QR box");
+    // (the demo never asks the server: the pretend world only)
+    const demoAsked = await asked(demo);
+    check(!demoAsked.some((x) => x.startsWith("/api/")), "the demo asked the server nothing", demoAsked.filter((x) => x.startsWith("/api")));
+    await demo.close();
+
     step("…the privacy policy and Terms open on it");
     const privacy = await dee.eval(`fetch("/privacy").then((r) => r.status)`);
     const terms = await dee.eval(`fetch("/terms").then((r) => r.status)`);
