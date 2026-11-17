@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "μαύρο"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "Αποκλεισμός"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "Αποκλεισμός του/της {name};"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "Αποκλεισμένα άτομα"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "Έγινε αποκλεισμός. Για αναίρεση, πάτησε την εικόνα προφίλ σου πάνω αριστερά και μετά Αποκλεισμένα άτομα στο κάτω μέρος."
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "Τα άλλαξες;"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "Συνομιλία"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "Η συνομιλία με {name} έληξε"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "Δεν ήταν δυνατή η αποδοχή"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "Δεν ήταν δυνατός ο αποκλεισμός — δοκίμασε ξανά"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Δεν ήταν δυνατός ο έλεγχος του προγράμματος περιήγησής σου — επίτρεψε το challenges.cloudflare.com ή δοκίμασε άλλο πρόγραμμα περιήγησης"
 
@@ -240,6 +264,10 @@ msgstr "Δεν ήταν δυνατή η φόρτωση των μηνυμάτων
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "Δεν ήταν δυνατή η φόρτωση παλαιότερων συνομιλιών — πάτησε για να δοκιμάσεις ξανά"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "Δεν ήταν δυνατή η φόρτωση — πάτησε για να δοκιμάσεις ξανά"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "Δεν ήταν δυνατή η σύνδεση — δοκίμασε ξα
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "Δεν ήταν δυνατή η αποσύνδεση — δοκίμασε ξανά"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "Δεν ήταν δυνατή η άρση αποκλεισμού — δοκίμασε ξανά"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "Πληκτρολόγησε {word} για επιβεβαίωση."
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "Άρση αποκλεισμού"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "Άρση αποκλεισμού του/της {name};"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "Υπάρχει ενημέρωση — πάτησε για επαναφόρτωση"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "Μπορείς να ανανεώσεις το όνομα και τη φωτογραφία σου μετά τη διαδρομή"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "Δεν έχεις αποκλείσει κανέναν"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "Δεν θα βλέπετε ο ένας τον άλλον, και η συνομιλία σας και τυχόν διαδρομή θα τελειώσουν."
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "Θα μπορείτε ξανά να βλέπετε ο ένας τον άλλον και να στέλνετε μηνύματα."
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "Έφτασες · παραλαβή: {name}"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "Αποκλείσατε ή άρατε τον αποκλεισμό πάρα πολλών ατόμων σήμερα — δοκίμασε ξανά αύριο"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "Έχεις αποκλείσει όσα άτομα επιτρέπεται — άρε πρώτα τον αποκλεισμό κάποιου"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

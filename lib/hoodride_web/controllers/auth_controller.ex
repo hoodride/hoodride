@@ -864,6 +864,62 @@ defmodule HoodrideWeb.AuthController do
     end
   end
 
+  # GET /api/blocks[?before=<cursor>] — the people you blocked, newest
+  # first, in pages as the chat list (the profile drawer's "Blocked people";
+  # owner, 2026-11-15). Name and photo only. An account that's gone simply
+  # isn't listed. `more`: where the next page starts, or nil.
+  def blocks(conn, %{"count" => _}) do
+    # just how many (the drawer opening: "Blocked people" shows only when
+    # there are any — asked here, not with every app open, which makes one
+    # database query: owner, 2026-11-17)
+    conn = put_resp_header(conn, "cache-control", "no-store")
+
+    case conn.assigns.current_user do
+      %{} = user -> json(conn, %{count: blocked_count(user.id)})
+      nil -> conn |> put_status(401) |> json(%{error: "unauthenticated"})
+    end
+  end
+
+  def blocks(conn, params) do
+    conn = put_resp_header(conn, "cache-control", "no-store")
+
+    with {:user, %{} = user} <- {:user, conn.assigns.current_user},
+         {:cursor, {:ok, before}} <- {:cursor, blocks_cursor(params)},
+         page = Hoodride.Blocks.page(user.id, before, Hoodride.Limits.blocks_page()),
+         {:people, {:ok, people}} <- {:people, Accounts.profiles(page.ids)} do
+      json(conn, %{
+        blocked: for(id <- page.ids, p = people[id], p != nil, do: person(p)),
+        more: cursor_text(page.more)
+      })
+    else
+      {:user, _} -> conn |> put_status(401) |> json(%{error: "unauthenticated"})
+      {:cursor, _} -> conn |> put_status(400) |> json(%{error: "bad_cursor"})
+      {:people, _} -> conn |> put_status(503) |> json(%{error: "busy"})
+    end
+  rescue
+    e ->
+      if Hoodride.Repo.down?(e),
+        do: conn |> put_status(503) |> json(%{error: "busy"}),
+        else: reraise(e, __STACKTRACE__)
+  end
+
+  # no `before`: the first page; one that isn't a cursor: refused
+  defp blocks_cursor(%{"before" => text}) do
+    case cursor_of(text) do
+      {_, _} = c -> {:ok, c}
+      nil -> :error
+    end
+  end
+
+  defp blocks_cursor(_params), do: {:ok, nil}
+
+  # (the database busy: 0 for now — the link shows on the next answer)
+  defp blocked_count(user_id) do
+    Hoodride.Blocks.count(user_id)
+  rescue
+    e -> if Hoodride.Repo.down?(e), do: 0, else: reraise(e, __STACKTRACE__)
+  end
+
   defp open_request_state(nil, _people), do: nil
 
   defp open_request_state(r, people) do

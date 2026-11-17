@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "കറുത്ത"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "ബ്ലോക്ക് ചെയ്യുക"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "{name}-നെ ബ്ലോക്ക് ചെയ്യണോ?"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "ബ്ലോക്ക് ചെയ്ത ആളുകൾ"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "ബ്ലോക്ക് ചെയ്തു. പഴയപടിയാക്കാൻ, മുകളിൽ ഇടതുവശത്തുള്ള നിങ്ങളുടെ പ്രൊഫൈൽ ചിത്രത്തിൽ ടാപ്പ് ചെയ്യുക, തുടർന്ന് താഴെയുള്ള “ബ്ലോക്ക് ചെയ്ത ആളുകൾ”."
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "അവ മാറ്റിയോ?"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "ചാറ്റ്"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "{name}-മായുള്ള ചാറ്റ് അവസാനിച്ചു"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "സ്വീകരിക്കാനായില്ല"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "ബ്ലോക്ക് ചെയ്യാനായില്ല — വീണ്ടും ശ്രമിക്കുക"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "നിങ്ങളുടെ ബ്രൗസർ പരിശോധിക്കാനായില്ല — challenges.cloudflare.com അനുവദിക്കുക, അല്ലെങ്കിൽ മറ്റൊരു ബ്രൗസർ ശ്രമിക്കുക"
 
@@ -240,6 +264,10 @@ msgstr "സന്ദേശങ്ങൾ ലോഡ് ചെയ്യാനായ�
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "പഴയ ചാറ്റുകൾ ലോഡ് ചെയ്യാനായില്ല — വീണ്ടും ശ്രമിക്കാൻ ടാപ്പ് ചെയ്യുക"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "ലോഡ് ചെയ്യാനായില്ല — വീണ്ടും ശ്രമിക്കാൻ ടാപ്പ് ചെയ്യുക"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "സൈൻ ഇൻ ചെയ്യാനായില്ല — വീണ�
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "സൈൻ ഔട്ട് ചെയ്യാനായില്ല — വീണ്ടും ശ്രമിക്കുക"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "അൺബ്ലോക്ക് ചെയ്യാനായില്ല — വീണ്ടും ശ്രമിക്കുക"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "സ്ഥിരീകരിക്കാൻ {word} എന്ന് ടൈപ്പ് ചെയ്യുക."
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "അൺബ്ലോക്ക് ചെയ്യുക"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "{name}-നെ അൺബ്ലോക്ക് ചെയ്യണോ?"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "അപ്ഡേറ്റ് ലഭ്യമാണ് — റീലോഡ് ചെയ്യാൻ ടാപ്പ് ചെയ്യുക"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "റൈഡിന് ശേഷം നിങ്ങളുടെ പേരും ഫോട്ടോയും റിഫ്രഷ് ചെയ്യാം"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "നിങ്ങൾ ആരെയും ബ്ലോക്ക് ചെയ്തിട്ടില്ല"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "നിങ്ങൾക്ക് പരസ്പരം കാണാനാവില്ല, നിങ്ങളുടെ ചാറ്റും ഏതൊരു റൈഡും അവസാനിക്കും."
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "നിങ്ങൾക്ക് വീണ്ടും പരസ്പരം കാണാനും സന്ദേശം അയയ്ക്കാനും കഴിയും."
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "നിങ്ങൾ എത്തി · {name}-നെ പിക്ക് ചെയ്യുന്നു"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "ഇന്ന് നിങ്ങൾ വളരെയധികം ആളുകളെ ബ്ലോക്ക് അല്ലെങ്കിൽ അൺബ്ലോക്ക് ചെയ്തു — നാളെ വീണ്ടും ശ്രമിക്കുക"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "നിങ്ങൾക്ക് ബ്ലോക്ക് ചെയ്യാവുന്നത്ര ആളുകളെ ബ്ലോക്ക് ചെയ്തു — ആദ്യം ആരെയെങ്കിലും അൺബ്ലോക്ക് ചെയ്യുക"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

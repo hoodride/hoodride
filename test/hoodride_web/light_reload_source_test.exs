@@ -188,11 +188,11 @@ defmodule HoodrideWeb.LightReloadSourceTest do
   end
 
   test "closing a chat — the server's word, or a load that finds it gone — one function" do
-    # (and who ended it, if someone did — End chat, 2026-11-12)
-    assert @app =~
-             ~s[userChannel.on("chat_closed", ({ peer_id, ended_by }) =>\n    closeChatWith(]
-
-    assert @app =~ "      realPeersById.get(peer_id),\n"
+    # (and who ended it, if someone did — End chat, 2026-11-12; or a
+    # neutral close, no reason given — a block, 2026-11-15)
+    assert @app =~ ~s[userChannel.on("chat_closed", ({ peer_id, ended_by, reason }) => {]
+    assert @app =~ "    const peer = realPeersById.get(peer_id);\n"
+    assert @app =~ ~s[        : reason === "ended"\n          ? "neutral"]
 
     assert body("closeChatWith") =~ "HoodBrowse.chatClosedActions({"
     assert body("closeChatWith") =~ "    endedBy,\n"

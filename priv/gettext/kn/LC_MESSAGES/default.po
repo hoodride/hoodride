@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "ಕಪ್ಪು"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "ನಿರ್ಬಂಧಿಸಿ"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "{name} ಅವರನ್ನು ನಿರ್ಬಂಧಿಸಬೇಕೆ?"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "ನಿರ್ಬಂಧಿಸಿದ ಜನರು"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ. ರದ್ದುಗೊಳಿಸಲು, ಮೇಲಿನ ಎಡಭಾಗದಲ್ಲಿರುವ ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಚಿತ್ರವನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ, ನಂತರ ಕೆಳಗಿನ “ನಿರ್ಬಂಧಿಸಿದ ಜನರು”."
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "ಅವುಗಳನ್ನು ಬದಲಾಯಿಸಿದ್ದೀರಾ?"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "ಚಾಟ್"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "{name} ಜೊತೆಗಿನ ಚಾಟ್ ಕೊನೆಗೊಂಡಿದೆ"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "ಸ್ವೀಕರಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "ನಿರ್ಬಂಧಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "ನಿಮ್ಮ ಬ್ರೌಸರ್ ಅನ್ನು ಪರಿಶೀಲಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — challenges.cloudflare.com ಅನ್ನು ಅನುಮತಿಸಿ, ಅಥವಾ ಬೇರೆ ಬ್ರೌಸರ್ ಪ್ರಯತ್ನಿಸಿ"
 
@@ -240,6 +264,10 @@ msgstr "ಸಂದೇಶಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಲಿ�
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "ಹಳೆಯ ಚಾಟ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಲು ಟ್ಯಾಪ್ ಮಾಡಿ"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಲು ಟ್ಯಾಪ್ ಮಾಡಿ"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "ಸೈನ್ ಇನ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "ಸೈನ್ ಔಟ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "ನಿರ್ಬಂಧ ತೆಗೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "ಖಚಿತಪಡಿಸಲು {word} ಎಂದು ಟೈಪ್ ಮಾಡಿ."
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "ನಿರ್ಬಂಧ ತೆಗೆಯಿರಿ"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "{name} ಅವರ ನಿರ್ಬಂಧ ತೆಗೆಯಬೇಕೆ?"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "ಅಪ್‌ಡೇಟ್ ಲಭ್ಯವಿದೆ — ರೀಲೋಡ್ ಮಾಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "ರೈಡ್ ಮುಗಿದ ನಂತರ ನಿಮ್ಮ ಹೆಸರು ಮತ್ತು ಫೋಟೋವನ್ನು ರಿಫ್ರೆಶ್ ಮಾಡಬಹುದು"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "ನೀವು ಯಾರನ್ನೂ ನಿರ್ಬಂಧಿಸಿಲ್ಲ"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "ನೀವು ಪರಸ್ಪರ ನೋಡುವುದಿಲ್ಲ, ಮತ್ತು ನಿಮ್ಮ ಚಾಟ್ ಹಾಗೂ ಯಾವುದೇ ರೈಡ್ ಕೊನೆಗೊಳ್ಳುತ್ತದೆ."
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "ನೀವು ಮತ್ತೆ ಪರಸ್ಪರ ನೋಡಬಹುದು ಮತ್ತು ಸಂದೇಶ ಕಳುಹಿಸಬಹುದು."
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "ನೀವು ತಲುಪಿದ್ದೀರಿ · {name} ಅವರನ್ನು ಪಿಕಪ್ ಮಾಡಲಾಗುತ್ತಿದೆ"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "ಇಂದು ನೀವು ತುಂಬಾ ಜನರನ್ನು ನಿರ್ಬಂಧಿಸಿದ್ದೀರಿ ಅಥವಾ ನಿರ್ಬಂಧ ತೆಗೆದಿದ್ದೀರಿ — ನಾಳೆ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "ನೀವು ಸಾಧ್ಯವಾದಷ್ಟು ಜನರನ್ನು ನಿರ್ಬಂಧಿಸಿದ್ದೀರಿ — ಮೊದಲು ಯಾರದಾದರೂ ನಿರ್ಬಂಧ ತೆಗೆಯಿರಿ"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

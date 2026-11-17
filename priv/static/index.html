@@ -138,6 +138,8 @@
       <div class="peer-info">
         <strong id="peer-name"></strong>
         <span id="peer-meta" class="muted peer-meta"><span id="peer-what"></span><span id="peer-where"></span></span>
+        <!-- block (owner, 2026-11-15 — HoodBlocks in app.js): asks first -->
+        <button id="peer-block" type="button" class="peer-block hidden" data-t>Block</button>
       </div>
       <button id="btn-msg" class="btn btn-primary btn-compact" data-t>Message</button>
       <button id="peer-close" class="card-close" aria-label="Close" data-t-attr="aria-label">✕</button>
@@ -206,7 +208,7 @@
         <p class="drawer-source"><a class="source-link" href="https://github.com/hoodride/hoodride" target="_blank" rel="noopener" title="Source code on GitHub" aria-label="Source code on GitHub" data-t-attr="title aria-label"><img src="github-invertocat-white.svg" alt="" width="16" height="16" /></a><a class="source-link" href="https://discord.gg/ehce7eGQFt" target="_blank" rel="noopener" title="Hood Ride on Discord" aria-label="Hood Ride on Discord" data-t-attr="title aria-label"><img src="discord-symbol-white.svg" alt="" width="21" height="16" /></a></p>
         <!-- delete account: a small link, not a big row — rare and permanent
              (its confirm step follows); blocked in a ride like sign out -->
-        <p class="drawer-legal muted"><a href="/terms" data-t>Terms</a> · <a href="/privacy" data-t>Privacy Policy</a><span id="delete-wrap"> · <button id="btn-delete" class="link-button" data-t>Delete account</button></span></p>
+        <p class="drawer-legal muted"><a href="/terms" data-t>Terms</a> · <a href="/privacy" data-t>Privacy Policy</a><span id="blocked-wrap" class="hidden"> · <button id="btn-blocked" class="link-button" data-t>Blocked people</button></span><span id="delete-wrap"> · <button id="btn-delete" class="link-button" data-t>Delete account</button></span></p>
       </div>
       <!-- delete: a second, explicit step (it can't be undone) -->
       <div id="delete-confirm" class="drawer-confirm" role="alertdialog" aria-labelledby="delete-title" aria-describedby="delete-desc">
@@ -223,6 +225,26 @@
         <button id="delete-cancel" class="btn btn-small" data-t>Cancel</button>
       </div>
     </aside>
+
+    <!-- block / unblock: asked first (owner, 2026-11-15). The same sheet for
+         both; "Blocked people" shows here when the limit is reached -->
+    <div id="block-backdrop" class="car-backdrop hidden"></div>
+    <div id="block-sheet" class="car-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="block-title" aria-describedby="block-desc">
+      <h2 id="block-title" tabindex="-1"></h2>
+      <p id="block-desc" class="muted"></p>
+      <p id="block-error" class="delete-error hidden" role="alert"></p>
+      <button id="block-yes" class="btn btn-danger"></button>
+      <button id="block-list-open" class="btn btn-small hidden" data-t>Blocked people</button>
+      <button id="block-cancel" class="btn btn-small" data-t>Cancel</button>
+    </div>
+
+    <!-- the people you blocked, newest first, in pages (owner, 2026-11-15) -->
+    <div id="blocked-backdrop" class="car-backdrop hidden"></div>
+    <div id="blocked-sheet" class="car-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="blocked-title">
+      <h2 id="blocked-title" tabindex="-1" data-t>Blocked people</h2>
+      <div id="blocked-list" class="blocked-list"></div>
+      <button id="blocked-close" class="btn btn-small" data-t>Close</button>
+    </div>
 
     <!-- Navigate's map app (owner, 2026-11-02): asked at the first Navigate,
          remembered on this phone; changed from the drawer. Each choice is a
@@ -276,7 +298,12 @@
           <!-- End chat (owner, 2026-11-12): gone for both; tap twice — the
                first tap asks "Tap again to end" for 3 s. Not with your ride
                partner mid-ride -->
-          <button id="chat-end" type="button" class="chat-end hidden" data-t>End chat</button>
+          <span class="chat-links">
+            <button id="chat-end" type="button" class="chat-end hidden" data-t>End chat</button>
+            <!-- block (owner, 2026-11-15): with anyone, your ride partner too
+                 (it ends the ride); asks first -->
+            <button id="chat-block" type="button" class="chat-end chat-block hidden" data-t>Block</button>
+          </span>
         </div>
         <!-- the ride's buttons, together: beside the name while there's room,
              both on their own row under it when there isn't (styles.css) -->

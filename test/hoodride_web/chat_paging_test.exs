@@ -19,7 +19,7 @@ defmodule HoodrideWeb.ChatPagingTest do
   use HoodrideWeb.ConnCase, async: false
 
   import Phoenix.ChannelTest,
-    only: [subscribe_and_join: 3, push: 3, assert_reply: 2, assert_reply: 3]
+    only: [subscribe_and_join: 3, assert_reply: 2, assert_reply: 3]
 
   @moduletag :capture_log
 

@@ -184,8 +184,12 @@ defmodule HoodrideWeb.WorldChannel do
        encode_once: Application.get_env(:hoodride, :map_encode_once, true),
        pending: %{},
        seq: 0,
-       flush_timer: nil
-     )}
+       flush_timer: nil,
+       blocks_retry: nil,
+       blocks_tries: 0,
+       blocks_missed: false
+     )
+     |> preload_blocks()}
   end
 
   # everything held goes out BEFORE any reply: a sync's fresh snapshot must
@@ -259,10 +263,15 @@ defmodule HoodrideWeb.WorldChannel do
   defp reveal(_payload, _socket), do: {:error, %{reason: "unavailable"}}
 
   # may this role see `id`'s marker on this screen right now? (in memory)
+  # (a block either way: never — the same "unavailable" as anyone out of view)
   defp visible?(id, role, socket) when is_integer(id) do
     case marker_topic(role, id) do
-      topic when is_binary(topic) -> MapSet.member?(socket.assigns.held, topic)
-      _ -> false
+      topic when is_binary(topic) ->
+        MapSet.member?(socket.assigns.held, topic) and
+          not Hoodride.Blocks.blocked?(socket.assigns.user_id, id)
+
+      _ ->
+        false
     end
   end
 
@@ -375,7 +384,9 @@ defmodule HoodrideWeb.WorldChannel do
       # not only the new ones (already-held cells' parked cars would never
       # show: they send no update of their own)
       snap = if is_map(payload) and payload["fresh"] == true, do: Enum.sort(want), else: new
-      {:reply, {:ok, snapshots(snap)}, assign(socket, geo: want_geo, agg: want_agg, held: want)}
+
+      {:reply, {:ok, snapshots(snap, socket.assigns.user_id)},
+       assign(socket, geo: want_geo, agg: want_agg, held: want)}
     end
   end
 
@@ -393,12 +404,15 @@ defmodule HoodrideWeb.WorldChannel do
     end
   end
 
-  defp snapshots(new_topics) do
+  # (anyone blocked either way with the viewer left out — Hoodride.Blocks;
+  # the counts stay whole: a number names nobody)
+  defp snapshots(new_topics, viewer) do
     Enum.reduce(new_topics, %{geo: [], agg: []}, fn topic, acc ->
       case parse(topic) do
         {:geo, layer, cell} ->
           snap = Geo.cell_snapshot(cell)
-          %{acc | geo: [%{:cell => cell, layer => Map.fetch!(snap, layer)} | acc.geo]}
+          shown = Enum.reject(Map.fetch!(snap, layer), &Hoodride.Blocks.blocked?(viewer, &1.id))
+          %{acc | geo: [%{:cell => cell, layer => shown} | acc.geo]}
 
         {:agg, layer, cell} ->
           counts = Geo.agg_counts_for(cell)
@@ -428,16 +442,137 @@ defmodule HoodrideWeb.WorldChannel do
   # car Y's snapshot just showed (find the nearest: "nobody" with a car right
   # there, for good if it's parked). Watched: passed to the map's own
   # handling (map_update).
-  def handle_info(%Phoenix.Socket.Broadcast{topic: topic} = msg, socket) do
-    if MapSet.member?(socket.assigns.held, topic),
-      do: map_update(msg, socket),
-      else: {:noreply, socket}
+  #
+  # A car or ✋ of someone blocked either way with this viewer is dropped
+  # HERE, before it's forwarded or held for a batch: the map writer sends
+  # one broadcast to everyone watching the cell, each watcher's own channel
+  # decides for its own app (Hoodride.Blocks — a memory lookup, as the role
+  # check). Their id and block never reach this app. "Left" goes through:
+  # it only takes a marker off.
+  def handle_info(
+        %Phoenix.Socket.Broadcast{topic: topic, event: event, payload: payload} = msg,
+        socket
+      ) do
+    if MapSet.member?(socket.assigns.held, topic) do
+      case shown(event, payload, socket) do
+        :shown -> map_update(msg, socket)
+        :hidden -> {:noreply, socket}
+        # couldn't tell (the database): held back, sent once it can
+        :unknown -> {:noreply, blocks_missed(socket)}
+      end
+    else
+      {:noreply, socket}
+    end
+  end
+
+  # the try again (blocks_missed/1): worked — the screen sent afresh
+  def handle_info(:blocks_retry, socket) do
+    socket = assign(socket, blocks_retry: nil)
+
+    case Hoodride.Blocks.preload(socket.assigns.user_id) do
+      :ok ->
+        {:noreply, socket |> assign(blocks_tries: 0, blocks_missed: false) |> resend_screen()}
+
+      :unavailable ->
+        {:noreply, blocks_missed(socket)}
+    end
+  end
+
+  # a block made just now, either way (HoodrideWeb.UserChannel "block"):
+  # anything of theirs held for the batch goes, and the app takes their
+  # marker off at once — not at their next update
+  def handle_info({:blocked, other}, socket) when is_integer(other) do
+    pending = Map.reject(socket.assigns.pending, fn {key, _} -> match?({_layer, ^other}, key) end)
+    socket = assign(socket, pending: pending)
+
+    case Roles.layer(socket.assigns.role) do
+      :drivers -> push(socket, "driver_left", %{id: other})
+      :hands -> push(socket, "hand_left", %{id: other})
+      _ -> :ok
+    end
+
+    {:noreply, socket}
   end
 
   def handle_info(:flush_map, socket),
     do: {:noreply, flush(%{socket | assigns: %{socket.assigns | flush_timer: nil}})}
 
+  # unblocked: their marker again at once, if it's in a cell on screen (and
+  # not still blocked the other way) — a parked car sends nothing itself
+  def handle_info({:unblocked, other}, socket) when is_integer(other) do
+    viewer = socket.assigns.user_id
+
+    with layer when layer in [:drivers, :hands] <- Roles.layer(socket.assigns.role),
+         false <- Hoodride.Blocks.blocked?(viewer, other),
+         cell when is_binary(cell) <- other_cell(layer, other),
+         true <- MapSet.member?(socket.assigns.held, Geo.geo_topic(layer, cell)),
+         %{} = entry <- Enum.find(Map.fetch!(Geo.cell_snapshot(cell), layer), &(&1.id == other)) do
+      push(socket, if(layer == :drivers, do: "driver_update", else: "hand_update"), entry)
+    end
+
+    {:noreply, socket}
+  end
+
   def handle_info(_other, socket), do: {:noreply, socket}
+
+  defp other_cell(:drivers, id), do: Geo.driver_cell(id)
+  defp other_cell(:hands, id), do: Geo.hand_cell(id)
+
+  defp shown(event, payload, socket) when event in ["driver_update", "hand_update"] do
+    case Hoodride.Blocks.check(socket.assigns.user_id, Map.get(payload, :id)) do
+      false -> :shown
+      true -> :hidden
+      :unknown -> :unknown
+    end
+  end
+
+  defp shown(_event, _payload, _socket), do: :shown
+
+  # every car / ✋ in the cells on screen (this role's layer), as updates —
+  # what a failed blocks read held back; nobody blocked either way
+  defp resend_screen(socket) do
+    viewer = socket.assigns.user_id
+
+    case Roles.layer(socket.assigns.role) do
+      layer when layer in [:drivers, :hands] ->
+        event = if layer == :drivers, do: "driver_update", else: "hand_update"
+
+        for topic <- socket.assigns.held,
+            {:geo, ^layer, cell} <- [parse(topic)],
+            entry <- Map.fetch!(Geo.cell_snapshot(cell), layer),
+            not Hoodride.Blocks.blocked?(viewer, entry.id),
+            do: push(socket, event, entry)
+
+      _ ->
+        :ok
+    end
+
+    socket
+  end
+
+  # The viewer's blocks into memory as the map joins (Hoodride.Blocks), so
+  # a car update arriving later is a memory lookup — never a database read
+  # at a moment it could fail (owner, 2026-11-15: a database hiccup at a
+  # parked car's one update hid it for good — it sends no other). Failed:
+  # tried again after a random wait (full jitter, doubling, capped — as the
+  # app's own reconnects, HoodSync.reconnectBackoff); once it works,
+  # whatever was held back meanwhile is sent (resend_screen/1).
+  defp preload_blocks(socket) do
+    case Hoodride.Blocks.preload(socket.assigns.user_id) do
+      :ok -> socket
+      :unavailable -> blocks_missed(socket)
+    end
+  end
+
+  defp blocks_missed(%{assigns: %{blocks_retry: nil}} = socket) do
+    tries = socket.assigns.blocks_tries
+    first = Hoodride.Limits.blocks_retry_first_ms()
+    cap = min(first * Integer.pow(2, min(tries, 20)), Hoodride.Limits.blocks_retry_max_ms())
+    timer = Process.send_after(self(), :blocks_retry, :rand.uniform(cap))
+    assign(socket, blocks_retry: timer, blocks_tries: tries + 1, blocks_missed: true)
+  end
+
+  defp blocks_missed(socket), do: assign(socket, blocks_missed: true)
 
   # a watched topic's broadcast — forward it on, but only if the LIVE role
   # still allows its layer (a message queued before a role ping must not

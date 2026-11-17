@@ -76,6 +76,8 @@ defmodule Hoodride.AccountDeletion do
     # too — FIRST, so a live connection can't put anything back on the map
     # meanwhile (every action checks it: HoodrideWeb.UserChannel)
     Hoodride.SessionTokens.forget(user_id)
+    # its blocks went with the row too (the cascade): from memory, both sides
+    Hoodride.Blocks.forget(user_id)
     # signed out everywhere — THEN a ride or request that slipped past the
     # check in delete/1 meanwhile is ended/withdrawn (A1)
     Rides.after_sign_out(user_id)

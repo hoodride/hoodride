@@ -207,3 +207,10 @@ test("mapMessageAction, hands: the same rules as cars", () => {
   assert.equal(B.mapMessageAction({ type: "ridepeer", cell: "A" }, "update", { id: 1, cell: "Z" }, "hand", false), "keep");
   assert.equal(B.mapMessageAction({ type: "ridepeer", cell: "A" }, "left", { id: 1 }, "hand", true), "keep");
 });
+
+// (owner, 2026-11-15) a close whose reason can't be said — a block, or a
+// chat found gone after a reconnect: neither "away" (untrue) nor "ended it"
+test("a neutral close: 'Chat with {name} ended' — no reason given", () => {
+  const a = B.chatClosedActions({ hasChat: true, isOpen: true, name: "Maria", endedBy: "neutral" });
+  assert.deepEqual(a, { remove: true, close: true, banner: "Chat with Maria ended" });
+});

@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "سوداء"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "حظر"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "هل تريد حظر {name}؟"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "الأشخاص المحظورون"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "تم الحظر. للتراجع، انقر على صورة ملفك الشخصي في أعلى اليمين، ثم «الأشخاص المحظورون» في الأسفل."
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "هل غيّرتهما؟"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "دردشة"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "انتهت الدردشة مع {name}"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "تعذّر القبول"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "تعذّر الحظر. حاول مرة أخرى"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "تعذّر التحقق من متصفحك. اسمح بـ challenges.cloudflare.com، أو جرّب متصفحًا آخر"
 
@@ -240,6 +264,10 @@ msgstr "تعذّر تحميل الرسائل. حاول مرة أخرى."
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "تعذّر تحميل الدردشات الأقدم. اضغط للمحاولة مرة أخرى"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "تعذّر التحميل. انقر للمحاولة مرة أخرى"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "تعذّر تسجيل الدخول. حاول مرة أخرى"
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "تعذّر تسجيل الخروج. حاول مرة أخرى"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "تعذّر إلغاء الحظر. حاول مرة أخرى"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "اكتب {word} للتأكيد."
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "إلغاء الحظر"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "هل تريد إلغاء حظر {name}؟"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "يتوفر تحديث. انقر لإعادة التحميل"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "يمكنك تحديث اسمك وصورتك بعد انتهاء توصيلتك"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "لم تحظر أحدًا"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "لن يرى أحدكما الآخر، وستنتهي محادثتكما وأي رحلة بينكما."
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "ستتمكنان من رؤية بعضكما وتبادل الرسائل من جديد."
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "وصلت · اصطحاب {name}"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "حظرت أو ألغيت حظر عدد كبير من الأشخاص اليوم. حاول مرة أخرى غدًا"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "وصلت إلى الحد الأقصى للأشخاص المحظورين. ألغِ حظر أحدهم أولًا"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

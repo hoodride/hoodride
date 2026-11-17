@@ -504,7 +504,16 @@ defmodule Hoodride.Chat do
         :ets.delete_object(@started, {b, key})
         :ets.delete(@reads, {key, a})
         :ets.delete(@reads, {key, b})
-        extra = if by, do: %{ended_by: by}, else: %{}
+        # `by`: who tapped End chat (told); `:neutral`: no reason given — a
+        # block (owner, 2026-11-15: "away" wasn't true, and who blocked isn't
+        # said); nil: the cleanup, someone away (the app says so)
+        extra =
+          case by do
+            nil -> %{}
+            :neutral -> %{reason: "ended"}
+            id -> %{ended_by: id}
+          end
+
         HoodrideWeb.Endpoint.broadcast("user:#{a}", "chat_closed", Map.put(extra, :peer_id, b))
         HoodrideWeb.Endpoint.broadcast("user:#{b}", "chat_closed", Map.put(extra, :peer_id, a))
         :ok

@@ -112,6 +112,11 @@ defmodule HoodrideWeb.PrivacyTest do
                  "Sign-in records (one per signed-in device, to keep you signed in)",
                  "Until you sign out, or 30 days after you last use the app (at most a year)"
                ],
+               # (2026-11-15: blocks — a limit too, never "as long as necessary")
+               [
+                 "Who you've blocked",
+                 "Until you unblock them, or either of you deletes your account"
+               ],
                ["Error logs", "14 days"]
              ] = rows
 
@@ -134,10 +139,24 @@ defmodule HoodrideWeb.PrivacyTest do
     # Refresh from Google; 2026-10-30: which messages you've read;
     # 2026-10-31: sign-out takes you off the map, "open Settings";
     # 2026-11-05: the language cookie, kept only if you choose;
-    # 2026-11-14: Cloudflare Turnstile on the sign-in screen)
+    # 2026-11-14: Cloudflare Turnstile on the sign-in screen;
+    # 2026-11-15: blocks — who you block, kept until you unblock)
     test "the effective date is the date of the last change", %{conn: conn} do
       html = conn |> get("/privacy") |> html_response(200)
-      assert html =~ "Effective November 14, 2026"
+      assert html =~ "Effective November 15, 2026"
+    end
+
+    # blocks (owner, 2026-11-15): what's kept, that the person isn't told,
+    # and for how long
+    test "names blocks: kept, private, until unblocked", %{conn: conn} do
+      html = conn |> get("/privacy") |> html_response(200)
+      assert html =~ "<strong>Who you block</strong>"
+      assert html =~ "Only you see your list, and the person isn't told."
+
+      assert html =~
+               "<tr><td>Who you've blocked</td><td>Until you unblock them, or either of you deletes your account</td></tr>"
+
+      assert html =~ "This includes who you've blocked."
     end
 
     # Cloudflare's "a person, not a program?" check on sign-in (owner,

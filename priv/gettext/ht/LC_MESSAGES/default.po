@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "nwa"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "Bloke"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "Bloke {name}?"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "Moun ki bloke"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "Bloke. Pou anile sa, peze foto pwofil ou anwo agoch, apre Moun ki bloke anba nèt."
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "Ou chanje yo?"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "Chat"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "Chat ak {name} fini"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "Pa t ka aksepte"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "Pa t ka bloke — eseye ankò"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Nou pa t ka verifye navigatè w la — otorize challenges.cloudflare.com, oswa eseye yon lòt navigatè"
 
@@ -240,6 +264,10 @@ msgstr "Nou pa t ka chaje mesaj yo. Eseye ankò."
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "Pa ka chaje ansyen chat yo — tape pou eseye ankò"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "Pa t ka chaje — tape pou eseye ankò"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "Pa t ka konekte — eseye ankò"
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "Pa t ka dekonekte — eseye ankò"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "Pa t ka debloke — eseye ankò"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "Tape {word} pou konfime."
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "Debloke"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "Debloke {name}?"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "Gen yon mizajou — peze pou rechaje"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "Ou ka mete non ak foto ou ajou apre woulib ou a"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "Ou pa bloke pèsonn"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "Nou p ap wè youn lòt, epi chat nou ak nenpòt woulib ap fini."
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "N ap ka wè youn lòt epi voye mesaj ankò."
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "Ou rive · w ap pran {name}"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "Ou bloke oswa debloke twòp moun jodi a — eseye ankò demen"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "Ou bloke maksimòm moun ou ka bloke — debloke yon moun anvan"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

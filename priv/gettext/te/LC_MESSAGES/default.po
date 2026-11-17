@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "నలుపు రంగు"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "బ్లాక్ చేయండి"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "{name}ని బ్లాక్ చేయాలా?"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "బ్లాక్ చేసిన వ్యక్తులు"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "బ్లాక్ చేయబడింది. అన్‌డూ చేయడానికి, ఎగువ ఎడమ వైపున ఉన్న మీ ప్రొఫైల్ ఫోటోను ట్యాప్ చేసి, ఆపై దిగువన 'బ్లాక్ చేసిన వ్యక్తులు'ని ట్యాప్ చేయండి."
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "వాటిని మార్చారా?"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "చాట్"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "{name}తో చాట్ ముగిసింది"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "అంగీకరించడం సాధ్యపడలేదు"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "బ్లాక్ చేయడం సాధ్యపడలేదు. మళ్లీ ట్రై చేయండి"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "మీ బ్రౌజర్‌ను తనిఖీ చేయడం సాధ్యపడలేదు. challenges.cloudflare.com‌ను అనుమతించండి, లేదా వేరే బ్రౌజర్ ట్రై చేయండి"
 
@@ -240,6 +264,10 @@ msgstr "సందేశాలను లోడ్ చేయలేకపోయా�
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "పాత చాట్‌లను లోడ్ చేయడం సాధ్యపడలేదు. మళ్లీ ట్రై చేయడానికి ట్యాప్ చేయండి"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "లోడ్ చేయడం సాధ్యపడలేదు. మళ్లీ ట్రై చేయడానికి ట్యాప్ చేయండి"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "సైన్ ఇన్ చేయడం సాధ్యపడలేదు
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "సైన్ అవుట్ చేయడం సాధ్యపడలేదు. మళ్లీ ట్రై చేయండి"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "అన్‌బ్లాక్ చేయడం సాధ్యపడలేదు. మళ్లీ ట్రై చేయండి"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "నిర్ధారించడానికి {word} అని టైప్ చేయండి."
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "అన్‌బ్లాక్ చేయండి"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "{name}ని అన్‌బ్లాక్ చేయాలా?"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "అప్‌డేట్ అందుబాటులో ఉంది. రీలోడ్ చేయడానికి ట్యాప్ చేయండి"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "మీ రైడ్ తర్వాత మీ పేరు, ఫోటోను రిఫ్రెష్ చేయవచ్చు"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "మీరు ఎవరినీ బ్లాక్ చేయలేదు"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "మీరు ఒకరినొకరు చూడలేరు, మీ చాట్ మరియు ఏదైనా రైడ్ ముగుస్తుంది."
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "మీరు మళ్లీ ఒకరినొకరు చూడగలరు, మెసేజ్ చేసుకోగలరు."
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "మీరు చేరుకున్నారు · {name}ను పికప్ చేస్తున్నారు"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "ఈరోజు మీరు చాలా మందిని బ్లాక్ లేదా అన్‌బ్లాక్ చేశారు. రేపు మళ్లీ ట్రై చేయండి"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "మీరు బ్లాక్ చేయగలిగినంత మందిని బ్లాక్ చేశారు. ముందుగా ఎవరినైనా అన్‌బ్లాక్ చేయండి"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

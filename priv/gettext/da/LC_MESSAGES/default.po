@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "sort"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "Bloker"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "Vil du blokere {name}?"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "Blokerede personer"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "Blokeret. Tryk på dit profilbillede øverst til venstre og derefter på Blokerede personer nederst for at fortryde."
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "Har du ændret dem?"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "Chat"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "Chatten med {name} er afsluttet"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "Kunne ikke acceptere"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "Kunne ikke blokere. Prøv igen"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Din browser kunne ikke tjekkes. Tillad challenges.cloudflare.com, eller prøv en anden browser"
 
@@ -240,6 +264,10 @@ msgstr "Beskederne kunne ikke indlæses. Prøv igen."
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "Kunne ikke indlæse ældre chats. Tryk for at prøve igen"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "Kunne ikke indlæse. Tryk for at prøve igen"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "Kunne ikke logge ind. Prøv igen"
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "Kunne ikke logge ud. Prøv igen"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "Kunne ikke fjerne blokering. Prøv igen"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "Skriv {word} for at bekræfte."
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "Fjern blokering"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "Vil du fjerne blokeringen af {name}?"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "Opdatering tilgængelig. Tryk for at genindlæse"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "Du kan opdatere dit navn og billede efter din tur"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "Du har ikke blokeret nogen"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "I kan ikke se hinanden, og jeres chat og en eventuel tur slutter."
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "I kan se og skrive til hinanden igen."
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "Du er fremme · henter {name}"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "Du har blokeret eller fjernet blokering af for mange i dag. Prøv igen i morgen"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "Du har blokeret så mange, som du kan. Fjern først en blokering"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "مشکی"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "مسدود کردن"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "{name} مسدود شود؟"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "افراد مسدودشده"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "مسدود شد. برای لغو، روی عکس پروفایلتان بالا سمت راست بزنید، سپس «افراد مسدودشده» در پایین."
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "تغییرشان داده‌اید؟"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "گفتگو"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "گفتگو با {name} تمام شد"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "پذیرفتن ممکن نشد"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "مسدود کردن ممکن نشد — دوباره امتحان کنید"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "بررسی مرورگر شما ممکن نشد — به challenges.cloudflare.com اجازه دهید، یا مرورگر دیگری را امتحان کنید"
 
@@ -240,6 +264,10 @@ msgstr "پیام‌ها بارگیری نشد. دوباره امتحان کنی�
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "بارگیری گفتگوهای قدیمی‌تر ممکن نشد — برای امتحان دوباره ضربه بزنید"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "بارگیری ممکن نشد — برای امتحان دوباره ضربه بزنید"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "ورود ممکن نشد — دوباره امتحان کنید"
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "خروج ممکن نشد — دوباره امتحان کنید"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "رفع مسدودی ممکن نشد — دوباره امتحان کنید"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "برای تأیید، {word} را تایپ کنید."
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "رفع مسدودی"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "مسدودی {name} برداشته شود؟"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "نسخهٔ جدید آمده — برای بارگذاری دوباره بزنید"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "بعد از سفر می‌توانید نام و عکستان را به‌روزرسانی کنید"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "کسی را مسدود نکرده‌اید"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "یکدیگر را نخواهید دید، و گفتگوی شما و هر سفری به پایان می‌رسد."
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "دوباره می‌توانید یکدیگر را ببینید و به هم پیام بدهید."
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "رسیدید · سوار کردن {name}"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "امروز افراد زیادی را مسدود یا رفع مسدودی کرده‌اید — فردا دوباره امتحان کنید"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "به حداکثر افراد مسدودشده رسیده‌اید — اول مسدودی کسی را بردارید"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

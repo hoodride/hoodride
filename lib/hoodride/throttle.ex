@@ -23,6 +23,9 @@ defmodule Hoodride.Throttle do
 
   @minute 60_000
   @hour 3_600_000
+  @day 86_400_000
+  # blocks and unblocks together (Hoodride.Blocks)
+  @block_actions_per_day Hoodride.Limits.block_actions_per_day()
 
   # a fast real chat is ~10-15 short messages a minute
   @messages_per_minute Hoodride.Limits.messages_per_minute()
@@ -55,6 +58,13 @@ defmodule Hoodride.Throttle do
     RateLimit.give_back({:msg, from_id})
     RateLimit.give_back({:msg_pair, from_id, to_id})
   end
+
+  @doc "Take one of the day's blocks or unblocks (Hoodride.Blocks): `:ok`, or `{:deny, ms}`."
+  def take_block_action(user_id),
+    do: take_all([{{:block, user_id}, @day, @block_actions_per_day}])
+
+  @doc "The block or unblock didn't change anything: its allowance back."
+  def give_back_block_action(user_id), do: RateLimit.give_back({:block, user_id})
 
   @doc "Take one cold contact (someone new): `:ok`, or `{:deny, ms}` with nothing taken."
   def take_new_conversation(from_id),

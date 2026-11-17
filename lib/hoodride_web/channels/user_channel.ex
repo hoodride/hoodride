@@ -365,6 +365,37 @@ defmodule HoodrideWeb.UserChannel do
     end
   end
 
+  # Block / unblock (owner, 2026-11-15 — Hoodride.Blocks). Saved first, so
+  # anything new between the two is refused; then what's between them ends
+  # (Hoodride.BlockEffects). Refusals: "self", "none", "full" (unblock
+  # someone first), "rate_limited" (the day's blocks and unblocks), "failed"
+  defp event("block", %{"peer" => peer}, socket) when is_integer(peer) do
+    me = socket.assigns.user_id
+
+    case Hoodride.Blocks.block(me, peer) do
+      :ok ->
+        Hoodride.BlockEffects.apply(me, peer)
+        {:reply, :ok, socket}
+
+      {:error, reason} ->
+        {:reply, {:error, %{reason: Atom.to_string(reason)}}, socket}
+    end
+  end
+
+  # (they see each other again from their next update or map move)
+  defp event("unblock", %{"peer" => peer}, socket) when is_integer(peer) do
+    me = socket.assigns.user_id
+
+    case Hoodride.Blocks.unblock(me, peer) do
+      :ok ->
+        Hoodride.BlockEffects.unblocked(me, peer)
+        {:reply, :ok, socket}
+
+      {:error, reason} ->
+        {:reply, {:error, %{reason: Atom.to_string(reason)}}, socket}
+    end
+  end
+
   # malformed payloads get an error reply, never a channel crash
   defp event(_event, _payload, socket) do
     {:reply, {:error, %{reason: "bad_request"}}, socket}

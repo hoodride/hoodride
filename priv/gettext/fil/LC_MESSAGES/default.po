@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "itim"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "I-block"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "I-block si {name}?"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "Mga naka-block"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "Na-block. Para i-undo, i-tap ang profile picture mo sa kaliwang itaas, pagkatapos ay Mga naka-block sa ibaba."
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "Binago mo na?"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "Chat"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "Natapos ang chat kay {name}"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "Hindi matanggap"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "Hindi ma-block — subukan ulit"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Hindi masuri ang browser mo — payagan ang challenges.cloudflare.com, o sumubok ng ibang browser"
 
@@ -240,6 +264,10 @@ msgstr "Hindi ma-load ang mga mensahe. Subukan ulit."
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "Hindi ma-load ang mas lumang chat — i-tap para subukan ulit"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "Hindi ma-load — i-tap para subukan ulit"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "Hindi maka-sign in — subukan ulit"
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "Hindi maka-sign out — subukan ulit"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "Hindi ma-unblock — subukan ulit"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "I-type ang {word} para kumpirmahin."
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "I-unblock"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "I-unblock si {name}?"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "May update — i-tap para i-reload"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "Puwede mong i-refresh ang pangalan at larawan mo pagkatapos ng sakay mo"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "Wala kang na-block"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "Hindi kayo magkikita sa isa't isa, at matatapos ang chat ninyo at anumang sakay."
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "Makikita at mamemensahe ninyo ulit ang isa't isa."
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "Nakarating ka na · susunduin si {name}"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "Masyadong marami kang na-block o na-unblock ngayong araw — subukan ulit bukas"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "Na-block mo na ang pinakamaraming puwede — mag-unblock muna ng isa"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

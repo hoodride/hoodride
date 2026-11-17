@@ -491,6 +491,11 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
    never seen as wide as the cap (owner, 2026-11-11) */
 .banner.fitting { visibility: hidden; }
 #banner-was { pointer-events: none; }
+/* a message's banner: a tap opens that chat (owner, 2026-11-17) */
+.banner.tappable { cursor: pointer; }
+/* typing with the keyboard up: the chat fills what's visible above it —
+   top and height set from the visual viewport (fitChatToKeyboard) */
+.chat.kb { border-radius: 16px; }
 
 .bottom-controls {
   position: absolute;
@@ -754,6 +759,19 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   color: var(--accent); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
 }
 .chat-end.armed { color: var(--danger); }
+/* End chat and Block, side by side under the name */
+.chat-links { display: flex; gap: 16px; align-items: center; }
+.chat-block { color: var(--muted); font-weight: 500; }
+/* the card's Block: small and quiet, under who they are (owner, 2026-11-15) */
+.peer-block {
+  align-self: flex-start; background: none; border: 0; padding: 4px 0 0; margin: 0;
+  color: var(--muted); font: inherit; font-size: 13px; cursor: pointer;
+}
+/* the Blocked people list */
+.blocked-list { display: flex; flex-direction: column; gap: 4px; max-height: 60vh; overflow-y: auto; margin: 4px 0 10px; }
+.blocked-row { display: flex; align-items: center; gap: 10px; padding: 6px 2px; }
+.blocked-row strong { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: start; }
+.blocked-empty, .blocked-more { padding: 12px 2px; text-align: center; font-size: 13px; cursor: pointer; }
 .chat-header .card-close { top: 14px; }
 
 .chat-back { position: static; font-size: 22px; padding: 0 6px; display: inline-flex; align-items: center; gap: 4px; }

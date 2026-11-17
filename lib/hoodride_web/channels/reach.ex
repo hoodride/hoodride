@@ -34,6 +34,9 @@ defmodule HoodrideWeb.Reach do
     me = socket.assigns.user_id
 
     cond do
+      # a block either way (Hoodride.Blocks): the same "unavailable" as
+      # anyone out of reach — never told it's a block
+      Hoodride.Blocks.blocked?(me, other) -> {:error, %{reason: "unavailable"}}
       Hoodride.Chat.exists?(me, other) or Hoodride.Requests.open_between?(me, other) -> :related
       true -> cold(socket, me, other)
     end

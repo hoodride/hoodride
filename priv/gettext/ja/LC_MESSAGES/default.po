@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "黒"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "ブロック"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "{name}さんをブロックしますか？"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "ブロックした人"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "ブロックしました。元に戻すには、左上のプロフィール写真をタップし、下部の「ブロックした人」をタップしてください。"
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "変更しましたか？"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "チャット"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "{name}さんとのチャットは終了しました"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "承諾できませんでした"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "ブロックできませんでした。もう一度お試しください"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "ブラウザを確認できませんでした。challenges.cloudflare.com を許可するか、別のブラウザをお試しください"
 
@@ -240,6 +264,10 @@ msgstr "メッセージを読み込めませんでした。もう一度お試し
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "以前のチャットを読み込めませんでした。タップしてもう一度お試しください"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "読み込めませんでした。タップしてもう一度お試しください"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "ログインできませんでした。もう一度お試しください
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "ログアウトできませんでした。もう一度お試しください"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "ブロックを解除できませんでした。もう一度お試しください"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "確認のため「{word}」と入力してください。"
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "ブロック解除"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "{name}さんのブロックを解除しますか？"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "アップデートがあります。タップして再読み込み"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "名前と写真は乗車後に更新できます"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "ブロックした人はいません"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "お互いに見えなくなり、チャットと進行中の相乗りは終了します。"
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "再びお互いが見え、メッセージを送り合えるようになります。"
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "到着しました · {name}さんをお迎え中"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "今日はブロックやブロック解除の回数が多すぎます。明日もう一度お試しください"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "ブロックできる人数の上限に達しました。先に誰かのブロックを解除してください"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

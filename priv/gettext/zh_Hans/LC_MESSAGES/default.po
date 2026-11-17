@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "黑色"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "屏蔽"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "要屏蔽 {name} 吗？"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "已屏蔽的人"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "已屏蔽。如需撤销，请点按左上角的头像，然后点按底部的“已屏蔽的人”。"
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "已经改好了？"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "聊天"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "与{name}的聊天已结束"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "无法接受"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "无法屏蔽，请重试"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "无法检查你的浏览器，请允许 challenges.cloudflare.com，或换用其他浏览器"
 
@@ -240,6 +264,10 @@ msgstr "无法加载消息，请重试。"
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "无法加载更早的聊天，轻触重试"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "无法加载，轻触重试"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "无法登录，请重试"
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "无法退出登录，请重试"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "无法取消屏蔽，请重试"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "输入{word}以确认。"
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "取消屏蔽"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "要取消屏蔽 {name} 吗？"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "有可用更新，点按即可重新加载"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "行程结束后即可刷新你的名字和头像"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "你没有屏蔽任何人"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "你们将看不到彼此，你们的聊天和任何行程都将结束。"
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "你们将能再次看到彼此并互发消息。"
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "你已到达 · 正在接{name}"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "今天屏蔽或取消屏蔽的人数过多，请明天再试"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "已屏蔽人数达到上限，请先取消屏蔽某人"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

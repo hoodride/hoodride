@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "கருப்பு நிற"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "தடு"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "{name} அவர்களைத் தடுக்கவா?"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "தடுக்கப்பட்டவர்கள்"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "தடுக்கப்பட்டது. மாற்ற, மேலே இடதுபுறம் உள்ள உங்கள் சுயவிவரப் படத்தைத் தட்டி, பிறகு கீழே உள்ள 'தடுக்கப்பட்டவர்கள்' என்பதைத் தட்டவும்."
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "அவற்றை மாற்றினீர்களா?"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "அரட்டை"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "{name} உடனான அரட்டை முடிந்தது"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "ஏற்க முடியவில்லை"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "தடுக்க முடியவில்லை. மீண்டும் முயலவும்"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "உங்கள் உலாவியைச் சரிபார்க்க முடியவில்லை. challenges.cloudflare.com-ஐ அனுமதிக்கவும் அல்லது வேறு உலாவியை முயலவும்"
 
@@ -240,6 +264,10 @@ msgstr "செய்திகளை ஏற்ற முடியவில்ல�
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "பழைய அரட்டைகளை ஏற்ற முடியவில்லை. மீண்டும் முயல தட்டவும்"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "ஏற்ற முடியவில்லை. மீண்டும் முயல தட்டவும்"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "உள்நுழைய முடியவில்லை. மீண்
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "வெளியேற முடியவில்லை. மீண்டும் முயலவும்"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "தடையை நீக்க முடியவில்லை. மீண்டும் முயலவும்"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "உறுதிப்படுத்த {word} என டைப் செய்யவும்."
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "தடையை நீக்கு"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "{name} அவர்களின் தடையை நீக்கவா?"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "புதுப்பிப்பு உள்ளது. மீண்டும் ஏற்ற தட்டவும்"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "பயணம் முடிந்ததும் உங்கள் பெயரையும் படத்தையும் புதுப்பிக்கலாம்"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "நீங்கள் யாரையும் தடுக்கவில்லை"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "நீங்கள் ஒருவரையொருவர் பார்க்க முடியாது, உங்கள் அரட்டையும் எந்தப் பயணமும் முடிவடையும்."
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "நீங்கள் மீண்டும் ஒருவரையொருவர் பார்க்கவும் செய்தி அனுப்பவும் முடியும்."
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "வந்துவிட்டீர்கள் · {name} ஐ அழைத்துச் செல்கிறீர்கள்"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "இன்று நீங்கள் மிக அதிகமானவர்களைத் தடுத்துள்ளீர்கள் அல்லது தடையை நீக்கியுள்ளீர்கள். நாளை மீண்டும் முயலவும்"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "நீங்கள் தடுக்கக்கூடிய அதிகபட்ச நபர்களைத் தடுத்துவிட்டீர்கள். முதலில் யாரேனும் ஒருவரின் தடையை நீக்கவும்"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

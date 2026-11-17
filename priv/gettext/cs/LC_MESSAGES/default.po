@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "černý"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "Zablokovat"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "Zablokovat uživatele {name}?"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "Zablokovaní lidé"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "Zablokováno. Zrušíš to klepnutím vlevo nahoře na svou profilovou fotku a pak dole na Zablokovaní lidé."
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "Už jsou změněné?"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "Chat"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "Chat ({name}) skončil"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "Nepodařilo se přijmout"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "Zablokování se nezdařilo – zkus to znovu"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Tvůj prohlížeč se nepodařilo ověřit – povol challenges.cloudflare.com, nebo zkus jiný prohlížeč"
 
@@ -240,6 +264,10 @@ msgstr "Zprávy se nepodařilo načíst. Zkus to znovu."
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "Starší chaty se nepodařilo načíst – klepnutím to zkus znovu"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "Načtení se nezdařilo – klepnutím to zkus znovu"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "Přihlášení se nezdařilo – zkus to znovu"
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "Odhlášení se nezdařilo – zkus to znovu"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "Odblokování se nezdařilo – zkus to znovu"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "Pro potvrzení napiš {word}."
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "Odblokovat"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "Odblokovat uživatele {name}?"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "K dispozici je aktualizace – klepnutím načteš znovu"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "Jméno a fotku můžeš aktualizovat po jízdě"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "Nikoho jsi nezablokoval(a)"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "Navzájem se neuvidíte a váš chat i případná jízda skončí."
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "Znovu se uvidíte a budete si moct psát."
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "Jsi na místě · vyzvedáváš: {name}"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "Dnes jsi zablokoval(a) nebo odblokoval(a) příliš mnoho lidí – zkus to zítra"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "Zablokoval(a) jsi nejvíc lidí, kolik jde – nejdřív někoho odblokuj"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

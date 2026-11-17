@@ -10,6 +10,8 @@ defmodule Hoodride.TestHelpers do
     :chat_by_user,
     :chat_spots,
     :chat_reads,
+    :block_rows,
+    :block_loaded,
     :chat_sent_ids,
     :request_spots,
     :geo_drivers,

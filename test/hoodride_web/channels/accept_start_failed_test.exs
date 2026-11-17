@@ -57,6 +57,10 @@ defmodule HoodrideWeb.AcceptStartFailedTest do
     ref = push(rchan, "request_ride", %{"to" => driver.id})
     assert_reply ref, :ok
 
+    # (the driver's blocks in memory, as a connected driver's are — their map
+    # loads them; the ride's last look checks them: Hoodride.Blocks)
+    :ok = Hoodride.Blocks.preload(driver.id)
+
     # from now on only this test's own process may use the database: the
     # ride's start-up (its name lookups) can't — it crashes
     Ecto.Adapters.SQL.Sandbox.mode(Hoodride.Repo, :manual)

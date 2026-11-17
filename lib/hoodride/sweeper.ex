@@ -117,6 +117,8 @@ defmodule Hoodride.Sweeper do
       {:sign_in_states, &Hoodride.SignInStates.sweep/0},
       # sign-ins past their 30 days (or their year): gone from memory
       {:session_tokens, &Hoodride.SessionTokens.sweep/0},
+      # blocks of people away a while: out of memory (read again when needed)
+      {:blocks, fn -> Hoodride.Blocks.sweep() end},
       # session-stamp rows of accounts with no device connected for a day
       {:session_stamps, &Hoodride.SessionStamp.prune/0},
       # the recount trusts membership: repair it first

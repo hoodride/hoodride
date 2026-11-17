@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "negru"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "Blochează"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "Blochezi pe {name}?"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "Persoane blocate"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "Blocat. Ca să anulezi, atinge fotografia de profil din stânga sus, apoi Persoane blocate, jos de tot."
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "Le-ai schimbat?"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "Chat"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "Chatul cu {name} s-a încheiat"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "Nu s-a putut accepta"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "Nu s-a putut bloca – încearcă din nou"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Nu ți-am putut verifica browserul – permite challenges.cloudflare.com sau încearcă alt browser"
 
@@ -240,6 +264,10 @@ msgstr "Mesajele nu au putut fi încărcate. Încearcă din nou."
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "Nu s-au putut încărca chaturile mai vechi – atinge pentru a încerca din nou"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "Nu s-a putut încărca – atinge pentru a încerca din nou"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "Nu te-ai putut conecta – încearcă din nou"
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "Nu te-ai putut deconecta – încearcă din nou"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "Nu s-a putut debloca – încearcă din nou"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "Scrie {word} pentru a confirma."
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "Deblochează"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "Deblochezi pe {name}?"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "Actualizare disponibilă – atinge pentru reîncărcare"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "Poți reîmprospăta numele și fotografia după cursă"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "Nu ai blocat pe nimeni"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "Nu vă veți mai vedea, iar chatul vostru și orice cursă se vor încheia."
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "Vă veți putea vedea și scrie din nou."
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "Ai ajuns · preiei: {name}"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "Azi ai blocat sau deblocat prea multe persoane – încearcă mâine"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "Ai blocat numărul maxim de persoane – mai întâi deblochează pe cineva"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

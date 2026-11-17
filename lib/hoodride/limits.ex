@@ -57,6 +57,18 @@ defmodule Hoodride.Limits do
     {:chats, :chat_preview_chars, 100, "Characters of a message shown as a chat's preview."},
     {:chats, :chat_preview_bytes, 400, "Bytes of that preview."},
 
+    # ---------- blocks (Hoodride.Blocks) ----------
+    {:blocks, :blocks_per_person, 200,
+     "People one person may have blocked at once; past it, unblock someone first (owner, 2026-11-15: 200 — far past real use, easy to raise)."},
+    {:blocks, :block_actions_per_day, 20,
+     "Blocks and unblocks one person may make a day, together (owner, 2026-11-15) — stops scripted block/unblock loops."},
+    {:blocks, :blocks_retry_first_ms, @second,
+     "The database couldn't give someone's blocks: their map tries again after a random wait up to this, the limit doubling each time — full jitter, as the app's own reconnects (owner, 2026-11-15)."},
+    {:blocks, :blocks_retry_max_ms, 10 * @second,
+     "…never more than this (as the reconnects: the wait a person sees)."},
+    {:blocks, :blocks_page, 30,
+     "People per page of the Blocked people list (older ones as it's scrolled, as the chat list — owner, 2026-11-15)."},
+
     # ---------- ride requests and rides ----------
     {:rides, :request_cooldown_ms, @minute,
      "After a request to a driver ends (declined, cancelled, expired), how long before the same rider may ask that driver again."},
@@ -92,8 +104,16 @@ defmodule Hoodride.Limits do
      "A sign-in this old is renewed when the app is used."},
     {:sign_in, :sign_in_max_age_ms, 365 * @day,
      "At most this long from the real Google sign-in, however often renewed."},
-    {:sign_in, :sign_ins_per_account, 10,
-     "Sign-ins one account may hold (devices × renewals); over it the oldest-replaced go first (the key fix, 2026-11-12)."},
+    # 4 = TWO devices (owner, 2026-11-17, from 10). Each device holds up to 2
+    # sign-ins for a moment: its weekly renewal keeps the old one until the
+    # new one is used, in case the reply was lost (else a bad signal would
+    # sign it out) — Hoodride.SessionTokens treats the two as one device and
+    # never splits them. Two devices is iPhone Safari + the home-screen app,
+    # which iOS keeps signed in apart. A third device (a tablet) may be
+    # signed out by a renewal and sign in again. Only one is ever LIVE
+    # anyway ("Use here"). Memory: about 128 bytes a sign-in.
+    {:sign_in, :sign_ins_per_account, 4,
+     "Sign-ins one account may hold: 4 = two devices (each holds 2 for a moment while its weekly renewal is unused); over it, expired ones go first, then replaced ones, then the device renewed longest ago (owner, 2026-11-17: from 10)."},
     {:sign_in, :lost_reply_ms, @minute,
      "A renewal whose new sign-in went unused this long may renew again (its reply was lost on bad signal)."},
     {:sign_in, :socket_pass_ms, @day, "A live-connection pass is accepted for this long."},

@@ -50,6 +50,10 @@ defmodule HoodrideWeb.NearCoversTest do
     "nav-sheet" => "the navigation app choice: a dialog (mapOutOfSight)",
     "car-backdrop" => "the car form: a dialog with its own backdrop",
     "car-sheet" => "the car form: a dialog (mapOutOfSight)",
+    "block-backdrop" => "block / unblock, asked first: a dialog with its own backdrop",
+    "block-sheet" => "block / unblock, asked first: a dialog (mapOutOfSight)",
+    "blocked-backdrop" => "the Blocked people list: a dialog with its own backdrop",
+    "blocked-sheet" => "the Blocked people list: a dialog (mapOutOfSight)",
     # straight in <body>
     "lang-backdrop" => "the language choice: a dialog with its own backdrop",
     "lang-sheet" => "the language choice: a dialog (mapOutOfSight)",
@@ -634,8 +638,9 @@ defmodule HoodrideWeb.NearCoversTest do
     assert o =~
              "return !!el && (open ? el.classList.contains(\"open\") : !el.classList.contains(\"hidden\"));"
 
+    # (the block dialogs too, 2026-11-15)
     assert o =~
-             ~s{return ["car-sheet", "nav-sheet", "lang-sheet"].some((id) => shown(id, false));}
+             ~s{return ["car-sheet", "nav-sheet", "lang-sheet", "block-sheet", "blocked-sheet"].some((id) => shown(id, false));}
   end
 
   test "the old strip model (and the watch's old fixed wait) is gone everywhere — the app, the tests, the journeys" do

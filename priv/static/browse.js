@@ -76,12 +76,16 @@
   // to say; else the server ended it (they've been away past grace)
   function chatClosedActions({ hasChat, isOpen, name, endedBy }) {
     if (!hasChat) return { remove: false, close: false, banner: null };
+    // "neutral": no reason can be given — a block, or a chat found gone
+    // after a reconnect (owner, 2026-11-15)
     const banner =
       endedBy === "me"
         ? null
         : endedBy === "peer"
           ? t("{name} ended the chat", { name })
-          : t("Chat with {name} ended — they've been away a while", { name });
+          : endedBy === "neutral"
+            ? t("Chat with {name} ended", { name })
+            : t("Chat with {name} ended — they've been away a while", { name });
     return { remove: true, close: !!isOpen, banner };
   }
 

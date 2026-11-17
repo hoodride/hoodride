@@ -432,6 +432,30 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     "ok"
   end
 
+  # this person has already blocked `n` people (BT-X1 the oldest), as over
+  # days — the Blocked people list in pages, and the limit (owner, 2026-11-15)
+  # (a third number: the first BT-X number — a second fill, more people)
+  defp server("blocks_fill " <> args) do
+    [n, id | rest] = args |> String.split() |> Enum.map(&String.to_integer/1)
+    from = List.first(rest) || 1
+    now = System.system_time(:millisecond)
+
+    for i <- from..(from + n - 1) do
+      name = "BT-X#{i}"
+
+      {:ok, u} =
+        Hoodride.Accounts.upsert_oauth_user(%{provider: "dev", provider_id: name, name: name})
+
+      Hoodride.Repo.query!(
+        "INSERT INTO blocks (blocker_id, blocked_id, inserted_at) VALUES (?, ?, ?)",
+        [id, u.id, now - (from + n - i) * 1000]
+      )
+    end
+
+    Hoodride.Blocks.forget(id)
+    "ok"
+  end
+
   # BT-C<i> (of chat_crowd) writes this person again
   defp server("crowd_says " <> args) do
     [i, id | words] = String.split(args)

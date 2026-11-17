@@ -11,6 +11,8 @@ defmodule Hoodride.SessionTokensTest do
   alias Hoodride.TestHelpers
 
   @day 86_400_000
+  # the cap (Limits.sign_ins_per_account): these tests hold at any value of it
+  @max Hoodride.Limits.sign_ins_per_account()
 
   defp user(key) do
     {:ok, u} = Accounts.upsert_oauth_user(%{provider: "dev", provider_id: key, name: key})
@@ -326,15 +328,15 @@ defmodule Hoodride.SessionTokensTest do
     assert SessionTokens.rotate(old) == :error, "…and the database says so too"
   end
 
-  test "a lost reply at the cap: the count stays 10, the phone's token kept" do
+  test "a lost reply at the cap: the count stays at the cap, the phone's token kept" do
     u = user("st-cap-lost")
     old = week_old(u)
-    for _ <- 1..9, do: SessionTokens.create(u.id)
+    for _ <- 1..(@max - 1), do: SessionTokens.create(u.id)
     {:ok, lost} = SessionTokens.rotate(old)
-    assert count(u.id) == 10
+    assert count(u.id) == @max
     age(lost, 61_000, 0)
     assert {:ok, again} = SessionTokens.rotate(old)
-    assert count(u.id) == 10
+    assert count(u.id) == @max
     assert {:ok, _} = SessionTokens.lookup(old)
     assert {:ok, _} = SessionTokens.lookup(again)
   end
@@ -350,20 +352,22 @@ defmodule Hoodride.SessionTokensTest do
 
     # (the phone's own first sign-in is the OLDEST of all — 8 days — but it
     # renewed just now: devices rank by their latest renewal)
+    n = @max - 2
+
     others =
-      for i <- 1..8 do
+      for i <- 1..n do
         {:ok, raw} = SessionTokens.create(u.id)
-        age(raw, (8 - i) * @day + 1_000, 0)
+        age(raw, (n - i) * @day + 1_000, 0)
         raw
       end
 
     # the phone renews, gets the reply, and the app is closed
     {:ok, renewed} = SessionTokens.rotate(old)
-    assert count(u.id) == 10
+    assert count(u.id) == @max
 
-    # an 11th sign-in somewhere
+    # one sign-in more somewhere
     {:ok, _} = SessionTokens.create(u.id)
-    assert count(u.id) <= 10
+    assert count(u.id) <= @max
     assert {:ok, _} = SessionTokens.lookup(renewed), "the phone's renewal kept"
     assert {:ok, _} = SessionTokens.lookup(old), "…and the token before it (a lost reply)"
     assert SessionTokens.lookup(hd(others)) == :error, "the oldest device went instead"
@@ -377,27 +381,27 @@ defmodule Hoodride.SessionTokensTest do
     {:ok, orphan} = SessionTokens.rotate(other_old)
     # the renewal pair is the OLDEST device: its renewal 10 days ago
     age(orphan, 10 * @day, 100 * @day)
-    for _ <- 1..8, do: SessionTokens.create(u.id)
-    # expired, other_old, orphan + 8: the 11th went (the expired one); one more
+    for _ <- 1..(@max - 2), do: SessionTokens.create(u.id)
+    # expired, other_old, orphan + the rest: one over (the expired one went); one more
     {:ok, _} = SessionTokens.create(u.id)
-    assert count(u.id) <= 10
+    assert count(u.id) <= @max
     assert rows(u.id) |> List.flatten() |> Enum.member?(SessionTokens.hash(expired)) == false
     # the whole device, both tokens — never one of the two
     assert SessionTokens.lookup(orphan) == :error
     assert SessionTokens.lookup(other_old) == :error
   end
 
-  test "signing in again from the same browser at the cap: still 10, the old one replaced" do
+  test "signing in again from the same browser at the cap: still at the cap, the old one replaced" do
     u = user("st-cap-again")
-    raws = for _ <- 1..10, do: elem(SessionTokens.create(u.id), 1)
+    raws = for _ <- 1..@max, do: elem(SessionTokens.create(u.id), 1)
     {:ok, again} = SessionTokens.create(u.id, List.last(raws))
-    assert count(u.id) == 10
+    assert count(u.id) == @max
     assert SessionTokens.lookup(List.last(raws)) == :error
     assert {:ok, _} = SessionTokens.lookup(again)
     for r <- Enum.drop(raws, -1), do: assert({:ok, _} = SessionTokens.lookup(r))
   end
 
-  test "at most 10 sign-ins per account: signing in again and again keeps the newest" do
+  test "at most the cap per account: signing in again and again keeps the newest" do
     u = user("st-cap")
     # each its own time, earlier ones older — sign-ins in one millisecond
     # tie, and among equally old ones any may go (precommit, 2026-11-12:
@@ -410,9 +414,9 @@ defmodule Hoodride.SessionTokensTest do
       end
 
     assert count(u.id) == SessionTokens.max_per_account()
-    assert length(:ets.match(:session_tokens, {:_, u.id, :_, :_})) == 10
-    for r <- Enum.take(raws, -10), do: assert({:ok, _} = SessionTokens.lookup(r))
-    for r <- Enum.take(raws, 5), do: assert(SessionTokens.lookup(r) == :error)
+    assert length(:ets.match(:session_tokens, {:_, u.id, :_, :_})) == @max
+    for r <- Enum.take(raws, -@max), do: assert({:ok, _} = SessionTokens.lookup(r))
+    for r <- Enum.take(raws, 15 - @max), do: assert(SessionTokens.lookup(r) == :error)
   end
 
   test "the cap drops replaced sign-ins first, then the oldest; another account untouched" do
@@ -424,10 +428,10 @@ defmodule Hoodride.SessionTokensTest do
     replaced = week_old(u)
     {:ok, successor} = SessionTokens.rotate(replaced)
     use!(successor)
-    # 3 so far; 8 more makes 11
-    for _ <- 1..8, do: SessionTokens.create(u.id)
+    # 3 so far; one over the cap with the rest
+    for _ <- 1..(@max - 2), do: SessionTokens.create(u.id)
 
-    assert count(u.id) == 10
+    assert count(u.id) == @max
     assert SessionTokens.lookup(replaced) == :error, "the replaced one went first"
     assert {:ok, _} = SessionTokens.lookup(oldest), "not the oldest in use"
     assert {:ok, _} = SessionTokens.lookup(successor)
@@ -437,10 +441,10 @@ defmodule Hoodride.SessionTokensTest do
   test "a renewal at the cap keeps the token being renewed and its replacement" do
     u = user("st-cap3")
     old = week_old(u)
-    for _ <- 1..9, do: SessionTokens.create(u.id)
-    assert count(u.id) == 10
+    for _ <- 1..(@max - 1), do: SessionTokens.create(u.id)
+    assert count(u.id) == @max
     assert {:ok, new} = SessionTokens.rotate(old)
-    assert count(u.id) == 10
+    assert count(u.id) == @max
     assert {:ok, _} = SessionTokens.lookup(old)
     assert {:ok, _} = SessionTokens.lookup(new)
   end

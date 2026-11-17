@@ -538,16 +538,33 @@ function situationBanner() {
 // `fromLoc`: location's own message ("location is off", "approximate…") —
 // the next reading's redraw replaces it, as it always did: a good reading
 // a second later must not leave "location is off" up (review, 2026-11-12)
-function transientBanner(text, ms = 3500, fromLoc = false) {
+function transientBanner(text, ms = 3500, fromLoc = false, peer = null) {
   clearTimeout(bannerTimer);
   bannerIsLoc = fromLoc;
+  setBannerPeer(peer);
   setBanner(text);
   bannerTimer = setTimeout(() => {
     bannerTimer = null;
     bannerIsLoc = false;
+    setBannerPeer(null);
     setBanner(contextBanner());
   }, ms);
 }
+
+// A message's banner ("💬 Bob: hey") opens that chat when tapped, while it
+// shows (owner, 2026-11-17) — nothing if the chat has gone meanwhile; any
+// other banner isn't tappable
+let bannerPeer = null;
+function setBannerPeer(peer) {
+  bannerPeer = peer;
+  $("banner").classList.toggle("tappable", !!peer);
+}
+$("banner").addEventListener("click", () => {
+  const peer = bannerPeer;
+  if (!peer || !bannerTimer || !chats.has(peer)) return;
+  setBannerPeer(null);
+  openChat(peer);
+});
 
 // a ✋ / GO ONLINE tap (or its cancel): the person acting — a message on
 // screen gives way to what the tap shows ("Finding your location…"); only a
@@ -555,6 +572,7 @@ function transientBanner(text, ms = 3500, fromLoc = false) {
 function locTap(which) {
   clearTimeout(bannerTimer);
   bannerTimer = null;
+  setBannerPeer(null);
   bannerIsLoc = false;
   if (which === "hand") loc.tapHand();
   else loc.tapOnline();
@@ -889,6 +907,7 @@ function openSettings() {
   // button can draw a ring after a tap (W3C dialog pattern: a static
   // element at the top, tabindex="-1")
   $("settings-name").focus();
+  refreshBlockedCount();
 }
 
 // A key (Escape, or Enter/Space on a button: a click with detail 0) — not a
@@ -1447,12 +1466,25 @@ async function connectSocket() {
 
   // ended_by: someone tapped End chat (the chat fix, 2026-11-12) — else the
   // server ended it (someone away past grace)
-  userChannel.on("chat_closed", ({ peer_id, ended_by }) =>
+  userChannel.on("chat_closed", ({ peer_id, ended_by, reason }) => {
+    const peer = realPeersById.get(peer_id);
+    // (closed by your own block — HoodBlocks: yours, nothing to tell you)
+    const mine = peer && peer.blocking;
     closeChatWith(
-      realPeersById.get(peer_id),
-      ended_by == null ? null : ended_by === peer_id ? "peer" : ended_by === state.realUser.id ? "me" : null
-    )
-  );
+      peer,
+      mine
+        ? "me"
+        : reason === "ended"
+          ? "neutral"
+          : ended_by == null
+            ? null
+            : ended_by === peer_id
+              ? "peer"
+              : ended_by === state.realUser.id
+                ? "me"
+                : null
+    );
+  });
 
   userChannel.on("msg", (m) => {
     const peer = ensurePeer(m.from);
@@ -2124,6 +2156,10 @@ async function softReload() {
   const reading = openChatPeerId && state.chatView !== "list" ? readingPlace() : null;
   // …if it was drawn: one still loading has no reading place to keep
   const wasLoaded = !!openChatPeerId && !!chats.get(state.chatPeer) && chats.get(state.chatPeer).loaded !== false;
+  // …and whether it was a real chat (the server's, or with a message of its
+  // own) — a new one nothing was sent in yet stays open through a reload
+  const openNow = openChatPeerId && chats.get(state.chatPeer);
+  const openWasReal = !!openNow && (openNow.server || openNow.msgs.some((m) => m.id != null));
   const openCardPeerId = !$("peer-card").classList.contains("hidden") && state.cardPeer ? state.cardPeer.id : null;
   // (a pile is remembered only while its list shows; the panel open with no
   // chat in it is the list)
@@ -2161,7 +2197,14 @@ async function softReload() {
   // nothing was sent in yet (the server decides at Send whether they can
   // be messaged); if it's the one on screen (not the list), it's read
   const reopen = openChatPeerId && realPeersById.get(openChatPeerId);
-  if (reopen && state.chatView !== "list" && !(wasLoaded && chatFor(reopen).loaded)) {
+  // …unless it was a real chat and the server no longer has it: it ended
+  // while we were away — closed, with a line that gives no reason (we can't
+  // know it: owner, 2026-11-15). It used to come back EMPTY, unexplained
+  if (reopen && openWasReal && !chats.has(reopen)) {
+    state.chatPeer = null;
+    closeChat();
+    transientBanner(t("Chat with {name} ended", { name: reopen.name }));
+  } else if (reopen && state.chatView !== "list" && !(wasLoaded && chatFor(reopen).loaded)) {
     // on screen but not drawn before (it was still loading), or back only as
     // a summary: opened as a tap opens it — "Loading…", then the line and
     // read (or at once, if the reload brought it in full)
@@ -3300,6 +3343,7 @@ const loc = HoodLocator.create({
       if (bannerTimer && !bannerIsLoc) return;
       clearTimeout(bannerTimer);
       bannerTimer = null;
+      setBannerPeer(null);
       bannerIsLoc = false;
       setBanner(contextBanner());
     },
@@ -3572,6 +3616,11 @@ function closePeerCard() {
   state.cardPeer = null;
   $("peer-card").classList.add("hidden");
 }
+// (each time the card shows: Block only for a real person)
+new MutationObserver(() => {
+  if (!$("peer-card").classList.contains("hidden")) $("peer-block").classList.toggle("hidden", !canBlock(state.cardPeer));
+}).observe($("peer-card"), { attributes: true, attributeFilter: ["class"] });
+$("peer-block").addEventListener("click", () => openBlockSheet(state.cardPeer, "block", $("peer-block")));
 $("peer-close").addEventListener("click", closePeerCard);
 $("btn-msg").addEventListener("click", () => {
   $("peer-card").classList.add("hidden");
@@ -3646,7 +3695,9 @@ function disarmEndChat() {
 function showEndChat(peer) {
   if (endArmed && endArmed !== peer) disarmEndChat();
   $("chat-end").classList.toggle("hidden", !canEndChat(peer));
+  $("chat-block").classList.toggle("hidden", !canBlock(peer));
 }
+$("chat-block").addEventListener("click", () => openBlockSheet(state.chatPeer, "block", $("chat-block")));
 $("chat-end").addEventListener("click", () => {
   const peer = state.chatPeer;
   if (!canEndChat(peer)) return showEndChat(peer);
@@ -3949,6 +4000,60 @@ function onChatResize() {
 }
 if ("ResizeObserver" in window) new ResizeObserver(onChatResize).observe($("chat-messages"));
 if (window.visualViewport) window.visualViewport.addEventListener("resize", onChatResize);
+
+// ===== The chat over the keyboard (owner, 2026-11-17: on an iPhone the
+// chat was squished) =====
+// Typing, with the on-screen keyboard up: the chat fills what you can see
+// above it — the visual viewport (W3C Visual Viewport API, the one keyboard
+// measure Safari has: iOS never resizes the page for the keyboard, it
+// shrinks what's visible and may scroll the page to the text box). Placed
+// by the visible area's place IN THE PAGE (pageTop), so a page Safari has
+// scrolled still fits; followed on its resize AND scroll (the scroll to the
+// text box arrives as a scroll). Not typing: back to half the screen —
+// only while you type is the keyboard area trusted (iOS 26 can report a
+// leftover one after it closes; Apple forums 800125, WebKit 297779).
+const KB_GAP = 8; // px kept above the chat
+const KB_MIN = 80; // px: less than this left out isn't a keyboard (a toolbar)
+function chatTyping() {
+  return document.activeElement === $("chat-input") && !$("chat").classList.contains("hidden");
+}
+function fitChatToKeyboard() {
+  const chat = $("chat");
+  const vv = window.visualViewport;
+  const keyboard = !!vv && chatTyping() && window.innerHeight - vv.height > KB_MIN;
+  if (!keyboard) {
+    if (chat.classList.contains("kb")) {
+      chat.classList.remove("kb");
+      chat.style.top = chat.style.bottom = chat.style.height = "";
+    }
+    return;
+  }
+  const host = chat.offsetParent || document.body;
+  const hostTop = host.getBoundingClientRect().top + window.scrollY;
+  chat.classList.add("kb");
+  chat.style.top = `${vv.pageTop - hostTop + KB_GAP}px`;
+  chat.style.bottom = "auto";
+  chat.style.height = `${Math.max(vv.height - KB_GAP, 120)}px`;
+}
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", fitChatToKeyboard);
+  window.visualViewport.addEventListener("scroll", fitChatToKeyboard);
+}
+$("chat-input").addEventListener("focus", () => requestAnimationFrame(fitChatToKeyboard));
+$("chat-input").addEventListener("blur", () => {
+  requestAnimationFrame(fitChatToKeyboard);
+  // iOS 26: the visible area can stay shifted after the keyboard closes
+  // (offsetTop left non-zero), fixed things stuck mid-screen. A 1 px scroll
+  // and back makes it measure again — only then, only once (the community
+  // workaround: Sedna.UI #172, nxlx #264)
+  setTimeout(() => {
+    const vv = window.visualViewport;
+    if (!vv || chatTyping() || vv.offsetTop < 1) return;
+    const y = window.scrollY;
+    window.scrollTo(window.scrollX, y + 1);
+    window.scrollTo(window.scrollX, y);
+  }, 350);
+});
 
 // the list's times age on screen ("now" → "1m" → …): redrawn every 30 s
 // while it's open — the times only, the rows stay put
@@ -4300,7 +4405,7 @@ function receiveMsg(peer, text, meta) {
     // everyone else ticks the unread badge quietly
     const inRide = state.ride && ["connected", "arrived"].includes(state.ride.status);
     if (!onScreen && (!inRide || state.ride.peer === peer)) {
-      transientBanner(["\u{1F4AC} ", { raw: `${peer.name}: ${text}` }]);
+      transientBanner(["\u{1F4AC} ", { raw: `${peer.name}: ${text}` }], 3500, false, peer);
     }
     if (chatOpen && state.chatView === "list") renderChat();
   }
@@ -4903,7 +5008,8 @@ function mapOutOfSight() {
   // Settings: open, or still sliding away over the map (0.2 s) — the map
   // isn't back until it's gone
   if (shown("settings-sheet", true) || onScreen("settings-sheet") || document.getElementById("session-moved")) return true;
-  return ["car-sheet", "nav-sheet", "lang-sheet"].some((id) => shown(id, false));
+  // (the block dialogs too — asked first, the list: owner, 2026-11-15)
+  return ["car-sheet", "nav-sheet", "lang-sheet", "block-sheet", "blocked-sheet"].some((id) => shown(id, false));
 }
 const NEAR_STEP = 0.5; // each step: half a zoom level wider (twice the ground)
 const NEAR_STEP_MS = 300; // each step's zoom: quick, the steps read as one move
@@ -5882,6 +5988,209 @@ const booting = HoodBoot.create({
 // the server (owner, 2026-11-07: signed in, the demo ALSO connected as you,
 // and the server's first answer closed a card tapped right after load).
 // "Leave demo" goes to the normal page, signed in as before.
+// ===== Blocks (owner, 2026-11-15 — the server: Hoodride.Blocks) =====
+// Block someone from their card or their chat; asked first. Either way you
+// don't see each other on the map and can't reach each other; your chat
+// and any ride or request between you end — the server does all of it
+// (their marker, the chat, the ride come off by its own messages). The
+// people you blocked: "Blocked people" at the bottom of the profile drawer
+// (only once you've blocked someone), in pages as the chat list.
+let blockedCount = 0;
+function setBlockedCount(n) {
+  blockedCount = Number.isFinite(n) && n > 0 ? n : 0;
+  $("blocked-wrap").classList.toggle("hidden", blockedCount === 0);
+}
+// asked as the drawer opens — never with every app open, which makes one
+// database query (owner, 2026-11-17). Not known (the demo, no answer): as it was
+async function refreshBlockedCount() {
+  if (DEMO) return;
+  try {
+    const res = await apiFetch("/api/blocks?count=1");
+    if (res.ok) setBlockedCount((await res.json()).count);
+  } catch (_) {}
+}
+
+// a real person (never the demo's pretend ones, never yourself)
+function canBlock(peer) {
+  return !DEMO && !!peer && Number.isInteger(peer.id) && realPeersById.get(peer.id) === peer && !!state.realUser && peer.id !== state.realUser.id;
+}
+
+let blockAsk = null; // { peer, mode: "block" | "unblock", opener, row }
+function openBlockSheet(peer, mode, opener, row = null) {
+  if (mode === "block" && !canBlock(peer)) return;
+  blockAsk = { peer, mode, opener, row };
+  const name = peer.name || "";
+  $("block-title").textContent = mode === "block" ? t("Block {name}?", { name }) : t("Unblock {name}?", { name });
+  $("block-desc").textContent =
+    mode === "block"
+      ? t("You won't see each other, and your chat and any ride will end.")
+      : t("You'll be able to see and message each other again.");
+  $("block-yes").textContent = mode === "block" ? t("Block") : t("Unblock");
+  $("block-yes").className = mode === "block" ? "btn btn-danger" : "btn btn-primary";
+  $("block-yes").disabled = false;
+  $("block-error").classList.add("hidden");
+  $("block-list-open").classList.add("hidden");
+  $("block-backdrop").classList.remove("hidden");
+  $("block-sheet").classList.remove("hidden");
+  $("block-title").focus();
+}
+
+function closeBlockSheet(e) {
+  const opener = blockAsk && blockAsk.opener;
+  blockAsk = null;
+  $("block-sheet").classList.add("hidden");
+  $("block-backdrop").classList.add("hidden");
+  returnFocus(opener, e);
+}
+
+function blockError(text, withList = false) {
+  $("block-error").textContent = text;
+  $("block-error").classList.remove("hidden");
+  $("block-list-open").classList.toggle("hidden", !withList);
+  $("block-yes").disabled = false;
+}
+
+function blockRefusal(reason, mode) {
+  if (reason === "full") return blockError(t("You've blocked the most people you can — unblock someone first"), true);
+  if (reason === "rate_limited") return blockError(t("You've blocked or unblocked too many people today — try again tomorrow"));
+  blockError(mode === "block" ? t("Couldn't block — try again") : t("Couldn't unblock — try again"));
+}
+
+$("block-yes").addEventListener("click", () => {
+  const ask = blockAsk;
+  if (!ask) return;
+  if (!liveNow()) return blockError(CANT_REACH());
+  $("block-yes").disabled = true;
+  const { peer, mode } = ask;
+  // (the server closes your chat before it answers: that close is yours)
+  if (mode === "block") peer.blocking = true;
+  userChannel
+    .push(mode, { peer: peer.id })
+    .receive("ok", () => {
+      if (mode === "block") {
+        afterBlocked(peer);
+        closeBlockSheet();
+        setBlockedCount(blockedCount + 1);
+        transientBanner(t("Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."));
+      } else {
+        if (ask.row) ask.row.remove();
+        closeBlockSheet();
+        setBlockedCount(blockedCount - 1);
+        if (!$("blocked-list").querySelector(".blocked-row") && !blockedMore) showBlockedEmpty();
+      }
+    })
+    .receive("error", (e) => {
+      peer.blocking = false;
+      blockRefusal(e && e.reason, mode);
+    })
+    .receive("timeout", () => {
+      peer.blocking = false;
+      blockRefusal(null, mode);
+    });
+});
+$("block-cancel").addEventListener("click", closeBlockSheet);
+$("block-backdrop").addEventListener("click", closeBlockSheet);
+$("block-list-open").addEventListener("click", () => {
+  closeBlockSheet();
+  openBlockedSheet();
+});
+
+// blocked: anything of theirs on this screen goes now (the server sends the
+// rest — their marker, the chat, the ride)
+function afterBlocked(peer) {
+  if (state.cardPeer === peer) closePeerCard();
+  if (chats.has(peer)) closeChatWith(peer, "me");
+  peer.blocking = false;
+}
+
+// ----- the list, in pages (GET /api/blocks) -----
+let blockedMore = null;
+let blockedLoading = false;
+let blockedSeen = null;
+function openBlockedSheet() {
+  $("blocked-list").replaceChildren();
+  blockedMore = null;
+  $("blocked-backdrop").classList.remove("hidden");
+  $("blocked-sheet").classList.remove("hidden");
+  $("blocked-title").focus();
+  loadBlocked(null);
+}
+function closeBlockedSheet(e) {
+  if (blockedSeen) blockedSeen.disconnect();
+  $("blocked-sheet").classList.add("hidden");
+  $("blocked-backdrop").classList.add("hidden");
+  returnFocus($("btn-blocked"), e);
+}
+function showBlockedEmpty() {
+  const p = document.createElement("p");
+  p.className = "blocked-empty muted";
+  p.textContent = t("You haven't blocked anyone");
+  $("blocked-list").replaceChildren(p);
+}
+async function loadBlocked(cursor) {
+  if (blockedLoading) return;
+  blockedLoading = true;
+  const list = $("blocked-list");
+  const tail = list.querySelector(".blocked-more");
+  if (tail) tail.remove();
+  let body = null;
+  try {
+    const res = await apiFetch("/api/blocks" + (cursor ? "?before=" + encodeURIComponent(cursor) : ""));
+    if (res.ok) body = await res.json();
+  } catch (_) {}
+  blockedLoading = false;
+  if ($("blocked-sheet").classList.contains("hidden")) return;
+  if (!body) return list.appendChild(blockedTail(cursor, true));
+  (body.blocked || []).forEach((p) => list.appendChild(blockedRow(p)));
+  blockedMore = typeof body.more === "string" ? body.more : null;
+  if (blockedMore) list.appendChild(blockedTail(blockedMore, false));
+  else if (!list.querySelector(".blocked-row")) showBlockedEmpty();
+}
+// the last row: "Loading…" (fetched in view), or after a failure "tap to try again"
+function blockedTail(cursor, failed) {
+  const row = document.createElement("div");
+  row.className = "blocked-more muted";
+  row.textContent = failed ? t("Couldn't load — tap to try again") : t("Loading…");
+  row.addEventListener("click", () => loadBlocked(cursor));
+  if (blockedSeen) blockedSeen.disconnect();
+  if (!failed && "IntersectionObserver" in window) {
+    blockedSeen = new IntersectionObserver((seen) => seen.some((e) => e.isIntersecting) && loadBlocked(cursor), {
+      root: $("blocked-list"),
+      rootMargin: "120px",
+    });
+    blockedSeen.observe(row);
+  }
+  return row;
+}
+function blockedRow(p) {
+  const row = document.createElement("div");
+  row.className = "blocked-row";
+  const img = document.createElement("img");
+  img.className = "avatar avatar-mini";
+  img.loading = "lazy";
+  img.alt = "";
+  img.dataset.name = p.name || "";
+  img.src = p.photo || HoodAvatar.url(p.name);
+  const name = document.createElement("strong");
+  name.dir = "auto";
+  name.textContent = p.name || "";
+  const un = document.createElement("button");
+  un.type = "button";
+  un.className = "btn btn-small";
+  un.textContent = t("Unblock");
+  un.addEventListener("click", () => openBlockSheet({ id: p.id, name: p.name }, "unblock", un, row));
+  row.append(img, name, un);
+  return row;
+}
+$("btn-blocked").addEventListener("click", openBlockedSheet);
+$("blocked-close").addEventListener("click", closeBlockedSheet);
+$("blocked-backdrop").addEventListener("click", closeBlockedSheet);
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (!$("block-sheet").classList.contains("hidden")) closeBlockSheet(e);
+  else if (!$("blocked-sheet").classList.contains("hidden")) closeBlockedSheet(e);
+});
+
 // Phones and tablets only (owner, 2026-11-14 — HoodDevice): a desktop
 // gets "Hood Ride works on your phone" and the QR code; nothing else
 // starts — no map, no /api/state, no connection. The demo (?demo) opens

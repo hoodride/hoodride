@@ -145,10 +145,16 @@ defmodule Hoodride.Requests do
   # the ride's look (accept/3): the accepting connection, and the rider —
   # any sign-in left (a sign-out or a deletion removes every one BEFORE it
   # looks for a ride: Rides.after_sign_out)
-  defp ride_look(nil, _rider_id), do: fn -> true end
+  # (and no block either way since the request: a block made in the moment
+  # of the accept — Hoodride.BlockEffects ends what it can see, this the rest)
+  defp ride_look(nil, rider_id, driver_id),
+    do: fn -> not Hoodride.Blocks.blocked?(driver_id, rider_id) end
 
-  defp ride_look(still_signed_in, rider_id),
-    do: fn -> still_signed_in.() and Hoodride.SessionTokens.any?(rider_id) end
+  defp ride_look(still_signed_in, rider_id, driver_id),
+    do: fn ->
+      still_signed_in.() and Hoodride.SessionTokens.any?(rider_id) and
+        not Hoodride.Blocks.blocked?(driver_id, rider_id)
+    end
 
   defp take_if_ours(rider_id, driver_id) do
     case :ets.lookup(@requests, rider_id) do
@@ -194,7 +200,7 @@ defmodule Hoodride.Requests do
   """
   def accept(driver, rider_id, still_signed_in \\ nil) do
     driver_id = driver.id
-    look = ride_look(still_signed_in, rider_id)
+    look = ride_look(still_signed_in, rider_id, driver_id)
 
     case take_if_ours(rider_id, driver_id) do
       {:ok, ts} ->

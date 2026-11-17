@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "siyah"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "Engelle"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "{name} engellensin mi?"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "Engellenen kişiler"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "Engellendi. Geri almak için sol üstteki profil fotoğrafına, ardından en alttaki Engellenen kişiler'e dokun."
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "Değiştirdin mi?"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "Sohbet"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "{name} ile sohbet sona erdi"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "Kabul edilemedi"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "Engellenemedi. Tekrar dene"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Tarayıcın kontrol edilemedi. challenges.cloudflare.com'a izin ver veya başka bir tarayıcı dene"
 
@@ -240,6 +264,10 @@ msgstr "Mesajlar yüklenemedi. Tekrar dene."
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "Eski sohbetler yüklenemedi. Tekrar denemek için dokun"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "Yüklenemedi. Tekrar denemek için dokun"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "Giriş yapılamadı. Tekrar dene"
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "Çıkış yapılamadı. Tekrar dene"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "Engel kaldırılamadı. Tekrar dene"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "Onaylamak için {word} yaz."
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "Engeli kaldır"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "{name} kişisinin engeli kaldırılsın mı?"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "Güncelleme var. Yeniden yüklemek için dokun"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "Adını ve fotoğrafını yolculuğundan sonra yenileyebilirsin"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "Kimseyi engellemedin"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "Birbirinizi görmeyeceksiniz; sohbetiniz ve varsa yolculuk sona erecek."
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "Birbirinizi yeniden görebilir ve mesajlaşabilirsiniz."
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "Vardın · yolcu alınıyor: {name}"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "Bugün çok fazla kişiyi engelledin ya da engelini kaldırdın. Yarın tekrar dene"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "Engelleyebileceğin en fazla kişiyi engelledin. Önce birinin engelini kaldır"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

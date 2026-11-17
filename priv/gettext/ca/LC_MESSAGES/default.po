@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "negre"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "Bloqueja"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "Vols bloquejar {name}?"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "Persones bloquejades"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "Bloquejat. Per desfer-ho, toca la teva foto de perfil a dalt a l'esquerra i després Persones bloquejades a baix de tot."
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "Els has canviat?"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "Xat"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "El xat amb {name} s'ha acabat"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "No s'ha pogut acceptar"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "No s'ha pogut bloquejar. Torna-ho a provar"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "No s'ha pogut comprovar el teu navegador. Permet challenges.cloudflare.com o prova un altre navegador"
 
@@ -240,6 +264,10 @@ msgstr "No s'han pogut carregar els missatges. Torna-ho a provar."
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "No s'han pogut carregar els xats més antics. Toca per tornar-ho a provar"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "No s'ha pogut carregar. Toca per tornar-ho a provar"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "No s'ha pogut iniciar la sessió. Torna-ho a provar"
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "No s'ha pogut tancar la sessió. Torna-ho a provar"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "No s'ha pogut desbloquejar. Torna-ho a provar"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "Escriu {word} per confirmar."
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "Desbloqueja"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "Vols desbloquejar {name}?"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "Hi ha una actualització. Toca per tornar a carregar"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "Podràs actualitzar el nom i la foto després del viatge"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "No has bloquejat ningú"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "No us veureu l'un a l'altre, i el vostre xat i qualsevol viatge s'acabaran."
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "Us podreu tornar a veure i enviar missatges."
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "Has arribat · vas a recollir {name}"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "Avui has bloquejat o desbloquejat massa persones. Torna-ho a provar demà"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "Has bloquejat el màxim de persones possible. Primer desbloqueja algú"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

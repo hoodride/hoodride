@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "ดำ"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "บล็อก"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "บล็อก {name} ไหม"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "คนที่บล็อก"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "บล็อกแล้ว หากต้องการยกเลิก ให้แตะรูปโปรไฟล์ที่มุมซ้ายบน แล้วแตะ คนที่บล็อก ที่ด้านล่าง"
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "เปลี่ยนแล้วใช่ไหม"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "แชท"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "แชทกับ {name} สิ้นสุดแล้ว"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "รับงานไม่ได้"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "บล็อกไม่ได้ โปรดลองอีกครั้ง"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "ตรวจสอบเบราว์เซอร์ของคุณไม่ได้ โปรดอนุญาต challenges.cloudflare.com หรือลองใช้เบราว์เซอร์อื่น"
 
@@ -240,6 +264,10 @@ msgstr "โหลดข้อความไม่ได้ ลองอีก�
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "โหลดแชทเก่าไม่ได้ แตะเพื่อลองอีกครั้ง"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "โหลดไม่ได้ แตะเพื่อลองอีกครั้ง"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "ลงชื่อเข้าใช้ไม่ได้ โปรด�
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "ออกจากระบบไม่ได้ โปรดลองอีกครั้ง"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "เลิกบล็อกไม่ได้ โปรดลองอีกครั้ง"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "พิมพ์ {word} เพื่อยืนยัน"
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "เลิกบล็อก"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "เลิกบล็อก {name} ไหม"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "มีอัปเดตใหม่ แตะเพื่อโหลดซ้ำ"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "คุณรีเฟรชชื่อและรูปภาพได้หลังจบการเดินทาง"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "คุณยังไม่ได้บล็อกใคร"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "คุณจะไม่เห็นกันอีก และแชทกับการเดินทางที่มีอยู่จะสิ้นสุดลง"
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "คุณจะกลับมาเห็นกันและส่งข้อความหากันได้อีกครั้ง"
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "คุณมาถึงแล้ว · กำลังรับ {name}"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "วันนี้คุณบล็อกหรือเลิกบล็อกหลายคนเกินไป โปรดลองอีกครั้งพรุ่งนี้"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "คุณบล็อกได้ครบจำนวนสูงสุดแล้ว โปรดเลิกบล็อกใครสักคนก่อน"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

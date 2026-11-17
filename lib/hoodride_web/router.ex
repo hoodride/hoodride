@@ -72,6 +72,8 @@ defmodule HoodrideWeb.Router do
     get "/chat", AuthController, :chat
     # the chat list's next page (owner, 2026-11-14)
     get "/chats", AuthController, :chats
+    # the people you blocked (owner, 2026-11-15)
+    get "/blocks", AuthController, :blocks
   end
 
   scope "/api", HoodrideWeb do

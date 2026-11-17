@@ -62,6 +62,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr ""
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr ""
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr ""
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -132,6 +148,10 @@ msgstr ""
 
 #: priv/static/index.html
 msgid "Chat"
+msgstr ""
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
 msgstr ""
 
 #: priv/static/browse.js
@@ -215,6 +235,10 @@ msgid "Couldn't accept"
 msgstr ""
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr ""
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr ""
 
@@ -236,6 +260,10 @@ msgstr ""
 
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
 msgstr ""
 
 #: priv/static/app.js
@@ -276,6 +304,10 @@ msgstr ""
 
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
 msgstr ""
 
 #: priv/static/app.js, priv/static/index.html
@@ -763,6 +795,14 @@ msgid "Type {word} to confirm."
 msgstr ""
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr ""
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr ""
 
@@ -803,7 +843,27 @@ msgid "You can refresh your name and photo after your ride"
 msgstr ""
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr ""
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr ""
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr ""
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
+msgstr ""
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr ""
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
 msgstr ""
 
 #: priv/static/app.js

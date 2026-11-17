@@ -29,6 +29,7 @@ defmodule Hoodride.Application do
     HoodrideWeb.UserSocket.init_table()
     Hoodride.SessionStamp.init_table()
     Hoodride.SessionTokens.init_table()
+    Hoodride.Blocks.init_table()
     # the build is fixed at boot: files edited later are the NEXT build
     HoodrideWeb.Build.current()
     # prod: the stamped page and sw.js too, once (HoodrideWeb.PageController.prepare/1)

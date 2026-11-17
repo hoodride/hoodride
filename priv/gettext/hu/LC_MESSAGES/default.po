@@ -65,6 +65,22 @@ msgctxt "car color, describing a car"
 msgid "Black"
 msgstr "fekete"
 
+#: priv/static/app.js, priv/static/index.html
+msgid "Block"
+msgstr "Letiltás"
+
+#: priv/static/app.js
+msgid "Block {name}?"
+msgstr "Letiltod: {name}?"
+
+#: priv/static/index.html
+msgid "Blocked people"
+msgstr "Letiltott személyek"
+
+#: priv/static/app.js
+msgid "Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."
+msgstr "Letiltva. A visszavonáshoz koppints a bal felső sarokban a profilképedre, majd alul a Letiltott személyek lehetőségre."
+
 #: priv/static/car.js
 msgctxt "car color"
 msgid "Blue"
@@ -136,6 +152,10 @@ msgstr "Módosítottad őket?"
 #: priv/static/index.html
 msgid "Chat"
 msgstr "Csevegés"
+
+#: priv/static/app.js, priv/static/browse.js
+msgid "Chat with {name} ended"
+msgstr "Véget ért a csevegés vele: {name}"
 
 #: priv/static/browse.js
 msgid "Chat with {name} ended — they've been away a while"
@@ -218,6 +238,10 @@ msgid "Couldn't accept"
 msgstr "Nem sikerült elfogadni"
 
 #: priv/static/app.js
+msgid "Couldn't block — try again"
+msgstr "Nem sikerült letiltani – próbáld újra"
+
+#: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Nem sikerült ellenőrizni a böngésződet – engedélyezd a challenges.cloudflare.com oldalt, vagy próbálj ki egy másik böngészőt"
 
@@ -240,6 +264,10 @@ msgstr "Nem sikerült betölteni az üzeneteket. Próbáld újra."
 #: priv/static/app.js
 msgid "Couldn't load older chats — tap to try again"
 msgstr "Nem sikerült betölteni a régebbi csevegéseket – koppints az újrapróbáláshoz"
+
+#: priv/static/app.js
+msgid "Couldn't load — tap to try again"
+msgstr "Nem sikerült betölteni – koppints az újrapróbáláshoz"
 
 #: priv/static/app.js
 msgid "Couldn't reach Hood Ride — check your connection and try again."
@@ -280,6 +308,10 @@ msgstr "Nem sikerült bejelentkezni – próbáld újra"
 #: priv/static/app.js
 msgid "Couldn't sign out — try again"
 msgstr "Nem sikerült kijelentkezni – próbáld újra"
+
+#: priv/static/app.js
+msgid "Couldn't unblock — try again"
+msgstr "Nem sikerült feloldani a letiltást – próbáld újra"
 
 #: priv/static/app.js, priv/static/index.html
 msgctxt "the word typed to delete the account"
@@ -766,6 +798,14 @@ msgid "Type {word} to confirm."
 msgstr "A megerősítéshez írd be: {word}."
 
 #: priv/static/app.js
+msgid "Unblock"
+msgstr "Letiltás feloldása"
+
+#: priv/static/app.js
+msgid "Unblock {name}?"
+msgstr "Feloldod {name} letiltását?"
+
+#: priv/static/app.js
 msgid "Update available — tap to reload"
 msgstr "Frissítés érhető el – koppints az újratöltéshez"
 
@@ -806,8 +846,28 @@ msgid "You can refresh your name and photo after your ride"
 msgstr "A nevedet és a fotódat a fuvar után frissítheted"
 
 #: priv/static/app.js
+msgid "You haven't blocked anyone"
+msgstr "Senkit sem tiltottál le"
+
+#: priv/static/app.js
+msgid "You won't see each other, and your chat and any ride will end."
+msgstr "Nem fogjátok látni egymást, és a csevegésetek és az esetleges fuvar véget ér."
+
+#: priv/static/app.js
+msgid "You'll be able to see and message each other again."
+msgstr "Újra láthatjátok egymást, és üzenhettek egymásnak."
+
+#: priv/static/app.js
 msgid "You've arrived · picking up {name}"
 msgstr "Megérkeztél · {name} felvétele"
+
+#: priv/static/app.js
+msgid "You've blocked or unblocked too many people today — try again tomorrow"
+msgstr "Ma túl sok személyt tiltottál le vagy oldottál fel – próbáld újra holnap"
+
+#: priv/static/app.js
+msgid "You've blocked the most people you can — unblock someone first"
+msgstr "Elérted a letiltható személyek maximumát – előbb oldd fel valakinek a letiltását"
 
 #: priv/static/app.js
 msgid "You've contacted a lot of new people — try again later"

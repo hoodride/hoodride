@@ -2762,7 +2762,14 @@ here say the rest.
   (1 s doubling to 32 s, jitter) (SignInHardeningTest, SignInFailuresTest).
 - **The session cookie is encrypted** too (`encryption_salt`): changing it
   signed everyone out once.
-- **The 10-sign-in cap never splits a device** (2026-11-14): a sign-in and
+- **The sign-in cap: 4, two devices** (owner, 2026-11-17, from 10): a
+  device holds 2 sign-ins for a moment after its weekly renewal, so 4
+  covers iPhone Safari + the home-screen app (iOS keeps them signed in
+  apart); a third device may be signed out by a renewal and sign in again.
+  Only one is ever live. All sign-ins stay in memory, read at start-up
+  (~128 bytes each: a million ≈ 128 MB) — the database is never asked on a
+  request, the lesson of the 2026-11-08 capacity test.
+- **The sign-in cap never splits a device** (2026-11-14): a sign-in and
   its renewal no request has used yet are one device — its phone may hold
   either (the reply arrived and the app was closed, or the reply was lost).
   The cap dropped that renewal first, signing the phone out the next time
@@ -2825,6 +2832,81 @@ here say the rest.
   (journey `signedout`). Your car works in the demo, kept on the page.
 - Every file the page loads is on the server's served list
   (StaticPathsTest — `turnstile.js` was missing, caught by its journey).
+
+### Blocks (2026-11-15)
+- **What a block does, either way:** off each other's maps (cars and ✋,
+  live and in snapshots; area counts stay whole — a number names nobody),
+  no messages or ride requests (the ordinary "unavailable",
+  `HoodrideWeb.Reach`), a name tap "unavailable". What was between them
+  ends at once (`Hoodride.BlockEffects`): a request (withdrawn or declined,
+  as any other), a ride, their chat (closed with a neutral line, "Chat
+  with … ended" — no "ended by", and not "they've been away", which was
+  untrue: the other was here), and both maps drop the other's marker. A ride STARTING in that moment can't slip through: its
+  own last look, once its seats are its own, checks blocks too
+  (`Requests.accept`). Unblocked: each one's marker sent to the other at
+  once if it's in view — a parked car sends nothing itself.
+- **Where the map filter sits:** the map writer sends ONE broadcast per
+  cell; each watcher's own map channel decides for its own app, before
+  forwarding or batching (`WorldChannel.handle_info`), so a blocked
+  person's id and block never reach the other's phone.
+- **The record and the memory:** the `blocks` table (who, whom, when;
+  either account deleted takes its rows) is the record. Memory holds the
+  blocks of people around (`Hoodride.Presence.around?/1` — connected, in
+  the presence grace, or in a ride or request; one rule, for sign-ins
+  next) — read on first need and dropped by the Sweeper once they're gone
+  ("cache-aside"); memory grows with who's around, not with every
+  block ever made. A person not in memory is read first, never "not
+  blocked"; the database unable to answer counts as blocked. Every change
+  takes both people's locks, database first; a load takes the person's
+  lock too, so a block can't fall between a load's read and its write.
+- **The map never misses a parked car to a database hiccup:** a viewer's
+  blocks load as their map joins; an update that came while the database
+  couldn't answer is held back, the load tried again (full jitter, 1 s
+  doubling to 10 s — as the app's reconnects), and the screen sent afresh
+  once it works. (A database hiccup at a parked car's one update hid it
+  for good: it sends no other.)
+- **Limits** (`limits.ex`): 200 blocked each (then "unblock someone
+  first", with the list a tap away), 20 blocks or unblocks a day together
+  (`Throttle`; a refusal costs nothing), the list in pages of 30.
+- **The app:** Block on a person's card and in their chat (beside End
+  chat; mid-ride too — it ends the ride), asked first in a sheet. "Blocked
+  people" at the bottom of the profile drawer only once you've blocked
+  someone (the count asked as the drawer opens, `/api/blocks?count=1` —
+  never with every app open, which makes ONE database query); the list
+  newest first, in pages as the chat list.
+- Privacy policy: who you block (only you see the list; the person isn't
+  told), kept until unblocked or either account is deleted.
+- **A chat gone while you were away** (2026-11-15): the reconnect finds
+  the chat that was open no longer on the server — it closes, with the same
+  neutral line (the app can't know why). It used to reopen EMPTY, with no
+  word. A new chat nothing was sent in yet stays open (journey `chatgone`).
+- Tests: BlocksTest (15; 6 breaks), BlocksEnforcedTest (16; 11 breaks),
+  BlocksApiTest (7); journeys `block`, `blockride`, `blocklist`.
+
+### The chat over the keyboard; a message's banner opens its chat (2026-11-17)
+
+- **Keyboard** (owner's iPhone: the chat squished with the keyboard up).
+  iOS (every iPhone browser is WebKit) never resizes the page for the
+  keyboard: it shrinks the visual viewport and may scroll the page to the
+  text box; CSS units (dvh) don't follow it, and the VirtualKeyboard API /
+  `keyboard-inset-height` are Chromium-only. So, the standard way
+  (W3C Visual Viewport API): while the chat's text box is focused and the
+  visible area is > 80 px short of the page, the chat (`.chat.kb`) is
+  placed at `visualViewport.pageTop` + 8 px and sized to its height − 8 —
+  followed on the viewport's `resize` AND `scroll`. Not typing: half the
+  screen again. The keyboard area is trusted only while typing: iOS 26 can
+  leave `offsetTop` non-zero after the keyboard closes (Apple forums
+  800125, WebKit 297779) — 350 ms after the blur, if it's still shifted, a
+  1 px scroll and back makes it measure again (Sedna.UI #172, nxlx #264).
+  `fitChatToKeyboard` in app.js; journey `chatkeyboard` (hands the page an
+  iPhone's viewport — Chrome has no phone keyboard; real-device check is
+  the owner's).
+- **Banner tap:** "💬 {name}: {text}" opens that chat when tapped while
+  it shows (`bannerPeer`, `.banner.tappable`); nothing if the chat's gone
+  meanwhile; no other banner is tappable. Journey `bannertap`.
+- Journey `bannerwrap`: ✋ tapped again and again keeps the same banner
+  size (Chrome; the owner's report of it growing is likely WebKit-only —
+  open).
 
 ### Phones and tablets only (2026-11-14)
 - A desktop gets "Hood Ride works on your phone" and a QR code
