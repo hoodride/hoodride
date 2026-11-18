@@ -175,6 +175,30 @@ defmodule HoodrideWeb.ChatLimitsTest do
     assert {:ok, _} = msg(chan, Enum.at(others, -2)), "still free to start one"
   end
 
+  # (owner, 2026-11-17: "A starts a chat with B, B is away 5 min, the
+  # sweeper removes it — does A get the slot back?") Yes: the whole way
+  test "someone you wrote to away past the grace: the sweeper ends that chat — your slot comes back" do
+    [me | others] = users("cl-away", Limits.chats_started_open() + 2)
+    cars(others)
+    {s, chan} = tab(me)
+    watching(s)
+    {first10, [eleventh]} = Enum.split(others, Limits.chats_started_open())
+    for o <- first10, do: assert({:ok, _} = msg(chan, o))
+    assert {:error, %{reason: "too_many_chats"}} = msg(chan, eleventh)
+
+    # nine still in the app; one gone past the 5 minutes
+    [gone | here] = first10
+    for o <- here, do: {:ok, _} = Registry.register(Hoodride.UserChannels, o.id, nil)
+    grace = div(Limits.presence_grace_ms(), 1000)
+    :ets.insert(:geo_presence, {gone.id, :grace, System.system_time(:second) - grace - 5})
+
+    Hoodride.Sweeper.sweep_empty_room_chats()
+    refute Chat.exists?(me.id, gone.id), "the away person's chat ended"
+    assert Enum.all?(here, &Chat.exists?(me.id, &1.id)), "the others kept"
+    assert Chat.started_open(me.id) == Limits.chats_started_open() - 1
+    assert {:ok, _} = msg(chan, eleventh), "a new chat allowed again"
+  end
+
   test "a chat that ended frees its slot" do
     [me | others] = users("cl-free", Limits.chats_started_open() + 1)
     for o <- Enum.take(others, Limits.chats_started_open()), do: Chat.send_message(me, o.id, "hi")

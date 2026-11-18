@@ -68,6 +68,11 @@ config :phoenix, :filter_parameters, ["password", "secret", "lat", "lng", "token
 # pause after telling them, so the pushes leave before the sockets close.
 config :hoodride, :restart_notice, min_ms: 4000, max_ms: 10000, flush_ms: 1000
 
+# The warm start (Hoodride.WarmStart): who's connected at a polite stop,
+# saved next to the database and loaded at the next start. A list older
+# than max_age_ms is skipped; loading stops after max_ms (the rest on demand).
+config :hoodride, :warm_start, path: :next_to_database, max_age_ms: 600_000, max_ms: 10_000
+
 # map updates held per watcher and sent as one frame (WorldChannel); 0 = off.
 # 500 ms from the capacity matrix (ARCHITECTURE.md "Capacity"): less than
 # half the server work of off at 4,000 people; longer windows saved no more

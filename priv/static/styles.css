@@ -417,6 +417,12 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 
 /* "Your car": a centred sheet over everything (Settings, or Go online) */
 .car-backdrop { position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,0.55); }
+/* Block / Unblock asks OVER the Blocked people list it's opened from — the
+   same kind of sheet, later in the page, drew on top of it (owner,
+   2026-11-17: the Unblock question was behind the list). Its backdrop dims
+   the list too */
+#block-backdrop { z-index: 42; }
+#block-sheet { z-index: 43; }
 /* pinned near the TOP, centred across: it grows only downward, so the Make
    box stays put when its suggestions open (centred, the whole form jumped
    up ~95 px at the first letter) — and on a phone it stays clear of the

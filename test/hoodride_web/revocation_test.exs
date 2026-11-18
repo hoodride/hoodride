@@ -33,12 +33,9 @@ defmodule HoodrideWeb.RevocationTest do
   defp signed_in(conn, u),
     do: init_test_session(conn, Hoodride.TestHelpers.session_for(u.id))
 
-  # what a restart does to the sign-ins: memory gone, refilled from the
-  # database
-  defp restart! do
-    :ets.delete_all_objects(:session_tokens)
-    :ok = Hoodride.SessionTokens.load()
-  end
+  # what a restart does to the sign-ins: memory gone (each person's read
+  # from the database when next needed)
+  defp restart!, do: :ok = Hoodride.SessionTokens.reset_memory()
 
   # a real database failure: every delete from `table` refused
   defp refuse_deletes(table),

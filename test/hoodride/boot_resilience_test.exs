@@ -31,13 +31,13 @@ defmodule Hoodride.BootResilienceTest do
     end
   end
 
-  test "expired sign-ins can't be deleted (a full disk): logged, the valid ones still load" do
+  test "expired sign-ins can't be deleted (a full disk): logged, the app still starts" do
     Application.put_env(:hoodride, :token_prune, fn _now ->
       raise Exqlite.Error, message: "database or disk is full"
     end)
 
     try do
-      log = capture_log(fn -> assert Hoodride.SessionTokens.load() == :ok end)
+      log = capture_log(fn -> assert Hoodride.SessionTokens.start_up() == :ok end)
       assert log =~ "expired sign-ins"
     after
       Application.delete_env(:hoodride, :token_prune)

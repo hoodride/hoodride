@@ -1,8 +1,9 @@
 defmodule Hoodride.Presence do
   @moduledoc """
   Is someone still AROUND? One rule for what memory keeps per person
-  (owner, 2026-11-17): their blocks now (Hoodride.Blocks), their sign-ins
-  next — read from the database on first need, kept while they're around,
+  (owner, 2026-11-17): their blocks (Hoodride.Blocks) and their sign-ins
+  (Hoodride.SessionTokens) — read from the database on first need, kept
+  while they're around,
   dropped by the Sweeper once they're not (and read again when next
   needed). One place, so the two can't drift apart.
 

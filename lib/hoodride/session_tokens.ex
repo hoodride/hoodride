@@ -16,9 +16,19 @@ defmodule Hoodride.SessionTokens do
     * signing out deletes EVERY token of the account (Hood Ride's sign-out is
       "on all your devices"); deleting the account deletes them with it.
 
-  Read from MEMORY (`:session_tokens`, loaded before the web server starts,
-  as the app's other start-up lists): no database read per request — the capacity test's
-  thousands of connects at once ran the pool dry. Every change writes the
+  Read from MEMORY (`:session_tokens`) — the sign-ins of people IN USE
+  (owner, 2026-11-17; as Hoodride.Blocks, one rule: Hoodride.Presence): a
+  person's are read from the database, in one query, the first time a
+  request or connect needs them, and dropped by the Sweeper once they're
+  not around (read again when next needed). So no database read per
+  request — the capacity test's thousands of connects at once ran the pool
+  dry — but memory grows with who's in use, not with every sign-in ever
+  made (they were all loaded at start-up: ~128 bytes each, 1M ≈ 128 MB). A
+  token not in memory is looked up by its hash (an index); unknown: not
+  signed in — no memory of "not found" (the cookie is signed and encrypted,
+  a connection pass signed and a day old at most: a made-up value never
+  gets this far). The database unable to answer: `:unavailable` — the
+  request is "try again" (503), NEVER "signed out". Every change writes the
   DATABASE FIRST, then memory, and takes the account's lock (`:global.trans`
   on this one node), so two changes of one account never interleave: a
   replacement can't slip in between a sign-out's database step and its
@@ -42,6 +52,9 @@ defmodule Hoodride.SessionTokens do
   # replacements not used yet by any request: {hash, user_id} (the
   # database's `unused`, so a restart doesn't forget a lost reply)
   @fresh :session_token_fresh
+  # {user_id}: this person's sign-ins are in memory (all of them: the cap
+  # and the renewal rules need the whole account)
+  @loaded :session_token_loaded
   @valid_ms Hoodride.Limits.sign_in_valid_ms()
   @rotate_after_ms Hoodride.Limits.sign_in_renew_after_ms()
   @cap_ms Hoodride.Limits.sign_in_max_age_ms()
@@ -59,6 +72,7 @@ defmodule Hoodride.SessionTokens do
     Hoodride.ETS.new(@table, [:named_table, :public, :set, read_concurrency: true])
     Hoodride.ETS.new(@links, [:named_table, :public, :set, read_concurrency: true])
     Hoodride.ETS.new(@fresh, [:named_table, :public, :set, read_concurrency: true])
+    Hoodride.ETS.new(@loaded, [:named_table, :public, :set, read_concurrency: true])
     :ok
   end
 
@@ -97,28 +111,88 @@ defmodule Hoodride.SessionTokens do
   @doc "The token's stored form (SHA-256)."
   def hash(raw) when is_binary(raw), do: :crypto.hash(:sha256, raw)
 
-  # ---------- reads (memory only) ----------
+  # ---------- reads (memory; a person not in it read first) ----------
 
   @doc """
   The token behind a session cookie: `{:ok, info}` while valid (30 days from
-  its making, a year from the real sign-in), else `:error`. `info` =
+  its making, a year from the real sign-in), `:error` when not, or
+  `:unavailable` — not in memory and the database couldn't answer ("try
+  again", never "signed out"). `info` =
   `%{user_id, hash, inserted_at, authenticated_at}`.
   """
   def lookup(raw, now \\ now()),
     do: if(is_binary(raw), do: lookup_hash(hash(raw), now), else: :error)
 
   @doc """
-  Any sign-in of `user_id` left in memory? A sign-out or a deletion removes
-  every one (revoke_all, forget) before it looks for a ride (A1: a ride's
-  start asks this of its rider — Requests.accept).
+  Any sign-in of `user_id` left? A sign-out or a deletion removes every one
+  (revoke_all, forget) before it looks for a ride (A1: a ride's start asks
+  this of its rider — Requests.accept). Not in memory: read first; the
+  database unable to answer: false (no ride starts on a guess).
   """
-  def any?(user_id),
-    do: :ets.select(@table, [{{:_, user_id, :_, :_}, [], [true]}], 1) != :"$end_of_table"
+  def any?(user_id) do
+    case read_loaded(user_id, fn ->
+           :ets.select(@table, [{{:_, user_id, :_, :_}, [], [true]}], 1) != :"$end_of_table"
+         end) do
+      {:ok, any} -> any
+      :unavailable -> false
+    end
+  end
 
-  @doc "The same, by the stored form (a connection pass carries only that)."
+  @doc """
+  The token behind a session cookie, KNOWING WHOSE it should be — the
+  cookie's own account (signed and encrypted: the server wrote it). The
+  person's sign-ins are read if they aren't in memory (one query); once
+  they are, memory has ALL of them: a token missing there is signed out —
+  no database read, so a sign-out bites at once (hot paths: revocation
+  with no read). `{:ok, info}`, `:error` or `:unavailable`.
+  """
+  def lookup_as(raw, user_id, now \\ now())
+
+  def lookup_as(raw, user_id, now) when is_binary(raw),
+    do: lookup_hash_as(hash(raw), user_id, now)
+
+  def lookup_as(_raw, _user_id, _now), do: :error
+
+  @doc "The same, by the stored form (a connection pass: its account and its token's hash)."
+  def lookup_hash_as(hash, user_id, now \\ now())
+
+  def lookup_hash_as(hash, user_id, now) when is_binary(hash) and is_integer(user_id) do
+    case read_loaded(user_id, fn -> in_memory(hash, now) end) do
+      {:ok, {:ok, %{user_id: ^user_id}} = ok} -> ok
+      {:ok, _} -> :error
+      :unavailable -> :unavailable
+    end
+  end
+
+  def lookup_hash_as(_hash, _user_id, _now), do: :error
+
+  @doc "By the stored form alone (whose not known: read by the hash first if not in memory)."
   def lookup_hash(hash, now \\ now())
 
   def lookup_hash(hash, now) when is_binary(hash) do
+    case in_memory(hash, now) do
+      :miss ->
+        # not in memory: whose is it? (an index) — then all of theirs
+        case load_by_hash(hash) do
+          {:ok, user_id} ->
+            case read_loaded(user_id, fn -> in_memory(hash, now) end) do
+              {:ok, :miss} -> :error
+              {:ok, found} -> found
+              :unavailable -> :unavailable
+            end
+
+          other ->
+            other
+        end
+
+      found ->
+        found
+    end
+  end
+
+  def lookup_hash(_, _now), do: :error
+
+  defp in_memory(hash, now) do
     case :ets.lookup(@table, hash) do
       [{^hash, user_id, inserted_at, authenticated_at}] ->
         if valid?(inserted_at, authenticated_at, now),
@@ -133,11 +207,136 @@ defmodule Hoodride.SessionTokens do
           else: :error
 
       [] ->
-        :error
+        :miss
     end
   end
 
-  def lookup_hash(_, _now), do: :error
+  # → {:ok, its owner} (theirs now in memory), :error (no such token),
+  # :unavailable
+  defp load_by_hash(hash) do
+    hook(:owner)
+
+    from(t in "user_tokens", where: t.token_hash == ^hash, select: t.user_id)
+    |> Repo.one()
+    |> case do
+      nil ->
+        :error
+
+      user_id ->
+        with :ok <- ensure(user_id), do: {:ok, user_id}
+    end
+  rescue
+    e -> if Hoodride.Repo.down?(e), do: unavailable(), else: reraise(e, __STACKTRACE__)
+  end
+
+  @doc false
+  def loaded?(user_id), do: :ets.member(@loaded, user_id)
+
+  # Read memory for someone, KNOWING it's complete (owner, 2026-11-17 —
+  # the capacity run: 1 join in ~3,000 refused "signed_out"): "loaded?",
+  # then the read, then "STILL loaded?" — the Sweeper may have dropped them
+  # in between (it takes the mark first, then the rows: a read that could
+  # have missed rows always finds the mark gone after). Gone: read again
+  # from the database. `{:ok, result}`, or `:unavailable` — the database
+  # couldn't answer, or (never seen) dropped three times running: "try
+  # again", never a guess
+  defp read_loaded(user_id, fun, tries \\ 3)
+  defp read_loaded(_user_id, _fun, 0), do: unavailable()
+
+  defp read_loaded(user_id, fun, tries) do
+    case ensure(user_id) do
+      :ok ->
+        # (tests: a pause between "loaded" and the read)
+        hook(:checked)
+        result = fun.()
+        if loaded?(user_id), do: {:ok, result}, else: read_loaded(user_id, fun, tries - 1)
+
+      :unavailable ->
+        :unavailable
+    end
+  end
+
+  # this person's sign-ins in memory: `:ok` or `:unavailable`
+  defp ensure(user_id) do
+    if loaded?(user_id), do: :ok, else: locked(user_id, fn -> load_now(user_id) end)
+  rescue
+    e -> if Hoodride.Repo.down?(e), do: unavailable(), else: reraise(e, __STACKTRACE__)
+  end
+
+  defp unavailable do
+    Logger.warning("sign-ins: couldn't read from the database — 'try again'")
+    :unavailable
+  end
+
+  # (under the account's lock — a change can't land between the read and
+  # the write: a load and a change at the same moment, SessionTokensTest)
+  # all of the account's rows, in ONE query: the tokens, which were
+  # replaced and by what, which replacements no request has used yet (a
+  # reply lost before the person was dropped still renews after)
+  defp load_now(user_id) do
+    if loaded?(user_id) do
+      :ok
+    else
+      hook(:read)
+
+      rows =
+        from(t in "user_tokens",
+          where: t.user_id == ^user_id,
+          select: {t.token_hash, t.inserted_at, t.authenticated_at, t.replaced_by, t.unused}
+        )
+        |> Repo.all()
+
+      hook(:loaded)
+
+      for {h, ins, auth, replaced_by, unused} <- rows do
+        :ets.insert(@table, {h, user_id, ins, auth})
+        if replaced_by, do: :ets.insert(@links, {h, replaced_by, user_id})
+        if unused == 1, do: :ets.insert(@fresh, {h, user_id})
+      end
+
+      :ets.insert(@loaded, {user_id})
+      :ok
+    end
+  end
+
+  @doc false
+  # The warm start (Hoodride.WarmStart): many people's sign-ins in ONE
+  # query, as load_now/1 for each — all their rows, then the mark. Start-up
+  # only, before the Sweeper and the web server: nothing else reads or
+  # changes sign-ins yet, so no locks. Anyone already in memory is left as
+  # is. Raises if the database can't answer (the warm start stops there).
+  def preload_many(ids) do
+    case Enum.reject(ids, &loaded?/1) do
+      [] ->
+        :ok
+
+      ids ->
+        hook(:read)
+
+        rows =
+          from(t in "user_tokens",
+            where: t.user_id in ^ids,
+            select:
+              {t.user_id, t.token_hash, t.inserted_at, t.authenticated_at, t.replaced_by,
+               t.unused}
+          )
+          |> Repo.all()
+
+        for {user_id, h, ins, auth, replaced_by, unused} <- rows do
+          :ets.insert(@table, {h, user_id, ins, auth})
+          if replaced_by, do: :ets.insert(@links, {h, replaced_by, user_id})
+          if unused == 1, do: :ets.insert(@fresh, {h, user_id})
+        end
+
+        :ets.insert(@loaded, for(id <- ids, do: {id}))
+        :ok
+    end
+  end
+
+  # (tests: a pause at a step; nil in production)
+  defp hook(step) do
+    if hook = Application.get_env(:hoodride, :session_tokens_hook), do: hook.(step)
+  end
 
   @doc "Is this token a week old (time to replace it — `rotate/1`)?"
   def due?(%{inserted_at: at}, now \\ now()), do: now - at >= @rotate_after_ms
@@ -157,6 +356,9 @@ defmodule Hoodride.SessionTokens do
     now = now()
 
     locked(user_id, fn ->
+      # the account's others first: the cap counts them (not in memory
+      # would read as none — a third device never dropping the oldest)
+      :ok = load_now(user_id)
       raw = :crypto.strong_rand_bytes(32)
       h = hash(raw)
       old = previous_of(user_id, previous)
@@ -213,6 +415,10 @@ defmodule Hoodride.SessionTokens do
   def rotate(raw) when is_binary(raw) do
     now = now()
     old = hash(raw)
+    # the person not in memory (a restart, or dropped while away): read
+    # first — else a phone whose reply was lost never renewed after a
+    # restart (SessionTokensTest "a lost reply survives a restart")
+    if :ets.lookup(@table, old) == [], do: load_by_hash(old)
 
     case :ets.lookup(@table, old) do
       [{^old, user_id, _, _}] ->
@@ -268,6 +474,8 @@ defmodule Hoodride.SessionTokens do
       from(t in "user_tokens", where: t.user_id == ^user_id) |> Repo.delete_all()
 
       forget_now(user_id)
+      # (known now: none — nothing to read)
+      :ets.insert(@loaded, {user_id})
       {:ok, at}
     end)
   rescue
@@ -279,7 +487,13 @@ defmodule Hoodride.SessionTokens do
   database's cascade): drop them from memory too — under the account's lock,
   so a replacement made just before can't outlive it.
   """
-  def forget(user_id), do: locked(user_id, fn -> forget_now(user_id) end)
+  def forget(user_id),
+    do:
+      locked(user_id, fn ->
+        # the mark FIRST, then the rows (read_loaded)
+        :ets.delete(@loaded, user_id)
+        forget_now(user_id)
+      end)
 
   defp forget_now(user_id) do
     :ets.select_delete(@table, [{{:_, user_id, :_, :_}, [], [true]}])
@@ -378,8 +592,25 @@ defmodule Hoodride.SessionTokens do
     :ok
   end
 
-  @doc "Drop expired tokens from memory (the Sweeper, every tick)."
+  @doc """
+  The Sweeper, every tick: the sign-ins of people no longer around
+  (Hoodride.Presence) out of memory — read again when next needed — and
+  expired tokens.
+  """
   def sweep(now \\ now()) do
+    secs = div(now, 1000)
+
+    for {user_id} <- :ets.tab2list(@loaded), not Hoodride.Presence.around?(user_id, secs) do
+      locked(user_id, fn ->
+        # the mark FIRST, then the rows: a check reading meanwhile finds
+        # the mark gone after its read, and reads again (read_loaded)
+        :ets.delete(@loaded, user_id)
+        # (tests: a pause between the two)
+        hook(:dropping)
+        forget_now(user_id)
+      end)
+    end
+
     :ets.select_delete(@table, [
       {{:_, :_, :"$1", :"$2"},
        [{:orelse, {:<, :"$1", now - @valid_ms}, {:<, :"$2", now - @cap_ms}}], [true]}
@@ -394,12 +625,14 @@ defmodule Hoodride.SessionTokens do
     :ok
   end
 
-  @doc "Refill memory from the database (start-up): the valid tokens; expired rows deleted."
-  def load(now \\ now()) do
-    # tidying, not loading: a delete the database refuses (a full disk, a
-    # lock) is logged and skipped — the valid sign-ins still load and the
-    # app starts (it used to stop the start: crash review 2026-11-13;
-    # Hoodride.BootResilienceTest). The next sign-in prunes again.
+  @doc """
+  Start-up: expired rows deleted — nothing loaded (each person's sign-ins
+  are read when first needed). A delete the database refuses (a full disk,
+  a lock) is logged and skipped: the app starts anyway (it used to stop the
+  start: crash review 2026-11-13; Hoodride.BootResilienceTest). The next
+  sign-in prunes again.
+  """
+  def start_up(now \\ now()) do
     try do
       Application.get_env(:hoodride, :token_prune, &prune_rows/1).(now)
     rescue
@@ -409,25 +642,13 @@ defmodule Hoodride.SessionTokens do
         )
     end
 
-    from(t in "user_tokens",
-      select: {t.token_hash, t.user_id, t.inserted_at, t.authenticated_at}
-    )
-    |> Repo.all()
-    |> Enum.each(&:ets.insert(@table, &1))
+    :ok
+  end
 
-    # which were replaced, and by what; which replacements no request has
-    # used yet (a reply lost just before a restart still renews after it)
-    from(t in "user_tokens",
-      where: not is_nil(t.replaced_by),
-      select: {t.token_hash, t.replaced_by, t.user_id}
-    )
-    |> Repo.all()
-    |> Enum.each(&:ets.insert(@links, &1))
-
-    from(t in "user_tokens", where: t.unused == 1, select: {t.token_hash, t.user_id})
-    |> Repo.all()
-    |> Enum.each(&:ets.insert(@fresh, &1))
-
+  @doc false
+  # (tests: memory as after a restart — empty)
+  def reset_memory do
+    for t <- [@table, @links, @fresh, @loaded], do: :ets.delete_all_objects(t)
     :ok
   end
 
@@ -458,14 +679,14 @@ defmodule Hoodride.SessionTokens do
 
   defp now, do: System.system_time(:millisecond)
 
-  # the start-up step: load, then step aside
+  # the start-up step: tidy, then step aside
   @doc false
   def child_spec(_),
     do: %{id: __MODULE__, start: {__MODULE__, :start_link, []}, restart: :transient}
 
   @doc false
   def start_link do
-    :ok = load()
+    :ok = start_up()
     :ignore
   end
 end

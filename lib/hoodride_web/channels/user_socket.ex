@@ -75,14 +75,18 @@ defmodule HoodrideWeb.UserSocket do
   def connect(params, socket, connect_info) do
     case user_of(params, connect_info) do
       nil -> failed_attempt(connect_info)
+      # the database couldn't say (SessionTokens): refused for now, not
+      # counted as a failure — the app tries again with its usual wait
+      :unavailable -> :error
       user -> authorize(socket, user, params)
     end
   end
 
   # THE TOKEN FIRST, then PER ADDRESS ONLY FOR FAILURES (OWASP's WebSocket
   # guidance: per-user limits, per-IP only "where user identification isn't
-  # available"). Checking a token is a signature and a memory lookup — no
-  # database, forged or revoked alike (HoodrideWeb.Auth). A signed-in person
+  # available"). Checking a token is a signature — a forged one goes no
+  # further — then memory, or for someone not in memory one indexed read
+  # (HoodrideWeb.Auth, Hoodride.SessionTokens). A signed-in person
   # connects on their account's own budget (authorize/3); only attempts that
   # fail count against the address. Every attempt used to: junk from one
   # person on a café's Wi-Fi drained the address and locked every signed-in

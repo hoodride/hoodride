@@ -44,11 +44,9 @@ defmodule HoodrideWeb.HotPathsTest do
     init_test_session(conn, session)
   end
 
-  # what a restart does: memory gone, refilled from the database
-  defp restart! do
-    :ets.delete_all_objects(:session_tokens)
-    :ok = Hoodride.SessionTokens.load()
-  end
+  # what a restart does: memory gone (each person's sign-ins read from the
+  # database when next needed)
+  defp restart!, do: :ok = Hoodride.SessionTokens.reset_memory()
 
   # how many database queries `fun` makes (Ecto's telemetry)
   defp queries(fun) do

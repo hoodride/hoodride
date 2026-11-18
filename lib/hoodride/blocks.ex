@@ -63,14 +63,29 @@ defmodule Hoodride.Blocks do
   """
   def check(a, b) when a == b, do: false
 
-  def check(a, b) when is_integer(a) and is_integer(b) do
+  def check(a, b) when is_integer(a) and is_integer(b), do: check_loaded(a, b, 3)
+  def check(_a, _b), do: false
+
+  # "loaded?", the read, then "STILL loaded?" (owner, 2026-11-17): the
+  # Sweeper may drop `a` in between — it takes the mark first, then the
+  # rows (drop/1), so a read that could have missed a row always finds the
+  # mark gone after it: read again from the database. Without this, a
+  # check caught mid-drop answered "not blocked" — a blocked car shown.
+  # Dropped three times running (never seen): :unknown — treated as blocked
+  defp check_loaded(_a, _b, 0), do: :unknown
+
+  defp check_loaded(a, b, tries) do
     case ensure(a) do
-      :ok -> :ets.member(@rows, {a, b})
-      :unavailable -> :unknown
+      :ok ->
+        # (tests: a pause between "loaded" and the read)
+        hook(:checked)
+        blocked = :ets.member(@rows, {a, b})
+        if loaded?(a), do: blocked, else: check_loaded(a, b, tries - 1)
+
+      :unavailable ->
+        :unknown
     end
   end
-
-  def check(_a, _b), do: false
 
   @doc "This person's blocks into memory now (a map joining): `:ok` or `:unavailable`."
   def preload(user_id) when is_integer(user_id), do: ensure(user_id)
@@ -113,6 +128,40 @@ defmodule Hoodride.Blocks do
       else
         reraise(e, __STACKTRACE__)
       end
+  end
+
+  @doc false
+  # The warm start (Hoodride.WarmStart): many people's blocks in ONE query,
+  # as load/1 for each — both directions, then the mark (someone with none
+  # is known to have none). Start-up only, before the Sweeper and the web
+  # server: nothing else reads or changes blocks yet, so no locks. Anyone
+  # already in memory is left as is. Raises if the database can't answer.
+  def preload_many(ids) do
+    case Enum.reject(ids, &loaded?/1) do
+      [] ->
+        :ok
+
+      ids ->
+        hook(:read)
+        set = MapSet.new(ids)
+
+        rows =
+          from(b in "blocks",
+            where: b.blocker_id in ^ids or b.blocked_id in ^ids,
+            select: {b.blocker_id, b.blocked_id}
+          )
+          |> Repo.all()
+
+        entries =
+          Enum.flat_map(rows, fn {x, y} ->
+            if(MapSet.member?(set, x), do: [{{x, y}}], else: []) ++
+              if(MapSet.member?(set, y), do: [{{y, x}}], else: [])
+          end)
+
+        :ets.insert(@rows, entries)
+        :ets.insert(@loaded, for(id <- ids, do: {id}))
+        :ok
+    end
   end
 
   # ---------- changes ----------
@@ -302,8 +351,12 @@ defmodule Hoodride.Blocks do
     :ok
   end
 
+  # the mark FIRST, then the rows: a check reading meanwhile finds the mark
+  # gone after its read, and reads again (check_loaded)
   defp drop(user_id) do
     :ets.delete(@loaded, user_id)
+    # (tests: a pause between the two)
+    hook(:dropping)
     :ets.match_delete(@rows, {{user_id, :_}})
   end
 

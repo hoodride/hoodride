@@ -30,6 +30,8 @@ defmodule Hoodride.LimitsTest do
     "hour" => "a unit",
     "day" => "a unit",
     "protocol" => "the map's message format version",
+    "list_format" => "the warm start's saved-list format version (Hoodride.WarmStart)",
+    "per_read" => "people loaded per database read in the warm start (Hoodride.WarmStart)",
     "spot_res" => "the map's block size (an H3 resolution — the app's, Hoodride.H3Test)",
     "cell_res" => "the map's neighborhood size (likewise)"
   }

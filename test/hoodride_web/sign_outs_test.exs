@@ -121,9 +121,8 @@ defmodule HoodrideWeb.SignOutsTest do
       token = Hoodride.TestHelpers.socket_token_for(u.id)
       :ok = Accounts.mark_logged_out(u.id)
 
-      # a restart: memory empty, the start-up load refills it
-      :ets.delete_all_objects(:session_tokens)
-      assert Hoodride.SessionTokens.load() == :ok
+      # a restart: memory empty (read from the database when needed)
+      assert Hoodride.SessionTokens.reset_memory() == :ok
       assert connect(token) == :error
     end
 
@@ -132,8 +131,7 @@ defmodule HoodrideWeb.SignOutsTest do
       token = Hoodride.TestHelpers.socket_token_for(u.id)
       :ok = AccountDeletion.delete(u.id)
 
-      :ets.delete_all_objects(:session_tokens)
-      assert Hoodride.SessionTokens.load() == :ok
+      assert Hoodride.SessionTokens.reset_memory() == :ok
       assert connect(token) == :error
     end
 

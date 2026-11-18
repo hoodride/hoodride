@@ -50,10 +50,13 @@ defmodule Hoodride.Application do
       # to start — a deploy switching back onto a newer version's database
       # changes fails its check loudly instead of failing every sign-in
       Hoodride.SchemaCheck,
-      # the sign-ins (Hoodride.SessionTokens), loaded before the web server
-      # starts (it blocks: no connection is accepted before the list is
-      # there) — every request and connect checks them in memory
+      # the sign-ins (Hoodride.SessionTokens): expired rows pruned; each
+      # person's read on demand
       Hoodride.SessionTokens,
+      # the warm start: the people connected at the last polite stop get
+      # their sign-ins and blocks loaded now, before the Sweeper and the web
+      # server (Hoodride.WarmStart) — never stops the start
+      Hoodride.WarmStart,
       # profile photos: the folder exists, files nothing points to removed
       Hoodride.Avatars,
       {DNSCluster, query: Application.get_env(:hoodride, :dns_cluster_query) || :ignore},
@@ -102,10 +105,14 @@ defmodule Hoodride.Application do
   end
 
   # A polite stop (SIGTERM — systemctl restart, deploy.sh): before anything
-  # shuts down, tell every connected app it's a planned restart, so it
-  # reconnects promptly instead of backing off (HoodrideWeb.RestartNotice).
+  # shuts down (OTP: prep_stop runs before the supervision tree stops),
+  # write down who's connected for the next start (Hoodride.WarmStart —
+  # first, while everyone still is; never stops the stop), then tell every
+  # connected app it's a planned restart, so it reconnects promptly instead
+  # of backing off (HoodrideWeb.RestartNotice).
   @impl true
   def prep_stop(state) do
+    _ = Hoodride.WarmStart.save()
     HoodrideWeb.RestartNotice.announce()
     state
   end

@@ -74,8 +74,13 @@
   // app still had it (after a reload it's simply not there).
   // endedBy: "peer" — they tapped End chat: say so; "me" — you did: nothing
   // to say; else the server ended it (they've been away past grace)
-  function chatClosedActions({ hasChat, isOpen, name, endedBy }) {
-    if (!hasChat) return { remove: false, close: false, banner: null };
+  // `others`: the chats left after this one. Ended by YOU (End chat, Block)
+  // with others left: the chat list — even one left; none left: closed
+  // (owner, 2026-11-17: as ‹, and as messengers — never into a chat you
+  // didn't pick). Ended by them or the server: closed, with the banner
+  function chatClosedActions({ hasChat, isOpen, name, endedBy, others = 0 }) {
+    if (!hasChat) return { remove: false, close: false, toList: false, banner: null };
+    const toList = !!isOpen && endedBy === "me" && others > 0;
     // "neutral": no reason can be given — a block, or a chat found gone
     // after a reconnect (owner, 2026-11-15)
     const banner =
@@ -86,7 +91,7 @@
           : endedBy === "neutral"
             ? t("Chat with {name} ended", { name })
             : t("Chat with {name} ended — they've been away a while", { name });
-    return { remove: true, close: !!isOpen, banner };
+    return { remove: true, close: !!isOpen && !toList, toList, banner };
   }
 
   // PILES. Fuzzed markers in one block sit on EXACTLY the same point, so

@@ -49,6 +49,10 @@ config :hoodride, :oauth_redirect_from_request, true
 # tests: no pause after the restart notice (HoodrideWeb.RestartNotice)
 config :hoodride, :restart_notice, min_ms: 4000, max_ms: 10000, flush_ms: 0
 
+# the warm start off: a test run's end would leave a list for the next
+# run's start (Hoodride.WarmStartTest sets its own file)
+config :hoodride, :warm_start, path: nil
+
 # profile photos (Hoodride.Avatars): a folder of their own, and every photo
 # request answered 404 unless a test stubs its own (Hoodride.AvatarsOffPlug)
 config :hoodride, :avatar_dir, Path.expand("../tmp/test_avatars", __DIR__)

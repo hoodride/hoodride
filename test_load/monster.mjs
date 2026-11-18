@@ -21,6 +21,9 @@
 //   L6 rides: both people hear it start; both hear it end
 //   L7 no unexpected error reply (bad_request, crashes…)
 //   L8 after the crowd leaves, a fresh observer sees no car and no ✋
+//   L9 blocks (owner, 2026-11-17): once a block is 3 s old, neither person
+//      gets the other's car or ✋ — live, batched or in a snapshot — either
+//      way; agents block people they've seen now and then, and unblock
 // Plus reply times per action and the server's memory, wave after wave.
 //
 // Run: node test_load/monster.mjs [agents=150] [seconds_per_wave=150] [waves=2] [seed] [chaos=1]
@@ -72,7 +75,12 @@ const somewhere = () => offset(CENTER, Math.sqrt(rnd()) * RADIUS_M, rnd() * 360)
 const AREA = h3.gridDisk(h3.latLngToCell(CENTER.lat, CENTER.lng, 8), 4); // the observer's view
 
 // ---------- results ----------
-const laws = { L1: [], L2: [], L3: [], L4: [], L5: [], L6: [], L7: [], L8: [] };
+const laws = { L1: [], L2: [], L3: [], L4: [], L5: [], L6: [], L7: [], L8: [], L9: [] };
+// L9: "blocker:blocked" → when the block was confirmed (now()); gone once
+// the unblock is confirmed. Either direction blocks both ways
+const BLOCKS = new Map();
+const blockedSettled = (a, b) =>
+  [`${a}:${b}`, `${b}:${a}`].some((k) => BLOCKS.has(k) && now() - BLOCKS.get(k) > 3000);
 // EVERY violation is kept (a rare one hiding behind the first few printed
 // went undiagnosed once): all of them go to a JSON file at the end
 const violate = (law, agent, msg) => {
@@ -285,6 +293,9 @@ class Agent {
     // when this ACCOUNT started new contacts: the server's 20/hour is per
     // account and outlives a wave (the same accounts play every wave)
     this.coldLog = user.coldLog ||= [];
+    // this ACCOUNT's blocks and unblocks (the server allows 20 a day; the
+    // same accounts play every wave): a few per run at most
+    this.blockLog = user.blockLog ||= [];
     this.liveSeq = 0; // live frames that /api/state also covers (see reloadState)
     this.declinedBy = new Set();
     this.seen = new Map(); // id → {type, cell, spot}
@@ -486,6 +497,7 @@ class Agent {
         for (const layer of ["drivers", "hands"]) {
           for (const m of snap[layer] || []) {
             this.checkShape("snapshot", m);
+            if (blockedSettled(this.id, m.id)) violate("L9", this, `snapshot had blocked #${m.id}${this.traceText()}`);
             this.seen.set(m.id, { type: layer === "drivers" ? "car" : "hand", cell: m.cell, spot: m.spot });
           }
         }
@@ -553,6 +565,8 @@ class Agent {
           const sides = Object.keys(p).filter((k) => k !== "cell");
           if (sides.length !== 1) violate("L2", this, `agg_update with ${sides}`);
         } else this.checkShape(event, p);
+        if ((event === "driver_update" || event === "hand_update") && blockedSettled(this.id, p.id))
+          violate("L9", this, `${event} of blocked #${p.id}${this.traceText()}`);
         if (event.endsWith("_left")) this.seen.delete(p.id);
         else if (event === "driver_update" || event === "hand_update") this.seen.set(p.id, { type: layer === "cars" ? "car" : "hand", cell: p.cell, spot: p.spot });
       }
@@ -751,9 +765,75 @@ class Agent {
   }
 
   // ----- what a person decides to do next -----
+  // now and then: block someone seen on the map, or unblock one blocked —
+  // never a ride partner or the one a request is open with
+  async maybeBlock() {
+    if (this.request || this.blockLog.length >= 4 || !chance(0.03)) return false;
+    const user = `user:${this.id}`;
+    const mine = [...BLOCKS.keys()].filter((k) => k.startsWith(`${this.id}:`));
+    if (mine.length && chance(0.5)) {
+      const key = pick(mine);
+      const peer = Number(key.split(":")[1]);
+      this.blockLog.push(now());
+      // no longer judged from the moment it's SENT: the server shows each to
+      // the other at once — that frame can arrive before our own reply
+      // (monster run 2026-11-17: 68 one-frame "leaks", every one this)
+      BLOCKS.delete(key);
+      const r = await this.call(user, "unblock", { peer });
+      if (r.status === "ok") {
+        bump("unblocks");
+        this.trace(`unblocked #${peer}`);
+      } else {
+        this.blockRefused("unblock", r);
+        await this.syncBlocks();
+      }
+      return true;
+    }
+    const seen = [...this.seen.keys()].filter((id) => id !== this.id && !BLOCKS.has(`${this.id}:${id}`));
+    if (!seen.length) return false;
+    const peer = pick(seen);
+    this.blockLog.push(now());
+    const r = await this.call(user, "block", { peer });
+    if (r.status === "ok") {
+      BLOCKS.set(`${this.id}:${peer}`, now());
+      this.seen.delete(peer);
+      bump("blocks");
+      this.trace(`blocked #${peer}`);
+    } else {
+      this.blockRefused("block", r);
+      await this.syncBlocks();
+    }
+    return true;
+  }
+  // a reply lost (the connection closed under it) or refused: what the
+  // SERVER holds is the truth — its list of who this account blocked
+  // (/api/blocks) replaces ours (monster run 2026-11-17: an unblock done
+  // but its reply lost read as 25 "leaks" and an "unblock → none")
+  async syncBlocks() {
+    try {
+      const res = await fetch(`${BASE}/api/blocks`, { headers: { cookie: this.cookie } });
+      if (!res.ok) return bump("block_truth_unreadable");
+      const ids = new Set(((await res.json()).blocked || []).map((p) => p.id));
+      for (const k of [...BLOCKS.keys()])
+        if (k.startsWith(`${this.id}:`) && !ids.has(Number(k.split(":")[1]))) BLOCKS.delete(k);
+      for (const id of ids) if (!BLOCKS.has(`${this.id}:${id}`)) BLOCKS.set(`${this.id}:${id}`, now());
+      bump("block_truth_synced");
+    } catch (_) {
+      bump("block_truth_unreadable");
+    }
+  }
+  // (the day's 20 across repeated runs: counted, not an L5 — a person
+  // doesn't block 20 people a day)
+  blockRefused(event, r) {
+    const reason = r.response && r.response.reason;
+    if (reason === "rate_limited") return bump(`${event}_rate_limited`);
+    this.refused(event, r);
+  }
+
   async act() {
     if (!this.conn || this.conn.closed || this.ride) return;
     const user = `user:${this.id}`;
+    if (await this.maybeBlock()) return;
     if (this.kind === "driver") {
       if (!this.online) {
         if (chance(0.7)) {
@@ -1101,6 +1181,17 @@ if (process.argv[2] === "selftest") {
     }],
     ["L5", () => a.refused("sync", { status: "error", response: { reason: "rate_limited" } })],
     ["L7", () => a.refused("send_msg", { status: "error", response: { reason: "bad_request" } })],
+    // blocked (settled): their car, live or in a batch, either direction
+    ["L9", () => {
+      BLOCKS.set("1:9", now() - 10_000);
+      a.onFrame(conn, "world", "driver_update", { id: 9, cell: "c", spot: "s" });
+      BLOCKS.delete("1:9");
+    }],
+    ["L9", () => {
+      BLOCKS.set("9:1", now() - 10_000);
+      a.onFrame(conn, "world", "batch", { items: [["driver_update", { id: 9, cell: "c", spot: "s" }]] });
+      BLOCKS.delete("9:1");
+    }],
   ];
   let ok = 0;
   for (const [law, run] of cases) {
@@ -1285,6 +1376,7 @@ const names = {
   L6: "both people hear a ride start and end",
   L7: "no unexpected errors",
   L8: "the map is empty after everyone leaves",
+  L9: "blocked people never see each other",
 };
 // every violation, with its trace, for a full diagnosis
 {

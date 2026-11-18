@@ -191,6 +191,20 @@ defmodule Hoodride.BlocksTest do
       assert Blocks.blocked?(ann.id, bob.id), "read from the database again"
     end
 
+    test "in a ride, or with a request open: kept past the grace (Hoodride.Presence)" do
+      [ann, bob, cat, dan] = [user("mk-ann"), user("mk-bob"), user("mk-cat"), user("mk-dan")]
+      :ok = Blocks.block(ann.id, cat.id)
+      :ok = Blocks.block(dan.id, cat.id)
+      :ok = Blocks.preload(ann.id)
+      :ok = Blocks.preload(dan.id)
+      {:ok, _} = Hoodride.Rides.start_ride(ann.id, bob.id)
+      Hoodride.Geo.driver_update(%{id: bob.id, name: "b", photo: nil}, "cell8", nil)
+      later = System.system_time(:second) + 10 * div(Hoodride.Limits.presence_grace_ms(), 1000)
+      Blocks.sweep(later)
+      assert Blocks.loaded?(ann.id), "in a ride"
+      refute Blocks.loaded?(dan.id), "nothing keeps Dan"
+    end
+
     test "someone never seen online (only asked over HTTP): not kept" do
       [ann, bob] = [user("me2-ann"), user("me2-bob")]
       :ok = Blocks.block(ann.id, bob.id)
@@ -258,6 +272,202 @@ defmodule Hoodride.BlocksTest do
       refute Blocks.loaded?(ann.id), "nothing half-loaded kept"
       Application.delete_env(:hoodride, :blocks_hook)
       refute Blocks.blocked?(ann.id, bob.id)
+    end
+  end
+
+  describe "every change racing a load; the database refusing a change" do
+    # `who`'s load pauses between reading its rows and writing memory;
+    # `change` runs in that gap (or waits for the load — the person's lock)
+    defp during_load(who, change) do
+      me = self()
+      {:ok, first} = Agent.start_link(fn -> true end)
+
+      Application.put_env(:hoodride, :blocks_hook, fn
+        :loaded ->
+          if Agent.get_and_update(first, &{&1, false}) do
+            send(me, {:paused, self()})
+
+            receive do
+              :go -> :ok
+            after
+              3_000 -> :ok
+            end
+          end
+
+        _ ->
+          :ok
+      end)
+
+      loader = Task.async(fn -> Blocks.preload(who) end)
+      assert_receive {:paused, pid}, 2_000
+      changer = Task.async(change)
+
+      receive do
+        :never -> :ok
+      after
+        200 -> :ok
+      end
+
+      send(pid, :go)
+      Task.await(loader)
+      result = Task.await(changer)
+      Application.delete_env(:hoodride, :blocks_hook)
+      result
+    end
+
+    # (found 2026-11-17, from the capacity run's sign-in twin of it: a check
+    # saw "loaded", the Sweeper dropped the person, the check read memory —
+    # no row — "not blocked": a blocked car shown)
+    test "a check between 'loaded' and its read, the person dropped meanwhile: still blocked" do
+      [ann, bob] = [user("dr-ann"), user("dr-bob")]
+      :ok = Blocks.block(ann.id, bob.id)
+      :ok = Blocks.preload(ann.id)
+      me = self()
+      {:ok, first} = Agent.start_link(fn -> true end)
+
+      Application.put_env(:hoodride, :blocks_hook, fn
+        :checked ->
+          if Agent.get_and_update(first, &{&1, false}) do
+            send(me, {:paused, self()})
+
+            receive do
+              :go -> :ok
+            after
+              3_000 -> :ok
+            end
+          end
+
+        _ ->
+          :ok
+      end)
+
+      check = Task.async(fn -> Blocks.check(ann.id, bob.id) end)
+      assert_receive {:paused, pid}, 2_000
+      Blocks.sweep()
+      refute Blocks.loaded?(ann.id)
+      send(pid, :go)
+      assert Task.await(check) == true, "a blocked person read as not blocked"
+      Application.delete_env(:hoodride, :blocks_hook)
+    end
+
+    test "a check in the middle of a drop (between its two steps): still blocked" do
+      [ann, bob] = [user("dm-ann"), user("dm-bob")]
+      :ok = Blocks.block(ann.id, bob.id)
+      :ok = Blocks.preload(ann.id)
+      me = self()
+
+      Application.put_env(:hoodride, :blocks_hook, fn
+        :dropping ->
+          send(me, {:dropping, self()})
+
+          receive do
+            :go -> :ok
+          after
+            3_000 -> :ok
+          end
+
+        _ ->
+          :ok
+      end)
+
+      sweep = Task.async(fn -> Blocks.sweep() end)
+      assert_receive {:dropping, pid}, 2_000
+      check = Task.async(fn -> Blocks.check(ann.id, bob.id) end)
+
+      receive do
+        :never -> :ok
+      after
+        200 -> :ok
+      end
+
+      send(pid, :go)
+      Task.await(sweep)
+      assert Task.await(check) == true, "read as not blocked mid-drop"
+      Application.delete_env(:hoodride, :blocks_hook)
+    end
+
+    test "an unblock while the blocker's rows load: stays unblocked" do
+      [ann, bob] = [user("ru-ann"), user("ru-bob")]
+      :ok = Blocks.block(ann.id, bob.id)
+      forget_memory()
+      assert :ok = during_load(ann.id, fn -> Blocks.unblock(ann.id, bob.id) end)
+      refute Blocks.blocked?(ann.id, bob.id)
+      refute Blocks.blocked?(bob.id, ann.id)
+    end
+
+    test "an unblock while the blocked one's rows load: stays unblocked for them too" do
+      [ann, bob] = [user("ru2-ann"), user("ru2-bob")]
+      :ok = Blocks.block(ann.id, bob.id)
+      forget_memory()
+      assert :ok = during_load(bob.id, fn -> Blocks.unblock(ann.id, bob.id) end)
+      refute Blocks.blocked?(bob.id, ann.id)
+    end
+
+    test "a block while the blocked one's rows load: seen by them" do
+      [ann, bob] = [user("rb-ann"), user("rb-bob")]
+      forget_memory()
+      assert :ok = during_load(bob.id, fn -> Blocks.block(ann.id, bob.id) end)
+      assert Blocks.blocked?(bob.id, ann.id)
+    end
+
+    test "an account deleted while the other's rows load: nothing of it left" do
+      [ann, bob] = [user("rd-ann"), user("rd-bob")]
+      :ok = Blocks.block(ann.id, bob.id)
+      forget_memory()
+
+      during_load(bob.id, fn ->
+        Repo.query!("DELETE FROM blocks WHERE blocker_id = ? OR blocked_id = ?", [ann.id, ann.id])
+        Blocks.forget(ann.id)
+      end)
+
+      refute Blocks.loaded?(ann.id)
+      assert :ets.match(:block_rows, {{ann.id, :_}}) == []
+      # (bob's row naming ann may stay until he's dropped — harmless: ann is
+      # gone; what matters is that nothing makes ann blocked/visible wrongly)
+    end
+
+    defp refuse(op),
+      do:
+        Repo.query!(
+          "CREATE TRIGGER refuse_blocks_#{op} BEFORE #{op} ON blocks BEGIN SELECT RAISE(ABORT, 'refused'); END"
+        )
+
+    defp allow(op), do: Repo.query!("DROP TRIGGER refuse_blocks_#{op}")
+
+    test "the database refuses a block: 'failed', nothing changed anywhere, the day's allowance given back" do
+      [ann, bob] = [user("wf-ann"), user("wf-bob")]
+      # both in memory: a half-done block would show there
+      refute Blocks.blocked?(ann.id, bob.id)
+      refuse("INSERT")
+      limit = Hoodride.Limits.block_actions_per_day()
+
+      for _ <- 1..(limit + 3),
+          do: assert(Blocks.block(ann.id, bob.id) == {:error, :failed})
+
+      refute Blocks.blocked?(ann.id, bob.id)
+      refute Blocks.blocked?(bob.id, ann.id)
+      assert rows() == []
+      allow("INSERT")
+      assert :ok = Blocks.block(ann.id, bob.id), "the failures cost nothing"
+      assert Blocks.blocked?(bob.id, ann.id)
+    end
+
+    test "the database refuses an unblock: 'failed', still blocked everywhere, the allowance given back" do
+      [ann, bob] = [user("wf2-ann"), user("wf2-bob")]
+      :ok = Blocks.block(ann.id, bob.id)
+      assert Blocks.blocked?(bob.id, ann.id)
+      refuse("DELETE")
+      limit = Hoodride.Limits.block_actions_per_day()
+
+      for _ <- 1..(limit + 3),
+          do: assert(Blocks.unblock(ann.id, bob.id) == {:error, :failed})
+
+      assert Blocks.blocked?(ann.id, bob.id)
+      assert Blocks.blocked?(bob.id, ann.id)
+      assert rows() == [[ann.id, bob.id]]
+      allow("DELETE")
+      assert :ok = Blocks.unblock(ann.id, bob.id)
+      refute Blocks.blocked?(bob.id, ann.id)
     end
   end
 

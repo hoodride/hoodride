@@ -1657,6 +1657,7 @@ function closeChatWith(peer, endedBy = null) {
     isOpen,
     name: peer ? peer.name : "",
     endedBy,
+    others: chats.size - (peer && chats.has(peer) ? 1 : 0),
   });
   if (a.remove) {
     chats.delete(peer);
@@ -1664,7 +1665,13 @@ function closeChatWith(peer, endedBy = null) {
     // (a chat missing after a reload isn't closed: unsay)
     peer.chatClosed = true;
   }
-  if (a.close) {
+  if (a.toList) {
+    // you ended it (End chat, Block): the list (HoodBrowse.chatClosedActions)
+    if (document.activeElement === $("chat-input")) $("chat-input").blur();
+    state.chatPeer = null;
+    state.chatView = "list";
+    renderChat();
+  } else if (a.close) {
     state.chatPeer = null;
     closeChat();
   } else if (state.chatView === "list" && !$("chat").classList.contains("hidden")) {
@@ -2558,7 +2565,17 @@ function drawPile(pm) {
   );
 }
 
+// A person tapped on the map, a chat (or the list) open: one panel at a
+// time — the chat goes (kept, with its draft; 💬 brings it back) and their
+// card shows in front, not behind it (owner, 2026-11-17: as map apps — a
+// tap on the map replaces the sheet). Only a TAP: a card redrawn in place
+// (a reconnect, a name arriving) leaves the chat alone
+function tappedOnMap() {
+  if (!$("chat").classList.contains("hidden")) closeChat();
+}
+
 function onPileTap(pm) {
+  tappedOnMap();
   if (pm.ids.length === 1) {
     const e = realEntries.get(pm.ids[0]);
     if (e) openMarkerCard(e.peer, pm.type);
@@ -3423,6 +3440,7 @@ function makeBubbleMarker(emoji, onClick, extraClass) {
   else el.textContent = emoji;
   el.addEventListener("click", (e) => {
     e.stopPropagation();
+    tappedOnMap();
     onClick();
   });
   return new maplibregl.Marker({ element: el });
@@ -3452,8 +3470,8 @@ function planDemoView() {
 function renderDemoAgg(inRide) {
   aggData.clear();
   if (!inRide && demoPlan && demoPlan.res !== H3_RES) {
-    const people = drivers.map((d) => ({ kind: "driver", pos: d.pos }));
-    if (mockHand) people.push({ kind: "hand", pos: mockHand.pos });
+    const people = drivers.filter((d) => !d.blocked).map((d) => ({ kind: "driver", pos: d.pos }));
+    if (mockHand && !mockHand.blocked) people.push({ kind: "hand", pos: mockHand.pos });
     HoodBrowse.demoCounts(h3, people, demoPlan.res, demoPlan.cells).forEach((c) => aggData.set(c.cell, c));
   }
   if (aggData.size > 0 || demoAggShown) renderAggLayer();
@@ -3472,7 +3490,7 @@ function refreshWorldMarkers() {
   renderDemoAgg(inRide);
   drivers.forEach((d) => {
     const shouldShow =
-      state.mode === "rider" && (inRide ? state.ride.peer === d : markersLevel);
+      !d.blocked && state.mode === "rider" && (inRide ? state.ride.peer === d : markersLevel);
     if (shouldShow && !d.visible) {
       d.marker.setLngLat([d.pos.lng, d.pos.lat]).addTo(map);
       d.visible = true;
@@ -3488,7 +3506,7 @@ function refreshWorldMarkers() {
   // alone — it removed the 🙋 just placed (owner, 2026-11-02)
   if (mockHand && !(inRide && state.ride.peer === mockHand)) {
     // same rule as real hands: tunnel vision mid-ride
-    const shouldShow = state.mode === "driver" && state.online && !inRide && markersLevel;
+    const shouldShow = !mockHand.blocked && state.mode === "driver" && state.online && !inRide && markersLevel;
     if (shouldShow && !mockHand.visible) {
       mockHand.marker.setLngLat([mockHand.pos.lng, mockHand.pos.lat]).addTo(map);
       mockHand.visible = true;
@@ -3679,7 +3697,11 @@ let endArmed = null;
 let endTimer = null;
 function canEndChat(peer) {
   const c = peer && chats.get(peer);
-  if (DEMO || !c) return false;
+  if (!c) return false;
+  // (the demo: its pretend people, ended on this phone alone — as the real
+  // one, only once a message has gone either way: an empty chat is just
+  // closed, ✕ or ‹)
+  if (DEMO) return c.msgs.length > 0 && !(state.ride && state.ride.peer === peer);
   const onServer = c.server || c.msgs.some((m) => m.id != null);
   const rideWithThem = !!state.ride && !!state.ride.peer && state.ride.peer.id === peer.id;
   return onServer && !rideWithThem;
@@ -3710,6 +3732,8 @@ $("chat-end").addEventListener("click", () => {
     return;
   }
   disarmEndChat();
+  // the demo: gone here at once, as the real one for the person ending it
+  if (DEMO) return closeChatWith(peer, "me");
   if (!liveNow()) return transientBanner(CANT_REACH());
   userChannel
     .push("end_chat", { peer: peer.id })
@@ -4366,6 +4390,8 @@ $("chat-messages").addEventListener(
 // meta: the server's {ts, id} for a real message (none for the demo's or a
 // local note like "📩 requested a ride")
 function receiveMsg(peer, text, meta) {
+  // (the demo: a pretend person you blocked says nothing more)
+  if (DEMO && peer.blocked) return;
   // a chat not loaded yet (older than the list's pages so far): not a new,
   // empty one — its earlier messages come when it's opened, and its unread
   // counted on the server moves to it (owner, 2026-11-14: it opened with
@@ -5397,10 +5423,12 @@ function setHand(up) {
     if (DEMO) {
       handPingTimer = setTimeout(() => {
         if (!state.handRaised || state.ride) return;
-        let nearest = drivers[0];
+        // (never a pretend driver you blocked; all blocked: nobody pings)
+        let nearest = null;
         drivers.forEach((d) => {
-          if (metersBetween(state.me, d.pos) < metersBetween(state.me, nearest.pos)) nearest = d;
+          if (!d.blocked && (!nearest || metersBetween(state.me, d.pos) < metersBetween(state.me, nearest.pos))) nearest = d;
         });
+        if (!nearest) return;
         // a message, like the real app: a banner and the unread count — no
         // card popping open (only a tap on a marker opens one)
         receiveMsg(nearest, t("yo, saw your hand ✋ need a pickup?"));
@@ -5535,6 +5563,7 @@ function scheduleIncomingRequest() {
   requestTimer = setTimeout(() => {
     if (!state.online || state.mode !== "driver" || state.ride) return;
     if ([...chats.keys()].some((p) => p.kind === "rider" && p.pending)) return;
+    if (demoBlocked.some((p) => p.name === REQUEST_RIDER.name)) return; // blocked
     const existing = [...chats.keys()].find(
       (p) => p.kind === "rider" && p.name === REQUEST_RIDER.name
     );
@@ -6003,16 +6032,21 @@ function setBlockedCount(n) {
 // asked as the drawer opens — never with every app open, which makes one
 // database query (owner, 2026-11-17). Not known (the demo, no answer): as it was
 async function refreshBlockedCount() {
-  if (DEMO) return;
+  if (DEMO) return setBlockedCount(demoBlocked.length);
   try {
     const res = await apiFetch("/api/blocks?count=1");
     if (res.ok) setBlockedCount((await res.json()).count);
   } catch (_) {}
 }
 
-// a real person (never the demo's pretend ones, never yourself)
+// a real person (never yourself). The demo (owner, 2026-11-17: "i wanna
+// see it"): its pretend people, played out on this phone alone — gone from
+// the map, their chat closed, quiet, in Blocked people until unblocked.
+// Not your demo ride partner (the pretend ride has no "ended by a block")
+const demoBlocked = []; // the demo's blocked pretend people, oldest first
 function canBlock(peer) {
-  return !DEMO && !!peer && Number.isInteger(peer.id) && realPeersById.get(peer.id) === peer && !!state.realUser && peer.id !== state.realUser.id;
+  if (DEMO) return !!peer && (drivers.includes(peer) || peer.kind === "rider") && !(state.ride && state.ride.peer === peer);
+  return !!peer && Number.isInteger(peer.id) && realPeersById.get(peer.id) === peer && !!state.realUser && peer.id !== state.realUser.id;
 }
 
 let blockAsk = null; // { peer, mode: "block" | "unblock", opener, row }
@@ -6059,6 +6093,7 @@ function blockRefusal(reason, mode) {
 $("block-yes").addEventListener("click", () => {
   const ask = blockAsk;
   if (!ask) return;
+  if (DEMO) return demoBlockAnswer(ask);
   if (!liveNow()) return blockError(CANT_REACH());
   $("block-yes").disabled = true;
   const { peer, mode } = ask;
@@ -6095,6 +6130,27 @@ $("block-list-open").addEventListener("click", () => {
   openBlockedSheet();
 });
 
+// the demo's Block / Unblock: the same sheet, list and words, no server
+function demoBlockAnswer({ peer, mode, row }) {
+  if (mode === "block") {
+    peer.blocked = true;
+    demoBlocked.push(peer);
+    afterBlocked(peer);
+    refreshWorldMarkers();
+    closeBlockSheet();
+    setBlockedCount(demoBlocked.length);
+    transientBanner(t("Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."));
+  } else {
+    peer.blocked = false;
+    demoBlocked.splice(demoBlocked.indexOf(peer), 1);
+    refreshWorldMarkers();
+    if (row) row.remove();
+    closeBlockSheet();
+    setBlockedCount(demoBlocked.length);
+    if (!$("blocked-list").querySelector(".blocked-row")) showBlockedEmpty();
+  }
+}
+
 // blocked: anything of theirs on this screen goes now (the server sends the
 // rest — their marker, the chat, the ride)
 function afterBlocked(peer) {
@@ -6113,6 +6169,13 @@ function openBlockedSheet() {
   $("blocked-backdrop").classList.remove("hidden");
   $("blocked-sheet").classList.remove("hidden");
   $("blocked-title").focus();
+  if (DEMO) {
+    // newest first, as the real list
+    const rows = demoBlocked.slice().reverse().map((p) => blockedRow({ name: p.name, photo: p.photo, peer: p }));
+    if (rows.length) $("blocked-list").append(...rows);
+    else showBlockedEmpty();
+    return;
+  }
   loadBlocked(null);
 }
 function closeBlockedSheet(e) {
@@ -6178,7 +6241,7 @@ function blockedRow(p) {
   un.type = "button";
   un.className = "btn btn-small";
   un.textContent = t("Unblock");
-  un.addEventListener("click", () => openBlockSheet({ id: p.id, name: p.name }, "unblock", un, row));
+  un.addEventListener("click", () => openBlockSheet(p.peer || { id: p.id, name: p.name }, "unblock", un, row));
   row.append(img, name, un);
   return row;
 }

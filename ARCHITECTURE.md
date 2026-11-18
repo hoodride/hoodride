@@ -1873,6 +1873,41 @@ the **restart notice** (HoodrideWeb.RestartNotice: `prep_stop` tells every app
 **13.4 s, one attempt each, none refused**. A crash/kill/power loss sends
 nothing: the normal backoff applies. (At 5,000, past the ceiling: 75 s.)
 
+**Deploys with blocks (2026-11-18, 4,000 on 2 cores, 3 blocks each):**
+blocks read on demand at map join made the restart slow — live (a18b040,
+sign-ins all read at start-up): server up after 14.7 s, everyone back
+after 68.0 s, 11,130 attempts. With sign-ins on demand + the drop-race fix:
+up after 7.5 s, back after 52.7 s, 5,621 attempts (503 "try again" while
+the database queue was full — never "signed out").
+
+**The warm start (owner, 2026-11-18, BUILT — `Hoodride.WarmStart`):** the
+polite stop (`prep_stop`, which OTP runs before the supervision tree stops;
+before the restart notice, while everyone's still connected) writes the
+connected account numbers to `warm_start.bin` next to the database
+(written aside, then renamed). The next start reads it ONCE (deleted
+first), then loads those people's sign-ins and blocks 500 at a time, after
+the sign-ins' start-up and before the Sweeper and the web server. Fresh
+from the database: a list of numbers can't be stale. Skipped, logged, and
+on demand as before: no file (a crash), unreadable (`binary_to_term` with
+`:safe`: no atoms made from a file), another version's, older than 10
+minutes, the database failing (whole chunks kept), out of time (10 s). The
+standard technique: MySQL's buffer-pool dump at shutdown / load at
+start-up (on by default; AWS RDS docs). Only at a polite stop, by the
+owner's choice; a save every minute would cover crashes too (AWS's advice
+for MySQL; a file, never a table — a million people ≈ 8 MB) — not built.
+Same test (4,000, 2 cores, 3 blocks each), three runs: 4,000 preloaded in
+130–175 ms; everyone back after 31.9 / 26.7 / 26.8 s (was 52.7 s);
+4,229–5,033 attempts (was 5,621); no 503s, no 403s, no server warnings.
+(Run 1's 4,000 ARRIVAL step, before any restart, missed its p99 — 9.5 s;
+runs 2 and 3: 4.3 / 4.4 s, as before (4.7). It came right after a run that
+died on a wrong port, whose load shards likely ran on; not proven.)
+WarmStartTest (35; 19 breaks), including memory after the warm start
+compared whole to memory after on-demand reads, and a test that 20
+requests at once for one person make ONE read (sign-ins and blocks).
+
+**Soak (2026-11-18):** `mix test --only soak`, 10 minutes, ~66,600 rides —
+memory flat at ~116.6 MB, processes ~270, no mailbox growth.
+
 **Overload, the chosen behaviour** (Fred Hebert's "Handling Overload": pick
 back-pressure or load-shedding deliberately): the map writer NEVER drops
 work — every change matters. Its callers wait (back-pressure), then STOP
@@ -2766,9 +2801,31 @@ here say the rest.
   device holds 2 sign-ins for a moment after its weekly renewal, so 4
   covers iPhone Safari + the home-screen app (iOS keeps them signed in
   apart); a third device may be signed out by a renewal and sign in again.
-  Only one is ever live. All sign-ins stay in memory, read at start-up
-  (~128 bytes each: a million ≈ 128 MB) — the database is never asked on a
-  request, the lesson of the 2026-11-08 capacity test.
+  Only one is ever live. Sign-ins are in memory for the people around —
+  see "Sign-ins on demand" below (until 2026-11-18: all of them, read at
+  start-up).
+- **Sign-ins on demand** (owner, 2026-11-18 — the same rule as blocks):
+  memory holds the sign-ins of people around (`Presence.around?/1`), read
+  on first need — ONE query for all of a person's rows, under their lock
+  (several requests at once read once) — and dropped by the Sweeper once
+  they're gone; memory grows with who's around, not with every account.
+  Once a person is in memory it has ALL their sign-ins: a token missing
+  there is signed out, with no read (a sign-out bites at once). The cookie
+  and the connection pass both name the account, so the read is that
+  account's (`lookup_as`, `lookup_hash_as`). The database unable to answer
+  for someone not in memory: "try again" (503, `retry-after: 2`; the app
+  retries) — NEVER "signed out" (the sign-in screen); a refused connection
+  isn't counted against the address. Start-up only prunes expired rows.
+  (SessionTokensOnDemandTest, SignInsOnDemandTest, PresenceTest,
+  ReconnectBurstTest.)
+- **The drop race** (found by the capacity run, 2026-11-17: 1 join in
+  ~3,000 refused "signed_out"; its blocks twin failed open): the Sweeper
+  could drop a person between "loaded?" and the read of their rows. The
+  drop now takes the "loaded" mark first, then the rows; a read checks
+  "loaded?", reads, then "STILL loaded?" — gone: read again from the
+  database (3 tries; then "try again" for sign-ins, "blocked" for blocks
+  — never a guess). Proven by tests that pause a read mid-drop (hooks),
+  4 breaks caught.
 - **The sign-in cap never splits a device** (2026-11-14): a sign-in and
   its renewal no request has used yet are one device — its phone may hold
   either (the reply arrived and the app was closed, or the reply was lost).
@@ -2853,7 +2910,7 @@ here say the rest.
   either account deleted takes its rows) is the record. Memory holds the
   blocks of people around (`Hoodride.Presence.around?/1` — connected, in
   the presence grace, or in a ride or request; one rule, for sign-ins
-  next) — read on first need and dropped by the Sweeper once they're gone
+  too) — read on first need and dropped by the Sweeper once they're gone
   ("cache-aside"); memory grows with who's around, not with every
   block ever made. A person not in memory is read first, never "not
   blocked"; the database unable to answer counts as blocked. Every change
@@ -2904,6 +2961,22 @@ here say the rest.
 - **Banner tap:** "💬 {name}: {text}" opens that chat when tapped while
   it shows (`bannerPeer`, `.banner.tappable`); nothing if the chat's gone
   meanwhile; no other banner is tappable. Journey `bannertap`.
+- **Block and End chat in the demo** (owner: "i wanna see it"): played
+  out on the phone alone, no server. End chat closes the chat (as for the
+  person ending it); Block hides the pretend person (`peer.blocked`: off
+  the map and its hex counts, no messages — `receiveMsg`, the ✋ ping, the
+  pretend request), closes their chat, lists them in Blocked people
+  (`demoBlocked`); Unblock brings them back. Not your demo ride partner.
+  Journey `demoblock`.
+- **You end a chat (End chat, Block) → the chat list**, even with one
+  chat left (as ‹; as messengers — never into a chat you didn't pick); none
+  left → the panel closes. Ended by them or the server: closed with the
+  banner, as before. `HoodBrowse.chatClosedActions` (`others`, `toList`).
+- **A person tapped on the map with a chat open:** the chat panel closes
+  (the chat and its draft kept; 💬 brings it back) and their card or the
+  pile's list shows in front — one panel at a time (`tappedOnMap`: marker
+  and pile taps only; a card redrawn in place leaves the chat alone).
+  Journey `endtolist`; the demo's in `demoblock`.
 - Journey `bannerwrap`: ✋ tapped again and again keeps the same banner
   size (Chrome; the owner's report of it growing is likely WebKit-only —
   open).

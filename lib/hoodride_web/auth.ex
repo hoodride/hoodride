@@ -29,12 +29,15 @@ defmodule HoodrideWeb.Auth do
 
   @doc """
   The signed-in user for a session map (string or atom keys) —
-  `%{id, name, photo, provider, terms_version, token}` — or nil. `token` is
-  the session token's info (Hoodride.SessionTokens.lookup/1). NO DATABASE READ.
+  `%{id, name, photo, provider, terms_version, token}` — nil, or
+  `:unavailable` (their sign-ins not in memory and the database couldn't
+  answer: "try again", never "signed out"). `token` is the session token's
+  info (Hoodride.SessionTokens.lookup/1). A database read only for someone
+  not in memory (their first request since they were last around).
   """
   def session_user(session) when is_map(session) do
-    with {:ok, token} <- SessionTokens.lookup(get(session, "user_token")),
-         id when id == token.user_id <- get(session, "user_id"),
+    with id when is_integer(id) <- get(session, "user_id"),
+         {:ok, token} <- SessionTokens.lookup_as(get(session, "user_token"), id),
          name when is_binary(name) <- get(session, "name") do
       # a renewal's new token used: its reply arrived (SessionTokens.rotate/1)
       SessionTokens.used(token.hash)
@@ -48,6 +51,7 @@ defmodule HoodrideWeb.Auth do
         token: token
       }
     else
+      :unavailable -> :unavailable
       _ -> nil
     end
   end
@@ -132,9 +136,18 @@ defmodule HoodrideWeb.Auth do
       {:ok, %{u: id, t: hash, n: name, p: photo}} when is_integer(id) and is_binary(hash) ->
         # a connect naming a renewal's new token: its reply arrived — an app
         # kept open on its socket makes no other request (review, 2026-11-12)
-        if signed_in?(id, hash) do
-          SessionTokens.used(hash)
-          %{id: id, name: name, photo: photo, token_hash: hash}
+        case SessionTokens.lookup_hash_as(hash, id) do
+          {:ok, _} ->
+            SessionTokens.used(hash)
+            %{id: id, name: name, photo: photo, token_hash: hash}
+
+          # (the database couldn't say: refused for now — the app tries
+          # again, never shown the sign-in screen)
+          :unavailable ->
+            :unavailable
+
+          _ ->
+            nil
         end
 
       _ ->
@@ -146,6 +159,6 @@ defmodule HoodrideWeb.Auth do
 
   @doc "Is the session token (`hash`) still a valid sign-in of `user_id`? (every channel join asks)"
   def signed_in?(user_id, hash) do
-    match?({:ok, %{user_id: ^user_id}}, SessionTokens.lookup_hash(hash))
+    match?({:ok, _}, SessionTokens.lookup_hash_as(hash, user_id))
   end
 end

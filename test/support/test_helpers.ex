@@ -12,6 +12,13 @@ defmodule Hoodride.TestHelpers do
     :chat_reads,
     :block_rows,
     :block_loaded,
+    # sign-ins, read on demand (owner, 2026-11-17): a "loaded" mark left
+    # from an earlier test (ids repeat once its database rolled back) would
+    # skip the read
+    :session_tokens,
+    :session_token_links,
+    :session_token_fresh,
+    :session_token_loaded,
     :chat_sent_ids,
     :request_spots,
     :geo_drivers,
@@ -70,6 +77,8 @@ defmodule Hoodride.TestHelpers do
   def age_sign_in(%{"user_token" => raw} = session, ms, auth_ms \\ nil) do
     import Ecto.Query
     h = Hoodride.SessionTokens.hash(raw)
+    # (its person not in memory — after a restart: read first, as a request would)
+    _ = Hoodride.SessionTokens.lookup_hash(h)
     [{^h, uid, ins, auth}] = :ets.lookup(:session_tokens, h)
     {ins, auth} = {ins - ms, auth - (auth_ms || ms)}
     :ets.insert(:session_tokens, {h, uid, ins, auth})

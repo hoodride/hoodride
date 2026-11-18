@@ -7,10 +7,19 @@ defmodule HoodrideWeb.CurrentUser do
 
   @impl true
   def call(conn, _opts) do
-    Plug.Conn.assign(
-      conn,
-      :current_user,
-      HoodrideWeb.Auth.session_user(Plug.Conn.get_session(conn))
-    )
+    case HoodrideWeb.Auth.session_user(Plug.Conn.get_session(conn)) do
+      # their sign-ins not in memory and the database couldn't answer: "try
+      # again" (the app retries), NEVER a 401 — that's "signed out", and
+      # the app would show the sign-in screen (owner, 2026-11-17)
+      :unavailable ->
+        conn
+        |> Plug.Conn.put_resp_content_type("application/json")
+        |> Plug.Conn.put_resp_header("retry-after", "2")
+        |> Plug.Conn.send_resp(503, ~s({"error":"unavailable"}))
+        |> Plug.Conn.halt()
+
+      user ->
+        Plug.Conn.assign(conn, :current_user, user)
+    end
   end
 end

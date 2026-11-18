@@ -68,9 +68,8 @@ defmodule Hoodride.SessionTokensTest do
     assert n.authenticated_at == info.authenticated_at
     refute SessionTokens.due?(n)
 
-    # …in the database too (a restart reads it from there)
-    :ets.delete_all_objects(:session_tokens)
-    :ok = SessionTokens.load()
+    # …in the database too (after a restart it's read from there)
+    :ok = SessionTokens.reset_memory()
     {:ok, reloaded} = SessionTokens.lookup(new)
     assert reloaded.authenticated_at == info.authenticated_at
     assert {:ok, _} = SessionTokens.lookup(old), "requests already on their way carry it"
@@ -140,8 +139,10 @@ defmodule Hoodride.SessionTokensTest do
     {:ok, old} = SessionTokens.create(u.id)
     test = self()
 
-    Application.put_env(:hoodride, :session_tokens_hook, fn :replace ->
-      send(test, {:between, SessionTokens.any?(u.id)})
+    # (other steps — a lookup reading someone not in memory — pass)
+    Application.put_env(:hoodride, :session_tokens_hook, fn
+      :replace -> send(test, {:between, SessionTokens.any?(u.id)})
+      _ -> :ok
     end)
 
     assert {:ok, new} = SessionTokens.create(u.id, old)
@@ -168,12 +169,16 @@ defmodule Hoodride.SessionTokensTest do
     {:ok, old} = SessionTokens.create(u.id)
     test = self()
 
-    Application.put_env(:hoodride, :session_tokens_hook, fn :rotate ->
-      send(test, :rotating)
+    Application.put_env(:hoodride, :session_tokens_hook, fn
+      :rotate ->
+        send(test, :rotating)
 
-      receive do
-        :go -> :ok
-      end
+        receive do
+          :go -> :ok
+        end
+
+      _ ->
+        :ok
     end)
 
     rotation = Task.async(fn -> SessionTokens.rotate(old) end)
@@ -281,12 +286,8 @@ defmodule Hoodride.SessionTokensTest do
     assert SessionTokens.rotate(old) == :error, "used: never taken back"
   end
 
-  defp restart do
-    for t <- [:session_tokens, :session_token_links, :session_token_fresh],
-        do: :ets.delete_all_objects(t)
-
-    :ok = SessionTokens.load()
-  end
+  # a restart: memory empty — each person's sign-ins read when next needed
+  defp restart, do: :ok = SessionTokens.reset_memory()
 
   test "replaced, and in use, survive a restart: still never renewed again" do
     u = user("st-restart")
@@ -464,10 +465,13 @@ defmodule Hoodride.SessionTokensTest do
     {:ok, new} = SessionTokens.rotate(old)
     age(old, 31 * @day)
     age(new, 31 * @day)
-    # another account's renewal, still valid: kept
+    # another account's renewal, still valid: kept (its owner still around
+    # — just left, in the grace; one not around is dropped whole: the
+    # memory tests below)
     v = user("st-sweep-keep")
     keep_old = week_old(v)
     {:ok, keep_new} = SessionTokens.rotate(keep_old)
+    Hoodride.Geo.user_disconnected(v.id)
 
     :ok = SessionTokens.sweep()
     assert :ets.lookup(:session_token_links, SessionTokens.hash(old)) == []
@@ -476,18 +480,20 @@ defmodule Hoodride.SessionTokensTest do
     assert [_] = :ets.lookup(:session_token_fresh, SessionTokens.hash(keep_new))
   end
 
-  test "a restart: memory refilled from the database; expired rows deleted" do
+  test "a restart: nothing loaded — read when first needed; expired rows deleted at start-up" do
     u = user("st-load")
     {:ok, live} = SessionTokens.create(u.id)
     {:ok, dead} = SessionTokens.create(u.id)
     age(dead, 31 * @day)
 
-    :ets.delete_all_objects(:session_tokens)
-    assert SessionTokens.lookup(live) == :error
-    :ok = SessionTokens.load()
+    :ok = SessionTokens.reset_memory()
+    :ok = SessionTokens.start_up()
+    refute SessionTokens.loaded?(u.id)
+    assert :ets.info(:session_tokens, :size) == 0, "nothing read at start-up"
 
-    assert {:ok, _} = SessionTokens.lookup(live)
-    assert SessionTokens.lookup(dead) == :error
+    assert {:ok, _} = SessionTokens.lookup_as(live, u.id)
+    assert SessionTokens.loaded?(u.id)
+    assert SessionTokens.lookup_as(dead, u.id) == :error
     assert rows(u.id) == [[SessionTokens.hash(live)]]
   end
 

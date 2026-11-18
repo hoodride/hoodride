@@ -103,15 +103,38 @@ test("they tapped End chat: '{name} ended the chat'", () => {
   assert.equal(a.banner, "Maria ended the chat");
 });
 
-test("I tapped End chat: removed and closed, nothing said", () => {
+test("I tapped End chat, no other chat: removed and closed, nothing said", () => {
   const a = B.chatClosedActions({ hasChat: true, isOpen: true, name: "Maria", endedBy: "me" });
-  assert.deepEqual(a, { remove: true, close: true, banner: null });
+  assert.deepEqual(a, { remove: true, close: true, toList: false, banner: null });
+});
+
+// owner, 2026-11-17: you ended it (End chat, Block) — the list, even with
+// one chat left; never straight into a chat you didn't pick
+test("I ended it with other chats left (even one): the list, nothing said", () => {
+  for (const others of [1, 5]) {
+    const a = B.chatClosedActions({ hasChat: true, isOpen: true, name: "Maria", endedBy: "me", others });
+    assert.deepEqual(a, { remove: true, close: false, toList: true, banner: null });
+  }
+});
+
+test("they or the server ended it, other chats left: closed with the banner — not the list", () => {
+  for (const endedBy of ["peer", "neutral", null]) {
+    const a = B.chatClosedActions({ hasChat: true, isOpen: true, name: "Maria", endedBy, others: 3 });
+    assert.deepEqual([a.close, a.toList], [true, false]);
+    assert.match(a.banner, /Maria/);
+  }
+});
+
+test("ended by me but not on screen: nothing to move", () => {
+  const a = B.chatClosedActions({ hasChat: true, isOpen: false, name: "Maria", endedBy: "me", others: 2 });
+  assert.deepEqual([a.close, a.toList], [false, false]);
 });
 
 test("chat_closed for a chat I don't have (a reload already dropped it): nothing at all", () => {
   assert.deepEqual(B.chatClosedActions({ hasChat: false, isOpen: false, name: "Maria" }), {
     remove: false,
     close: false,
+    toList: false,
     banner: null,
   });
 });
@@ -212,5 +235,5 @@ test("mapMessageAction, hands: the same rules as cars", () => {
 // chat found gone after a reconnect: neither "away" (untrue) nor "ended it"
 test("a neutral close: 'Chat with {name} ended' — no reason given", () => {
   const a = B.chatClosedActions({ hasChat: true, isOpen: true, name: "Maria", endedBy: "neutral" });
-  assert.deepEqual(a, { remove: true, close: true, banner: "Chat with Maria ended" });
+  assert.deepEqual(a, { remove: true, close: true, toList: false, banner: "Chat with Maria ended" });
 });
