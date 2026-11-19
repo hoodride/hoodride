@@ -17,8 +17,12 @@ await journey("blockride: blocking your ride partner ends the ride for both", as
   await bob.eval(`(openChat(realPeersById.get(${annId})), true)`);
   await bob.waitFor(`document.getElementById("btn-ride-action").textContent === "Accept ride"`, "Accept ride button");
   await bob.click("btn-ride-action");
-  await ann.waitFor(`state.ride && state.ride.status === "connected"`, "Ann's ride started", 15000);
-  await bob.waitFor(`state.ride && state.ride.status === "connected"`, "Bob's ride started", 15000);
+  // (started: "connected" — or already "arrived": they're at the same
+  // spot, so Bob's app says "I'm here" at once; between the two checks it
+  // can have — the first check passing, the second waiting on a moment gone)
+  const started = `state.ride && ["connected", "arrived"].includes(state.ride.status)`;
+  await ann.waitFor(started, "Ann's ride started", 15000);
+  await bob.waitFor(started, "Bob's ride started", 15000);
 
   step("mid-ride, in their chat: Block shows (End chat doesn't); Ann blocks Bob");
   await ann.eval(`(openChat(state.ride.peer), true)`);

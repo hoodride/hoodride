@@ -378,6 +378,7 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 .settings-danger .settings-label { color: var(--danger); font-weight: 700; }
 .drawer-row:disabled { cursor: default; background: transparent; }
 .drawer-legal { margin: 8px 10px 0; font-size: 13px; }
+.drawer-blocked { margin: 8px 10px 0; font-size: 13px; }
 
 /* the GitHub mark: small, linking to the public code. A finger-sized tap
    area around a small picture (the padding), without moving the text */

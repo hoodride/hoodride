@@ -146,7 +146,9 @@ await journey("lightreload2: reconnects, failures, a refused message, a ride, a 
   // 2026-11-12; it was 50 × 20 KB, about 1 MB, the size this step was for)
   step("50 messages of ~20 KB each: only the newest that fit in a chat's 64 KB come back — on a slow connection (~200 KB/s), never 'Couldn't load'");
   await server(`big_msgs ${annId} ${samId} 50`);
-  await sam.waitFor(`${chatOf(annId)}.msgs.length >= 50`, "heard live", 30000);
+  // (all 50 heard live — the phone keeps the newest 20, CHAT_KEEP: the last
+  // one's arrival is the sign, not a count of 50)
+  await sam.waitFor(`${chatOf(annId)}.msgs.some((m) => m.text.startsWith("50 "))`, "heard live", 30000);
   await reload(sam);
   await sam.eval(`performance.clearResourceTimings(), true`);
   try {

@@ -20,12 +20,14 @@ defmodule Hoodride.Sweeper do
   # passes before it counts as a jump
   @clock_skew_s 30
   # the steps that judge by the wall clock — skipped in a pass after it
-  # jumped (handle_info :sweep)
+  # jumped (handle_info :sweep). Only times that come from outside this
+  # running server stay on it: a sign-in's (stored, and in the database)
+  # and a sign-in state's (in the browser's cookie). Cars, ✋, presence,
+  # requests and chats are aged by the STEADY clock since 2026-11-18 — a
+  # skipped pass only helped a forward jump; a step BACK kept departed cars
+  # and requests for as long as the step (ClockJumpTest)
   @timed_steps [
     :sign_in_states,
-    :expire_stale_requests,
-    :sweep_stale_geo,
-    :sweep_empty_room_chats,
     :session_tokens
   ]
 
@@ -71,8 +73,13 @@ defmodule Hoodride.Sweeper do
 
   @hand_ids [{{:"$1", :_, :_}, [], [:"$1"]}]
   @driver_id_ts [{{:"$1", :_, :_, :"$2"}, [], [{{:"$1", :"$2"}}]}]
-  # :pending seats belong to a ride still being set up — never "active"
-  @active_seats [{{:"$1", :"$2"}, [{:"=/=", :"$2", :pending}], [{{:"$1", :"$2"}}]}]
+  # {:pending, starter, rider, driver} seats belong to a ride still being
+  # set up — never "active" (a started ride's seat is its id, a string)
+  @active_seats [{{:"$1", :"$2"}, [{:is_binary, :"$2"}], [{{:"$1", :"$2"}}]}]
+  @starting_seats [{{:"$1", {:pending, :_, :_, :_}}, [], [:"$_"]}]
+  # presence rows of people gone (not connected) — the grace ones
+  @grace_rows [{{:"$1", :grace, :"$2"}, [], [{{:"$1", :"$2"}}]}]
+  @online_rows [{{:"$1", :online, :_}, [], [:"$1"]}]
   @request_pairs [{{:"$1", :"$2", :_}, [], [{{:"$1", :"$2"}}]}]
   @conversation_keys [{{:"$1", :_}, [], [:"$1"]}]
 
@@ -101,6 +108,7 @@ defmodule Hoodride.Sweeper do
     [
       {:expire_stale_requests, &expire_stale_requests/0},
       {:heal_orphan_ride_slots, &heal_orphan_ride_slots/0},
+      {:heal_stranded_starting_seats, &heal_stranded_starting_seats/0},
       {:sweep_stale_geo, &sweep_stale_geo/0},
       {:heal_geo_consistency, &heal_geo_consistency/0},
       {:heal_unlawful_requests, &heal_unlawful_requests/0},
@@ -121,6 +129,9 @@ defmodule Hoodride.Sweeper do
       {:blocks, fn -> Hoodride.Blocks.sweep() end},
       # session-stamp rows of accounts with no device connected for a day
       {:session_stamps, &Hoodride.SessionStamp.prune/0},
+      # presence rows of people gone past grace: no row already means "long
+      # gone" — after every step above that reads them
+      {:presence, &prune_presence/0},
       # the recount trusts membership: repair it first
       {:rebuild_members,
        fn ->
@@ -170,6 +181,13 @@ defmodule Hoodride.Sweeper do
   # clean-ups (someone gone past grace) are not repairs.
   defp repaired(what), do: Process.put({:repair, what}, Process.get({:repair, what}, 0) + 1)
 
+  # a re-checked removal (Geo.reap): logged only when it removed something —
+  # not when its re-check found the person had moved on (else a busy server
+  # logged false repairs: the seventh review). Its answer not known in time
+  # (the writer busy past the pass's wait): not logged — under, never over
+  defp repaired_if(:removed, what), do: repaired(what)
+  defp repaired_if(_kept_or_late, _what), do: :ok
+
   defp log_repairs do
     for {{:repair, what} = key, n} <- Process.get() do
       Process.delete(key)
@@ -184,24 +202,36 @@ defmodule Hoodride.Sweeper do
   # Every geo invariant gets healed within one tick.
   @doc false
   def heal_geo_consistency do
+    # Each removal below is Geo.reap: its reason is asked AGAIN when the
+    # removal runs in the writer — it may wait in a busy writer's queue
+    # behind the person's own newer change (a ✋ just raised, a ride just
+    # ended), and acting on the old look removed what they'd just done,
+    # nothing telling them (independent review, 2026-11-18; SweeperStallTest)
+    #
     # (a) car AND hand at once — the parents row is last-writer-wins, so its
     # role names the winner; the loser dies with full semantics (a losing
     # car declines its waiters)
     each_match(:geo_hands, @hand_ids, fn user_id ->
       if Hoodride.Geo.driver_on_map?(user_id) do
-        repaired("car and ✋ at once")
+        role = parents_role(user_id)
+        still = fn -> both_on_map?(user_id) and parents_role(user_id) == role end
 
-        case :ets.lookup(:geo_parents, user_id) do
-          [{_, :driver, _}] ->
-            Hoodride.Geo.hand_down(user_id)
+        result =
+          case role do
+            :driver ->
+              Hoodride.Geo.reap(:hand, user_id, still)
 
-          [{_, :hand, _}] ->
-            Hoodride.Geo.driver_offline(user_id)
+            :hand ->
+              Hoodride.Geo.reap(:driver, user_id, still)
 
-          [] ->
-            Hoodride.Geo.hand_down(user_id)
-            Hoodride.Geo.driver_offline(user_id)
-        end
+            # neither can be trusted: both go, in ONE step under one re-check
+            # (two steps: the car's check couldn't tell its own ✋ removal
+            # from the person lowering it — the sixth review)
+            nil ->
+              Hoodride.Geo.reap(:both, user_id, still)
+          end
+
+        repaired_if(result, "car and ✋ at once")
       end
     end)
 
@@ -209,9 +239,10 @@ defmodule Hoodride.Sweeper do
     each_match(:rides_by_user, @active_seats, fn {user_id, _ride_id} ->
       car? = Hoodride.Geo.driver_on_map?(user_id)
       hand? = :ets.member(:geo_hands, user_id)
-      if car? or hand?, do: repaired("on the map mid-ride")
-      if car?, do: Hoodride.Geo.driver_offline(user_id)
-      if hand?, do: Hoodride.Geo.hand_down(user_id)
+      mid_ride = fn -> in_ride?(user_id) end
+      car = if car?, do: Hoodride.Geo.reap(:driver, user_id, mid_ride)
+      hand = if hand?, do: Hoodride.Geo.reap(:hand, user_id, mid_ride)
+      if :removed in [car, hand], do: repaired("on the map mid-ride")
     end)
 
     # (altitude orphans are pruned by the recount, inside its writer pause)
@@ -224,6 +255,69 @@ defmodule Hoodride.Sweeper do
       Hoodride.Geo.reindex_user(user_id)
     end)
   end
+
+  defp parents_role(user_id) do
+    case :ets.lookup(:geo_parents, user_id) do
+      [{_, role, _}] -> role
+      [] -> nil
+    end
+  end
+
+  defp both_on_map?(user_id),
+    do: Hoodride.Geo.driver_on_map?(user_id) and :ets.member(:geo_hands, user_id)
+
+  # A seat claimed for a ride that's starting names the start's caller —
+  # the accepting driver's connection ({:pending, starter, rider, driver}:
+  # Hoodride.Rides.start_ride). The caller gone and no ride working on the
+  # start (none started, or it died), nothing can finish it: freed, the
+  # person told their role — and the rider told their request was declined
+  # (the accept had taken it) — else both stayed "in a ride" with no ride
+  # until a restart (independent reviews, 2026-11-18). A ride mid-start-up
+  # finishes or cleans up by itself; the caller alive: never touched.
+  @doc false
+  def heal_stranded_starting_seats do
+    each_match(:rides_by_user, @starting_seats, fn {user_id, {:pending, starter, rider, driver}} =
+                                                     row ->
+      # (no ride working on it either: one mid-start-up finishes or cleans
+      # up by itself — freeing its seats then lost a good Accept: the fifth
+      # review, 2026-11-18)
+      if not Process.alive?(starter) and not Hoodride.Rides.Ride.starting_for?(starter) and
+           :ets.select_delete(:rides_by_user, [{row, [], [true]}]) == 1 do
+        repaired("seat left starting")
+        Hoodride.Roles.changed(user_id)
+        if user_id == rider, do: Hoodride.Rides.abandoned_start(rider, driver)
+      end
+    end)
+  end
+
+  # Presence rows of people gone past grace (2026-11-18, independent review:
+  # one per person since the server started, never removed — no row
+  # already means "long gone", so it's the same answer). The exact row: a
+  # reconnect meanwhile wrote a new one, kept. After every step that reads
+  # them (the reaps, chats, sign-ins, blocks). An "online" row with no
+  # channel (one ended without its goodbye — a hard kill, the phone book
+  # restarting) starts its grace now, as past_grace?/2 does for people with
+  # a car, ✋ or chat — for everyone else it stayed forever (the second
+  # review)
+  @doc false
+  def prune_presence do
+    now = steady_now()
+
+    each_match(:geo_presence, @grace_rows, fn {user_id, since} ->
+      if now - since > @presence_grace and not Hoodride.Geo.connected?(user_id),
+        do: :ets.delete_object(:geo_presence, {user_id, :grace, since})
+    end)
+
+    each_match(:geo_presence, @online_rows, fn user_id ->
+      if not Hoodride.Geo.connected?(user_id) do
+        repaired("online without a channel")
+        Hoodride.Geo.user_disconnected(user_id)
+      end
+    end)
+  end
+
+  # ages of cars, ✋, presence and chats: the steady clock (Hoodride.Geo)
+  defp steady_now, do: System.monotonic_time(:second)
 
   # The request reconciler: a create can race the thing that would have
   # refused it (its rider's own ride start, its driver going busy/offline).
@@ -314,7 +408,7 @@ defmodule Hoodride.Sweeper do
 
   @doc false
   def sweep_stale_geo do
-    now = System.system_time(:second)
+    now = steady_now()
 
     # every driver needs the grace check (presence lives outside the row),
     # so this pass reads them all — but copies only {id, ts}, never the
@@ -322,24 +416,59 @@ defmodule Hoodride.Sweeper do
     each_match(:geo_drivers, @driver_id_ts, fn {user_id, ts} ->
       stale? = now - ts > @position_stale
 
-      if stale? or past_grace?(user_id, now) do
-        # silent past the limit while CONNECTED: a stuck app (a repair);
-        # silent because they left: the normal grace reap
-        if stale? and Hoodride.Geo.connected?(user_id), do: repaired("frozen car")
-        Hoodride.Geo.driver_offline(user_id)
+      cond do
+        # silent past the limit while CONNECTED: a stuck app (a repair) —
+        # unless its fresh position, queued ahead of this, landed first
+        # (else its waiting riders were told "declined" by a driver who
+        # declined no one — independent review, 2026-11-18)
+        stale? and Hoodride.Geo.connected?(user_id) ->
+          Hoodride.Geo.reap(:driver, user_id, fn -> still_silent?(user_id) end)
+          |> repaired_if("frozen car")
+
+        # silent because they left: the normal reap — unless they're back by
+        # the time it runs (Geo.reap: it may wait in a busy writer's queue)
+        stale? or past_grace?(user_id, now) ->
+          Hoodride.Geo.reap(:driver, user_id, fn ->
+            still_silent?(user_id) or gone_past_grace?(user_id)
+          end)
+
+        true ->
+          :ok
       end
     end)
 
     each_match(:geo_hands, @hand_ids, fn user_id ->
-      if past_grace?(user_id, now), do: Hoodride.Geo.hand_down(user_id)
+      if past_grace?(user_id, now),
+        do: Hoodride.Geo.reap(:hand, user_id, fn -> gone_past_grace?(user_id) end)
     end)
+  end
+
+  # Asked again inside the writer, when a removal runs: gone NOW — not
+  # connected, and past the grace by their CURRENT presence row (they may
+  # have come back and left again while the removal waited: a fresh grace —
+  # independent review, 2026-11-18)
+  defp gone_past_grace?(user_id) do
+    not Hoodride.Geo.connected?(user_id) and
+      case :ets.lookup(:geo_presence, user_id) do
+        [] -> true
+        [{_, :online, _}] -> false
+        [{_, _, since}] -> steady_now() - since > @presence_grace
+      end
+  end
+
+  # (asked inside the writer, when the frozen car's removal runs)
+  defp still_silent?(user_id) do
+    case :ets.lookup(:geo_drivers, user_id) do
+      [{_, _, _, ts}] -> steady_now() - ts > @position_stale
+      [] -> false
+    end
   end
 
   # A conversation lives while BOTH people are around. Deleting it tells
   # both (Chat.delete_conversation), so whoever is still in the app clears it.
   @doc false
   def sweep_empty_room_chats do
-    now = System.system_time(:second)
+    now = steady_now()
 
     each_match(:chat_conversations, @conversation_keys, fn {a, b} = key ->
       # HISTORY (until 2026-10-23): a conversation died only when BOTH were

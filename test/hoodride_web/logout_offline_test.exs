@@ -106,7 +106,7 @@ defmodule HoodrideWeb.LogoutOfflineTest do
 
     test "while a ride is just starting (a claimed seat)", %{conn: conn} do
       u = user("lo-pending")
-      :ets.insert(:rides_by_user, {u.id, :pending})
+      :ets.insert(:rides_by_user, {u.id, {:pending, self(), 0, 0}})
       assert json_response(logout(conn, u), 409) == %{"error" => "in_ride"}
 
       assert Hoodride.Repo.query!("SELECT count(*) FROM user_tokens WHERE user_id = ?", [u.id]).rows !=

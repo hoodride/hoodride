@@ -14,6 +14,18 @@ const msg = (id, text = `m${id}`) => ({ id, text });
 const note = (text, after) => ({ id: null, text, after });
 const texts = (list) => list.map((m) => m.text);
 
+// (growth inventory, 2026-11-19) an open chat keeps what the server keeps
+test("keep: the newest `max`, oldest dropped — the same list, the same objects", () => {
+  const list = [msg(1), msg(2), msg(3), msg(4), msg(5)];
+  const newest = list[4];
+  const out = M.keep(list, 3);
+  assert.equal(out, list, "trimmed in place: the chat's list stays the chat's");
+  assert.deepEqual(texts(list), ["m3", "m4", "m5"]);
+  assert.equal(list[2], newest, "a message is still found by its object");
+  assert.deepEqual(texts(M.keep([msg(1), msg(2)], 3)), ["m1", "m2"], "under the limit: untouched");
+  assert.deepEqual(texts(M.keep([msg(1), msg(2), msg(3)], 3)), ["m1", "m2", "m3"], "at the limit: untouched");
+});
+
 test("the server's messages, as they come", () => {
   assert.deepEqual(texts(M.merge([msg(1), msg(2), msg(3)], [])), ["m1", "m2", "m3"]);
 });

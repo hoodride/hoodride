@@ -108,7 +108,7 @@ defmodule Hoodride.Chat do
 
   def sent_receipt(from_id, cid) do
     case :ets.lookup(@sent_ids, {from_id, cid}) do
-      [{_, receipt, at}] -> if System.system_time(:second) - at <= @sent_id_ttl, do: receipt
+      [{_, receipt, at}] -> if steady_s() - at <= @sent_id_ttl, do: receipt
       [] -> nil
     end
   end
@@ -117,11 +117,16 @@ defmodule Hoodride.Chat do
   def remember_sent(_from_id, nil, _receipt), do: :ok
 
   def remember_sent(from_id, cid, receipt),
-    do: :ets.insert(@sent_ids, {{from_id, cid}, receipt, System.system_time(:second)})
+    do: :ets.insert(@sent_ids, {{from_id, cid}, receipt, steady_s()})
+
+  # how long an id is kept is a LENGTH of time: the steady clock, which
+  # never jumps — by the wall clock, a forward jump made a retry of a lost
+  # reply "never seen": the message delivered twice (ClockJumpTest)
+  defp steady_s, do: System.monotonic_time(:second)
 
   @doc "Forget client ids past their 10 minutes (the sweeper)."
   def sweep_sent_ids do
-    cutoff = System.system_time(:second) - @sent_id_ttl
+    cutoff = steady_s() - @sent_id_ttl
     :ets.select_delete(@sent_ids, [{{:_, :_, :"$1"}, [{:<, :"$1", cutoff}], [true]}])
     :ok
   end

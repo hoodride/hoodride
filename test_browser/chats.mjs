@@ -202,11 +202,13 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   })()`);
   const fayWrites = (prefix, n) => rita.eval(`(() => { const p = realPeersById.get(${fayId}); for (let i = 1; i <= ${n}; i++) receiveMsg(p, "${prefix} " + i); return true; })()`);
   await fayWrites("new", 30);
-  check((await unreadFrom(rita, fayId)) === 30, "30 unread from Fay", await unreadFrom(rita, fayId));
+  // (a chat keeps its newest 20 — CHAT_KEEP, the server's own: 30 sent, 20
+  // kept, all of them new, the count never past them)
+  check((await unreadFrom(rita, fayId)) === 20, "20 unread from Fay (all that's kept of 30)", await unreadFrom(rita, fayId));
   await openChatWith(rita, fayId);
   await settled();
   const atLine = await view();
-  check(!!atLine.line && atLine.line.lines === 1 && atLine.line.text === "New messages" && atLine.after === "new 1", "a 'New messages' line, just above the first new one", atLine);
+  check(!!atLine.line && atLine.line.lines === 1 && atLine.line.text === "New messages" && atLine.after === "new 11", "a 'New messages' line, just above the first new one kept", atLine);
   check(atLine.line.fromTop >= 0 && atLine.line.fromTop < 40 && atLine.fromBottom > 100, "opened at the line, near the top — not the newest", atLine);
   check(atLine.jump && atLine.badge === null && atLine.corner, "↓ in the bottom corner, no count: nothing came in since", atLine);
   // (this browser's scrollbar takes room — else the next check couldn't fail)

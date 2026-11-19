@@ -75,7 +75,17 @@
       });
     }
 
-    return { tap, copy, close };
+    // is the chip open on this bubble? (a bubble going: close it only then)
+    function openOn(key) {
+      return !!open && open.key === key;
+    }
+
+    // drawn again where its message is now (messages above it went)
+    function refresh() {
+      if (open) render(open);
+    }
+
+    return { tap, copy, close, openOn, refresh };
   }
 
   // WHERE THE CHIP FLOATS. Over the chat, never in its flow: inserting it

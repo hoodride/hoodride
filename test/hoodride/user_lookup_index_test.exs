@@ -213,7 +213,7 @@ defmodule Hoodride.UserLookupIndexTest do
 
     test "a conversation missing its index rows is re-indexed by the sweep" do
       key = Chat.pair_key(1, 2)
-      :ets.insert(:chat_conversations, {key, System.system_time(:second)})
+      :ets.insert(:chat_conversations, {key, System.monotonic_time(:second)})
       assert Chat.conversations_for(1) == []
 
       Chat.heal_index()
@@ -311,7 +311,7 @@ defmodule Hoodride.UserLookupIndexTest do
       :ok = Requests.create(person(1), 10)
 
       # make the standing request visibly older than any new attempt
-      ts = System.system_time(:second) - 100
+      ts = System.monotonic_time(:second) - 100
       :ets.insert(:ride_requests, {1, 10, ts})
       :ets.insert(:requests_by_driver, {{10, 1}, ts})
 
@@ -327,7 +327,7 @@ defmodule Hoodride.UserLookupIndexTest do
     end
 
     test "a leftover index row never shows, and the sweep removes it only past the TTL" do
-      now = System.system_time(:second)
+      now = System.monotonic_time(:second)
       # an old leftover (no request behind it) and a young one (could be a
       # create still in flight: index written, main row not yet)
       :ets.insert(:requests_by_driver, {{10, 1}, now - 1_000})
@@ -341,7 +341,7 @@ defmodule Hoodride.UserLookupIndexTest do
     end
 
     test "a request missing its index row is re-indexed by the sweep" do
-      now = System.system_time(:second)
+      now = System.monotonic_time(:second)
       :ets.insert(:ride_requests, {1, 10, now})
       assert Requests.pending_for_driver(10) == []
 

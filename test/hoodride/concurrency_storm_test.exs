@@ -63,7 +63,7 @@ defmodule Hoodride.ConcurrencyStormTest do
   defp end_own_ride(u) do
     case Hoodride.Rides.ride_id_of_user(u.id) do
       nil -> :ok
-      :pending -> :ok
+      {:pending, _, _, _} -> :ok
       ride_id -> Hoodride.Rides.end_ride(ride_id, u.id)
     end
   end

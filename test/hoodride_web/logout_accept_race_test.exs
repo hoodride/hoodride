@@ -249,7 +249,7 @@ defmodule HoodrideWeb.LogoutAcceptRaceTest do
     src = File.read!("lib/hoodride/rides.ex")
     [start_ride] = Regex.run(~r/def start_ride\(rider_id, driver_id.*?\n  end\n/s, src)
     refute start_ride =~ ":ets.delete(:rides_by_user,"
-    assert start_ride =~ ":ets.delete_object(:rides_by_user, {uid, :pending})"
+    assert start_ride =~ ":ets.delete_object(:rides_by_user, {uid, claim})"
     assert start_ride =~ ":ets.delete_object(:rides_by_user, {uid, id})"
   end
 
@@ -310,7 +310,11 @@ defmodule HoodrideWeb.LogoutAcceptRaceTest do
   test "a ride still starting counts as a ride: the sign-out is refused", %{conn: conn} do
     driver = user("a1p-drv")
     rider = user("a1p-rdr")
-    :ets.insert(:rides_by_user, [{rider.id, :pending}, {driver.id, :pending}])
+
+    :ets.insert(:rides_by_user, [
+      {rider.id, {:pending, self(), 0, 0}},
+      {driver.id, {:pending, self(), 0, 0}}
+    ])
 
     out =
       conn
@@ -334,9 +338,9 @@ defmodule HoodrideWeb.LogoutAcceptRaceTest do
     assert_receive %Phoenix.Socket.Broadcast{event: "ended"}
 
     # starting: not this one's to end (the ride's own look does)
-    :ets.insert(:rides_by_user, {other.id, :pending})
+    :ets.insert(:rides_by_user, {other.id, {:pending, self(), 0, 0}})
     assert :ok = Rides.after_sign_out(other.id)
-    assert Rides.ride_id_of_user(other.id) == :pending
+    assert {:pending, _, _, _} = Rides.ride_id_of_user(other.id)
     :ets.delete(:rides_by_user, other.id)
 
     Geo.driver_update(me_map(driver), @cell, nil, [])

@@ -118,7 +118,6 @@ defmodule Hoodride.BlocksTest do
       :ok = Blocks.block(dan.id, ann.id)
       # (the same millisecond: newest is the later one)
       assert Blocks.list(ann.id) == [cat.id, bob.id]
-      assert Blocks.count(ann.id) == 2
       assert Blocks.list(bob.id) == []
     end
   end
@@ -181,7 +180,7 @@ defmodule Hoodride.BlocksTest do
 
       # Ann just left: in the grace — kept
       Hoodride.Geo.user_disconnected(ann.id)
-      now = System.system_time(:second)
+      now = System.monotonic_time(:second)
       Blocks.sweep(now)
       assert Blocks.loaded?(ann.id), "kept through the grace"
 
@@ -199,7 +198,7 @@ defmodule Hoodride.BlocksTest do
       :ok = Blocks.preload(dan.id)
       {:ok, _} = Hoodride.Rides.start_ride(ann.id, bob.id)
       Hoodride.Geo.driver_update(%{id: bob.id, name: "b", photo: nil}, "cell8", nil)
-      later = System.system_time(:second) + 10 * div(Hoodride.Limits.presence_grace_ms(), 1000)
+      later = System.monotonic_time(:second) + 10 * div(Hoodride.Limits.presence_grace_ms(), 1000)
       Blocks.sweep(later)
       assert Blocks.loaded?(ann.id), "in a ride"
       refute Blocks.loaded?(dan.id), "nothing keeps Dan"

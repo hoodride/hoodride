@@ -165,9 +165,10 @@ defmodule HoodrideWeb.ChatRebuildTest do
       assert a =~ "const mine = HoodReadStore.read(s, state.realUser.id);"
       assert a =~ "HoodReadStore.merge(mine === null && readKnown ? {} : mine, fromServer)"
       assert a =~ "HoodReadStore.reconcile(note, convs, null)"
-      # (+ a chat not loaded yet: the server's count from before its new message)
+      # (+ a chat not loaded yet: the server's count from before its new
+      # message — never past what a chat keeps, CHAT_KEEP: 2026-11-19)
       assert a =~
-               "if (c.server) c.unread = (r.unread[p.id] || 0) + (c.loaded === false ? c.restUnread || 0 : 0);"
+               "if (c.server) c.unread = Math.min((r.unread[p.id] || 0) + (c.loaded === false ? c.restUnread || 0 : 0), CHAT_KEEP);"
 
       refute body("softReload") =~ "unread.get(p.id)"
     end

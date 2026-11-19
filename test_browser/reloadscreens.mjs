@@ -553,15 +553,16 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   check(listAfter.list && !listAfter.jump, "the list, no ↓", listAfter);
   await sam.eval(`closeChat(), true`);
 
-  // more than the server's last 20 on Sam's phone (heard live): a reload
-  // brings only 20 (Hoodride.Limits.chat_history, the chat fix 2026-11-12)
-  // — what's above him changes. Still the same message
-  // where it was; the 3 that came while it loaded count on ↓
-  step("30 from Dora heard live, Sam scrolled up to one of them; 3 more while a reload loads: the same message where it was, ↓ 3");
+  // 30 heard live: the phone keeps the newest 20, as the server does
+  // (CHAT_KEEP = Hoodride.Limits.chat_history — 2026-11-19; it used to keep
+  // all 30). A reload while 3 more come: the server's 20 are the newest
+  // again — what's above him changes. Still the same message where it was;
+  // the 3 that came while it loaded count on ↓
+  step("30 from Dora heard live (20 kept, as the server), Sam scrolled up to one of them; 3 more while a reload loads: the same message where it was, ↓ 3");
   await doraChatOpen();
   await onServer(`many_msgs ${doraId} ${samId} 30 c`);
-  await sam.waitFor(`chatFor(realPeersById.get(${doraId})).msgs.filter((m) => m.text.startsWith("c") && !isNaN(Number(m.text.slice(1)))).length === 30`, "the 30 heard live");
-  check((await sam.eval(`chatFor(realPeersById.get(${doraId})).msgs.length`)) > 20, "(more than 20 on his phone)");
+  await sam.waitFor(`chatFor(realPeersById.get(${doraId})).msgs.some((m) => m.text === "c30")`, "the 30 heard live");
+  check((await sam.eval(`chatFor(realPeersById.get(${doraId})).msgs.length`)) === 20, "(the newest 20 on his phone, as on the server)");
   const pinned = await sam.eval(`(() => {
     const b = document.getElementById("chat-messages");
     const el = [...b.querySelectorAll(".msg")].find((e) => e.textContent === "c20");
@@ -641,24 +642,29 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   const kLine = await lineAt();
   check(kLine.line !== null && kLine.above === "k1", "the line above her first message", { noteLine, kLine });
 
-  // the message he was on is older than the server's last 50: gone after
-  // the reload — the list stays where it was (not sent to the top, nor to
-  // the newest)
-  step("scrolled up to a message older than the server's last 50; a reload: at the top (the oldest kept, the nearest to it), ↓ showing");
+  // the message he was on drops out of the server's last 20 while a reload
+  // loads (5 more came — the phone keeps the same 20, CHAT_KEEP, so it's
+  // one of the oldest kept): gone after the reload — the list stays at the
+  // top (the oldest kept, the nearest to it), not sent to the newest
+  step("scrolled up to one of the oldest kept; 5 more while a reload loads push it out: at the top, ↓ showing");
   await onServer(`many_msgs ${doraId} ${samId} 60 h`);
-  await sam.waitFor(`chatFor(realPeersById.get(${doraId})).msgs.some((m) => m.text === "h60")`, "the 60 heard live");
+  await sam.waitFor(`chatFor(realPeersById.get(${doraId})).msgs.some((m) => m.text === "h60")`, "the 60 heard live (the newest 20 kept)");
   const oldPlace = await sam.eval(`(() => {
     const b = document.getElementById("chat-messages");
-    const el = [...b.querySelectorAll(".msg")].find((e) => e.textContent === "h3");
+    const el = [...b.querySelectorAll(".msg")].find((e) => e.textContent === "h43");
     b.scrollTop += el.getBoundingClientRect().top - b.getBoundingClientRect().top - 20;
     b.dispatchEvent(new Event("scroll"));
     return { top: Math.round(b.scrollTop), fromBottom: Math.round(b.scrollHeight - b.scrollTop - b.clientHeight) };
   })()`);
-  check(oldPlace.fromBottom > 300 && oldPlace.top > 300, "(h3 near the top: far up)", oldPlace);
+  check(oldPlace.fromBottom > 300 && oldPlace.top > 0, "(h43 near the top: scrolled up, not at the very top)", oldPlace);
+  await sam.eval(`(window.__drop = true), true`); // (the 5 heard only through the reload)
+  await onServer(`many_msgs ${doraId} ${samId} 5 i`);
+  await new Promise((r) => setTimeout(r, 800));
+  await sam.eval(`(window.__drop = false), true`);
   await reload(sam);
   await sam.eval(`new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => done(true), 50))))`);
-  const oldAfter = await sam.eval(`(() => { const b = document.getElementById("chat-messages"); return { top: Math.round(b.scrollTop), fromBottom: Math.round(b.scrollHeight - b.scrollTop - b.clientHeight), h3: [...b.querySelectorAll(".msg")].some((e) => e.textContent === "h3"), jump: !document.getElementById("chat-jump").classList.contains("hidden") }; })()`);
-  check(!oldAfter.h3 && oldAfter.top === 0 && oldAfter.fromBottom > 300 && oldAfter.jump, "h3 gone (older than 50): at the top, ↓ showing", { oldPlace, oldAfter });
+  const oldAfter = await sam.eval(`(() => { const b = document.getElementById("chat-messages"); return { top: Math.round(b.scrollTop), fromBottom: Math.round(b.scrollHeight - b.scrollTop - b.clientHeight), h43: [...b.querySelectorAll(".msg")].some((e) => e.textContent === "h43"), jump: !document.getElementById("chat-jump").classList.contains("hidden") }; })()`);
+  check(!oldAfter.h43 && oldAfter.top === 0 && oldAfter.fromBottom > 300 && oldAfter.jump, "h43 gone (out of the last 20): at the top, ↓ showing", { oldPlace, oldAfter });
   await sam.eval(`closeChat(), true`);
 
   // the chat is gone (closed by the server) before Sam's "sent" comes: no

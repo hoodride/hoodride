@@ -95,7 +95,10 @@ defmodule HoodrideWeb.LightReloadSourceTest do
 
   test "loaded: put together, then — only for the chat on screen — the line, read, drawn, placed" do
     l = body("loadChat")
-    assert l =~ "c.msgs = HoodChatMerge.merge(body.messages.map(fromServer), c.msgs);"
+    # (then kept to the newest CHAT_KEEP, as everywhere — 2026-11-19)
+    assert l =~
+             "c.msgs = HoodChatMerge.keep(HoodChatMerge.merge(body.messages.map(fromServer), c.msgs), CHAT_KEEP);"
+
     assert l =~ "c.loaded = true;"
     assert l =~ "c.summary = null;"
     [on_screen] = Regex.run(~r/if \(chatOnScreen\(peer\)\) \{\n.*?\n  \} else if/s, l)

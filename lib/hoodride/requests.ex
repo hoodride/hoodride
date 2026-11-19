@@ -54,7 +54,9 @@ defmodule Hoodride.Requests do
   end
 
   defp do_create(rider, driver_id, spot, still_signed_in) do
-    now = System.system_time(:second)
+    # a request's age is a length of time: the steady clock (wall_ts/1 for
+    # anything shown — ClockJumpTest, 2026-11-18)
+    now = steady_s()
 
     # index first: the request is findable the instant it exists
     :ets.insert(@by_driver, {{driver_id, rider.id}, now})
@@ -93,7 +95,8 @@ defmodule Hoodride.Requests do
 
   defp announce(rider, driver_id, now, spot) do
     if spot,
-      do: :ets.insert(@spots, {rider.id, driver_id, now, spot, System.system_time(:millisecond)})
+      do:
+        :ets.insert(@spots, {rider.id, driver_id, now, spot, System.monotonic_time(:millisecond)})
 
     HoodrideWeb.Endpoint.broadcast("user:#{driver_id}", "request", %{
       from: %{id: rider.id, name: rider.name, photo: rider.photo},
@@ -276,6 +279,26 @@ defmodule Hoodride.Requests do
     HoodrideWeb.Endpoint.broadcast("user:#{rider_id}", "request_declined", %{by_id: driver_id})
   end
 
+  @doc "A request already taken, told to its rider as declined (Rides.abandoned_start/2)."
+  def declined_by(rider_id, driver_id) do
+    taken(rider_id, driver_id)
+    decline_consumed(rider_id, driver_id)
+  end
+
+  @doc """
+  A request an Accept took, its own clean-up never reached (the accepting
+  connection gone mid-start): its index row goes — unless the rider has
+  asked this driver again since (then the row is that request's). Left, the
+  index repair called it a bug for 5 minutes (the third and fourth reviews,
+  2026-11-18).
+  """
+  def taken(rider_id, driver_id) do
+    unless match?([{_, ^driver_id, _}], :ets.lookup(@requests, rider_id)),
+      do: :ets.delete(@by_driver, {driver_id, rider_id})
+
+    :ok
+  end
+
   @doc """
   A driver who becomes unavailable — goes offline, is grace-reaped, or enters
   a ride — declines everyone still waiting on them, each rider notified
@@ -323,7 +346,7 @@ defmodule Hoodride.Requests do
   defp spot_of(rider_id, driver_id, ts) do
     case :ets.lookup(@spots, rider_id) do
       [{_, ^driver_id, ^ts, spot, at}] ->
-        %{spot: spot, age_ms: max(System.system_time(:millisecond) - at, 0)}
+        %{spot: spot, age_ms: max(System.monotonic_time(:millisecond) - at, 0)}
 
       _ ->
         nil
@@ -390,7 +413,7 @@ defmodule Hoodride.Requests do
 
   defp drop_stale_index(ttl) do
     import Hoodride.ETS, only: [fold_match: 4]
-    cutoff = System.system_time(:second) - ttl
+    cutoff = steady_s() - ttl
 
     # the age test runs inside ETS: only rows old enough to be stale are
     # copied out and checked against the main table
@@ -406,7 +429,7 @@ defmodule Hoodride.Requests do
   end
 
   def expire_older_than(seconds) do
-    cutoff = System.system_time(:second) - seconds
+    cutoff = steady_s() - seconds
 
     # the age test runs inside ETS: only expired requests are copied out
     Hoodride.ETS.each_match(@requests, [{{:_, :_, :"$1"}, [{:<, :"$1", cutoff}], [:"$_"]}], fn
@@ -423,4 +446,12 @@ defmodule Hoodride.Requests do
         end
     end)
   end
+
+  defp steady_s, do: System.monotonic_time(:second)
+
+  @doc """
+  A request's time (the steady clock) as the wall clock's seconds — for
+  anything sent out (/api/state). Its age is exact even across a jump.
+  """
+  def wall_ts(ts), do: System.system_time(:second) - (steady_s() - ts)
 end

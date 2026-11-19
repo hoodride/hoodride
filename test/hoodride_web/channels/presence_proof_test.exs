@@ -128,12 +128,12 @@ defmodule HoodrideWeb.PresenceProofTest do
     assert [{_, :online, _}] = :ets.lookup(:geo_presence, user.id)
 
     # make the row look like they connected 10 min ago (over the 5-min grace)
-    :ets.insert(:geo_presence, {user.id, :online, System.system_time(:second) - 600})
+    :ets.insert(:geo_presence, {user.id, :online, System.monotonic_time(:second) - 600})
     Hoodride.Sweeper.sweep_now()
 
     assert Hoodride.Geo.driver_on_map?(user.id), "a sweep in the gap reaped a connected user"
     assert [{_, :grace, t}] = :ets.lookup(:geo_presence, user.id)
-    assert t >= System.system_time(:second) - 2
+    assert t >= System.monotonic_time(:second) - 2
 
     # the phone book works again: the app rejoining is listed
     _tab2 = open_tab(user)

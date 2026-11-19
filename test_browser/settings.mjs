@@ -23,9 +23,11 @@ await journey("settings: the drawer, your car, Go online without one", async (br
       const box = (e) => e.getBoundingClientRect();
       const gap = (a, b) => Math.round(Math.max(b.top - a.bottom, a.top - b.bottom, b.left - a.right, a.left - b.right));
       const [cat, dc] = [...document.querySelectorAll(".drawer-source img")].map(box), out = box(document.getElementById("btn-logout")), del = box(document.getElementById("btn-delete"));
-      return { signOut: Math.min(gap(out, cat), gap(out, dc)), delete: Math.min(gap(cat, del), gap(dc, del)), apart: gap(cat, dc), deleteLast: del.top > Math.max(cat.bottom, dc.bottom), oneLine: Math.round(box(document.querySelector(".drawer-legal")).height) < 30 };
+      return { signOut: Math.min(gap(out, cat), gap(out, dc)), delete: Math.min(gap(cat, del), gap(dc, del)), apart: gap(cat, dc), deleteLast: del.top > Math.max(cat.bottom, dc.bottom), oneLine: Math.round(box(document.querySelector(".drawer-legal")).height) < 30, blocked: !!document.getElementById("btn-blocked").offsetParent, blockedOneLine: Math.round(box(document.getElementById("blocked-wrap")).height) < 30, blockedAbove: box(document.getElementById("blocked-wrap")).bottom <= box(document.querySelector(".drawer-legal")).top };
     })()`);
     check(gaps.signOut >= 24 && gaps.delete >= 24 && gaps.apart >= 24 && gaps.deleteLast && gaps.oneLine, `${width} px: GitHub and Discord ≥ 24 px from Sign out, Delete and each other; Delete last, on one line`, gaps);
+    // (owner, 2026-11-18) "Blocked people" always there, on its own line just above
+    check(gaps.blocked && gaps.blockedOneLine && gaps.blockedAbove, `${width} px: Blocked people on its own line, above the legal links`, gaps);
   }
   await dan.eval(`closeSettings(), true`);
 

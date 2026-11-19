@@ -30,7 +30,8 @@ defmodule HoodrideWeb.OwnNewsTest do
   end
 
   test "\"I'm here\" counts once per ride, where it's said (it repeats at the pickup)" do
-    [arrived] = Regex.run(~r/function declareArrived\(\) \{.*?\n\}/s, @app)
+    # (said by the tap and the pickup's tick both: sayArrived — 2026-11-19)
+    [arrived] = Regex.run(~r/function sayArrived\(\) \{.*?\n\}/s, @app)
 
     assert arrived =~
              "if (!state.ride.arrivedNews) {\n      state.ride.arrivedNews = true;\n      tapNews();\n    }"

@@ -142,6 +142,16 @@ defmodule Hoodride.SignInFailuresTest do
     refute F.paused?(1)
   end
 
+  # (independent review, 2026-11-18: the exact edge had no test)
+  test "the sweep's edge: a pause ending AT now is forgotten; one ending a moment later is kept" do
+    F.throttled("google", 1_000, 0)
+    [[until]] = :ets.match(:sign_in_failures, {:paused, :"$1"})
+    F.sweep(until - 1)
+    assert :ets.match(:sign_in_failures, {:paused, :"$1"}) == [[until]]
+    F.sweep(until)
+    assert :ets.match(:sign_in_failures, {:paused, :"$1"}) == []
+  end
+
   test "the sweep forgets an ended pause and an old window" do
     F.record(1)
     F.throttled("google", 1_000, 0)

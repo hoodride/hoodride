@@ -98,7 +98,9 @@ defmodule Hoodride.SessionStamp do
   seen → the clock starts now (so the day counts from at most one pass after
   the last disconnect); not connected for over a day → both rows go.
   """
-  def prune(now \\ System.system_time(:millisecond)) do
+  # (`now`: the STEADY clock — a day offline is a length of time; by the
+  # wall clock a day-long jump forgot everyone offline: ClockJumpTest)
+  def prune(now \\ System.monotonic_time(:millisecond)) do
     Hoodride.ETS.each_match(@highest, [{{:"$1", :_}, [], [:"$1"]}], fn user_id ->
       cond do
         Registry.lookup(Hoodride.SocketStamps, user_id) != [] ->
@@ -107,13 +109,23 @@ defmodule Hoodride.SessionStamp do
         :ets.insert_new(@last_live, {user_id, now}) ->
           :ok
 
-        now - :ets.lookup_element(@last_live, user_id, 2) > @keep_offline_ms ->
+        # (a default: an account deleted meanwhile took its row — it raised,
+        # and every account after it waited a pass: independent review,
+        # 2026-11-18)
+        now - :ets.lookup_element(@last_live, user_id, 2, now) > @keep_offline_ms ->
           # gone a day: but re-check — a device may have connected meanwhile
           if Registry.lookup(Hoodride.SocketStamps, user_id) == [], do: forget(user_id)
 
         true ->
           :ok
       end
+    end)
+
+    # a "last seen" with no stamp behind it (an account deleted between the
+    # read above and its write — the second review, 2026-11-18): never
+    # visited by the pass above, so dropped here
+    Hoodride.ETS.each_match(@last_live, [{{:"$1", :_}, [], [:"$1"]}], fn user_id ->
+      if not :ets.member(@highest, user_id), do: :ets.delete(@last_live, user_id)
     end)
   end
 

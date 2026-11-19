@@ -150,6 +150,20 @@ defmodule Hoodride.GeoWriter do
     :ok
   end
 
+  # (Geo.reap: the check runs here, serialized with this person's other map
+  # changes — right before the removal, however long it waited)
+  # :removed or :kept — so a repair is logged only when it repaired
+  # something (the seventh review)
+  defp run({:reap, kind, user_id, still_gone?}) do
+    if still_gone?.() do
+      if kind in [:hand, :both], do: Hoodride.Geo.hand_down_now(user_id)
+      if kind in [:driver, :both], do: Hoodride.Geo.driver_offline_now(user_id)
+      :removed
+    else
+      :kept
+    end
+  end
+
   defp run({:reindex, user_id}) do
     Hoodride.Geo.reindex_user_now(user_id)
     :ok

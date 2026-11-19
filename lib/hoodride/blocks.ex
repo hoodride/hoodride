@@ -44,7 +44,10 @@ defmodule Hoodride.Blocks do
 
   def init_table do
     # (one call per table: Hoodride.EtsTablesTest counts them)
-    Hoodride.ETS.new(@rows, [:named_table, :public, :set, read_concurrency: true])
+    # sorted: one person's blocks are a quick range ({{user, _}}), not a scan
+    # of everyone's (dropping 4,000 people after a restart: 10 s for one
+    # pass — the second review, 2026-11-18)
+    Hoodride.ETS.new(@rows, [:named_table, :public, :ordered_set, read_concurrency: true])
     Hoodride.ETS.new(@loaded, [:named_table, :public, :set, read_concurrency: true])
     :ok
   end
@@ -121,7 +124,7 @@ defmodule Hoodride.Blocks do
     e ->
       if Repo.down?(e) do
         Logger.warning(
-          "blocks: couldn't read #{user_id}'s from the database — treated as blocked for now"
+          "blocks: couldn't read someone's from the database — treated as blocked for now"
         )
 
         :unavailable
@@ -306,8 +309,9 @@ defmodule Hoodride.Blocks do
     }
   end
 
-  @doc "How many `me` blocked."
-  def count(me),
+  # how many `me` blocked (the cap; nothing outside needs it since the
+  # drawer's link stopped waiting on it — 2026-11-18)
+  defp count(me),
     do: from(b in "blocks", where: b.blocker_id == ^me, select: count()) |> Repo.one()
 
   defp row?(blocker, blocked),
@@ -325,12 +329,16 @@ defmodule Hoodride.Blocks do
   too), and in no ride or request. Read again when next needed.
   `now`: seconds, the presence clock.
   """
-  def sweep(now \\ System.system_time(:second)) do
-    for {user_id} <- :ets.tab2list(@loaded), not Hoodride.Presence.around?(user_id, now) do
-      locked([user_id], fn -> drop(user_id) end)
-    end
-
-    :ok
+  def sweep(now \\ System.monotonic_time(:second)) do
+    # a page at a time (Hoodride.ETS.each_match) — never a copy of everyone
+    # loaded (SweeperMemoryTest, 2026-11-18)
+    Hoodride.ETS.each_match(@loaded, [{{:"$1"}, [], [:"$1"]}], fn user_id ->
+      # a person whose lock is busy (a read on a slow database holds it):
+      # skipped, caught next pass — waiting stalled the whole pass and every
+      # step after it (independent review, 2026-11-18)
+      if not Hoodride.Presence.around?(user_id, now),
+        do: :global.trans({{__MODULE__, user_id}, self()}, fn -> drop(user_id) end, [node()], 0)
+    end)
   end
 
   @doc "A deleted account: gone from memory, both sides (its rows went with it)."

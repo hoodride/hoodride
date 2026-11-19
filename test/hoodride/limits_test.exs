@@ -119,6 +119,11 @@ defmodule Hoodride.LimitsTest do
            "the server's is the looser backstop"
   end
 
+  # (growth inventory, 2026-11-19: an open chat kept every message)
+  test "an open chat keeps what the server keeps: chat_history (app.js)" do
+    assert File.read!("priv/static/app.js") =~ "const CHAT_KEEP = #{Limits.chat_history()};"
+  end
+
   test "the app's error reports: the same caps (errors.js)" do
     js = File.read!("priv/static/errors.js")
     assert js =~ "const MAX_MESSAGE = #{Limits.error_report_chars()};"

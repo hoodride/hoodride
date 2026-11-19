@@ -190,7 +190,7 @@ defmodule HoodrideWeb.ChatLimitsTest do
     [gone | here] = first10
     for o <- here, do: {:ok, _} = Registry.register(Hoodride.UserChannels, o.id, nil)
     grace = div(Limits.presence_grace_ms(), 1000)
-    :ets.insert(:geo_presence, {gone.id, :grace, System.system_time(:second) - grace - 5})
+    :ets.insert(:geo_presence, {gone.id, :grace, System.monotonic_time(:second) - grace - 5})
 
     Hoodride.Sweeper.sweep_empty_room_chats()
     refute Chat.exists?(me.id, gone.id), "the away person's chat ended"

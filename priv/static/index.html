@@ -208,7 +208,11 @@
         <p class="drawer-source"><a class="source-link" href="https://github.com/hoodride/hoodride" target="_blank" rel="noopener" title="Source code on GitHub" aria-label="Source code on GitHub" data-t-attr="title aria-label"><img src="github-invertocat-white.svg" alt="" width="16" height="16" /></a><a class="source-link" href="https://discord.gg/ehce7eGQFt" target="_blank" rel="noopener" title="Hood Ride on Discord" aria-label="Hood Ride on Discord" data-t-attr="title aria-label"><img src="discord-symbol-white.svg" alt="" width="21" height="16" /></a></p>
         <!-- delete account: a small link, not a big row — rare and permanent
              (its confirm step follows); blocked in a ride like sign out -->
-        <p class="drawer-legal muted"><a href="/terms" data-t>Terms</a> · <a href="/privacy" data-t>Privacy Policy</a><span id="blocked-wrap" class="hidden"> · <button id="btn-blocked" class="link-button" data-t>Blocked people</button></span><span id="delete-wrap"> · <button id="btn-delete" class="link-button" data-t>Delete account</button></span></p>
+        <!-- the people you blocked: always here (owner, 2026-11-18), on a line
+             of its own — beside the legal links it didn't fit one line on a
+             360 px phone (test_browser/settings.mjs) -->
+        <p id="blocked-wrap" class="drawer-blocked muted"><button id="btn-blocked" class="link-button" data-t>Blocked people</button></p>
+        <p class="drawer-legal muted"><a href="/terms" data-t>Terms</a> · <a href="/privacy" data-t>Privacy Policy</a><span id="delete-wrap"> · <button id="btn-delete" class="link-button" data-t>Delete account</button></span></p>
       </div>
       <!-- delete: a second, explicit step (it can't be undone) -->
       <div id="delete-confirm" class="drawer-confirm" role="alertdialog" aria-labelledby="delete-title" aria-describedby="delete-desc">

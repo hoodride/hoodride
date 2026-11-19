@@ -104,6 +104,28 @@ defmodule HoodrideWeb.SignInHardeningTest do
       assert calls.() == 0
     end
 
+    # (owner, 2026-11-18 — Hoodride.SignInStatesTest: a stopped cleanup
+    # fills the table) full: "busy, try again", the provider never asked,
+    # the state not spent — the same return works once there's room
+    test "the used-states table full: 'try again', Google never asked; with room, the same return goes through" do
+      calls = counting(HoodrideWeb.Google, &refused/1)
+      {conn, state} = started()
+      max = Hoodride.Limits.sign_in_states_max()
+      later = System.os_time(:second) + 3600
+      true = :ets.insert(:sign_in_states, for(i <- 1..max, do: {"full-#{i}", later}))
+      on_exit(fn -> :ets.delete_all_objects(:sign_in_states) end)
+
+      res = back(conn, "google", state)
+      # "Sign-in is busy right now — try again in a moment", with when
+      assert res.status == 503
+      assert [_] = get_resp_header(res, "retry-after")
+      assert calls.() == 0, "Google asked while full"
+
+      :ets.delete_all_objects(:sign_in_states)
+      _ = back(conn, "google", state)
+      assert calls.() == 1, "the same return, with room: Google asked"
+    end
+
     test "a Google state brought to Facebook's return: refused, Facebook never asked" do
       fb = counting(HoodrideWeb.Facebook, &refused/1)
       {conn, state} = started("google")

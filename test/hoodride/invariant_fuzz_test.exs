@@ -66,7 +66,7 @@ defmodule Hoodride.InvariantFuzzTest do
       {:end_ride, i} ->
         case Rides.ride_id_of_user(u.(i).id) do
           nil -> :ok
-          :pending -> :ok
+          {:pending, _, _, _} -> :ok
           ride_id -> Rides.end_ride(ride_id, u.(i).id)
         end
 

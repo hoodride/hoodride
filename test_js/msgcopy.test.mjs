@@ -54,6 +54,28 @@ test("a tap shows Copy under that message", () => {
   assert.deepEqual(h.shown, { key: "m1", label: "copy" });
 });
 
+// (final review, 2026-11-19) a chat dropping its oldest message closes the
+// chip only if it's on THAT message — never because another chat dropped one
+test("openOn: open on this message, and only this one", () => {
+  const h = harness();
+  assert.equal(h.c.openOn("m1"), false, "nothing open");
+  h.c.tap("m1", "hi");
+  assert.equal(h.c.openOn("m1"), true);
+  assert.equal(h.c.openOn("m2"), false, "another message");
+  h.c.close();
+  assert.equal(h.c.openOn("m1"), false, "closed");
+});
+
+test("refresh: drawn again as it is — and nothing drawn when closed", () => {
+  const h = harness();
+  h.c.refresh();
+  assert.equal(h.shown, null, "closed: nothing");
+  h.c.tap("m1", "hi");
+  h.shown = "stale";
+  h.c.refresh();
+  assert.deepEqual(h.shown, { key: "m1", label: "copy" });
+});
+
 test("tapping the same message again closes it", () => {
   const h = harness();
   h.c.tap("m1", "hi");

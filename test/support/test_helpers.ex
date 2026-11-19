@@ -18,6 +18,7 @@ defmodule Hoodride.TestHelpers do
     :session_tokens,
     :session_token_links,
     :session_token_fresh,
+    :session_token_by_user,
     :session_token_loaded,
     :chat_sent_ids,
     :request_spots,
@@ -177,7 +178,7 @@ defmodule Hoodride.TestHelpers do
       slots = :ets.tab2list(:rides_by_user)
 
       # 1. ride seats always come in consistent pairs pointing at a live ride
-      for {user_id, ride_id} <- slots, ride_id != :pending do
+      for {user_id, ride_id} <- slots, is_binary(ride_id) do
         case Rides.get(ride_id) do
           {:ok, st} ->
             assert user_id in [st.rider, st.driver],
@@ -193,7 +194,7 @@ defmodule Hoodride.TestHelpers do
 
       # 2. nobody is simultaneously riding and openly requesting
       for u <- users do
-        in_ride = Rides.ride_id_of_user(u.id) not in [nil, :pending]
+        in_ride = is_binary(Rides.ride_id_of_user(u.id))
 
         if in_ride do
           assert Requests.open_request_of(u.id) == nil,
@@ -211,7 +212,7 @@ defmodule Hoodride.TestHelpers do
         assert Geo.driver_on_map?(driver_id),
                "request from #{rider_id} targets off-map driver #{driver_id}"
 
-        assert Rides.ride_id_of_user(driver_id) in [nil, :pending],
+        assert not is_binary(Rides.ride_id_of_user(driver_id)),
                "request from #{rider_id} targets mid-ride driver #{driver_id}"
       end
 
@@ -228,7 +229,7 @@ defmodule Hoodride.TestHelpers do
       # start): the first mid-ride message is never a cold contact, and a
       # silent ride stays reachable after it ends
       for {user_id, ride_id} <- slots,
-          ride_id != :pending,
+          is_binary(ride_id),
           {:ok, st} <- [Rides.get(ride_id)],
           user_id == st.rider do
         assert Hoodride.Chat.exists?(st.rider, st.driver),
@@ -243,7 +244,7 @@ defmodule Hoodride.TestHelpers do
     end
 
     # 6. mid-ride users are invisible: no car, no hand, no hex footprint
-    for u <- users, Rides.ride_id_of_user(u.id) not in [nil, :pending] do
+    for u <- users, is_binary(Rides.ride_id_of_user(u.id)) do
       refute Geo.driver_on_map?(u.id), "mid-ride user #{u.id} has a driver row"
       assert :ets.lookup(:geo_hands, u.id) == [], "mid-ride user #{u.id} has a hand up"
       assert :ets.lookup(:geo_parents, u.id) == [], "mid-ride user #{u.id} counts in a hex"

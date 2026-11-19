@@ -553,8 +553,12 @@ defmodule Hoodride.SessionTokensOnDemandTest do
   end
 
   describe "who's kept (the Sweeper)" do
-    defp sweep_at(secs), do: SessionTokens.sweep(secs * 1000)
-    defp now_s, do: System.system_time(:second)
+    # `secs` on the presence clock (the steady one); the tokens' wall clock
+    # moved on by as much
+    defp sweep_at(secs),
+      do: SessionTokens.sweep(System.system_time(:millisecond) + (secs - now_s()) * 1000, secs)
+
+    defp now_s, do: System.monotonic_time(:second)
 
     defp loaded!(key) do
       u = user(key)
@@ -587,6 +591,25 @@ defmodule Hoodride.SessionTokensOnDemandTest do
       # back: read again — still signed in, the renewal state intact
       assert {:ok, _} = SessionTokens.lookup_as(fresh, u.id)
       assert :ets.member(:session_token_fresh, SessionTokens.hash(fresh))
+    end
+
+    # (the second review, 2026-11-18) how everyone comes back after a
+    # restart: read from the database — and when they leave, dropped from
+    # every table (found by their own range of the index, not a scan)
+    test "read back from the database after a restart, then gone: dropped from every table" do
+      {u, raw} = loaded!("sw-db")
+      {:ok, fresh} = SessionTokens.rotate(raw |> tap(&age(&1, 8 * @day, 100 * @day)))
+      SessionTokens.reset_memory()
+      assert {:ok, _} = SessionTokens.lookup_as(fresh, u.id)
+      assert SessionTokens.loaded?(u.id) and mine(u.id) != []
+
+      sweep_at(now_s() + 10 * @grace)
+
+      refute SessionTokens.loaded?(u.id)
+      assert mine(u.id) == []
+      assert :ets.match(:session_token_links, {:_, :_, u.id}) == []
+      assert :ets.match(:session_token_fresh, {:_, u.id}) == []
+      assert :ets.match(:session_token_by_user, {{u.id, :_}}) == []
     end
 
     test "in a ride: kept, rider and driver" do

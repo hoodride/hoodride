@@ -353,6 +353,8 @@ defmodule Hoodride.WarmStartTest do
           :session_token_links,
           :session_token_fresh,
           :session_token_loaded,
+          # (which sign-ins are whose: the drop finds them by it)
+          :session_token_by_user,
           :block_rows,
           :block_loaded
         ],
@@ -572,8 +574,10 @@ defmodule Hoodride.WarmStartTest do
       assert {true, 0} = reads("blocks", fn -> Blocks.blocked?(back.id, away.id) end)
 
       # the Sweeper's first pass: `away` never came back (past the grace) — dropped; `back` kept
-      later = System.system_time(:second) + div(Hoodride.Limits.presence_grace_ms(), 1000) + 5
-      SessionTokens.sweep(later * 1000)
+      # (presence is aged by the steady clock; the tokens by the wall clock)
+      grace = div(Hoodride.Limits.presence_grace_ms(), 1000)
+      later = System.monotonic_time(:second) + grace + 5
+      SessionTokens.sweep(System.system_time(:millisecond) + (grace + 5) * 1000, later)
       Blocks.sweep(later)
       assert SessionTokens.loaded?(back.id) and Blocks.loaded?(back.id)
       refute SessionTokens.loaded?(away.id) or Blocks.loaded?(away.id)

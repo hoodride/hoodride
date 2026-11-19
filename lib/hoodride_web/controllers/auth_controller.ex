@@ -867,19 +867,8 @@ defmodule HoodrideWeb.AuthController do
   # GET /api/blocks[?before=<cursor>] — the people you blocked, newest
   # first, in pages as the chat list (the profile drawer's "Blocked people";
   # owner, 2026-11-15). Name and photo only. An account that's gone simply
-  # isn't listed. `more`: where the next page starts, or nil.
-  def blocks(conn, %{"count" => _}) do
-    # just how many (the drawer opening: "Blocked people" shows only when
-    # there are any — asked here, not with every app open, which makes one
-    # database query: owner, 2026-11-17)
-    conn = put_resp_header(conn, "cache-control", "no-store")
-
-    case conn.assigns.current_user do
-      %{} = user -> json(conn, %{count: blocked_count(user.id)})
-      nil -> conn |> put_status(401) |> json(%{error: "unauthenticated"})
-    end
-  end
-
+  # isn't listed. `more`: where the next page starts, or nil. (No count:
+  # the link is always there, owner 2026-11-18 — the list says "nobody".)
   def blocks(conn, params) do
     conn = put_resp_header(conn, "cache-control", "no-store")
 
@@ -913,22 +902,16 @@ defmodule HoodrideWeb.AuthController do
 
   defp blocks_cursor(_params), do: {:ok, nil}
 
-  # (the database busy: 0 for now — the link shows on the next answer)
-  defp blocked_count(user_id) do
-    Hoodride.Blocks.count(user_id)
-  rescue
-    e -> if Hoodride.Repo.down?(e), do: 0, else: reraise(e, __STACKTRACE__)
-  end
-
   defp open_request_state(nil, _people), do: nil
 
   defp open_request_state(r, people) do
-    with %{} = d <- people[r.driver_id], do: %{driver: driver_person(d), ts: r.ts}
+    with %{} = d <- people[r.driver_id],
+         do: %{driver: driver_person(d), ts: Hoodride.Requests.wall_ts(r.ts)}
   end
 
   defp pending_request_state(pending, people) do
     for r <- pending, rd = people[r.rider_id], rd != nil do
-      %{rider: person(rd), ts: r.ts, spot: r.spot}
+      %{rider: person(rd), ts: Hoodride.Requests.wall_ts(r.ts), spot: r.spot}
     end
   end
 

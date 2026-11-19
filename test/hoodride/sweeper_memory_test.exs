@@ -29,7 +29,7 @@ defmodule Hoodride.SweeperMemoryTest do
 
   # a big, healthy world: everyone fresh and present, nothing to act on
   defp healthy_world(n) do
-    now = System.system_time(:second)
+    now = System.monotonic_time(:second)
 
     for id <- 1..n do
       cell = "c8-#{rem(id, 500)}"
@@ -42,7 +42,7 @@ defmodule Hoodride.SweeperMemoryTest do
       :ets.insert(:ride_requests, {rider, id, now})
       :ets.insert(:requests_by_driver, {{id, rider}, now})
       # seats claimed by a ride still being set up
-      :ets.insert(:rides_by_user, {200_000 + id, :pending})
+      :ets.insert(:rides_by_user, {200_000 + id, {:pending, self(), 0, 0}})
 
       key = Hoodride.Chat.pair_key(id, rider)
       :ets.insert(:chat_conversations, {key, now})
@@ -92,14 +92,97 @@ defmodule Hoodride.SweeperMemoryTest do
     assert :ets.info(:chat_conversations, :size) == 10_000
   end
 
+  # (2026-11-18, the sweeper review) the sign-ins' and blocks' cleanups
+  # copied EVERYONE loaded (tab2list) each pass — and the sign-ins' its two
+  # side tables' keys too — while every other step reads a page at a time.
+  # Everyone here is around: nothing to drop, so nothing should be copied
+  # beyond a page
+  test "the sign-ins' and blocks' cleanups read a page at a time, not a copy of everyone" do
+    n = 50_000
+    now = System.monotonic_time(:second)
+
+    for id <- 1..n do
+      :ets.insert(:geo_presence, {id, :online, now})
+      :ets.insert(:session_token_loaded, {id})
+      :ets.insert(:block_loaded, {id})
+      # what's kept about each sign-in, beside it (links, fresh): their
+      # tokens still there, so nothing to forget
+      h = <<id::256>>
+      ms = System.system_time(:millisecond)
+      :ets.insert(:session_tokens, {h, id, ms, ms})
+      :ets.insert(:session_token_links, {h, :x, id})
+      :ets.insert(:session_token_fresh, {h, :x})
+    end
+
+    for {name, sweep, tables} <- [
+          {"sign-ins", fn -> Hoodride.SessionTokens.sweep() end,
+           [:session_token_loaded, :session_token_links, :session_token_fresh]},
+          {"blocks", fn -> Hoodride.Blocks.sweep() end, [:block_loaded]}
+        ] do
+      scanned = tables |> Enum.map(&bytes/1) |> Enum.sum()
+      grew = heap_growth_bytes(sweep)
+      assert grew < div(scanned, 10), "#{name}: grew #{grew} B scanning #{scanned} B"
+    end
+
+    assert :ets.info(:session_token_loaded, :size) == n
+    assert :ets.info(:block_loaded, :size) == n
+    assert :ets.info(:session_token_links, :size) == n
+  end
+
+  # (the second review, 2026-11-18) dropping one person scanned whole tables
+  # — after a restart where 4,000 didn't come back, one pass took ~50 s
+  # (sign-ins 40.6 s, blocks 10 s on the dev machine); by each person's own
+  # range now: ~0.3 s. The limit is generous (a slow machine passes); the
+  # structure is what's checked exactly
+  test "dropping 4,000 people at once: each by their own range, the pass in seconds, not a minute" do
+    assert :ets.info(:block_rows, :type) == :ordered_set
+    assert :ets.info(:session_token_by_user, :type) == :ordered_set
+    ms = System.system_time(:millisecond)
+    n = 4_000
+
+    for id <- 1..n do
+      :ets.insert(:session_token_loaded, {id})
+      :ets.insert(:block_loaded, {id})
+
+      for k <- 1..3 do
+        h = <<id::128, k::128>>
+        :ets.insert(:session_tokens, {h, id, ms, ms})
+        :ets.insert(:session_token_by_user, {{id, h}})
+        :ets.insert(:session_token_links, {h, :x, id})
+        :ets.insert(:session_token_fresh, {h, id})
+        :ets.insert(:block_rows, {{id, 10_000_000 + id * 10 + k}})
+      end
+    end
+
+    # nobody around (no presence at all)
+    {us, :ok} =
+      :timer.tc(fn ->
+        Hoodride.SessionTokens.sweep()
+        Hoodride.Blocks.sweep()
+      end)
+
+    for t <- [
+          :session_token_loaded,
+          :session_tokens,
+          :session_token_by_user,
+          :session_token_links,
+          :session_token_fresh,
+          :block_loaded,
+          :block_rows
+        ],
+        do: assert(:ets.info(t, :size) == 0, "#{t} not emptied")
+
+    assert us < 5_000_000, "dropping #{n} people took #{div(us, 1000)} ms"
+  end
+
   # The filters now run inside ETS, so their exact edges get their own
   # tests. Start well inside a wall-clock second, so "now" can't tick over
   # between planting a row and the sweep reading it.
   defp fresh_second do
-    if rem(System.system_time(:millisecond), 1000) > 500 do
+    if rem(System.monotonic_time(:millisecond), 1000) > 500 do
       fresh_second()
     else
-      System.system_time(:second)
+      System.monotonic_time(:second)
     end
   end
 
@@ -146,17 +229,17 @@ defmodule Hoodride.SweeperMemoryTest do
     end
 
     test "a seat still being set up (:pending) is never treated as an active ride" do
-      now = System.system_time(:second)
+      now = System.monotonic_time(:second)
       :ets.insert(:geo_presence, {5, :online, now})
       :ets.insert(:geo_drivers, {5, "c8", "c8", now})
       :ets.insert(:geo_by_cell, {{"c8", 5}, :driver})
-      :ets.insert(:rides_by_user, {5, :pending})
+      :ets.insert(:rides_by_user, {5, {:pending, self(), 0, 0}})
 
       Hoodride.Sweeper.sweep_now()
 
       # not a mid-ride ghost, and not an orphaned seat
       assert Hoodride.Geo.driver_on_map?(5)
-      assert :ets.lookup(:rides_by_user, 5) == [{5, :pending}]
+      assert :ets.lookup(:rides_by_user, 5) == [{5, {:pending, self(), 0, 0}}]
     end
 
     test "cell index drift finds each kind of drift, and only those users" do
@@ -223,7 +306,7 @@ defmodule Hoodride.SweeperMemoryTest do
     end
 
     test "request index: a row naming the wrong driver (counts still equal) is fixed" do
-      now = System.system_time(:second)
+      now = System.monotonic_time(:second)
       # rider 1 is waiting on driver 20, but the only index row says driver 10
       :ets.insert(:ride_requests, {1, 20, now})
       :ets.insert(:requests_by_driver, {{10, 1}, now - 1_000})
@@ -244,7 +327,7 @@ defmodule Hoodride.SweeperMemoryTest do
     end
 
     test "chat index: a stale row is dropped even when a missing pair would balance the count" do
-      now = System.system_time(:second)
+      now = System.monotonic_time(:second)
       # a conversation with NO index rows (2 missing)...
       live = Hoodride.Chat.pair_key(1, 2)
       :ets.insert(:chat_conversations, {live, now})
@@ -259,7 +342,7 @@ defmodule Hoodride.SweeperMemoryTest do
 
     test "chat index: a row filed under someone outside the conversation is dropped" do
       key = Hoodride.Chat.pair_key(1, 2)
-      :ets.insert(:chat_conversations, {key, System.system_time(:second)})
+      :ets.insert(:chat_conversations, {key, System.monotonic_time(:second)})
       # the two right rows, plus one under user 99 — only a bug could write it
       :ets.insert(:chat_by_user, [{{1, key}}, {{2, key}}, {{99, key}}])
 
@@ -271,7 +354,7 @@ defmodule Hoodride.SweeperMemoryTest do
 
     test "a connected user is never past grace, whatever their stored clock says" do
       # stored clock from long ago, but a live channel registration right now
-      :ets.insert(:geo_presence, {7, :grace, System.system_time(:second) - 10_000})
+      :ets.insert(:geo_presence, {7, :grace, System.monotonic_time(:second) - 10_000})
       :ets.insert(:geo_hands, {7, "c8", "spot"})
       :ets.insert(:geo_by_cell, {{"c8", 7}, :hand})
       {:ok, _} = Registry.register(Hoodride.UserChannels, 7, nil)
@@ -309,7 +392,7 @@ defmodule Hoodride.SweeperMemoryTest do
     end
 
     test "request index: a stale row is dropped even when a missing one would balance the count" do
-      now = System.system_time(:second)
+      now = System.monotonic_time(:second)
       # a request with no index row (1 missing)...
       :ets.insert(:ride_requests, {1, 10, now})
       # ...and an old stale row with no request behind it (1 extra)
@@ -331,7 +414,7 @@ defmodule Hoodride.SweeperMemoryTest do
 
     test "passes act on EVERY match, across many pages, not just the first page" do
       # well over two pages of expired requests
-      old = System.system_time(:second) - 10_000
+      old = System.monotonic_time(:second) - 10_000
       for rider <- 1..1_200, do: :ets.insert(:ride_requests, {rider, 10, old})
 
       Hoodride.Requests.expire_older_than(300)

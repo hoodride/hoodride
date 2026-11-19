@@ -34,7 +34,7 @@ defmodule Hoodride.PresenceTest do
     u = user("pr-conn")
     {:ok, _} = Registry.register(Hoodride.UserChannels, u.id, nil)
     assert Presence.around?(u.id)
-    assert Presence.around?(u.id, System.system_time(:second) + 10 * @grace)
+    assert Presence.around?(u.id, System.monotonic_time(:second) + 10 * @grace)
   end
 
   test "left: around through the grace — to its last second — then not" do
@@ -49,7 +49,7 @@ defmodule Hoodride.PresenceTest do
   test "in a ride: around, rider and driver alike, long after leaving" do
     [rider, driver] = [user("pr-ride-r"), user("pr-ride-d")]
     {:ok, _} = Rides.start_ride(rider.id, driver.id)
-    later = System.system_time(:second) + 10 * @grace
+    later = System.monotonic_time(:second) + 10 * @grace
     assert Presence.around?(rider.id, later)
     assert Presence.around?(driver.id, later)
   end
@@ -58,7 +58,7 @@ defmodule Hoodride.PresenceTest do
     [rider, driver] = [user("pr-req-r"), user("pr-req-d")]
     on_map(driver)
     :ok = Requests.create(m(rider), driver.id)
-    later = System.system_time(:second) + 10 * @grace
+    later = System.monotonic_time(:second) + 10 * @grace
     assert Presence.around?(rider.id, later), "asking"
     assert Presence.around?(driver.id, later), "asked"
   end
@@ -68,7 +68,7 @@ defmodule Hoodride.PresenceTest do
     on_map(driver)
     :ok = Requests.create(m(rider), driver.id)
     Requests.cancel(rider.id)
-    later = System.system_time(:second) + 10 * @grace
+    later = System.monotonic_time(:second) + 10 * @grace
     refute Presence.around?(rider.id, later)
     refute Presence.around?(driver.id, later)
   end

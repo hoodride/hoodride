@@ -505,6 +505,26 @@ defmodule Hoodride.SessionTokensTest do
     assert :ets.lookup(:session_tokens, SessionTokens.hash(raw)) == []
   end
 
+  # (the third review, 2026-11-18) the "whose" index never outgrows the
+  # sign-ins it points at — for someone always around too (never dropped)
+  test "the index of whose sign-ins: a sign-in expired or dropped by the cap leaves it too" do
+    u = user("st-idx")
+    {:ok, _} = Registry.register(Hoodride.UserChannels, u.id, nil)
+    whose = fn -> :ets.select(:session_token_by_user, [{{{u.id, :"$1"}}, [], [:"$1"]}]) end
+    mine = fn -> :ets.select(:session_tokens, [{{:"$1", u.id, :_, :_}, [], [:"$1"]}]) end
+
+    # the cap: more sign-ins than an account keeps — the oldest go
+    for _ <- 1..(SessionTokens.max_per_account() + 2), do: {:ok, _} = SessionTokens.create(u.id)
+    assert Enum.sort(whose.()) == Enum.sort(mine.())
+
+    # expiry: every one past its 30 days (still around: not dropped)
+    for h <- mine.(), do: :ets.update_element(:session_tokens, h, [{3, 0}, {4, 0}])
+    :ok = SessionTokens.sweep()
+    assert SessionTokens.loaded?(u.id)
+    assert mine.() == []
+    assert whose.() == [], "index rows left for sign-ins that are gone"
+  end
+
   test "deleting the account deletes its tokens (the database's cascade)" do
     u = user("st-del")
     {:ok, _} = SessionTokens.create(u.id)

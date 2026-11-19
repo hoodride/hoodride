@@ -29,7 +29,7 @@ defmodule Hoodride.DeepAuditTest do
   end
 
   defp as_map(u), do: %{id: u.id, name: u.name, photo: nil}
-  defp ancient, do: System.system_time(:second) - 10_000
+  defp ancient, do: System.monotonic_time(:second) - 10_000
 
   # requests can only target a driver who is on the map
   defp on_map(u),
@@ -217,7 +217,7 @@ defmodule Hoodride.DeepAuditTest do
   test "reconnecting within grace keeps a driver on the map", %{b: d} do
     :ets.insert(
       :geo_drivers,
-      {d.id, "cellR", "cellR", System.system_time(:second)}
+      {d.id, "cellR", "cellR", System.monotonic_time(:second)}
     )
 
     :ets.insert(:geo_presence, {d.id, :grace, ancient()})

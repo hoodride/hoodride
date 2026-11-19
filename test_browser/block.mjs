@@ -2,8 +2,11 @@
 // blocks Bob from his card, after a question. Either way: Bob's car leaves
 // Ann's map at once and doesn't come back on a reload; their chat closes —
 // for Bob a plain close, never "blocked"; Bob's message gets the ordinary
-// "unavailable". "Blocked people" appears at the bottom of Ann's profile
-// drawer; unblocking (asked too) brings them back to each other.
+// "unavailable". "Blocked people" is always at the bottom of Ann's profile
+// drawer (owner, 2026-11-18): opening the drawer asks the server nothing;
+// the list says "You haven't blocked anyone" when empty and "Couldn't load —
+// tap to try again" when it can't load. Unblocking (asked too) brings them
+// back to each other.
 import { journey, step, check } from "./cdp.mjs";
 import { goOnline, sees, openChatWith, typeText, send, DRAWN } from "./app.mjs";
 
@@ -27,10 +30,39 @@ await journey("block: blocked from the card — off each other's maps, the chat 
   await bob.waitFor(`chats.has(realPeersById.get(${annId}))`, "Bob has the chat");
   await ann.eval(`closeChat(), true`);
 
+  step("before any block: 'Blocked people' is in Ann's drawer all the same — opening it asks the server nothing");
+  await ann.eval(`(() => {
+    const f = window.fetch.bind(window);
+    window.__blocksCalls = [];
+    window.__failBlocks = false;
+    window.fetch = (u, o) => {
+      if (String(u).startsWith("/api/blocks")) {
+        window.__blocksCalls.push(String(u));
+        if (window.__failBlocks) return Promise.resolve(new Response("{}", { status: 503 }));
+      }
+      return f(u, o);
+    };
+    return true;
+  })()`);
+  await ann.click("btn-account");
+  await ann.waitFor(`document.getElementById("settings-sheet").classList.contains("open")`, "the drawer open");
+  check(await shownEl(ann, "blocked-wrap"), "'Blocked people' there with nobody blocked");
+  await new Promise((r) => setTimeout(r, 500));
+  check((await ann.eval(`window.__blocksCalls.length`)) === 0, "the drawer opened without asking /api/blocks", await ann.eval(`JSON.stringify(window.__blocksCalls)`));
+
+  step("…the list can't load: said so; a tap tries again — and says nobody's blocked");
+  await ann.eval(`window.__failBlocks = true, true`);
+  await ann.click("btn-blocked");
+  await ann.waitFor(`(document.querySelector("#blocked-list .blocked-more") || {}).textContent === t("Couldn't load — tap to try again")`, "the failure said");
+  await ann.eval(`window.__failBlocks = false, document.querySelector("#blocked-list .blocked-more").click(), true`);
+  await ann.waitFor(`(document.querySelector("#blocked-list .blocked-empty") || {}).textContent === t("You haven't blocked anyone")`, "'You haven't blocked anyone' on the tap");
+  check(!(await ann.eval(`!!document.querySelector("#blocked-list .blocked-more")`)), "the failure line gone");
+  await ann.click("blocked-close");
+  await ann.eval(`closeSettings(), true`);
+
   step("Ann taps his car: 'Block' on the card — asked first, then done");
   await ann.eval(`(openMarkerCard(realPeersById.get(${bobId}), "driver"), true)`);
   await ann.waitFor(`!document.getElementById("peer-card").classList.contains("hidden") && !document.getElementById("peer-block").classList.contains("hidden")`, "the card, with Block");
-  check(!(await shownEl(ann, "blocked-wrap")), "no 'Blocked people' in the drawer yet");
   await ann.click("peer-block");
   await ann.waitFor(`!document.getElementById("block-sheet").classList.contains("hidden")`, "asked first");
   check((await ann.eval(`document.getElementById("block-title").textContent`)) === "Block BT-Bob?", "'Block BT-Bob?'", await ann.eval(`document.getElementById("block-title").textContent`));
@@ -58,7 +90,7 @@ await journey("block: blocked from the card — off each other's maps, the chat 
   step("'Blocked people' at the bottom of Ann's drawer: Bob there; Unblock (asked) — back on each other's maps");
   await ann.click("btn-account");
   await ann.waitFor(`document.getElementById("settings-sheet").classList.contains("open")`, "the drawer open");
-  check(await shownEl(ann, "blocked-wrap"), "'Blocked people' shows now");
+  check(await shownEl(ann, "blocked-wrap"), "'Blocked people' there");
   await ann.click("btn-blocked");
   await ann.waitFor(`document.querySelectorAll("#blocked-list .blocked-row").length === 1`, "the list: one person");
   check((await ann.eval(`document.querySelector("#blocked-list .blocked-row strong").textContent`)) === "BT-Bob", "it's Bob");
@@ -67,7 +99,7 @@ await journey("block: blocked from the card — off each other's maps, the chat 
   check((await ann.eval(`document.getElementById("block-title").textContent`)) === "Unblock BT-Bob?", "'Unblock BT-Bob?'");
   await ann.click("block-yes");
   await ann.waitFor(`document.querySelector("#blocked-list .blocked-empty")`, "nobody left in the list");
-  check(!(await shownEl(ann, "blocked-wrap")), "'Blocked people' gone from the drawer again");
+  check(await shownEl(ann, "blocked-wrap"), "'Blocked people' still there with nobody blocked");
   await ann.click("blocked-close");
   await ann.eval(`closeSettings(), true`);
   // at once, no reload — his car is parked (it sends nothing of its own)

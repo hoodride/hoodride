@@ -260,7 +260,9 @@ defmodule HoodrideWeb.ContactPrivacyTest do
       %{r: r, d: d, ride_id: ride_id} = silent_ride()
 
       # nobody connected and both long past grace: only the ride protects it
-      for u <- [r, d], do: :ets.insert(:geo_presence, {u.id, :grace, 0})
+      # (long ago on the presence clock — the steady one, which can start below 0)
+      long_ago = System.monotonic_time(:second) - 100_000
+      for u <- [r, d], do: :ets.insert(:geo_presence, {u.id, :grace, long_ago})
       Hoodride.Sweeper.sweep_empty_room_chats()
       assert Hoodride.Chat.exists?(r.id, d.id)
 

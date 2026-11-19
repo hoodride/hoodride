@@ -81,7 +81,7 @@ defmodule HoodrideWeb.ContactFuzzTest do
 
       # the spec, known independently of the chat table: ride partners can
       # always reach each other (the server must have opened their chat)
-      my_ride not in [nil, :pending] and my_ride == Rides.ride_id_of_user(other.id) ->
+      is_binary(my_ride) and my_ride == Rides.ride_id_of_user(other.id) ->
         {:ok, :ride_partner}
 
       Chat.exists?(me.id, other.id) or Requests.open_between?(me.id, other.id) ->

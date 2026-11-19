@@ -1,10 +1,9 @@
 defmodule HoodrideWeb.BlocksApiTest do
   @moduledoc """
-  Blocks in the app's answers (owner, 2026-11-15): `/api/state` says how
-  many you've blocked (the "Blocked people" link at the bottom of the
-  profile drawer shows only then) and never lists a chat or request with
-  someone blocked either way (a block ends them — a safety net);
-  `GET /api/blocks` is the list, newest first, name and photo only.
+  Blocks in the app's answers (owner, 2026-11-15): `GET /api/blocks` is
+  the list, newest first, name and photo only — asked only when the
+  "Blocked people" link (always at the bottom of the profile drawer, owner
+  2026-11-18) is tapped. No count anywhere: nothing needs one.
   """
   use HoodrideWeb.ConnCase, async: false
 
@@ -30,18 +29,16 @@ defmodule HoodrideWeb.BlocksApiTest do
 
   defp state(u), do: json_response(get(signed_in(u), "/api/state?chats=list"), 200)
 
-  # (asked as the profile drawer opens — never with every app open, which
-  # makes one database query: owner, 2026-11-17)
-  defp count(u), do: json_response(get(signed_in(u), "/api/blocks?count=1"), 200)["count"]
-
-  test "how many you've blocked: 0, then the count" do
-    [ann, bob, cat] = [user("ba-ann"), user("ba-bob"), user("ba-cat")]
-    assert count(ann) == 0
+  # (owner, 2026-11-18: the link is always there, so the count it once
+  # waited on is gone — an old app asking for it gets the list, never an
+  # error, and being blocked is said nowhere)
+  test "no count: '?count=1' is just the list; nothing in the app's state" do
+    [ann, bob] = [user("ba-ann"), user("ba-bob")]
     :ok = Blocks.block(ann.id, bob.id)
-    :ok = Blocks.block(ann.id, cat.id)
-    assert count(ann) == 2
-    # being blocked isn't counted (nor said)
-    assert count(bob) == 0
+    body = json_response(get(signed_in(ann), "/api/blocks?count=1"), 200)
+    refute Map.has_key?(body, "count")
+    assert Enum.map(body["blocked"], & &1["name"]) == ["ba-bob"]
+    refute Map.has_key?(json_response(get(signed_in(bob), "/api/blocks?count=1"), 200), "count")
     refute Map.has_key?(state(ann), "blocked"), "not with every app open"
   end
 

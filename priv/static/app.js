@@ -55,6 +55,9 @@ const MAX_WATCHED_CELLS = 110;
 // the wire protocol this app speaks — must equal the server's
 // (HoodrideWeb.WorldChannel @protocol); a mismatch offers a reload
 const PROTOCOL = 3;
+// messages an open chat keeps: the server's own (Limits.chat_history —
+// LimitsTest checks the two agree)
+const CHAT_KEEP = 20;
 
 // ===== Auth =====
 const auth = {
@@ -907,7 +910,6 @@ function openSettings() {
   // button can draw a ring after a tap (W3C dialog pattern: a static
   // element at the top, tabindex="-1")
   $("settings-name").focus();
-  refreshBlockedCount();
 }
 
 // A key (Escape, or Enter/Space on a button: a click with detail 0) — not a
@@ -1254,6 +1256,8 @@ function ensurePeer(profile) {
   }
   if (profile.name) peer.name = profile.name;
   if (profile.photo) peer.photo = profile.photo;
+  // mentioned again: its quiet minute starts over (forgetUnusedPeers)
+  peer.unusedSince = null;
   // a driver's car, as their rider sees it (only riders are sent one)
   if ("car" in profile) peer.car = carOf(profile);
   return peer;
@@ -1851,11 +1855,14 @@ function hydrate(st) {
     state.online = true;
     requestWakeLock();
     setBanner(contextBanner());
-    // SEED the send-filter, don't push: geolocation hasn't delivered its
-    // first fix yet. The row already sits at our remembered spot; the first
-    // real fix in another spot, or the 20s heartbeat, restamps it, well
-    // inside the 3-min frozen-reap window (no fix at all: nothing is sent).
-    lastGeoSent = HoodSendFilter.seed(state.me, mySpot || "", Date.now());
+    // Due at once: the first good reading sends (never before one — no fix,
+    // nothing sent: HoodSendFilter.gpsAllows). Nothing went while the
+    // connection was down (pushDriverUpdate), so after a reconnect the
+    // server's row is as old as the outage — a heartbeat more could take it
+    // past 3 min and off the map as frozen (final review, 2026-11-19). (It
+    // used to be SEEDED, not sent: every page's first join reloads anyway,
+    // so the seed never outlived it — one rule now.)
+    lastGeoSent = null;
   }
 
   refreshControls();
@@ -2232,7 +2239,7 @@ async function softReload() {
     // scrolled up reading: back where you were — what came in meantime
     // counts on ↓ (at the newest: it stays there, as renderChat leaves it)
     if (reading && !reading.stuck) backToReadingPlace(reading, chatFor(reopen).msgs);
-    // (always someone the app knows: it never forgets a person)
+    // (always someone the app knows: the open chat holds them — peerInUse)
   } else if (panelOpen) {
     // the chat list, opened from 💬 Chat before any chat was: drawn again
     // from what the reload brought — it showed the old rows (no new
@@ -2797,6 +2804,10 @@ function pushDriverUpdate() {
   // would be in the wrong city (the server drops a silent car in 3 min)
   if (!HoodSendFilter.gpsAllows(state.haveFix, "send")) return;
   const spot = currentSpot();
+  // not connected: nothing queued — Phoenix holds every push until the
+  // rejoin, ~180 an hour on shift (growth review, 2026-11-19); the next
+  // tick after the rejoin sends where we are (lastGeoSent untouched)
+  if (!liveNow()) return;
   const now = Date.now();
   if (!HoodSendFilter.shouldSend(lastGeoSent, now, state.me, spot, HoodSendFilter.BROWSE_MIN_METERS))
     return;
@@ -2822,7 +2833,7 @@ function pushDriverOffline() {
 // ride's counts — except the position updates, sent every ~1.5 s (a reload
 // would never settle): going online is counted where it's tapped, and "I'm
 // here" (said again with each update at the pickup) once per ride, where
-// it's said (declareArrived). (Accept,
+// it's said (sayArrived). (Accept,
 // the pin, End ride: the server already answers them with news of its own
 // — ride_started, pin, ride_ended — so for them this is a second safety net,
 // for any later action it doesn't answer; test_browser/tapreload.mjs.)
@@ -2870,8 +2881,15 @@ function pushRidePos() {
   // partner's phone stopped updating (HoodRidePos.arrivalTarget).
   if (state.ride.status === "connected" && state.ride.role === "driver") {
     const target = HoodRidePos.arrivalTarget(state.ride.peer, partnerAgeMs());
-    if (target && metersBetween(state.me, target) < 35) declareArrived();
+    // (the ride channel down: not said — it's said every tick until the
+    // answer, and ~40 a minute piled up offline, all sent at the rejoin;
+    // the first tick after says it — review, 2026-11-19)
+    const joined = !rideChannel || rideChannel.state === "joined";
+    if (joined && target && metersBetween(state.me, target) < 35) sayArrived();
   }
+  // (the ride channel not joined: nothing queued — up to ~2,400 an hour
+  // moving mid-ride; sent again from the next tick after its rejoin)
+  if (rideChannel.state !== "joined") return;
   const now = Date.now();
   if (!HoodSendFilter.shouldSend(lastRidePosSent, now, state.me, "", HoodSendFilter.RIDE_MIN_METERS))
     return;
@@ -2879,7 +2897,27 @@ function pushRidePos() {
   rideChannel.push("pos", { lat: state.me.lat, lng: state.me.lng });
 }
 
+// the "I'm here" tap. Told "try again" only when nothing can carry it — the
+// ride channel not joined AND the user channel not either (truly
+// disconnected) — as every tap that needs the server; never silently
+// dropped. The ride channel only rejoining (every reload leaves and joins
+// it again), the user channel up: the one tap waits for the join and goes,
+// as it always did. The ride channel up: it goes, whatever the user
+// channel is doing.
 function declareArrived() {
+  if (rideChannel && rideChannel.state !== "joined" && !liveNow()) {
+    if (state.ride && state.ride.status === "connected") transientBanner(CANT_REACH());
+    return;
+  }
+  sayArrived();
+}
+
+// "I've arrived", said: by the tap, and by the 1.5 s tick at the pickup —
+// which checks the ride channel itself (pushRidePos) and never shows a
+// banner (it used to go through the tap's check: with the user channel
+// down and the ride channel up, "try again" flashed every tick though
+// nobody tapped — review, 2026-11-19)
+function sayArrived() {
   if (!state.ride || state.ride.status !== "connected") return;
   if (rideChannel) {
     // news once per ride: at the pickup it's said again with every update
@@ -3873,7 +3911,7 @@ const chatStick = HoodChatScroll.createStick();
 let chatLineMsg = null;
 
 // where you're reading the open chat, for a reload (softReload) to put you
-// back: by MESSAGE, not by pixels — a reload brings the server's last 50
+// back: by MESSAGE, not by pixels — a reload brings the server's last 20
 // (this phone may have had more) and drops this app's own notes ("📩
 // requested a ride"), so what's above you changes (owner, 2026-11-08). The
 // first message the server knows (its id) from the top of the screen down
@@ -3905,7 +3943,7 @@ function readingPlace() {
 }
 
 // …and back there, the chat drawn again: that message where it was. Gone
-// (older than the server's last 50): the top — the oldest there is, the
+// (older than the server's last 20): the top — the oldest there is, the
 // nearest to where you were (the old pixel position, in a shorter list,
 // landed far newer — owner, 2026-11-08). ↓ counts their messages newer
 // than any you had.
@@ -3922,7 +3960,9 @@ function backToReadingPlace(place, msgs) {
   // (the scroll event after the redraw would say so too, a frame later —
   // ↓ flashed up for that frame)
   chatStick.stuck = HoodChatScroll.atBottom(box);
-  chatBelow = chatStick.stuck ? 0 : place.below + msgs.filter((x) => !x.mine && x.id != null && x.id > place.lastId).length;
+  chatBelow = chatStick.stuck
+    ? 0
+    : Math.min(place.below + msgs.filter((x) => !x.mine && x.id != null && x.id > place.lastId).length, CHAT_KEEP);
   updateChatJump();
 }
 
@@ -4116,7 +4156,9 @@ function applyReadState() {
   const r = HoodReadStore.reconcile(note, convs, null);
   chats.forEach((c, p) => {
     // (+ a chat not loaded yet: what the server counted before its new message)
-    if (c.server) c.unread = (r.unread[p.id] || 0) + (c.loaded === false ? c.restUnread || 0 : 0);
+    // (never past what a chat keeps: CHAT_KEEP — else the "New messages"
+    // line had no message to go above, and the chat opened at the newest)
+    if (c.server) c.unread = Math.min((r.unread[p.id] || 0) + (c.loaded === false ? c.restUnread || 0 : 0), CHAT_KEEP);
   });
   HoodReadStore.save(s, state.realUser.id, r.note);
 }
@@ -4218,7 +4260,7 @@ async function loadChat(peer, c) {
     if (chatOnScreen(peer)) renderChat();
     return;
   }
-  c.msgs = HoodChatMerge.merge(body.messages.map(fromServer), c.msgs);
+  c.msgs = HoodChatMerge.keep(HoodChatMerge.merge(body.messages.map(fromServer), c.msgs), CHAT_KEEP);
   c.loaded = true;
   c.summary = null;
   c.failed = false;
@@ -4267,6 +4309,47 @@ function chatLoadingNote(c) {
 // message stayed, looking sent (owner, 2026-11-08)
 const bubbleOf = new WeakMap();
 
+// a chat keeps its newest CHAT_KEEP — and an open chat's screen with it:
+// the bubbles of the messages dropped go too (else a flood into an open
+// chat still grew the page — growth review, 2026-11-19)
+function keepChat(c) {
+  const dropped = c.msgs.slice(0, Math.max(0, c.msgs.length - CHAT_KEEP));
+  if (!dropped.length) return;
+  HoodChatMerge.keep(c.msgs, CHAT_KEEP);
+  const box = $("chat-messages");
+  // (both read BEFORE anything goes: removing shrinks the scroll range,
+  // and the browser pulls scrollTop inside it the moment it's read)
+  const before = box.scrollHeight;
+  const top0 = box.scrollTop;
+  let shown = false;
+  dropped.forEach((m) => {
+    const el = bubbleOf.get(m);
+    if (!el) return;
+    // (the copy chip goes only with its own bubble — never because another
+    // chat dropped one)
+    if (msgCopy.openOn(el)) msgCopy.close();
+    if (box.contains(el)) shown = true;
+    el.remove();
+  });
+  // scrolled up, reading: stay on what you're reading — the browser's own
+  // scroll anchoring is off in the chat (styles.css), so the app keeps the
+  // place, by as much as went from above (final review, 2026-11-19)
+  if (shown && !chatStick.stuck) chatScrollTo(top0 - (before - box.scrollHeight));
+  // the copy chip, if open on a message still here: redrawn by it (it's
+  // placed by its message's position, which just moved up)
+  if (shown) msgCopy.refresh();
+  // the "New messages" line's message gone: the line goes above the first
+  // of theirs left (all kept ones of theirs are newer than it was)
+  if (chatLineMsg && dropped.includes(chatLineMsg)) {
+    chatLineMsg = c.msgs.find((m) => !m.mine) || null;
+    // …and on screen, above that message (not left above one of yours)
+    const line = box.querySelector(".chat-line");
+    const el = chatLineMsg && bubbleOf.get(chatLineMsg);
+    if (line && el && box.contains(el)) box.insertBefore(line, el);
+    else if (line && !chatLineMsg) line.remove();
+  }
+}
+
 function appendBubble(text, mine) {
   // were you following the chat? REMEMBERED (chatStick), not measured now:
   // the keyboard opening moves the list without you scrolling
@@ -4294,7 +4377,7 @@ function appendBubble(text, mine) {
     chatStick.stuck = true;
   } else {
     // (only theirs ever waits: yours always follows)
-    chatBelow++;
+    chatBelow = Math.min(chatBelow + 1, CHAT_KEEP); // (never past what's kept)
     updateChatJump();
   }
   return div;
@@ -4417,6 +4500,7 @@ function receiveMsg(peer, text, meta) {
   // the messages come (HoodChatMerge)
   if (c.loaded === false && id == null) msg.after = newestKnownId(c);
   c.msgs.push(msg);
+  keepChat(c);
   const chatOpen = !$("chat").classList.contains("hidden");
   const onScreen = chatOpen && state.chatView === "msgs" && state.chatPeer === peer;
   // a chat still loading isn't drawn or read here: what came is drawn with
@@ -4426,7 +4510,9 @@ function receiveMsg(peer, text, meta) {
     bubbleOf.set(msg, appendBubble(text, false));
     markSeen(peer);
   } else {
-    c.unread++;
+    // (never more than a chat keeps — the server's own cap: 20 unread or
+    // more are every message kept, the "New messages" line above them all)
+    c.unread = Math.min(c.unread + 1, CHAT_KEEP);
     // mid-ride, only the ride partner may interrupt the ride banner —
     // everyone else ticks the unread badge quietly
     const inRide = state.ride && ["connected", "arrived"].includes(state.ride.status);
@@ -4499,6 +4585,7 @@ $("chat-form").addEventListener("submit", (e) => {
   $("chat-count-alert").textContent = "";
   const sentMsg = { text, mine: true, at: Date.now() };
   chatFor(peer).msgs.push(sentMsg);
+  keepChat(chatFor(peer));
   chatFor(peer).lastAt = sentMsg.at;
   // you replied: caught up — the "New messages" line goes (as Discord)
   removeNewMessagesLine();
@@ -5937,11 +6024,28 @@ function toggle(id, on) {
 }
 
 // ===== Wake lock =====
-let wakeLock = null;
+let wakeLock = null; // the lock held now, or null
+let wakeLockAsking = false;
 async function requestWakeLock() {
+  // one at a time: it was asked for again at every reconnect and return to
+  // the app, each kept (growth review, 2026-11-19). The phone releases it
+  // when the app is hidden — its "release" event clears it, and it's asked
+  // for again (the event, not `released`: that came later, Chrome 87).
+  // (Two asks at once — start-up and a reload's hydrate — one request.)
+  if (wakeLockAsking || wakeLock) return;
+  wakeLockAsking = true;
   try {
-    if ("wakeLock" in navigator) wakeLock = await navigator.wakeLock.request("screen");
-  } catch (_) {}
+    if ("wakeLock" in navigator) {
+      const lock = await navigator.wakeLock.request("screen");
+      wakeLock = lock;
+      lock.addEventListener("release", () => {
+        if (wakeLock === lock) wakeLock = null;
+      });
+    }
+  } catch (_) {
+  } finally {
+    wakeLockAsking = false;
+  }
 }
 document.addEventListener("visibilitychange", async () => {
   checkForUpdate(); // hidden now: maybe a silent reload; shown: maybe the offer
@@ -6022,22 +6126,11 @@ const booting = HoodBoot.create({
 // don't see each other on the map and can't reach each other; your chat
 // and any ride or request between you end — the server does all of it
 // (their marker, the chat, the ride come off by its own messages). The
-// people you blocked: "Blocked people" at the bottom of the profile drawer
-// (only once you've blocked someone), in pages as the chat list.
-let blockedCount = 0;
-function setBlockedCount(n) {
-  blockedCount = Number.isFinite(n) && n > 0 ? n : 0;
-  $("blocked-wrap").classList.toggle("hidden", blockedCount === 0);
-}
-// asked as the drawer opens — never with every app open, which makes one
-// database query (owner, 2026-11-17). Not known (the demo, no answer): as it was
-async function refreshBlockedCount() {
-  if (DEMO) return setBlockedCount(demoBlocked.length);
-  try {
-    const res = await apiFetch("/api/blocks?count=1");
-    if (res.ok) setBlockedCount((await res.json()).count);
-  } catch (_) {}
-}
+// people you blocked: "Blocked people" at the bottom of the profile drawer,
+// always there (owner, 2026-11-18: as the big apps; a count that failed to
+// load can't hide it, and opening the drawer asks the server nothing), the
+// list loaded only when tapped, in pages as the chat list — "You haven't
+// blocked anyone" when empty, "Couldn't load — tap to try again" on failure.
 
 // a real person (never yourself). The demo (owner, 2026-11-17: "i wanna
 // see it"): its pretend people, played out on this phone alone — gone from
@@ -6050,6 +6143,39 @@ function canBlock(peer) {
 }
 
 let blockAsk = null; // { peer, mode: "block" | "unblock", opener, row }
+
+// ===== People this page no longer needs (owner, 2026-11-19) =====
+// realPeersById keeps one record per person met — id, name, photo, car,
+// the block they were shown in — so the map, a chat and a card agree. It
+// kept them all until a reload: someone who left the map, their chat gone,
+// stayed in memory (their last block too). Now a record nothing points at
+// — not on the map, no chat, not the open chat or card, not a ride or a
+// request either way, not the banner's or the block sheet's — goes once
+// it's stayed so a full PEER_QUIET_MS: a reply on its way (a request's
+// answer, a late message) still finds the same record, never a second one.
+const PEER_QUIET_MS = 60_000;
+function peerInUse(p) {
+  return (
+    realEntries.has(p.id) ||
+    chats.has(p) ||
+    state.chatPeer === p ||
+    state.cardPeer === p ||
+    (!!state.ride && state.ride.peer === p) ||
+    bannerPeer === p ||
+    (!!blockAsk && blockAsk.peer === p) ||
+    endArmed === p ||
+    !!p.pending ||
+    !!p.blocking
+  );
+}
+function forgetUnusedPeers(now = performance.now()) {
+  realPeersById.forEach((p, id) => {
+    if (peerInUse(p)) p.unusedSince = null;
+    else if (p.unusedSince == null) p.unusedSince = now;
+    else if (now - p.unusedSince >= PEER_QUIET_MS) realPeersById.delete(id);
+  });
+}
+setInterval(() => forgetUnusedPeers(), PEER_QUIET_MS / 2);
 function openBlockSheet(peer, mode, opener, row = null) {
   if (mode === "block" && !canBlock(peer)) return;
   blockAsk = { peer, mode, opener, row };
@@ -6105,12 +6231,10 @@ $("block-yes").addEventListener("click", () => {
       if (mode === "block") {
         afterBlocked(peer);
         closeBlockSheet();
-        setBlockedCount(blockedCount + 1);
         transientBanner(t("Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."));
       } else {
         if (ask.row) ask.row.remove();
         closeBlockSheet();
-        setBlockedCount(blockedCount - 1);
         if (!$("blocked-list").querySelector(".blocked-row") && !blockedMore) showBlockedEmpty();
       }
     })
@@ -6138,7 +6262,6 @@ function demoBlockAnswer({ peer, mode, row }) {
     afterBlocked(peer);
     refreshWorldMarkers();
     closeBlockSheet();
-    setBlockedCount(demoBlocked.length);
     transientBanner(t("Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."));
   } else {
     peer.blocked = false;
@@ -6146,7 +6269,6 @@ function demoBlockAnswer({ peer, mode, row }) {
     refreshWorldMarkers();
     if (row) row.remove();
     closeBlockSheet();
-    setBlockedCount(demoBlocked.length);
     if (!$("blocked-list").querySelector(".blocked-row")) showBlockedEmpty();
   }
 }

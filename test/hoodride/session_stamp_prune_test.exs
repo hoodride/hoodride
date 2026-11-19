@@ -21,7 +21,8 @@ defmodule Hoodride.SessionStampPruneTest do
   @day_ms 86_400_000
 
   defp id, do: 4_294_967_296 + System.unique_integer([:positive])
-  defp now_ms, do: System.system_time(:millisecond)
+  # (the steady clock, as prune/1's own — ClockJumpTest)
+  defp now_ms, do: System.monotonic_time(:millisecond)
 
   # stands in for a connected device of the account (what UserSocket.admit
   # registers for the life of the connection)
@@ -82,6 +83,26 @@ defmodule Hoodride.SessionStampPruneTest do
     SessionStamp.prune(t + 60_000)
     SessionStamp.prune(t + 23 * 3_600_000)
     assert SessionStamp.highest(u) == 100
+  end
+
+  # (the second review) a "last seen" with no stamp behind it — an account
+  # deleted between the pass's read and its write — is dropped
+  test "a 'last seen' with no stamp behind it: dropped" do
+    :ets.insert(:session_last_live, {9_851, now_ms()})
+    SessionStamp.prune(now_ms())
+    assert :ets.lookup(:session_last_live, 9_851) == []
+  end
+
+  # (independent review, 2026-11-18: the exact edge had no test)
+  test "exactly a day: kept; a millisecond more: dropped" do
+    u = id()
+    SessionStamp.saw(u, 100)
+    t = now_ms()
+    SessionStamp.prune(t)
+    SessionStamp.prune(t + @day_ms)
+    assert SessionStamp.highest(u) == 100
+    SessionStamp.prune(t + @day_ms + 1)
+    assert SessionStamp.highest(u) == nil
   end
 
   test "nothing connected for over a day: dropped" do

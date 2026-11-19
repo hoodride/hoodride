@@ -39,5 +39,16 @@
     return result;
   }
 
-  return { merge };
+  // An open chat keeps what the server keeps — its newest `max` (the
+  // server's chat_history) — dropping the oldest, IN PLACE (a message is
+  // found by its object, and the list by its chat). It kept every message
+  // that arrived while the page stayed open: a long ride, a phone left on
+  // the chat — or a flood at the pair limit, megabytes an hour (growth
+  // inventory, 2026-11-19).
+  function keep(list, max) {
+    if (list.length > max) list.splice(0, list.length - max);
+    return list;
+  }
+
+  return { merge, keep };
 });

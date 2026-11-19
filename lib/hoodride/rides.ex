@@ -17,10 +17,23 @@ defmodule Hoodride.Rides do
   signs out (after_sign_out/1): whichever is second sees the other (A1).
   """
   def start_ride(rider_id, driver_id, still_signed_in \\ fn -> true end) do
-    # atomically claim both seats (all-or-nothing) — closes the race where the
-    # same driver, on two sockets, accepts two riders "simultaneously"
-    if :ets.insert_new(:rides_by_user, [{rider_id, :pending}, {driver_id, :pending}]) do
-      # a claimed seat (even :pending) means "in a ride": no more map for either
+    # The seats FIRST, claimed in the name of this caller (the driver's
+    # connection): {user, {:pending, caller, rider, driver}} — atomically, both or
+    # neither, so the same driver accepting two riders on two sockets gets
+    # one ride. (2026-11-18, the sweeper reviews.) They used to be a bare
+    # :pending: this caller ending before the ride's process existed left
+    # both "in a ride" with no ride until a restart — nothing said whose
+    # they were. Now: that caller gone while its seats are still starting
+    # and no ride is working on the start (Ride.starting_for?/1), the
+    # Sweeper frees them and tells the rider their request was declined; a
+    # ride already in its start-up finishes or cleans up by itself (its
+    # terminate/2); the caller alive: never touched. The ride takes the
+    # seats over only if they're STILL this start's (Ride.start/7) — never
+    # seats freed and claimed by another start since.
+    claim = {:pending, self(), rider_id, driver_id}
+
+    if :ets.insert_new(:rides_by_user, [{rider_id, claim}, {driver_id, claim}]) do
+      # a claimed seat (even starting) means "in a ride": no more map for either
       Hoodride.Roles.changed(rider_id)
       Hoodride.Roles.changed(driver_id)
       # random: a counter ("r4675") told both people how many rides the
@@ -47,7 +60,7 @@ defmodule Hoodride.Rides do
           # only THIS start's rows — still starting, or listed as this ride
           # (undone after its look): never a newer ride's that took the seat
           for uid <- [rider_id, driver_id] do
-            :ets.delete_object(:rides_by_user, {uid, :pending})
+            :ets.delete_object(:rides_by_user, {uid, claim})
             :ets.delete_object(:rides_by_user, {uid, id})
           end
 
@@ -59,6 +72,16 @@ defmodule Hoodride.Rides do
       {:error, :busy}
     end
   end
+
+  @doc """
+  A start abandoned — its caller (the accepting driver's connection) gone
+  before the ride began, the request already taken: the rider is told it
+  was declined, so they can ask someone else (it used to wait on "asking…"
+  until a reload: independent review, 2026-11-18). Said ONLY by whoever
+  actually freed the rider's starting seat — never twice.
+  """
+  def abandoned_start(rider_id, driver_id),
+    do: Hoodride.Requests.declined_by(rider_id, driver_id)
 
   # the ride's process, started — or an error if the rides' supervisor can't
   # be reached (restarting): it used to EXIT here, crashing the driver's
@@ -199,6 +222,7 @@ end
 defmodule Hoodride.Rides.Ride do
   @moduledoc "A living ride. Born at accept, dies at end — the death IS the deletion."
   use GenServer, restart: :temporary
+  require Logger
 
   @abandoned_after div(Hoodride.Limits.ride_abandoned_ms(), 1000)
   @check_every 60_000
@@ -218,8 +242,23 @@ defmodule Hoodride.Rides.Ride do
   @impl true
   def init(%{starter: starter} = args) do
     Process.monitor(starter)
+    # "a ride is working on this start" — until its start-up is done (the
+    # fifth review, 2026-11-18): the Sweeper frees a dead starter's seats
+    # only when no ride is; one mid-start-up finishes (or cleans up) itself.
+    # (one start per caller at a time — start_ride waits for it)
+    case Registry.register(Hoodride.Rides.Registry, {:starting, starter}, nil) do
+      {:ok, _} -> :ok
+      # (never expected: the Sweeper's protection of this start would lapse)
+      _ -> Logger.warning("ride start: couldn't mark the start as in progress")
+    end
+
     {:ok, {:starting, args}}
   end
+
+  @doc false
+  # the Sweeper's question: is a ride process working on `starter`'s start?
+  def starting_for?(starter),
+    do: Registry.lookup(Hoodride.Rides.Registry, {:starting, starter}) != []
 
   defp peer_of(user_id, seat) do
     case Hoodride.Accounts.profile(user_id) do
@@ -251,14 +290,48 @@ defmodule Hoodride.Rides.Ride do
   def name_retry_ms(attempt),
     do: min(Hoodride.Accounts.retry_wait_ms() * 2 ** (attempt - 1), 30_000)
 
-  defp start(id, rider, driver, peers, unnamed, still_signed_in) do
-    now = System.system_time(:second)
-    :ets.insert(:rides_by_user, [{rider, id}, {driver, id}])
+  defp start(id, rider, driver, starter, peers, unnamed, still_signed_in) do
+    now = steady_s()
 
+    # the seats taken over ONLY if they're still this start's claim — each
+    # in one step (select_replace): its caller gone, the Sweeper may have
+    # freed them meanwhile and another start claimed them; this ride never
+    # overwrites that (2026-11-18, the sweeper reviews)
+    claim = {:pending, starter, rider, driver}
+
+    took =
+      :ets.select_replace(:rides_by_user, [
+        {{rider, claim}, [], [{{rider, id}}]},
+        {{driver, claim}, [], [{{driver, id}}]}
+      ])
+
+    if took == 2,
+      do: seated(id, rider, driver, peers, unnamed, still_signed_in, now),
+      else: lost_seats(id, rider, driver, starter)
+  end
+
+  # a seat no longer this start's: what it did take, given back; the rider
+  # told — if nobody else will (the caller gone: its own answer would put the
+  # request back; the Sweeper tells the rider when IT frees the rider's seat)
+  defp lost_seats(id, rider, driver, starter) do
+    rider_taken = :ets.select_delete(:rides_by_user, [{{rider, id}, [], [true]}]) == 1
+    :ets.delete_object(:rides_by_user, {driver, id})
+    Hoodride.Roles.changed(rider)
+    Hoodride.Roles.changed(driver)
+
+    if rider_taken and not Process.alive?(starter),
+      do: Hoodride.Rides.abandoned_start(rider, driver)
+
+    # (only once its caller is gone — a trail in the log: the seventh review)
+    Logger.warning("ride start: its seats were no longer its claim — given back")
+    :lost
+  end
+
+  defp seated(id, rider, driver, peers, unnamed, still_signed_in, now) do
     # the seats are this ride's now — THEN: is the accepting sign-in still
     # there? Signed out since its check, its sign-out may have looked for a
-    # ride before this (A1): nothing announced, no ride (start_ride frees
-    # the seats)
+    # ride before this (A1): nothing announced, no ride (its terminate/2
+    # frees the seats)
     if still_signed_in.(),
       do: started(id, rider, driver, peers, unnamed, now),
       else: :signed_out
@@ -271,6 +344,10 @@ defmodule Hoodride.Rides.Ride do
     # your own asks read "cancelled", before the decline sweep below
     Hoodride.Requests.cancel(rider)
     Hoodride.Requests.cancel(driver)
+    # the accepted request's index row: the Accept's own clean-up does it
+    # after this start — unless its connection died meanwhile (the fourth
+    # review); done here too, harmlessly twice
+    Hoodride.Requests.taken(rider, driver)
     # BOTH participants leave the browse map entirely — cars AND hands,
     # whichever seat you're in. Mid-ride means unavailable (waiters declined)
     # and invisible (no ghost 🚗 or ✋ from a lost mode-flip survives this).
@@ -336,8 +413,8 @@ defmodule Hoodride.Rides.Ride do
         {:starting, %{id: id, rider: rider, driver: driver} = args} = starting
       ) do
     # who's who, FIRST — before anything is cancelled, moved or announced: a
-    # partner that doesn't exist stops the ride here, cleanly (start_ride
-    # frees the seats). A database that can't answer (overload) shows
+    # partner that doesn't exist stops the ride here, cleanly (its
+    # terminate/2 frees the claim). A database that can't answer (overload) shows
     # "Neighbor" instead, so the ride still starts and BOTH are told.
     case {peer_of(rider, :rider), peer_of(driver, :driver)} do
       {{rider_peer, rider_known}, {driver_peer, driver_known}} ->
@@ -347,9 +424,16 @@ defmodule Hoodride.Rides.Ride do
         peers = %{rider => driver_peer, driver => rider_peer}
         check = Map.get(args, :still_signed_in, fn -> true end)
 
-        case start(id, rider, driver, peers, unnamed, check) do
-          {:ok, state} -> {:reply, :ok, state}
-          :signed_out -> {:stop, :normal, {:error, :signed_out}, starting}
+        case start(id, rider, driver, args.starter, peers, unnamed, check) do
+          {:ok, state} ->
+            Registry.unregister(Hoodride.Rides.Registry, {:starting, args.starter})
+            {:reply, :ok, state}
+
+          :signed_out ->
+            {:stop, :normal, {:error, :signed_out}, starting}
+
+          :lost ->
+            {:stop, :normal, {:error, :gone}, starting}
         end
 
       _ ->
@@ -451,7 +535,9 @@ defmodule Hoodride.Rides.Ride do
 
   @impl true
   def handle_info(:check_abandoned, state) do
-    now = System.system_time(:second)
+    # how long both have been silent: the steady clock (a forward jump of
+    # the wall clock read as silence and ended live rides — 2026-11-18)
+    now = steady_s()
 
     if now - state.last_rider > @abandoned_after and now - state.last_driver > @abandoned_after do
       free_seats(state)
@@ -520,10 +606,15 @@ defmodule Hoodride.Rides.Ride do
   # two-seat claim freed (only if still the claim), and gone. (Once started,
   # a starter's end is just another message: ignored below.)
   def handle_info({:DOWN, _, :process, starter, _}, {:starting, %{starter: starter} = args}) do
-    :ets.delete_object(:rides_by_user, {args.rider, :pending})
-    :ets.delete_object(:rides_by_user, {args.driver, :pending})
+    # (only seats claimed by THIS start — never another's)
+    claim = {:pending, starter, args.rider, args.driver}
+    freed = :ets.select_delete(:rides_by_user, [{{args.rider, claim}, [], [true]}]) == 1
+    :ets.delete_object(:rides_by_user, {args.driver, claim})
     Hoodride.Roles.changed(args.rider)
     Hoodride.Roles.changed(args.driver)
+    # the request was taken by the accept: the rider told, by whoever freed
+    # their seat (here, or the Sweeper if it got there first)
+    if freed, do: Hoodride.Rides.abandoned_start(args.rider, args.driver)
     {:stop, :normal, {:starting, args}}
   end
 
@@ -539,14 +630,44 @@ defmodule Hoodride.Rides.Ride do
   @impl true
   def handle_cast(_unknown, state), do: {:noreply, state}
 
-  # safety net for abnormal exits; idempotent with the eager free in end_ride.
-  # A NORMAL stop (end_ride, abandoned) already announced "ended"; any other
-  # exit (a crash) must announce it here, or both apps sit on a dead ride.
-  # stopped before its start-up finished: nobody was told anything, and its
-  # seats are still the claim — start_ride frees those
   @impl true
-  def terminate(_reason, {:starting, _}), do: :ok
+  # Stopped (or crashed) while starting: its own rows go here — the seats it
+  # took over (its sign-in check failed: the driver signed out mid-Accept; a
+  # crash in the start-up), or its claim if it never took them (no such
+  # person). They used to wait for the caller's cleanup — but the caller may
+  # be gone (signing out closes its socket), and then the rider was never
+  # told and stayed "in a ride" (the third and fourth reviews, 2026-11-18).
+  # The rider told "declined" only if nobody else will: the caller gone
+  # (alive, its accept answers for itself). (Not on a brutal kill: the
+  # Sweeper's heals free those seats.)
+  def terminate(_reason, {:starting, %{id: id, rider: rider, driver: driver} = args}) do
+    starter = Map.get(args, :starter)
+    # taken over (its id) or still its claim — a start that stopped before
+    # taking them (no such user; a crash in its look-up) frees its claim
+    # here too, at once, not a Sweeper pass later (the fourth review)
+    mine = [id, {:pending, starter, rider, driver}]
 
+    rider_had =
+      Enum.any?(mine, &(:ets.select_delete(:rides_by_user, [{{rider, &1}, [], [true]}]) == 1))
+
+    driver_had =
+      Enum.any?(mine, &(:ets.select_delete(:rides_by_user, [{{driver, &1}, [], [true]}]) == 1))
+
+    if rider_had or driver_had do
+      Hoodride.Roles.changed(rider)
+      Hoodride.Roles.changed(driver)
+    end
+
+    if rider_had and is_pid(starter) and not Process.alive?(starter),
+      do: Hoodride.Rides.abandoned_start(rider, driver)
+
+    :ok
+  end
+
+  # a started ride: the safety net for abnormal exits; idempotent with the
+  # eager free in end_ride. A NORMAL stop (end_ride, abandoned) already
+  # announced "ended"; any other exit (a crash) must announce it here, or
+  # both apps sit on a dead ride.
   def terminate(reason, state) do
     free_seats(state)
 
@@ -568,8 +689,11 @@ defmodule Hoodride.Rides.Ride do
     Hoodride.Roles.changed(state.driver)
   end
 
+  # silence is a length of time: the steady clock, which never jumps
+  defp steady_s, do: System.monotonic_time(:second)
+
   defp stamp(state, user_id) do
-    now = System.system_time(:second)
+    now = steady_s()
 
     cond do
       user_id == state.rider -> %{state | last_rider: now}

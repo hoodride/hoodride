@@ -55,6 +55,12 @@ defmodule Hoodride.SessionTokens do
   # {user_id}: this person's sign-ins are in memory (all of them: the cap
   # and the renewal rules need the whole account)
   @loaded :session_token_loaded
+  # {{user_id, hash}}: which sign-ins are whose — sorted, so one person's are
+  # a quick range, not a scan of everyone's (the second review, 2026-11-18:
+  # dropping 4,000 people after a restart scanned every table 4,000 times —
+  # 40 s for one pass). Only ever a list of CANDIDATES: a hash here whose
+  # row is gone (expired, replaced) is harmless, removed with its person
+  @by_user :session_token_by_user
   @valid_ms Hoodride.Limits.sign_in_valid_ms()
   @rotate_after_ms Hoodride.Limits.sign_in_renew_after_ms()
   @cap_ms Hoodride.Limits.sign_in_max_age_ms()
@@ -73,6 +79,7 @@ defmodule Hoodride.SessionTokens do
     Hoodride.ETS.new(@links, [:named_table, :public, :set, read_concurrency: true])
     Hoodride.ETS.new(@fresh, [:named_table, :public, :set, read_concurrency: true])
     Hoodride.ETS.new(@loaded, [:named_table, :public, :set, read_concurrency: true])
+    Hoodride.ETS.new(@by_user, [:named_table, :public, :ordered_set])
     :ok
   end
 
@@ -290,6 +297,7 @@ defmodule Hoodride.SessionTokens do
 
       for {h, ins, auth, replaced_by, unused} <- rows do
         :ets.insert(@table, {h, user_id, ins, auth})
+        :ets.insert(@by_user, {{user_id, h}})
         if replaced_by, do: :ets.insert(@links, {h, replaced_by, user_id})
         if unused == 1, do: :ets.insert(@fresh, {h, user_id})
       end
@@ -324,6 +332,7 @@ defmodule Hoodride.SessionTokens do
 
         for {user_id, h, ins, auth, replaced_by, unused} <- rows do
           :ets.insert(@table, {h, user_id, ins, auth})
+          :ets.insert(@by_user, {{user_id, h}})
           if replaced_by, do: :ets.insert(@links, {h, replaced_by, user_id})
           if unused == 1, do: :ets.insert(@fresh, {h, user_id})
         end
@@ -378,6 +387,7 @@ defmodule Hoodride.SessionTokens do
       # A1), and a rider signing in again (the silent Google refresh) would
       # read as signed out in between (third review, 2026-11-11)
       :ets.insert(@table, {h, user_id, now, now})
+      :ets.insert(@by_user, {{user_id, h}})
       # (a test can look at the moment between the two; nil in production)
       if hook = Application.get_env(:hoodride, :session_tokens_hook), do: hook.(:replace)
       forget_hashes(Enum.reject([old | dropped], &is_nil/1))
@@ -444,6 +454,7 @@ defmodule Hoodride.SessionTokens do
             # moment a sign-out must not slip into; nil in production)
             if hook = Application.get_env(:hoodride, :session_tokens_hook), do: hook.(:rotate)
             :ets.insert(@table, {h, user_id, now, auth})
+            :ets.insert(@by_user, {{user_id, h}})
             :ets.insert(@fresh, {h, user_id})
             :ets.insert(@links, {old, h, user_id})
             forget_hashes(gone ++ dropped)
@@ -495,10 +506,16 @@ defmodule Hoodride.SessionTokens do
         forget_now(user_id)
       end)
 
+  # this person's rows, found by their own range of @by_user — never a scan
+  # of everyone's. Each candidate checked: only rows that ARE theirs go
   defp forget_now(user_id) do
-    :ets.select_delete(@table, [{{:_, user_id, :_, :_}, [], [true]}])
-    :ets.select_delete(@links, [{{:_, :_, user_id}, [], [true]}])
-    :ets.select_delete(@fresh, [{{:_, user_id}, [], [true]}])
+    for h <- :ets.select(@by_user, [{{{user_id, :"$1"}}, [], [:"$1"]}]) do
+      :ets.match_delete(@table, {h, user_id, :_, :_})
+      :ets.match_delete(@links, {h, :_, user_id})
+      :ets.match_delete(@fresh, {h, user_id})
+    end
+
+    :ets.select_delete(@by_user, [{{{user_id, :_}}, [], [true]}])
     :ok
   end
 
@@ -588,7 +605,12 @@ defmodule Hoodride.SessionTokens do
     do: from(t in "user_tokens", where: t.token_hash in ^hashes) |> Repo.delete_all()
 
   defp forget_hashes(hashes) do
-    for h <- hashes, t <- [@table, @links, @fresh], do: :ets.delete(t, h)
+    for h <- hashes do
+      # its "whose" row too (else it grew for someone who never leaves)
+      for {_, uid, _, _} <- :ets.lookup(@table, h), do: :ets.delete(@by_user, {uid, h})
+      for t <- [@table, @links, @fresh], do: :ets.delete(t, h)
+    end
+
     :ok
   end
 
@@ -597,32 +619,48 @@ defmodule Hoodride.SessionTokens do
   (Hoodride.Presence) out of memory — read again when next needed — and
   expired tokens.
   """
-  def sweep(now \\ now()) do
-    secs = div(now, 1000)
-
-    for {user_id} <- :ets.tab2list(@loaded), not Hoodride.Presence.around?(user_id, secs) do
-      locked(user_id, fn ->
-        # the mark FIRST, then the rows: a check reading meanwhile finds
-        # the mark gone after its read, and reads again (read_loaded)
-        :ets.delete(@loaded, user_id)
-        # (tests: a pause between the two)
-        hook(:dropping)
-        forget_now(user_id)
-      end)
-    end
+  # `now`: the wall clock's ms (the tokens' own times, stored); `secs`: who's
+  # around, by the presence clock (the steady one — Hoodride.Geo)
+  def sweep(now \\ now(), secs \\ System.monotonic_time(:second)) do
+    # a page at a time (Hoodride.ETS.each_match) — never a copy of everyone
+    # loaded (SweeperMemoryTest, 2026-11-18)
+    Hoodride.ETS.each_match(@loaded, [{{:"$1"}, [], [:"$1"]}], fn user_id ->
+      if not Hoodride.Presence.around?(user_id, secs), do: drop_loaded(user_id)
+    end)
 
     :ets.select_delete(@table, [
       {{:_, :_, :"$1", :"$2"},
        [{:orelse, {:<, :"$1", now - @valid_ms}, {:<, :"$2", now - @cap_ms}}], [true]}
     ])
 
-    # a token gone: what was kept about it goes too
-    for t <- [@links, @fresh],
-        h <- :ets.select(t, [{:"$1", [], [{:element, 1, :"$1"}]}]),
-        not :ets.member(@table, h),
-        do: :ets.delete(t, h)
+    # a token gone: what was kept about it goes too (a page at a time)
+    for t <- [@links, @fresh] do
+      Hoodride.ETS.each_match(t, [{:"$1", [], [{:element, 1, :"$1"}]}], fn h ->
+        if not :ets.member(@table, h), do: :ets.delete(t, h)
+      end)
+    end
+
+    # …and its "whose" row (expired above: else it grew for someone who
+    # never leaves — the third review)
+    Hoodride.ETS.each_match(@by_user, [{{{:"$1", :"$2"}}, [], [{{:"$1", :"$2"}}]}], fn {uid, h} ->
+      if not :ets.member(@table, h), do: :ets.delete(@by_user, {uid, h})
+    end)
 
     :ok
+  end
+
+  # (the Sweeper's: a person whose lock is busy — a read on a slow database
+  # holds it — is skipped, caught next pass. Waiting for it stalled the
+  # whole pass and every step after it: independent review, 2026-11-18)
+  defp drop_loaded(user_id) do
+    try_locked(user_id, fn ->
+      # the mark FIRST, then the rows: a check reading meanwhile finds
+      # the mark gone after its read, and reads again (read_loaded)
+      :ets.delete(@loaded, user_id)
+      # (tests: a pause between the two)
+      hook(:dropping)
+      forget_now(user_id)
+    end)
   end
 
   @doc """
@@ -648,7 +686,7 @@ defmodule Hoodride.SessionTokens do
   @doc false
   # (tests: memory as after a restart — empty)
   def reset_memory do
-    for t <- [@table, @links, @fresh, @loaded], do: :ets.delete_all_objects(t)
+    for t <- [@table, @links, @fresh, @loaded, @by_user], do: :ets.delete_all_objects(t)
     :ok
   end
 
@@ -676,6 +714,10 @@ defmodule Hoodride.SessionTokens do
 
   # one change of an account at a time (this node only: one server)
   defp locked(user_id, fun), do: :global.trans({{__MODULE__, user_id}, self()}, fun, [node()])
+
+  # the lock now or not at all (:aborted): never waits
+  defp try_locked(user_id, fun),
+    do: :global.trans({{__MODULE__, user_id}, self()}, fun, [node()], 0)
 
   defp now, do: System.system_time(:millisecond)
 

@@ -19,7 +19,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
     %{rider: rider, driver: driver}
   end
 
-  defp ancient, do: System.system_time(:second) - 10_000
+  defp ancient, do: System.monotonic_time(:second) - 10_000
 
   test "sweeper expires stale requests and notifies both sides", %{rider: r, driver: d} do
     HoodrideWeb.Endpoint.subscribe("user:#{r.id}")
@@ -38,7 +38,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
   test "sweeper removes drivers and hands whose owner is past grace", %{rider: r, driver: d} do
     :ets.insert(
       :geo_drivers,
-      {d.id, "cellA", "cellA", System.system_time(:second)}
+      {d.id, "cellA", "cellA", System.monotonic_time(:second)}
     )
 
     :ets.insert(:geo_hands, {r.id, "cellA", "spotA"})
@@ -56,7 +56,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
   test "sweeper keeps geo for users within grace", %{driver: d} do
     :ets.insert(
       :geo_drivers,
-      {d.id, "cellB", "cellB", System.system_time(:second)}
+      {d.id, "cellB", "cellB", System.monotonic_time(:second)}
     )
 
     Geo.user_disconnected(d.id)
@@ -218,7 +218,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
     # busy driver can't accept a pending request — busy means unavailable, so
     # the request is declined with notice rather than left dangling
     HoodrideWeb.Endpoint.subscribe("user:#{other.id}")
-    :ets.insert(:ride_requests, {other.id, d.id, System.system_time(:second)})
+    :ets.insert(:ride_requests, {other.id, d.id, System.monotonic_time(:second)})
     assert {:error, :busy} = Requests.accept(%{id: d.id, name: "SD", photo: nil}, other.id)
     assert Requests.open_request_of(other.id) == nil
     assert_receive %Phoenix.Socket.Broadcast{event: "request_declined"}
@@ -234,7 +234,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
 
     Hoodride.Geo.driver_update(%{id: 71, name: "Frozen", photo: nil}, "cell8q", nil, ["c7Q"])
 
-    stale = System.system_time(:second) - 4 * 60
+    stale = System.monotonic_time(:second) - 4 * 60
     [{_, cell, spot, _ts}] = :ets.lookup(:geo_drivers, 71)
     :ets.insert(:geo_drivers, {71, cell, spot, stale})
     # a rider was waiting on the frozen one
@@ -280,6 +280,44 @@ defmodule Hoodride.SweeperAndGuardsTest do
     assert_receive %Broadcast{topic: ^roles, event: "changed"}
     assert_receive %Broadcast{topic: "geo:h:cell8s", event: "hand_left", payload: %{id: 92}}
     assert_receive %Broadcast{topic: "agg:h:c7S", event: "agg_update", payload: %{hands: 0}}
+  end
+
+  # (2026-11-18, the sweeper review) the pass judging someone "gone past
+  # grace" in the very moment they come back: their car is taken off though
+  # they're here. Nothing is lost for good — the app sends its spot again
+  # within 20 s, even parked (sendfilter.js's heartbeat), and that puts the
+  # car back for everyone watching, counted, with the role said again
+  test "a driver reaped as they came back: their next heartbeat puts the car back for the watchers" do
+    alias Phoenix.Socket.Broadcast
+
+    for t <- ~w(geo:d:cell8t agg:d:c7T), do: HoodrideWeb.Endpoint.subscribe(t)
+    roles = Hoodride.Roles.topic(94)
+    HoodrideWeb.Endpoint.subscribe(roles)
+    me = %{id: 94, name: "Back", photo: nil}
+    Geo.driver_update(me, "cell8t", nil, ["c7T"])
+    assert_receive %Broadcast{topic: "geo:d:cell8t", event: "driver_update"}
+    assert_receive %Broadcast{topic: "agg:d:c7T", payload: %{drivers: 1}}
+    assert_receive %Broadcast{topic: ^roles, event: "changed"}
+
+    # gone past grace by the pass's look — the pass reaps the car
+    :ets.insert(:geo_presence, {94, :grace, ancient()})
+    Sweeper.sweep_now()
+    assert_receive %Broadcast{topic: "geo:d:cell8t", event: "driver_left", payload: %{id: 94}}
+    assert_receive %Broadcast{topic: ^roles, event: "changed"}
+    refute Geo.driver_on_map?(94)
+
+    # …but they'd just come back: connected, and the app's next heartbeat
+    Geo.user_connected(94)
+    Geo.driver_update(me, "cell8t", nil, ["c7T"])
+
+    assert Geo.driver_on_map?(94)
+    assert_receive %Broadcast{topic: "geo:d:cell8t", event: "driver_update", payload: %{id: 94}}
+    assert_receive %Broadcast{topic: "agg:d:c7T", event: "agg_update", payload: %{drivers: 1}}
+    assert_receive %Broadcast{topic: ^roles, event: "changed"}
+
+    # and the next pass keeps them: connected, heartbeating
+    Sweeper.sweep_now()
+    assert Geo.driver_on_map?(94)
   end
 
   # a shard that died mid-move (the row moved, the index and messages not):
@@ -367,12 +405,12 @@ defmodule Hoodride.SweeperAndGuardsTest do
   test "the index repair announces no one in a ride, and no silent car" do
     alias Phoenix.Socket.Broadcast
     for t <- ~w(geo:d:rpA geo:h:rpH geo:d:rpS), do: HoodrideWeb.Endpoint.subscribe(t)
-    now = System.system_time(:second)
+    now = System.monotonic_time(:second)
     # in a ride (seat claimed), the index row missing
     :ets.insert(:geo_drivers, {95, "rpA", "rpA-s", now})
     :ets.insert(:geo_hands, {96, "rpH", "rpH-s"})
-    :ets.insert(:rides_by_user, {95, :pending})
-    :ets.insert(:rides_by_user, {96, :pending})
+    :ets.insert(:rides_by_user, {95, {:pending, self(), 0, 0}})
+    :ets.insert(:rides_by_user, {96, {:pending, self(), 0, 0}})
     # silent for 4 minutes, not in a ride
     :ets.insert(:geo_drivers, {97, "rpS", "rpS-s", now - 4 * 60})
     for id <- [95, 96, 97], do: Geo.reindex_user(id)
@@ -393,10 +431,12 @@ defmodule Hoodride.SweeperAndGuardsTest do
   # a message's client id is kept 10 minutes (a retry within them gets the
   # same receipt); older ones are forgotten — and swept
   test "message ids: a receipt within 10 min, none after; the sweep keeps only the fresh" do
-    now = System.system_time(:second)
-    :ets.insert(:chat_sent_ids, {{501, "old"}, %{id: 1, ts: now}, now - 601})
-    :ets.insert(:chat_sent_ids, {{501, "edge"}, %{id: 2, ts: now}, now - 599})
-    :ets.insert(:chat_sent_ids, {{501, "new"}, %{id: 3, ts: now}, now})
+    now = System.monotonic_time(:second)
+    # (kept by the steady clock — ClockJumpTest)
+    at = System.monotonic_time(:second)
+    :ets.insert(:chat_sent_ids, {{501, "old"}, %{id: 1, ts: now}, at - 601})
+    :ets.insert(:chat_sent_ids, {{501, "edge"}, %{id: 2, ts: now}, at - 599})
+    :ets.insert(:chat_sent_ids, {{501, "new"}, %{id: 3, ts: now}, at})
     assert Hoodride.Chat.sent_receipt(501, "old") == nil
     assert Hoodride.Chat.sent_receipt(501, "edge") == %{id: 2, ts: now}
     assert Hoodride.Chat.sent_receipt(501, "new") == %{id: 3, ts: now}
@@ -414,7 +454,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
   test "an empty phone book with an ONLINE presence row: the sweep removes nobody (online = here now)" do
     Geo.driver_update(%{id: 610, name: "On", photo: nil}, "cell8on", nil, [])
     Geo.hand_up(611, "cell8oh", nil, [])
-    long_ago = System.system_time(:second) - 600
+    long_ago = System.monotonic_time(:second) - 600
     # connected 10 min ago — their channels just died with the phone book
     :ets.insert(:geo_presence, {610, :online, long_ago})
     :ets.insert(:geo_presence, {611, :online, long_ago})
@@ -426,7 +466,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
     assert :ets.member(:geo_hands, 611), "a ✋ whose owner was online was reaped"
     # their grace clock started NOW (not "since they connected") …
     assert [{610, :grace, t}] = :ets.lookup(:geo_presence, 610)
-    assert t >= System.system_time(:second) - 2
+    assert t >= System.monotonic_time(:second) - 2
     # … so one truly gone (never came back) is still reaped 5 min on
     :ets.insert(:geo_presence, {610, :grace, t - 301})
     Sweeper.sweep_now()
@@ -456,7 +496,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
 
   test "really gone (a GRACE row past 5 min): still reaped — the fix spares only 'online'" do
     Geo.driver_update(%{id: 612, name: "Gone", photo: nil}, "cell8gn", nil, [])
-    :ets.insert(:geo_presence, {612, :grace, System.system_time(:second) - 600})
+    :ets.insert(:geo_presence, {612, :grace, System.monotonic_time(:second) - 600})
     Sweeper.sweep_now()
     refute Geo.driver_on_map?(612)
   end
@@ -512,10 +552,10 @@ defmodule Hoodride.SweeperAndGuardsTest do
     names = Enum.map(Sweeper.steps(), &elem(&1, 0))
 
     assert names ==
-             ~w(expire_stale_requests heal_orphan_ride_slots sweep_stale_geo heal_geo_consistency
-             heal_unlawful_requests requests_heal_index sweep_empty_room_chats chat_heal_index chat_sent_ids
-             rate_budget sign_in_failures sign_in_states session_tokens blocks session_stamps rebuild_members
-             recompute_aggregates)a
+             ~w(expire_stale_requests heal_orphan_ride_slots heal_stranded_starting_seats sweep_stale_geo
+             heal_geo_consistency heal_unlawful_requests requests_heal_index sweep_empty_room_chats
+             chat_heal_index chat_sent_ids rate_budget sign_in_failures sign_in_states session_tokens blocks
+             session_stamps presence rebuild_members recompute_aggregates)a
 
     assert Enum.all?(Sweeper.steps(), fn {_, f} -> is_function(f, 0) end)
   end
@@ -528,13 +568,13 @@ defmodule Hoodride.SweeperAndGuardsTest do
 
     test "a normal sweep — someone gone past grace reaped — logs no repair" do
       Geo.driver_update(%{id: 620, name: "G", photo: nil}, "cell8rl", nil, [])
-      :ets.insert(:geo_presence, {620, :grace, System.system_time(:second) - 600})
+      :ets.insert(:geo_presence, {620, :grace, System.monotonic_time(:second) - 600})
       # silent 4 min BECAUSE they left (no channel): the normal reap, not a
       # "frozen car"
       Geo.driver_update(%{id: 627, name: "S", photo: nil}, "cell8sl", nil, [])
       [{_, c, sp, _}] = :ets.lookup(:geo_drivers, 627)
-      :ets.insert(:geo_drivers, {627, c, sp, System.system_time(:second) - 240})
-      :ets.insert(:geo_presence, {627, :grace, System.system_time(:second) - 240})
+      :ets.insert(:geo_drivers, {627, c, sp, System.monotonic_time(:second) - 240})
+      :ets.insert(:geo_presence, {627, :grace, System.monotonic_time(:second) - 240})
       log = capture_log(fn -> Sweeper.sweep_now() end)
       refute log =~ "repair:"
       refute Geo.driver_on_map?(627)
@@ -586,7 +626,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
     end
 
     test "each kind of repair: one line naming it, with its count" do
-      now = System.system_time(:second)
+      now = System.monotonic_time(:second)
       # car AND ✋ at once
       Geo.user_connected(621)
       Registry.register(Hoodride.UserChannels, 621, self())
@@ -652,7 +692,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
     end
 
     test "a wrong hex count, a stray chat index row, a missing request index row: each healed, each logged" do
-      now = System.system_time(:second)
+      now = System.monotonic_time(:second)
       # a count that says 7 cars where there are none
       :ets.insert(:geo_agg, {"c7-wrong", 7, 0})
       # a chat index row with no conversation behind it
@@ -708,7 +748,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
     # the writer refuses mid-ride rows, so plant them raw — the heal must still win
     :ets.insert(
       :geo_drivers,
-      {d.id, "cell8g1", "cell8g1", System.system_time(:second)}
+      {d.id, "cell8g1", "cell8g1", System.monotonic_time(:second)}
     )
 
     :ets.insert(:geo_hands, {r.id, "cell8g2", "spot9g2"})
@@ -733,7 +773,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
     Geo.user_connected(d.id)
 
     # raw rows that create/accept could never produce (they raced their guards)
-    now = System.system_time(:second)
+    now = System.monotonic_time(:second)
     # rider r is mid-ride yet "asks" someone → heal cancels it
     :ets.insert(:ride_requests, {r.id, 777, now})
     # rider 92 waits on an off-map driver 778 → heal declines with notice
@@ -747,6 +787,164 @@ defmodule Hoodride.SweeperAndGuardsTest do
     assert Requests.open_request_of(r.id) == nil
     assert Requests.open_request_of(92) == nil
     assert_receive %Phoenix.Socket.Broadcast{topic: "user:92", event: "request_declined"}
+  end
+
+  # (2026-11-18, the sweeper review) a car AND a ✋ with no record of which
+  # came last (the parents row missing): neither can be trusted — both go,
+  # the counts with them, the watchers and the person told
+  test "a car and a ✋ at once with no record of which came last: both off the map" do
+    alias Phoenix.Socket.Broadcast
+    Hoodride.Geo.user_connected(64)
+    Hoodride.Geo.driver_update(%{id: 64, name: "C64", photo: nil}, "cell8u", nil, ["c7U"])
+    :ets.insert(:geo_hands, {64, "cell8u", "spot9u"})
+    :ets.delete(:geo_parents, 64)
+    for t <- ~w(geo:d:cell8u geo:h:cell8u), do: HoodrideWeb.Endpoint.subscribe(t)
+    roles = Hoodride.Roles.topic(64)
+    HoodrideWeb.Endpoint.subscribe(roles)
+
+    Hoodride.Sweeper.sweep_now()
+
+    refute Hoodride.Geo.driver_on_map?(64)
+    assert :ets.lookup(:geo_hands, 64) == []
+    assert Hoodride.Geo.agg_counts_for("c7U") == %{drivers: 0, hands: 0}
+    assert :ets.match_object(:geo_by_cell, {{:_, 64}, :_}) == []
+    assert_receive %Broadcast{topic: "geo:d:cell8u", event: "driver_left", payload: %{id: 64}}
+    assert_receive %Broadcast{topic: "geo:h:cell8u", event: "hand_left", payload: %{id: 64}}
+    assert_receive %Broadcast{topic: ^roles, event: "changed"}
+  end
+
+  # ---- (independent review, 2026-11-18) ----
+
+  # a starting seat names its ride's process: that process gone, nothing can
+  # finish the start — freed, the person told; alive, never touched
+  test "seats left 'starting' by a start whose caller is gone: freed, both told, the rider told 'declined'; a live start's kept" do
+    alias Phoenix.Socket.Broadcast
+    dead = spawn(fn -> :ok end)
+    ref = Process.monitor(dead)
+    assert_receive {:DOWN, ^ref, :process, ^dead, _}
+    live = spawn(fn -> receive do: (:stop -> :ok) end)
+    on_exit(fn -> send(live, :stop) end)
+    claim = {:pending, dead, 9_801, 9_802}
+    :ets.insert(:rides_by_user, [{9_801, claim}, {9_802, claim}])
+    :ets.insert(:rides_by_user, {9_803, {:pending, live, 9_803, 9_804}})
+    for u <- [9_801, 9_802], do: HoodrideWeb.Endpoint.subscribe(Hoodride.Roles.topic(u))
+    for u <- [9_801, 9_802], do: HoodrideWeb.Endpoint.subscribe("user:#{u}")
+
+    log = ExUnit.CaptureLog.capture_log(fn -> Sweeper.sweep_now() end)
+
+    assert Rides.ride_id_of_user(9_801) == nil and Rides.ride_id_of_user(9_802) == nil
+
+    for u <- [9_801, 9_802] do
+      t = Hoodride.Roles.topic(u)
+      assert_received %Broadcast{topic: ^t, event: "changed"}
+    end
+
+    # the rider (the accept had taken their request) told, once; the driver not
+    assert_received %Broadcast{
+      topic: "user:9801",
+      event: "request_declined",
+      payload: %{by_id: 9_802}
+    }
+
+    refute_received %Broadcast{event: "request_declined"}
+    assert {:pending, ^live, _, _} = Rides.ride_id_of_user(9_803)
+    assert log =~ "repair: seat left starting ×2"
+  end
+
+  # (seats are claimed before any process starts: a taken seat means
+  # nothing claimed, nothing started, the other seat untouched)
+  test "a ride start that finds a seat taken: 'busy' — nothing claimed, nothing started" do
+    :ets.insert(:rides_by_user, {9_811, "taken"})
+    before = DynamicSupervisor.count_children(Hoodride.Rides.Supervisor).active
+    assert {:error, :busy} = Rides.start_ride(9_810, 9_811)
+    assert DynamicSupervisor.count_children(Hoodride.Rides.Supervisor).active == before
+    assert Rides.ride_id_of_user(9_810) == nil, "a seat claimed though the other was taken"
+    assert Rides.ride_id_of_user(9_811) == "taken"
+  end
+
+  # a person's lock held (a read on a slow database): the cleanup skips them
+  # and goes on — it used to wait, and the whole pass with it
+  test "sign-ins and blocks: a person whose lock is busy is skipped, not waited for; caught next pass" do
+    {:ok, u} =
+      Hoodride.Accounts.upsert_oauth_user(%{provider: "dev", provider_id: "lk", name: "L"})
+
+    {:ok, _raw} = Hoodride.SessionTokens.create(u.id)
+    :ok = Hoodride.SessionTokens.preload_many([u.id])
+    :ok = Hoodride.Blocks.preload_many([u.id])
+    assert Hoodride.SessionTokens.loaded?(u.id) and Hoodride.Blocks.loaded?(u.id)
+    # (not around: no presence at all)
+    test = self()
+
+    holder =
+      spawn(fn ->
+        for m <- [Hoodride.SessionTokens, Hoodride.Blocks],
+            do: true = :global.set_lock({{m, u.id}, self()}, [node()])
+
+        send(test, :held)
+        receive do: (:release -> :ok)
+      end)
+
+    assert_receive :held
+    # (a failure midway never leaves this person's locks held for later tests)
+    on_exit(fn -> Process.exit(holder, :kill) end)
+    pass = Task.async(fn -> Sweeper.sweep_now() end)
+    assert Task.yield(pass, 3_000) == {:ok, :ok}, "the pass waited on a busy lock"
+    assert Hoodride.SessionTokens.loaded?(u.id) and Hoodride.Blocks.loaded?(u.id)
+
+    ref = Process.monitor(holder)
+    send(holder, :release)
+    assert_receive {:DOWN, ^ref, :process, ^holder, _}
+    Sweeper.sweep_now()
+    refute Hoodride.SessionTokens.loaded?(u.id) or Hoodride.Blocks.loaded?(u.id)
+  end
+
+  # one presence row per person since the server started, never removed —
+  # those gone past grace go now (no row already means "long gone")
+  test "presence rows: gone past grace removed; within grace, online, or connected again kept" do
+    now = System.monotonic_time(:second)
+    grace = div(Hoodride.Limits.presence_grace_ms(), 1000)
+    :ets.insert(:geo_presence, {9_821, :grace, now - grace - 5})
+    :ets.insert(:geo_presence, {9_822, :grace, now - 10})
+    :ets.insert(:geo_presence, {9_823, :online, now - 10_000})
+    :ets.insert(:geo_presence, {9_824, :grace, now - grace - 5})
+    {:ok, _} = Registry.register(Hoodride.UserChannels, 9_824, nil)
+
+    Sweeper.prune_presence()
+
+    assert :ets.lookup(:geo_presence, 9_821) == []
+    for u <- [9_822, 9_823, 9_824], do: assert([_] = :ets.lookup(:geo_presence, u))
+    # and gone is the same answer as before
+    refute Hoodride.Presence.around?(9_821)
+  end
+
+  # (the second review) an "online" row whose channel ended without its
+  # goodbye, for someone with no car, ✋ or chat: it stayed forever. Its
+  # grace starts now; past it, gone
+  test "an 'online' row with no channel: its grace starts, then it goes" do
+    :ets.insert(:geo_presence, {9_841, :online, System.monotonic_time(:second) - 10_000})
+
+    ExUnit.CaptureLog.capture_log(fn -> Sweeper.prune_presence() end)
+    assert [{_, :grace, since}] = :ets.lookup(:geo_presence, 9_841)
+    assert abs(since - System.monotonic_time(:second)) <= 2
+
+    :ets.insert(:geo_presence, {9_841, :grace, since - 3600})
+    Sweeper.prune_presence()
+    assert :ets.lookup(:geo_presence, 9_841) == []
+  end
+
+  # (the half a full pass hides: heal (b) takes a mid-ride car off first)
+  test "unlawful request: its driver in a ride — declined, the rider told" do
+    HoodrideWeb.Endpoint.subscribe("user:9831")
+    Geo.user_connected(9_832)
+    :ok = Geo.driver_update(%{id: 9_832, name: "D", photo: nil}, "cell8x", nil, [])
+    :ets.insert(:ride_requests, {9_831, 9_832, System.monotonic_time(:second)})
+    :ets.insert(:requests_by_driver, {{9_832, 9_831}, System.monotonic_time(:second)})
+    :ets.insert(:rides_by_user, {9_832, "r-other"})
+
+    Sweeper.heal_unlawful_requests()
+
+    assert Requests.open_request_of(9_831) == nil
+    assert_receive %Phoenix.Socket.Broadcast{topic: "user:9831", event: "request_declined"}
   end
 
   test "two-tab race residue heals: the parents row's role picks the winner" do
@@ -768,7 +966,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
 
     :ets.insert(
       :geo_drivers,
-      {62, "cell8v", "cell8v", System.system_time(:second)}
+      {62, "cell8v", "cell8v", System.monotonic_time(:second)}
     )
 
     :ok = Requests.create(%{id: 63, name: "W63", photo: nil}, 62)

@@ -16,8 +16,8 @@ defmodule Hoodride.Presence do
   # (seconds, as the presence clock — Hoodride.Geo)
   @grace div(Hoodride.Limits.presence_grace_ms(), 1000)
 
-  @doc "`now`: seconds, the presence clock."
-  def around?(user_id, now \\ System.system_time(:second)) do
+  @doc "`now`: seconds, the presence clock (the steady one — Hoodride.Geo)."
+  def around?(user_id, now \\ System.monotonic_time(:second)) do
     Hoodride.Geo.connected?(user_id) or
       in_grace?(Hoodride.Geo.grace_since(user_id), now) or
       Hoodride.Rides.ride_id_of_user(user_id) != nil or

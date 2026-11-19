@@ -921,6 +921,8 @@ Everything live is in ETS / process state. **Every piece of state has a death ru
 | Active rides              | GenServer per ride  | End ride, or abandoned sweep (both silent ~30 min) |
 | Conversations + messages  | ETS                 | EITHER party offline past grace (5 min, checked each minute), unless the two share a ride — the same rule that takes a car or hand off the map (owner's call 2026-10-23; until then it took BOTH gone, no open request, no ride). Both sides are told (`chat_closed`); a message sent to someone away 5+ min is lost with the chat (accepted) |
 | Aggregate counts          | ETS (derived)       | recomputed each tick from fine table |
+| An open chat's messages, on the phone | the page's memory | beyond the newest 20 (the server's `chat_history`; `CHAT_KEEP` in app.js, LimitsTest keeps them equal) — the oldest dropped as new ones come (2026-11-19: an open chat kept every message) |
+| A person's record, on the phone (name, photo, car, last block) | the page's memory (`realPeersById`) | nothing points at it — not on the map, no chat, not the open chat or card, no ride or request, not the banner's or block sheet's (`peerInUse`) — for a quiet minute (`forgetUnusedPeers`, every 30 s; the minute: a reply on its way still finds the same record). Kept until a reload before 2026-11-19. A new holder of a person must join `peerInUse` — AppPeerHoldersTest finds them by name and fails until it does |
 | **User accounts**         | **SQLite**          | account deletion (the only durable data; block-list joins it later) |
 
 - "Open states are held, terminal states are deleted."
@@ -2761,7 +2763,11 @@ here say the rest.
   slow database froze it (RideBusyTest).
 - **The Sweeper waits at most 1 s on the map writers**, then not at all for
   the rest of the pass (`GeoWriter.short_waits/2`); changes still land, in
-  order (SweeperStallTest).
+  order (SweeperStallTest). A removal of someone judged gone asks "still
+  gone?" again inside the writer, when it runs (`Geo.reap`, 2026-11-18):
+  queued behind busy writers, it used to remove a ✋ whose rider had come
+  back and whose app had already read it back — nothing told them (a ✋ is
+  sent once; a car's 20 s heartbeat brings a car back).
 - **The offline worker gives the network 4 s**, then shows the saved app
   (Workbox's `networkTimeoutSeconds` pattern; `sw.js NETWORK_WAIT_MS`;
   journey `weaksignal`).
@@ -2770,7 +2776,38 @@ here say the rest.
   limit, and a reboot without a time server kept the site down); the
   Sweeper skips its time-based steps for a pass after the wall clock jumped
   against the steady one (OTP 29 follows clock jumps: `multi_time_warp`;
-  ClockJumpTest).
+  ClockJumpTest). Lengths of time nobody sees are kept by the STEADY
+  clock, which never jumps (Erlang's time guide): the per-person rate
+  budgets (`RateBudget`), sign-in failure windows, and since 2026-11-18 (the sweeper reviews) a message's
+  10-minute retry id — by the wall clock a forward jump made a retry
+  "never seen", the message delivered twice — the day an offline
+  account's "device you chose" is kept, presence (gone 5 minutes?), a
+  car's last position (frozen?), a request's age (its 5 minutes; sent to
+  the app as a wall-clock time, `Requests.wall_ts`) and a ride's silence
+  (abandoned?). A step BACK of the wall clock kept departed cars and
+  requests for as long as the step; a skipped pass only helped a forward
+  jump. Only times from outside the running server still skip a jump's
+  pass: a sign-in's (stored) and a sign-in state's (in the cookie). (The
+  Hammer-backed `RateLimit`/`Throttle` cooldowns still use the wall clock:
+  a jump only shortens or lengthens one cooldown.)
+- **A starting ride's seats name the start** (`{:pending, caller, rider,
+  driver}` — claimed first, both or neither, in the accepting driver's
+  connection's name; the ride then takes them over only if they're still
+  that claim: `select_replace`). The connection ending before the ride's
+  process existed used to leave both "in a ride" with no ride until a
+  restart, and the rider's request (already taken by the accept) waited
+  on "asking…" forever. Now the Sweeper frees a starting seat whose caller
+  is gone AND no ride is working on that start (`Ride.starting_for?/1`;
+  a ride mid-start-up finishes, or frees its seats in its own
+  `terminate/2`); never one whose caller is alive, however slow the
+  start-up. Whoever frees the rider's seat tells them "declined" — once. (Claimed
+  first, not after starting the process: a Cancel in between would answer
+  "cancelled" and then the ride would open — CancelAcceptRaceTest.)
+- **Dropping a person from memory reads only their own rows**: blocks in a
+  sorted table (`{{user, other}}` — a range), sign-ins through
+  `session_token_by_user` (`{{user, hash}}`). Each used to scan whole
+  tables: 4,000 people not back after a restart took ~50 s for one pass;
+  ~0.3 s now (SweeperMemoryTest).
 - **A shared piece restarting** never crashes its callers: the rides'
   supervisor (`start_child` exits caught, seats freed), the rate-limit
   table's owner (`RateLimit.guarded`), the database's supervisor
@@ -2927,10 +2964,13 @@ here say the rest.
   (`Throttle`; a refusal costs nothing), the list in pages of 30.
 - **The app:** Block on a person's card and in their chat (beside End
   chat; mid-ride too — it ends the ride), asked first in a sheet. "Blocked
-  people" at the bottom of the profile drawer only once you've blocked
-  someone (the count asked as the drawer opens, `/api/blocks?count=1` —
-  never with every app open, which makes ONE database query); the list
-  newest first, in pages as the chat list.
+  people" always at the bottom of the profile drawer (owner, 2026-11-18,
+  as WhatsApp/Instagram/iOS: it was shown only once you'd blocked someone,
+  from a count asked as the drawer opened — a failed count hid it). No
+  count now: opening the drawer asks the server nothing; the list loads
+  when tapped, newest first, in pages as the chat list — "You haven't
+  blocked anyone" when empty, "Couldn't load — tap to try again" on a
+  failure.
 - Privacy policy: who you block (only you see the list; the person isn't
   told), kept until unblocked or either account is deleted.
 - **A chat gone while you were away** (2026-11-15): the reconnect finds

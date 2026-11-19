@@ -29,7 +29,10 @@ await journey("demoblock: in the demo, End chat closes the chat; Block hides the
   await dee.waitFor(shown("chat-end"), "End chat shown");
   await dee.click("chat-end");
   check((await dee.eval(`document.getElementById("chat-end").textContent`)) === "Tap again to end", "the first tap asks again");
-  await dee.click("chat-end");
+  // the second tap at once, once it's armed: two separate taps from the test
+  // could be more than End chat's 3 s apart on a loaded machine (the
+  // precommit, 2026-11-19) — the arming then lapsed and the tap re-armed
+  await dee.eval(`(() => { const b = document.getElementById("chat-end"); if (b.textContent !== "Tap again to end") throw new Error("not armed: " + b.textContent); b.click(); return true; })()`);
   await dee.waitFor(`!${chatOpen} && !chats.has(drivers[0])`, "the chat gone");
 
   step("two chats, End chat in one: the list, with the other (owner, 2026-11-17)");
@@ -41,7 +44,10 @@ await journey("demoblock: in the demo, End chat closes the chat; Block hides the
   await send(dee);
   await dee.waitFor(shown("chat-end"), "End chat shown");
   await dee.click("chat-end");
-  await dee.click("chat-end");
+  // the second tap at once, once it's armed: two separate taps from the test
+  // could be more than End chat's 3 s apart on a loaded machine (the
+  // precommit, 2026-11-19) — the arming then lapsed and the tap re-armed
+  await dee.eval(`(() => { const b = document.getElementById("chat-end"); if (b.textContent !== "Tap again to end") throw new Error("not armed: " + b.textContent); b.click(); return true; })()`);
   await dee.waitFor(`!chats.has(drivers[2])`, "that chat gone");
   check(await dee.eval(`${chatOpen} && state.chatView === "list"`), "the list");
   check((await dee.eval(`[...document.querySelectorAll("#chat-messages .chat-item strong")].map((s) => s.textContent)`)).join() === (await dee.eval(`drivers[0].name`)), "the other chat in it");

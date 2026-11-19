@@ -102,6 +102,16 @@ defmodule Hoodride.Geo do
 
   def hand_down(user_id, timeout \\ nil), do: exec(user_id, {:hand_down, user_id}, timeout)
 
+  @doc """
+  The Sweeper's removal of someone it judged gone: `still_gone?` is asked
+  again INSIDE the writer, when the removal actually runs — it can wait in
+  the writer's queue (busy writers), and they may have come back meanwhile
+  (2026-11-18: a returning rider's ✋ removed after their app had read it
+  back — nothing ever told them; SweeperStallTest).
+  """
+  def reap(kind, user_id, still_gone?) when kind in [:driver, :hand, :both],
+    do: exec(user_id, {:reap, kind, user_id, still_gone?}, nil)
+
   defp exec(key, op, nil), do: Hoodride.GeoWriter.exec(key, op)
   defp exec(key, op, timeout), do: Hoodride.GeoWriter.exec(key, op, timeout)
 
@@ -378,7 +388,8 @@ defmodule Hoodride.Geo do
     announce = if stale == [], do: missing, else: expected
 
     if Hoodride.Rides.ride_id_of_user(user_id) == nil do
-      now = System.system_time(:second)
+      # (a car's time is the steady clock's: now/0)
+      now = now()
 
       Enum.each(announce, fn
         {{cell, _}, :driver} ->
@@ -944,5 +955,9 @@ defmodule Hoodride.Geo do
   def agg_topic(:drivers, cell), do: "agg:d:" <> cell
   def agg_topic(:hands, cell), do: "agg:h:" <> cell
 
-  defp now, do: System.system_time(:second)
+  # presence and car times are LENGTHS of time (gone 5 min? silent 3?):
+  # the steady clock, which never jumps — by the wall clock, a step back
+  # kept departed cars on the map for as long as the step (ClockJumpTest,
+  # 2026-11-18). Never shown to anyone; compared only with this clock
+  defp now, do: System.monotonic_time(:second)
 end
