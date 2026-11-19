@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Računa ni bilo mogoče izbrisati – poskusi znova."
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "Računa ni bilo mogoče izbrisati. Odjavljen(a) si – znova se prijavi, da poskusiš znova."
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "Klepeta ni bilo mogoče končati – poskusi znova"
 
@@ -1313,8 +1317,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 Čakanje na tvojo lokacijo – sopotniki te še ne vidijo"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 Tvoja lokacija je le približna – vklopi natančno lokacijo, {why}: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 Tvoja lokacija je le približna. Če si v zaprtem prostoru, pojdi ven – ali preveri, ali je vklopljena natančna lokacija, {why}: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

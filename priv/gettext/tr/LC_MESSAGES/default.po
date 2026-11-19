@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Hesabın silinemedi. Lütfen tekrar dene."
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "Hesabın silinemedi. Oturumun kapatıldı — tekrar denemek için yeniden giriş yap."
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "Sohbet bitirilemedi. Tekrar dene"
 
@@ -1299,8 +1303,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 Konumun bekleniyor. Yolcular seni henüz göremiyor"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 Konumun yalnızca yaklaşık — {why} Tam Konum'u aç: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 Konumun yalnızca yaklaşık. İçerideysen dışarı çık — ya da {why} Tam Konum'un açık olduğundan emin ol: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

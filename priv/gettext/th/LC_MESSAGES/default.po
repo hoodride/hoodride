@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "ลบบัญชีของคุณไม่ได้ โปรดลองอีกครั้ง"
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "ลบบัญชีของคุณไม่ได้ คุณออกจากระบบแล้ว โปรดลงชื่อเข้าใช้อีกครั้งเพื่อลองใหม่"
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "จบแชทไม่ได้ โปรดลองอีกครั้ง"
 
@@ -1292,8 +1296,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 กำลังรอตำแหน่งของคุณ ผู้โดยสารยังมองไม่เห็นคุณ"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 ตำแหน่งของคุณเป็นแบบโดยประมาณเท่านั้น โปรดเปิด ตำแหน่งที่ตั้งจริง {why}: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 ตำแหน่งของคุณเป็นแบบโดยประมาณเท่านั้น หากอยู่ในอาคาร ให้ออกไปข้างนอก — หรือตรวจดูว่าเปิด ตำแหน่งที่ตั้งจริง อยู่ {why}: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

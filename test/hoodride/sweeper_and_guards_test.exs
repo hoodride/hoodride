@@ -320,6 +320,11 @@ defmodule Hoodride.SweeperAndGuardsTest do
     assert Geo.driver_on_map?(94)
   end
 
+  # the cell-index repair as the Sweeper runs it: the drift pass, then each
+  # person's repair in their shard, with the wrong rows the pass found
+  defp repair_index,
+    do: for({id, seen} <- Geo.cell_index_strays(), do: Geo.reindex_user(id, seen))
+
   # a shard that died mid-move (the row moved, the index and messages not):
   # the repair must TELL the watchers, as the move would have — else the
   # old cell's watchers keep a ghost and the new cell's never see them
@@ -335,8 +340,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
     [{_, _, _, ts}] = :ets.lookup(:geo_drivers, 93)
     :ets.insert(:geo_drivers, {93, "rxB", "rxB-s", ts})
     :ets.insert(:geo_hands, {94, "rxD", "rxD-s"})
-    Geo.reindex_user(93)
-    Geo.reindex_user(94)
+    repair_index()
 
     # IN ORDER: the "left" first — a "left" names only the id: sent after
     # the update, it would wipe the car that just arrived (a watcher of both)
@@ -374,9 +378,12 @@ defmodule Hoodride.SweeperAndGuardsTest do
     # (the rxB side of those two moves: taken too)
     assert_receive %Broadcast{topic: "geo:d:rxB", event: "driver_left"}
     assert_receive %Broadcast{topic: "geo:d:rxB", event: "driver_update"}
-    # an index already right: a repair says nothing
-    Geo.reindex_user(93)
-    Geo.reindex_user(94)
+    # an index already right: a repair says nothing — the check finds no
+    # one, and a repair run anyway (the Sweeper's false positive: someone
+    # mid-move when it looked, right by the time the repair runs) neither
+    repair_index()
+    Geo.reindex_user(93, [])
+    Geo.reindex_user(94, [])
     refute_receive %Broadcast{topic: "geo:" <> _}, 100
   end
 
@@ -392,7 +399,7 @@ defmodule Hoodride.SweeperAndGuardsTest do
     assert_receive %Broadcast{topic: "geo:d:ghB", event: "driver_update"}
     # the ghost: indexed in A too
     :ets.insert(:geo_by_cell, {{"ghA", 99}, :driver})
-    Geo.reindex_user(99)
+    repair_index()
     assert_receive %Broadcast{topic: "geo:d:ghA", event: "driver_left", payload: %{id: 99}}
     assert_receive %Broadcast{topic: "geo:d:ghB", event: "driver_update", payload: up}
     assert Map.delete(up, :json) == %{id: 99, cell: "ghB", spot: "ghB-s"}

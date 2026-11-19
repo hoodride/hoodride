@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "നിങ്ങളുടെ അക്കൗണ്ട് ഇല്ലാതാക്കാനായില്ല — ദയവായി വീണ്ടും ശ്രമിക്കുക."
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "നിങ്ങളുടെ അക്കൗണ്ട് ഇല്ലാതാക്കാനായില്ല. നിങ്ങൾ സൈൻ ഔട്ട് ആയി — വീണ്ടും ശ്രമിക്കാൻ വീണ്ടും സൈൻ ഇൻ ചെയ്യുക."
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "ചാറ്റ് അവസാനിപ്പിക്കാനായില്ല — വീണ്ടും ശ്രമിക്കുക"
 
@@ -1299,8 +1303,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 നിങ്ങളുടെ ലൊക്കേഷനായി കാത്തിരിക്കുന്നു — യാത്രക്കാർക്ക് ഇതുവരെ നിങ്ങളെ കാണാനാകില്ല"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 നിങ്ങളുടെ ലൊക്കേഷൻ ഏകദേശം മാത്രമാണ് — {why} കൃത്യമായ ലൊക്കേഷൻ ഓണാക്കുക: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 നിങ്ങളുടെ ലൊക്കേഷൻ ഏകദേശം മാത്രമാണ്. നിങ്ങൾ അകത്താണെങ്കിൽ പുറത്തേക്ക് പോകുക — അല്ലെങ്കിൽ {why} കൃത്യമായ ലൊക്കേഷൻ ഓണാണോ എന്ന് പരിശോധിക്കുക: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

@@ -274,22 +274,49 @@ defmodule Hoodride.Geo do
   # pattern (a guard would not narrow the ordered_set traversal). Each hit
   # is confirmed against the main table, so an index row caught mid-update
   # on another shard can never produce a ghost in a snapshot.
-  def cell_snapshot(cell) do
-    rows = :ets.match_object(@by_cell, {{cell, :_}, :_})
+  def cell_snapshot(cell),
+    do: %{drivers: cell_snapshot(cell, :drivers), hands: cell_snapshot(cell, :hands)}
 
-    drivers =
-      for {{_, id}, :driver} <- rows,
-          [{^id, ^cell, spot, _ts}] <- [:ets.lookup(@drivers, id)] do
-        %{id: id, cell: cell, spot: spot}
-      end
+  @doc """
+  One layer of an area (`:drivers` or `:hands`) — what a viewer watches:
+  the other layer's people there are never looked up. A rider's snapshot
+  built the area's ✋ too, then kept only the cars (2026-11-19: 5,000 ✋
+  in a block, ~73,000 units of work for one car). The index's rows are
+  still walked for the area (the role is the row's value, not its key):
+  one comparison each, copying only the matching ids.
+  """
+  def cell_snapshot(cell, :drivers) do
+    for [id] <- :ets.match(@by_cell, {{cell, :"$1"}, :driver}),
+        [{^id, ^cell, spot, _ts}] <- [:ets.lookup(@drivers, id)] do
+      %{id: id, cell: cell, spot: spot}
+    end
+  end
 
-    hands =
-      for {{_, id}, :hand} <- rows,
-          [{^id, ^cell, spot}] <- [:ets.lookup(@hands, id)] do
-        %{id: id, cell: cell, spot: spot}
-      end
+  def cell_snapshot(cell, :hands) do
+    for [id] <- :ets.match(@by_cell, {{cell, :"$1"}, :hand}),
+        [{^id, ^cell, spot}] <- [:ets.lookup(@hands, id)] do
+      %{id: id, cell: cell, spot: spot}
+    end
+  end
 
-    %{drivers: drivers, hands: hands}
+  @doc """
+  One person's marker, as cell_snapshot/1 would show it in their cell
+  (`%{id, cell, spot}`), or nil: on the map in `layer` and indexed there —
+  read by their keys, not by building their whole cell (an unblock wanted
+  one marker: full-scan audit, 2026-11-19).
+  """
+  def marker(:drivers, id) do
+    with [{^id, cell, spot, _ts}] <- :ets.lookup(@drivers, id),
+         :driver <- :ets.lookup_element(@by_cell, {cell, id}, 2, nil),
+         do: %{id: id, cell: cell, spot: spot},
+         else: (_ -> nil)
+  end
+
+  def marker(:hands, id) do
+    with [{^id, cell, spot}] <- :ets.lookup(@hands, id),
+         :hand <- :ets.lookup_element(@by_cell, {cell, id}, 2, nil),
+         do: %{id: id, cell: cell, spot: spot},
+         else: (_ -> nil)
   end
 
   # ===== cell index repair (sweeper) =====
@@ -310,23 +337,36 @@ defmodule Hoodride.Geo do
   the costlier direction). Any concurrent change just makes the counts
   disagree, and the full check runs.
   """
-  def cell_index_drift do
+  def cell_index_drift, do: Map.keys(cell_index_strays())
+
+  @doc """
+  The same, with the index rows the pass found wrong: `%{user_id =>
+  [{{cell, user_id}, role}]}` (`[]`: only a row missing). The repair gets
+  them (reindex_user/2): it fixes rows by their exact keys — finding a
+  person's rows itself read the whole index ({cell, user} has no leading
+  user), inside their writer shard (full-scan audit, 2026-11-19).
+  """
+  def cell_index_strays do
     import Hoodride.ETS, only: [fold_match: 4]
 
     # lookup_element/4 reads ONE field with a default: no row copy, and no
     # exception for a missing key
     stray =
-      fold_match(@by_cell, [{:"$1", [], [:"$1"]}], [], fn
-        {{cell, id}, :driver}, acc ->
-          if :ets.lookup_element(@drivers, id, 2, nil) == cell, do: acc, else: [id | acc]
+      fold_match(@by_cell, [{:"$1", [], [:"$1"]}], %{}, fn
+        {{cell, id}, :driver} = row, acc ->
+          if :ets.lookup_element(@drivers, id, 2, nil) == cell,
+            do: acc,
+            else: add_stray(acc, id, row)
 
-        {{cell, id}, :hand}, acc ->
-          if :ets.lookup_element(@hands, id, 2, nil) == cell, do: acc, else: [id | acc]
+        {{cell, id}, :hand} = row, acc ->
+          if :ets.lookup_element(@hands, id, 2, nil) == cell,
+            do: acc,
+            else: add_stray(acc, id, row)
       end)
 
-    if stray == [] and
+    if stray == %{} and
          :ets.info(@by_cell, :size) == :ets.info(@drivers, :size) + :ets.info(@hands, :size) do
-      []
+      %{}
     else
       indexed_as? = fn cell, id, role ->
         :ets.lookup_element(@by_cell, {cell, id}, 2, nil) == role
@@ -334,15 +374,18 @@ defmodule Hoodride.Geo do
 
       suspects =
         fold_match(@drivers, [{{:"$1", :"$2", :_, :_}, [], [{{:"$1", :"$2"}}]}], stray, fn
-          {id, cell}, acc -> if indexed_as?.(cell, id, :driver), do: acc, else: [id | acc]
+          {id, cell}, acc ->
+            if indexed_as?.(cell, id, :driver), do: acc, else: Map.put_new(acc, id, [])
         end)
 
       fold_match(@hands, [{{:"$1", :"$2", :_}, [], [{{:"$1", :"$2"}}]}], suspects, fn
-        {id, cell}, acc -> if indexed_as?.(cell, id, :hand), do: acc, else: [id | acc]
+        {id, cell}, acc ->
+          if indexed_as?.(cell, id, :hand), do: acc, else: Map.put_new(acc, id, [])
       end)
-      |> Enum.uniq()
     end
   end
+
+  defp add_stray(acc, id, row), do: Map.update(acc, id, [row], &[row | &1])
 
   # repairs run in the USER's own writer shard, so they are serialized with
   # that user's live updates and can't race them; anything in flight when the
@@ -351,10 +394,14 @@ defmodule Hoodride.Geo do
   # never brings it back on watchers' maps meanwhile; = Sweeper's limit)
   @repair_fresh_s 3 * 60
 
-  def reindex_user(user_id), do: Hoodride.GeoWriter.exec(user_id, {:reindex, user_id})
+  # `seen`: the wrong index rows the drift pass found for them
+  # (cell_index_strays/0) — with the rows they should have, all the repair
+  # reads, each by its key
+  def reindex_user(user_id, seen \\ []),
+    do: Hoodride.GeoWriter.exec(user_id, {:reindex, user_id, seen})
 
   @doc false
-  def reindex_user_now(user_id) do
+  def reindex_user_now(user_id, seen \\ []) do
     expected =
       case :ets.lookup(@drivers, user_id) do
         [{_, cell, _, _}] -> [{{cell, user_id}, :driver}]
@@ -365,7 +412,8 @@ defmodule Hoodride.Geo do
           [] -> []
         end
 
-    actual = :ets.match_object(@by_cell, {{:_, user_id}, :_})
+    # (each still there as it was seen — a move since is the normal path's)
+    actual = still_indexed(@by_cell, seen ++ expected, user_id)
     stale = actual -- expected
     missing = expected -- actual
     Enum.each(stale, fn {key, _} -> :ets.delete(@by_cell, key) end)
@@ -426,14 +474,21 @@ defmodule Hoodride.Geo do
   row count also equals the total parent cells, nothing is missing. Only
   then is the costlier parents-side pass skipped.
   """
-  def member_drift do
+  def member_drift, do: Map.keys(member_strays())
+
+  @doc """
+  The same, with the membership rows the pass found wrong: `%{user_id =>
+  rows}` — the repair fixes rows by their exact keys (rebuild_members/2),
+  as the cell index's (cell_index_strays/0).
+  """
+  def member_strays do
     import Hoodride.ETS, only: [fold_match: 4]
 
     stray =
-      fold_match(@members, [{:"$1", [], [:"$1"]}], [], fn {{cell, id}, role}, acc ->
+      fold_match(@members, [{:"$1", [], [:"$1"]}], %{}, fn {{cell, id}, role} = row, acc ->
         case :ets.lookup(@parents, id) do
-          [{_, ^role, cells}] -> if cell in cells, do: acc, else: [id | acc]
-          _ -> [id | acc]
+          [{_, ^role, cells}] -> if cell in cells, do: acc, else: add_stray(acc, id, row)
+          _ -> add_stray(acc, id, row)
         end
       end)
 
@@ -442,33 +497,44 @@ defmodule Hoodride.Geo do
         n + length(cells)
       end)
 
-    if stray == [] and :ets.info(@members, :size) == expected do
-      []
+    if stray == %{} and :ets.info(@members, :size) == expected do
+      %{}
     else
       fold_match(@parents, [{:"$1", [], [:"$1"]}], stray, fn {id, role, cells}, acc ->
         if Enum.all?(cells, &(:ets.lookup_element(@members, {&1, id}, 2, nil) == role)),
           do: acc,
-          else: [id | acc]
+          else: Map.put_new(acc, id, [])
       end)
-      |> Enum.uniq()
     end
   end
 
   # re-derived inside the user's own shard, serialized with their live ops
-  def rebuild_members(user_id), do: Hoodride.GeoWriter.exec(user_id, {:rebuild_members, user_id})
+  # `seen`: the wrong rows member_strays/0 found for them
+  def rebuild_members(user_id, seen \\ []),
+    do: Hoodride.GeoWriter.exec(user_id, {:rebuild_members, user_id, seen})
 
   @doc false
-  def rebuild_members_now(user_id) do
+  def rebuild_members_now(user_id, seen \\ []) do
     expected =
       case parents_of(user_id) do
         {nil, []} -> []
         {role, cells} -> for c <- cells, do: {{c, user_id}, role}
       end
 
-    actual = :ets.match_object(@members, {{:_, user_id}, :_})
+    actual = still_indexed(@members, seen ++ expected, user_id)
     Enum.each(actual -- expected, fn {key, _} -> :ets.delete(@members, key) end)
     Enum.each(expected -- actual, &:ets.insert(@members, &1))
     :ok
+  end
+
+  # of `rows` ({{cell, user_id}, role}), those in `table` now, as they are
+  # — each read by its key
+  defp still_indexed(table, rows, user_id) do
+    for {{cell, ^user_id} = key, _} <- Enum.uniq(rows),
+        role = :ets.lookup_element(table, key, 2, nil),
+        role != nil,
+        uniq: true,
+        do: {{cell, user_id}, role}
   end
 
   # ===== aggregates (V1: full periodic recompute — cache of the live tables) =====

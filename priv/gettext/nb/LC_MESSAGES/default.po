@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Kunne ikke slette kontoen din. Prøv igjen."
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "Kunne ikke slette kontoen din. Du er logget ut — logg på igjen for å prøve igjen."
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "Kunne ikke avslutte chatten. Prøv igjen"
 
@@ -1299,8 +1303,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 Venter på posisjonen din. Passasjerer kan ikke se deg ennå"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 Posisjonen din er bare omtrentlig. Slå på nøyaktig posisjon {why}: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 Posisjonen din er bare omtrentlig. Er du inne, gå ut — eller sjekk at nøyaktig posisjon er slått på {why}: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

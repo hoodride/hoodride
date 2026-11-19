@@ -150,6 +150,11 @@ defmodule Hoodride.GeoWriter do
     :ok
   end
 
+  # changes nothing: answered once everything queued before it (this
+  # writer's) has run — a caller waits on it, never on a second copy of a
+  # change (Hoodride.AccountDeletion)
+  defp run({:caught_up, _user_id}), do: :ok
+
   # (Geo.reap: the check runs here, serialized with this person's other map
   # changes — right before the removal, however long it waited)
   # :removed or :kept — so a repair is logged only when it repaired
@@ -164,8 +169,8 @@ defmodule Hoodride.GeoWriter do
     end
   end
 
-  defp run({:reindex, user_id}) do
-    Hoodride.Geo.reindex_user_now(user_id)
+  defp run({:reindex, user_id, seen}) do
+    Hoodride.Geo.reindex_user_now(user_id, seen)
     :ok
   end
 
@@ -174,8 +179,8 @@ defmodule Hoodride.GeoWriter do
     :ok
   end
 
-  defp run({:rebuild_members, user_id}) do
-    Hoodride.Geo.rebuild_members_now(user_id)
+  defp run({:rebuild_members, user_id, seen}) do
+    Hoodride.Geo.rebuild_members_now(user_id, seen)
     :ok
   end
 

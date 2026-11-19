@@ -103,8 +103,8 @@ defmodule Hoodride.SweeperMemoryTest do
 
     for id <- 1..n do
       :ets.insert(:geo_presence, {id, :online, now})
-      :ets.insert(:session_token_loaded, {id})
-      :ets.insert(:block_loaded, {id})
+      :ets.insert(:session_token_loaded, {id, 0})
+      :ets.insert(:block_loaded, {id, 0})
       # what's kept about each sign-in, beside it (links, fresh): their
       # tokens still there, so nothing to forget
       h = <<id::256>>
@@ -141,8 +141,8 @@ defmodule Hoodride.SweeperMemoryTest do
     n = 4_000
 
     for id <- 1..n do
-      :ets.insert(:session_token_loaded, {id})
-      :ets.insert(:block_loaded, {id})
+      :ets.insert(:session_token_loaded, {id, 0})
+      :ets.insert(:block_loaded, {id, 0})
 
       for k <- 1..3 do
         h = <<id::128, k::128>>

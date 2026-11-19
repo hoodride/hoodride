@@ -53,6 +53,8 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     on_exit(fn -> Application.delete_env(:hoodride, :terms_version) end)
     # (and Turnstile, after server("turnstile_on"))
     on_exit(fn -> turnstile_off() end)
+    # (and the account deletion's test pause, after server("delete_slow …"))
+    on_exit(fn -> Application.delete_env(:hoodride, :account_deletion_hook) end)
 
     # the server's side of a failure: every socket connect and channel join,
     # when and how long it took (a join stuck "joining" under load, 2026-11-02).
@@ -289,6 +291,30 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     end
   end
 
+  # the next account deletion's database step takes 2.5 s (a busy
+  # database): the deleting phone's own connection is closed first, and it
+  # notices before the answer comes. "fail": the erase then refused too
+  defp server("delete_slow " <> args) do
+    # "fail" | "ok" [, the pause in ms — 2,500 unless given]
+    [how | rest] = String.split(args)
+    ms = if rest == [], do: 2_500, else: String.to_integer(hd(rest))
+
+    Application.put_env(:hoodride, :account_deletion_hook, fn
+      :erasing -> Process.sleep(ms)
+      _ -> :ok
+    end)
+
+    Hoodride.Repo.query!("DROP TRIGGER IF EXISTS journey_refuse_delete")
+
+    if how == "fail",
+      do:
+        Hoodride.Repo.query!(
+          "CREATE TRIGGER journey_refuse_delete BEFORE DELETE ON users BEGIN SELECT RAISE(ABORT, 'refused'); END"
+        )
+
+    "ok"
+  end
+
   # as if new Terms of Use were published: open apps are asked again
   defp server("terms_new") do
     Application.put_env(:hoodride, :terms_version, "2099-01-01")
@@ -452,7 +478,12 @@ defmodule HoodrideWeb.BrowserJourneysTest do
       )
     end
 
-    Hoodride.Blocks.forget(id)
+    # (this person out of memory — the mark, then their rows — so their next
+    # check reads these. Only theirs: forget/2 is a DELETED account's — on a
+    # live one it took the others' rows naming them while leaving those
+    # others marked loaded, "not blocked" though the database says blocked)
+    :ets.delete(:block_loaded, id)
+    :ets.match_delete(:block_rows, {{id, :_}})
     "ok"
   end
 

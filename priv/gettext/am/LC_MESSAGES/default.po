@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "አካውንትዎን መሰረዝ አልተቻለም — እባክዎ እንደገና ይሞክሩ።"
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "አካውንትዎን መሰረዝ አልተቻለም። ዘግተው ወጥተዋል — እንደገና ለመሞከር እንደገና ይግቡ።"
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "ቻቱን መጨረስ አልተቻለም — እንደገና ይሞክሩ"
 
@@ -1299,8 +1303,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 አካባቢዎን በመጠበቅ ላይ — ተሳፋሪዎች ገና ሊያዩዎት አይችሉም"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 አካባቢዎ ግምታዊ ብቻ ነው — {why} Precise Location ያብሩ፦ {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 አካባቢዎ ግምታዊ ብቻ ነው። ቤት ውስጥ ከሆኑ ወደ ውጭ ይውጡ — ወይም {why} Precise Location መብራቱን ያረጋግጡ፦ {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

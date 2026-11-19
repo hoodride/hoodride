@@ -351,11 +351,20 @@ defmodule HoodrideWeb.LogoutAcceptRaceTest do
 
   # deleting the account: the same look, after its sign-ins are gone
   test "account deletion looks too: after the sign-ins are forgotten" do
+    # (2026-11-19: shut down before the erase — signed out (revoke_all),
+    # THEN take_down/2 looks; after the erase, memory forgotten, THEN it
+    # looks again)
     src = File.read!("lib/hoodride/account_deletion.ex")
-    [after_erase] = Regex.run(~r/defp after_erase\(user_id\) do.*?\n  end\n/s, src)
-    {forget, _} = :binary.match(after_erase, "Hoodride.SessionTokens.forget(user_id)")
-    {look, _} = :binary.match(after_erase, "Rides.after_sign_out(user_id)")
-    assert forget < look
+    [shut_down] = Regex.run(~r/defp shut_down\(user_id\) do.*?\n  end\n/s, src)
+    {revoke, _} = :binary.match(shut_down, "Hoodride.SessionTokens.revoke_all(user_id)")
+    {down, _} = :binary.match(shut_down, "take_down(user_id, 1)")
+    assert revoke < down
+    [take_down] = Regex.run(~r/defp take_down\(user_id, part\) do.*?\n  end\n/s, src)
+    assert take_down =~ "Rides.after_sign_out(user_id)"
+    [do_delete] = Regex.run(~r/defp do_delete\(user_id\) do.*?\n  end\n/s, src)
+    {forget, _} = :binary.match(do_delete, "Hoodride.SessionTokens.forget(user_id)")
+    {again, _} = :binary.match(do_delete, "take_down(user_id, 5)")
+    assert forget < again
 
     auth = File.read!("lib/hoodride_web/controllers/auth_controller.ex")
     [logout] = Regex.run(~r/defp do_logout\(conn, user\) do.*?\n  end\n/s, auth)

@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Δεν ήταν δυνατή η διαγραφή του λογαριασμού σου — δοκίμασε ξανά."
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "Δεν ήταν δυνατή η διαγραφή του λογαριασμού σου. Έγινε αποσύνδεση — συνδέσου ξανά για να δοκιμάσεις ξανά."
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "Δεν ήταν δυνατός ο τερματισμός της συνομιλίας — δοκίμασε ξανά"
 
@@ -1299,8 +1303,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 Αναμονή για την τοποθεσία σου — οι επιβάτες δεν σε βλέπουν ακόμα"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 Η τοποθεσία σου είναι μόνο κατά προσέγγιση — ενεργοποίησε την ακριβή τοποθεσία {why}: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 Η τοποθεσία σου είναι μόνο κατά προσέγγιση. Αν είσαι σε εσωτερικό χώρο, βγες έξω — ή έλεγξε ότι η ακριβής τοποθεσία είναι ενεργή {why}: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

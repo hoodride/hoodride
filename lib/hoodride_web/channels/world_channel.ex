@@ -410,8 +410,10 @@ defmodule HoodrideWeb.WorldChannel do
     Enum.reduce(new_topics, %{geo: [], agg: []}, fn topic, acc ->
       case parse(topic) do
         {:geo, layer, cell} ->
-          snap = Geo.cell_snapshot(cell)
-          shown = Enum.reject(Map.fetch!(snap, layer), &Hoodride.Blocks.blocked?(viewer, &1.id))
+          # (only the layer watched: the other's people aren't looked up)
+          shown =
+            Enum.reject(Geo.cell_snapshot(cell, layer), &Hoodride.Blocks.blocked?(viewer, &1.id))
+
           %{acc | geo: [%{:cell => cell, layer => shown} | acc.geo]}
 
         {:agg, layer, cell} ->
@@ -504,9 +506,9 @@ defmodule HoodrideWeb.WorldChannel do
 
     with layer when layer in [:drivers, :hands] <- Roles.layer(socket.assigns.role),
          false <- Hoodride.Blocks.blocked?(viewer, other),
-         cell when is_binary(cell) <- other_cell(layer, other),
-         true <- MapSet.member?(socket.assigns.held, Geo.geo_topic(layer, cell)),
-         %{} = entry <- Enum.find(Map.fetch!(Geo.cell_snapshot(cell), layer), &(&1.id == other)) do
+         # (their marker by its keys — it built their whole cell to find it)
+         %{cell: cell} = entry <- Geo.marker(layer, other),
+         true <- MapSet.member?(socket.assigns.held, Geo.geo_topic(layer, cell)) do
       push(socket, if(layer == :drivers, do: "driver_update", else: "hand_update"), entry)
     end
 
@@ -514,9 +516,6 @@ defmodule HoodrideWeb.WorldChannel do
   end
 
   def handle_info(_other, socket), do: {:noreply, socket}
-
-  defp other_cell(:drivers, id), do: Geo.driver_cell(id)
-  defp other_cell(:hands, id), do: Geo.hand_cell(id)
 
   defp shown(event, payload, socket) when event in ["driver_update", "hand_update"] do
     case Hoodride.Blocks.check(socket.assigns.user_id, Map.get(payload, :id)) do
@@ -539,7 +538,7 @@ defmodule HoodrideWeb.WorldChannel do
 
         for topic <- socket.assigns.held,
             {:geo, ^layer, cell} <- [parse(topic)],
-            entry <- Map.fetch!(Geo.cell_snapshot(cell), layer),
+            entry <- Geo.cell_snapshot(cell, layer),
             not Hoodride.Blocks.blocked?(viewer, entry.id),
             do: push(socket, event, entry)
 

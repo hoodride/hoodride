@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "无法删除你的账号，请重试。"
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "无法删除你的账号。你已退出登录——请重新登录后再试。"
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "无法结束聊天，请重试"
 
@@ -1292,8 +1296,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 正在等待你的位置，乘客暂时还看不到你"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 你的位置只是大致位置。请开启“精确位置”，{why}：{steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 你的位置只是大致位置。如果你在室内，请到室外——或确认已开启“精确位置”，{why}：{steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

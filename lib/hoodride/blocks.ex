@@ -38,7 +38,8 @@ defmodule Hoodride.Blocks do
   # {{user_id, other_id}}: either blocked the other (one row per person in
   # memory: each side has its own)
   @rows :block_rows
-  # {user_id}: this person's rows are in memory
+  # {user_id, load number}: this person's rows are in memory (the number:
+  # each load's own — check_loaded)
   @loaded :block_loaded
   @cap Hoodride.Limits.blocks_per_person()
 
@@ -77,13 +78,23 @@ defmodule Hoodride.Blocks do
   # Dropped three times running (never seen): :unknown — treated as blocked
   defp check_loaded(_a, _b, 0), do: :unknown
 
+  # (and the SAME load still: a drop followed by a new load — `a` again on
+  # another request — read as "still loaded", and the read made while they
+  # were gone said "not blocked": fourth review, 2026-11-19. Each load has
+  # its own number: the mark is {user_id, number})
   defp check_loaded(a, b, tries) do
     case ensure(a) do
       :ok ->
+        n = load_number(a)
         # (tests: a pause between "loaded" and the read)
         hook(:checked)
         blocked = :ets.member(@rows, {a, b})
-        if loaded?(a), do: blocked, else: check_loaded(a, b, tries - 1)
+        # (tests: a pause between the read and "the same load still?")
+        hook(:read_done)
+
+        if n != nil and load_number(a) == n,
+          do: blocked,
+          else: check_loaded(a, b, tries - 1)
 
       :unavailable ->
         :unknown
@@ -96,6 +107,16 @@ defmodule Hoodride.Blocks do
   @doc false
   def loaded?(user_id), do: :ets.member(@loaded, user_id)
 
+  # each load's own number: nil — not loaded
+  defp load_number(user_id) do
+    case :ets.lookup(@loaded, user_id) do
+      [{_, n}] -> n
+      _ -> nil
+    end
+  end
+
+  defp new_mark(user_id), do: {user_id, :erlang.unique_integer([:monotonic, :positive])}
+
   defp ensure(user_id), do: if(loaded?(user_id), do: :ok, else: load(user_id))
 
   # under the person's lock: a change can't land between the read and the write
@@ -106,17 +127,11 @@ defmodule Hoodride.Blocks do
       else
         hook(:read)
 
-        others =
-          from(b in "blocks",
-            where: b.blocker_id == ^user_id or b.blocked_id == ^user_id,
-            select: {b.blocker_id, b.blocked_id}
-          )
-          |> Repo.all()
-          |> Enum.map(fn {x, y} -> if x == user_id, do: y, else: x end)
+        others = partners(user_id)
 
         hook(:loaded)
         :ets.insert(@rows, for(o <- others, do: {{user_id, o}}))
-        :ets.insert(@loaded, {user_id})
+        :ets.insert(@loaded, new_mark(user_id))
         :ok
       end
     end)
@@ -162,7 +177,7 @@ defmodule Hoodride.Blocks do
           end)
 
         :ets.insert(@rows, entries)
-        :ets.insert(@loaded, for(id <- ids, do: {id}))
+        :ets.insert(@loaded, for(id <- ids, do: new_mark(id)))
         :ok
     end
   end
@@ -194,17 +209,36 @@ defmodule Hoodride.Blocks do
           {:error, :full}
 
         true ->
-          Repo.insert_all("blocks", [%{blocker_id: me, blocked_id: other, inserted_at: now()}],
-            on_conflict: :nothing
-          )
+          # (tests: a pause just before the row is written)
+          hook(:inserting)
 
-          hook(:inserted)
+          case insert_block(me, other) do
+            :ok ->
+              hook(:inserted)
+              if loaded?(me), do: :ets.insert(@rows, {{me, other}})
+              if loaded?(other), do: :ets.insert(@rows, {{other, me}})
+              :ok
 
-          if loaded?(me), do: :ets.insert(@rows, {{me, other}})
-          if loaded?(other), do: :ets.insert(@rows, {{other, me}})
-          :ok
+            :gone ->
+              {:error, :none}
+          end
       end
     end)
+  end
+
+  # `:gone`: the database refused the row because `other`'s account was
+  # deleted after block/2 found it (its foreign key) — "not there", as it
+  # would have said a moment later. It read as "the database is down: try
+  # again" (eleventh review, 2026-11-19). Any other error goes on as before
+  defp insert_block(me, other) do
+    Repo.insert_all("blocks", [%{blocker_id: me, blocked_id: other, inserted_at: now()}],
+      on_conflict: :nothing
+    )
+
+    :ok
+  rescue
+    e in Exqlite.Error ->
+      if e.message =~ "FOREIGN KEY", do: :gone, else: reraise(e, __STACKTRACE__)
   end
 
   @doc """
@@ -332,7 +366,7 @@ defmodule Hoodride.Blocks do
   def sweep(now \\ System.monotonic_time(:second)) do
     # a page at a time (Hoodride.ETS.each_match) — never a copy of everyone
     # loaded (SweeperMemoryTest, 2026-11-18)
-    Hoodride.ETS.each_match(@loaded, [{{:"$1"}, [], [:"$1"]}], fn user_id ->
+    Hoodride.ETS.each_match(@loaded, [{{:"$1", :_}, [], [:"$1"]}], fn user_id ->
       # a person whose lock is busy (a read on a slow database holds it):
       # skipped, caught next pass — waiting stalled the whole pass and every
       # step after it (independent review, 2026-11-18)
@@ -341,14 +375,49 @@ defmodule Hoodride.Blocks do
     end)
   end
 
-  @doc "A deleted account: gone from memory, both sides (its rows went with it)."
-  def forget(user_id) do
-    locked([user_id], fn ->
-      drop(user_id)
-      :ets.match_delete(@rows, {{:_, user_id}})
-    end)
+  @doc """
+  A deleted account: gone from memory, both sides (its rows went with it).
+  `partners`: everyone it blocked or was blocked by, read before its rows
+  were deleted (partners/1) — the others' rows naming it are found by
+  their keys: {anyone, it} has no leading key, and finding them read every
+  block row of everyone in memory (full-scan audit, 2026-11-19). Its own
+  rows, if loaded, name them too.
+  """
+  # (each partner's row under that partner's lock: their load holds it
+  # from its database read to its memory write — one that read before the
+  # deletion committed and wrote after would put back a row naming the
+  # deleted account. Waiting for it, the row is removed after it lands; a
+  # load after reads none. 2026-11-19: it used to stay until the partner
+  # was dropped. ONE lock at a time, each only for its own row — all of
+  # them at once held up every other partner's load while waiting for a
+  # busy one (the standard advice: never hold several when each step needs
+  # one). Rare — a deletion — one local lock per partner)
+  def forget(user_id, partners) when is_list(partners) do
+    own =
+      locked([user_id], fn ->
+        own = :ets.select(@rows, [{{{user_id, :"$1"}}, [], [:"$1"]}])
+        drop(user_id)
+        own
+      end)
+
+    for o <- Enum.uniq(partners ++ own), o != user_id do
+      locked([o], fn ->
+        hook({:forgetting, o})
+        :ets.delete(@rows, {o, user_id})
+      end)
+    end
 
     :ok
+  end
+
+  @doc "Everyone `user_id` blocked or was blocked by, from the database (both indexed)."
+  def partners(user_id) do
+    from(b in "blocks",
+      where: b.blocker_id == ^user_id or b.blocked_id == ^user_id,
+      select: {b.blocker_id, b.blocked_id}
+    )
+    |> Repo.all()
+    |> Enum.map(fn {x, y} -> if x == user_id, do: y, else: x end)
   end
 
   @doc false

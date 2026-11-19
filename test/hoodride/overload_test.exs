@@ -183,6 +183,10 @@ defmodule Hoodride.OverloadTest do
 
     test "deleting an account completes" do
       u = user("ov-del")
+      # (its wait for the map, short: a wedged writer is waited on only so
+      # long, then the deletion goes on — Hoodride.AccountDeletion)
+      Application.put_env(:hoodride, :deletion_off_map_wait_ms, 200)
+      on_exit(fn -> Application.delete_env(:hoodride, :deletion_off_map_wait_ms) end)
       Geo.driver_update(me(u), @cell, @spot, [])
 
       stuck([u.id], fn ->

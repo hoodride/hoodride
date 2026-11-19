@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Contul nu a putut fi șters – încearcă din nou."
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "Contul nu a putut fi șters. Ai fost deconectat – conectează-te din nou ca să încerci iar."
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "Nu s-a putut încheia chatul – încearcă din nou"
 
@@ -1306,8 +1310,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 Îți așteptăm locația – pasagerii încă nu te văd"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 Locația ta e doar aproximativă – activează Localizarea precisă {why}: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 Locația ta e doar aproximativă. Dacă ești înăuntru, ieși afară – sau verifică dacă Localizarea precisă e activată {why}: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

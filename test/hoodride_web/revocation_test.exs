@@ -71,7 +71,14 @@ defmodule HoodrideWeb.RevocationTest do
     refute connects?(token), "a deleted account must not come back after a restart"
   end
 
-  test "a delete that can't reach the database changes NOTHING — and a retry works", %{conn: conn} do
+  # (owner, 2026-11-19: the account is shut down BEFORE its row goes —
+  # signed out, off the map — so nobody it blocked can see it in between;
+  # a failed erase leaves the account intact but signed out and offline.
+  # Signing in again, the retry works)
+  test "a delete that can't reach the database: the account intact, signed out — a retry works",
+       %{
+         conn: conn
+       } do
     u = user("rv-fail")
     Geo.driver_update(%{id: u.id, name: u.name, photo: nil}, @cell, nil)
     token = Hoodride.TestHelpers.socket_token_for(u.id)
@@ -85,12 +92,19 @@ defmodule HoodrideWeb.RevocationTest do
         "confirm" => "DELETE"
       })
 
-    assert json_response(conn1, 503) == %{"error" => "failed"}
+    # (twentieth review: it answered "failed", and the app said "please try
+    # again" — to someone already signed out. Now it says so, and this
+    # session ends with it)
+    assert json_response(conn1, 503) == %{"error" => "failed_signed_out"}
+    # the session cookie ended by this answer itself (asking /api/me after
+    # couldn't tell: the sign-in is revoked either way — twenty-first review)
+    assert conn1.private[:plug_session_info] == :drop
+    assert json_response(get(recycle(conn1), "/api/me"), 200)["user"] == nil
 
-    # nothing happened: the account, its sign-in, its car on the map
+    # the account intact; signed out and off the map (shut down first)
     assert Accounts.get_user(u.id)
-    assert connects?(token), "not signed out by a delete that didn't happen"
-    assert Geo.driver_cell(u.id) == @cell
+    refute connects?(token), "still signed in after the shutdown"
+    assert Geo.driver_cell(u.id) == nil
 
     allow_deletes("users")
 
@@ -103,6 +117,25 @@ defmodule HoodrideWeb.RevocationTest do
 
     assert Accounts.get_user(u.id) == nil
     refute connects?(token)
+  end
+
+  # the deletion's FIRST step — signing out — refused by the database:
+  # nothing has changed at all, so "try again" is true
+  test "a delete whose sign-out step fails: NOTHING changed, still signed in", %{conn: conn} do
+    u = user("rv-fail-so")
+    Geo.driver_update(%{id: u.id, name: u.name, photo: nil}, @cell, nil)
+    token = Hoodride.TestHelpers.socket_token_for(u.id)
+    Process.sleep(2)
+    conn = signed_in(conn, u)
+    refuse_deletes("user_tokens")
+
+    failed = Hoodride.TestHelpers.post_json(conn, "/api/account/delete", %{"confirm" => "DELETE"})
+    assert json_response(failed, 503) == %{"error" => "failed"}
+    assert Accounts.get_user(u.id)
+    assert connects?(token)
+    assert json_response(get(recycle(failed), "/api/me"), 200)["user"]["id"] == u.id
+    assert Geo.driver_cell(u.id) == @cell
+    allow_deletes("user_tokens")
   end
 
   describe "signing out when the database can't" do

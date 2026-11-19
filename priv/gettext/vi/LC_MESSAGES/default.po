@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Không thể xóa tài khoản của bạn — vui lòng thử lại."
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "Không thể xóa tài khoản của bạn. Bạn đã bị đăng xuất — hãy đăng nhập lại để thử lại."
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "Không thể kết thúc cuộc trò chuyện — hãy thử lại"
 
@@ -1292,8 +1296,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 Đang chờ vị trí của bạn — hành khách chưa thấy bạn"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 Vị trí của bạn chỉ là gần đúng — hãy bật Vị trí chính xác {why}: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 Vị trí của bạn chỉ là gần đúng. Nếu bạn đang ở trong nhà, hãy ra ngoài trời — hoặc kiểm tra xem Vị trí chính xác đã bật chưa {why}: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

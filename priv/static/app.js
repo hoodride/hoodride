@@ -58,6 +58,9 @@ const PROTOCOL = 3;
 // messages an open chat keeps: the server's own (Limits.chat_history —
 // LimitsTest checks the two agree)
 const CHAT_KEEP = 20;
+// this phone's read marks kept for chats on pages not loaded yet (the
+// newest; applyReadState): a few bytes each, ten pages of chats
+const READ_KEEP_UNLOADED = 300;
 
 // ===== Auth =====
 const auth = {
@@ -743,6 +746,11 @@ $("settings-refresh-link").addEventListener("click", () => HoodGoogleRefresh.tak
 // update's silent reload and the Google refresh's round trip both wipe the
 // page: never while any of it is going on. The car form open: what's typed
 // in it would go (U2, owner 2026-11-11)
+// an account deletion in flight / signed out by a failed one (deleteAccount):
+// declared before anything that can read them during the page's start
+let deleteInFlight = false;
+let refusedWhileDeleting = false;
+let deleteSignedOut = false;
 function busyView() {
   return {
     mode: state.mode,
@@ -751,6 +759,7 @@ function busyView() {
     ride: state.ride,
     draft: allDrafts(),
     form: carSheetOpen(),
+    deleting: deleteInFlight || deleteSignedOut,
   };
 }
 let awayFromApp = false;
@@ -837,24 +846,53 @@ function showDeleteConfirm() {
 
 function hideDeleteConfirm() {
   $("settings-sheet").classList.remove("confirming");
+  // signed out by a deletion that then failed: on to the sign-in screen
+  if (deleteSignedOut) location.reload();
 }
 
+// A deletion in flight: its answer decides, not a refusal meanwhile. The
+// server closes this phone's own connection FIRST (it shuts the account down
+// before erasing it): the refused reconnect reloaded to the sign-in screen
+// before the answer came — a failed erase's "you've been signed out" never
+// read, a slow success's clean-up skipped (twenty-first review, 2026-11-19).
+// A refusal meanwhile is only noted (refusedReload). Then, signed out by a
+// deletion that failed: the message stays until it's closed (Cancel)
+// (deleteInFlight, refusedWhileDeleting, deleteSignedOut: declared above busyView, which reads them)
+
 async function deleteAccount() {
-  if (state.ride || !deleteTyped()) return;
+  // (one at a time: a second, started while one waits, came back "signed
+  // out" at once and reloaded under the first — twenty-third review)
+  if (state.ride || !deleteTyped() || deleteSignedOut || deleteInFlight) return;
   $("delete-yes").disabled = true;
   const fail = (msg) => {
     $("delete-error").textContent = msg;
     $("delete-error").classList.remove("hidden");
     $("delete-yes").disabled = !deleteTyped();
   };
+  // (signed out meanwhile — here or elsewhere — and this one didn't sign
+  // out: the reload that refusal would have made)
+  const refusedMeanwhile = () => refusedWhileDeleting && location.reload();
   let res;
+  deleteInFlight = true;
+  refusedWhileDeleting = false;
+  // its own wait, longer than every other request's (API_TIMEOUT_MS): the
+  // server waits on each step (Hoodride.AccountDeletion) — a busy database
+  // twice and a stuck map writer already take ~18 s, more if locks are
+  // busy too. Given up on, the phone said "couldn't reach" while the
+  // deletion went on (twenty-third review, 2026-11-19); past 30 s it still
+  // can, and the next refused reconnect shows the sign-in screen
+  const stop = new AbortController();
+  setTimeout(() => stop.abort(), DELETE_TIMEOUT_MS);
   try {
     res = await apiFetch("/api/account/delete", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ confirm: $("delete-typed").value }),
+      signal: stop.signal,
     });
   } catch (_) {
+    deleteInFlight = false;
+    if (refusedMeanwhile()) return;
     return fail(t("Couldn't reach Hood Ride — check your connection and try again."));
   }
   if (res.ok) {
@@ -870,6 +908,21 @@ async function deleteAccount() {
     return;
   }
   const reason = (await res.json().catch(() => ({}))).error;
+  deleteInFlight = false;
+  // (signed out first, then the erase failed: "try again" alone would be
+  // wrong — they're signed out. Shown, and kept: no reload under it)
+  if (reason === "failed_signed_out") {
+    // (the confirm step closed meanwhile — the drawer shut while it waited:
+    // the message would go into a hidden panel and the app stay on, signed
+    // out; the sign-in screen instead — twenty-second review)
+    if (!settingsOpen() || !$("settings-sheet").classList.contains("confirming")) return location.reload();
+    deleteSignedOut = true;
+    $("delete-yes").disabled = true;
+    $("delete-error").textContent = t("Couldn't delete your account. You've been signed out — sign in again to try again.");
+    $("delete-error").classList.remove("hidden");
+    return;
+  }
+  if (refusedMeanwhile()) return;
   if (reason === "in_ride") return fail(t("End your ride first."));
   if (reason === "request_waiting") return fail(t("Cancel your ride request first."));
   if (res.status === 401) return location.reload(); // already signed out
@@ -884,7 +937,8 @@ $("delete-cancel").addEventListener("click", () => {
 });
 $("delete-yes").addEventListener("click", deleteAccount);
 $("delete-typed").addEventListener("input", () => {
-  $("delete-yes").disabled = !deleteTyped();
+  // (signed out by a failed deletion: nothing to delete with — kept locked)
+  $("delete-yes").disabled = !deleteTyped() || deleteSignedOut || deleteInFlight;
 });
 // Enter (the keyboard's "done") deletes only once the word is right
 $("delete-typed").addEventListener("keydown", (e) => {
@@ -1292,6 +1346,13 @@ function tabStorage() {
 function onSessionMoved() {
   // (nothing looks on behind the cover)
   stopFindNearest();
+  // a deletion waiting: not left marked "deleting" behind the cover. Its
+  // answer may never come (when it's the delete's own answer that brought
+  // the cover up, apiFetch stops there), or may still come and be acted on
+  // behind it — either way "Use here" reloads (twenty-fourth and
+  // twenty-fifth reviews, 2026-11-19)
+  deleteInFlight = false;
+  refusedWhileDeleting = false;
   if (socket) socket.disconnect();
   showSessionMoved();
 }
@@ -1322,6 +1383,9 @@ const steppedAside = () => !!document.getElementById("session-moved");
 // cleared: an abort after the answer has been read does nothing, and one
 // mid-body (a body still trickling in at the limit) is a failure too.
 const API_TIMEOUT_MS = 15_000;
+// …but deleting the account: it shuts the account down before erasing it,
+// and waits on each step (deleteAccount)
+const DELETE_TIMEOUT_MS = 30_000;
 function apiFetch(url, opts = {}) {
   const headers = new Headers(opts.headers || {});
   if (state.realUser) headers.set("x-hood-user", String(state.realUser.id));
@@ -1384,7 +1448,10 @@ async function ownRefusal(res) {
 let reloadAfterCarForm = false;
 function refusedReload(why) {
   if (!why) return false;
-  if (why === "terms" && carSheetOpen()) reloadAfterCarForm = true;
+  // a deletion's answer decides (deleteAccount); its "signed out" message
+  // stays until closed
+  if (deleteInFlight || deleteSignedOut) refusedWhileDeleting = true;
+  else if (why === "terms" && carSheetOpen()) reloadAfterCarForm = true;
   else location.reload();
   return true;
 }
@@ -3414,7 +3481,8 @@ const loc = HoodLocator.create({
     },
     // (the car form open too: the reload wiped what was typed in it — U2's
     // second route, review 2026-11-11; test_browser/carformupdate.mjs)
-    typing: () => (($("chat-input") && $("chat-input").value) || "").trim() !== "" || carSheetOpen(),
+    typing: () =>
+      (($("chat-input") && $("chat-input").value) || "").trim() !== "" || carSheetOpen() || deleteInFlight || deleteSignedOut,
   },
 });
 
@@ -4160,7 +4228,9 @@ function applyReadState() {
     // line had no message to go above, and the chat opened at the newest)
     if (c.server) c.unread = Math.min((r.unread[p.id] || 0) + (c.loaded === false ? c.restUnread || 0 : 0), CHAT_KEEP);
   });
-  HoodReadStore.save(s, state.realUser.id, r.note);
+  // (+ this phone's marks for chats on pages not loaded yet: kept until
+  // their page comes — every page here, a chat not among them has ended)
+  HoodReadStore.save(s, state.realUser.id, chatsMore ? HoodReadStore.keepUnloaded(r.note, note, convs, READ_KEEP_UNLOADED) : r.note);
 }
 
 // this chat was seen: its bookmark moves to its newest message

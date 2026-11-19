@@ -385,6 +385,43 @@ defmodule Hoodride.BlocksTest do
       Application.delete_env(:hoodride, :blocks_hook)
     end
 
+    # (fourth review, 2026-11-19: "still loaded?" couldn't tell a person
+    # dropped AND loaded again from one never dropped — a check that read
+    # while they were gone took its empty read: "not blocked", a blocked
+    # car shown)
+    test "dropped and loaded again while a check read: still blocked" do
+      [ann, bob] = [user("drl-ann"), user("drl-bob")]
+      :ok = Blocks.block(ann.id, bob.id)
+      :ok = Blocks.preload(ann.id)
+      me = self()
+      {:ok, once} = Agent.start_link(fn -> MapSet.new() end)
+
+      Application.put_env(:hoodride, :blocks_hook, fn step ->
+        first? = Agent.get_and_update(once, &{not MapSet.member?(&1, step), MapSet.put(&1, step)})
+
+        if step in [:checked, :read_done] and first? do
+          send(me, {step, self()})
+
+          receive do
+            :go -> :ok
+          after
+            3_000 -> :ok
+          end
+        end
+      end)
+
+      check = Task.async(fn -> Blocks.check(ann.id, bob.id) end)
+      assert_receive {:checked, pid}, 2_000
+      Blocks.sweep()
+      refute Blocks.loaded?(ann.id)
+      send(pid, :go)
+      assert_receive {:read_done, ^pid}, 2_000
+      :ok = Blocks.preload(ann.id)
+      send(pid, :go)
+      assert Task.await(check) == true, "a blocked person read as not blocked"
+      Application.delete_env(:hoodride, :blocks_hook)
+    end
+
     test "an unblock while the blocker's rows load: stays unblocked" do
       [ann, bob] = [user("ru-ann"), user("ru-bob")]
       :ok = Blocks.block(ann.id, bob.id)
@@ -415,14 +452,31 @@ defmodule Hoodride.BlocksTest do
       forget_memory()
 
       during_load(bob.id, fn ->
+        # (as a deletion: who her blocks name, read before they go)
+        partners = Blocks.partners(ann.id)
         Repo.query!("DELETE FROM blocks WHERE blocker_id = ? OR blocked_id = ?", [ann.id, ann.id])
-        Blocks.forget(ann.id)
+        Blocks.forget(ann.id, partners)
       end)
 
       refute Blocks.loaded?(ann.id)
       assert :ets.match(:block_rows, {{ann.id, :_}}) == []
-      # (bob's row naming ann may stay until he's dropped — harmless: ann is
-      # gone; what matters is that nothing makes ann blocked/visible wrongly)
+      # (and bob's row naming her: his load read the database before her
+      # deletion and wrote after it — the deletion now waits for his load:
+      # 2026-11-19, it used to stay until he was dropped)
+      refute :ets.member(:block_rows, {bob.id, ann.id}), "bob's load put back a row naming ann"
+    end
+
+    # the real deletion, through AccountDeletion (its partners read in its
+    # transaction): the same — nothing naming the deleted account comes back
+    test "an account deleted (the real path) while a partner's rows load: no row naming it comes back" do
+      [ann, bob] = [user("rdr-ann"), user("rdr-bob")]
+      :ok = Blocks.block(bob.id, ann.id)
+      forget_memory()
+
+      assert :ok = during_load(bob.id, fn -> Hoodride.AccountDeletion.delete(ann.id) end)
+
+      assert Blocks.loaded?(bob.id)
+      refute :ets.member(:block_rows, {bob.id, ann.id}), "bob's load put back a row naming ann"
     end
 
     defp refuse(op),
@@ -470,6 +524,101 @@ defmodule Hoodride.BlocksTest do
     end
   end
 
+  # (2026-11-19: the deletion took every partner's lock at once — waiting for
+  # one busy partner while holding the others' held up their loads too.
+  # One at a time, as the standard advice goes: each partner's own lock,
+  # only for its own row)
+  test "deleting an account cleans up each partner under that partner's lock alone" do
+    [ann | partners] = for k <- ~w(ol-ann ol-b ol-c ol-d), do: user(k)
+    for p <- partners, do: :ok = Blocks.block(p.id, ann.id)
+    ids = Enum.map(partners, & &1.id)
+    me = self()
+
+    Application.put_env(:hoodride, :blocks_hook, fn
+      {:forgetting, o} ->
+        # from another process, without waiting: every OTHER partner's lock
+        free =
+          Task.async(fn ->
+            for other <- ids -- [o],
+                do: :global.trans({{Blocks, other}, self()}, fn -> :free end, [node()], 0)
+          end)
+          |> Task.await()
+
+        send(me, {:others_free, o, free})
+
+      _ ->
+        :ok
+    end)
+
+    on_exit(fn -> Application.delete_env(:hoodride, :blocks_hook) end)
+    assert :ok = Hoodride.AccountDeletion.delete(ann.id)
+
+    for o <- ids do
+      assert_received {:others_free, ^o, free}
+
+      assert Enum.all?(free, &(&1 == :free)),
+             "while cleaning up #{o}, another partner's lock was held"
+    end
+  end
+
+  # (fifteenth review, 2026-11-19: a deletion took the account's blocks out
+  # of memory BEFORE its car and ✋ left the map — in between, someone it
+  # blocked (or who blocked it) opening that area saw the car)
+  # (one driving, one with ✋ up: raising ✋ takes a car off the map, so one
+  # account can't show both — the sixteenth review)
+  for kind <- [:car, :hand] do
+    test "deleting an account (#{kind}): off the map before its blocks leave memory" do
+      kind = unquote(kind)
+      [ann, bob] = [user("om-ann-#{kind}"), user("om-bob-#{kind}")]
+      :ok = Blocks.block(bob.id, ann.id)
+      Hoodride.Geo.user_connected(ann.id)
+
+      case kind do
+        :car ->
+          Hoodride.Geo.driver_update(%{id: ann.id, name: "A", photo: nil}, "omC", "omC-s", [])
+
+        :hand ->
+          Hoodride.Geo.hand_up(ann.id, "omC", "omC-h", [])
+      end
+
+      on_map = fn ->
+        case kind do
+          :car -> Hoodride.Geo.driver_on_map?(ann.id)
+          :hand -> Hoodride.Geo.hand_cell(ann.id) != nil
+        end
+      end
+
+      assert on_map.()
+      me = self()
+
+      Application.put_env(:hoodride, :blocks_hook, fn
+        {:forgetting, _} -> send(me, {:on_map, on_map.()})
+        _ -> :ok
+      end)
+
+      assert :ok = Hoodride.AccountDeletion.delete(ann.id)
+      assert_received {:on_map, still?}
+      refute still?, "on the map while the blocks naming it were forgotten"
+    end
+  end
+
+  # (eleventh review, 2026-11-19: "does the other exist?" is asked before
+  # the row is written — an account deleted in between made the database
+  # refuse the row (its foreign key), read as "the database is down": the
+  # app said "try again", and trying again said "not there")
+  test "blocking someone whose account is deleted that moment: 'not there', no crash" do
+    [ann, bob] = [user("bd-ann"), user("bd-bob")]
+
+    Application.put_env(:hoodride, :blocks_hook, fn
+      :inserting -> Repo.query!("DELETE FROM users WHERE id = ?", [bob.id])
+      _ -> :ok
+    end)
+
+    on_exit(fn -> Application.delete_env(:hoodride, :blocks_hook) end)
+    assert Blocks.block(ann.id, bob.id) == {:error, :none}
+    assert rows() == []
+  end
+
   test "deleting an account deletes its blocks, both ways" do
     [ann, bob, cat] = [user("del-ann"), user("del-bob"), user("del-cat")]
     :ok = Blocks.block(ann.id, bob.id)
@@ -478,5 +627,47 @@ defmodule Hoodride.BlocksTest do
     assert rows() == []
     refute Blocks.blocked?(bob.id, ann.id)
     refute Blocks.blocked?(cat.id, ann.id)
+  end
+
+  # (full-scan audit, 2026-11-19: forgetting a deleted account read every
+  # block row of everyone in memory — {anyone, deleted} has no leading key)
+  # a deleted account blocked by one person and blocking another, out of
+  # memory itself (its own rows can't name them), both of them in memory:
+  # the deletion's work in reductions, and whether their rows naming it went
+  defp delete_blocked_account(key) do
+    [gone, bob, cat] = [user("#{key}-gone"), user("#{key}-bob"), user("#{key}-cat")]
+    :ok = Blocks.block(gone.id, bob.id)
+    :ok = Blocks.block(cat.id, gone.id)
+    for id <- [bob.id, cat.id], do: :ok = Blocks.preload(id)
+    # (as the Sweeper drops it: the mark, then its rows)
+    :ets.delete(:block_loaded, gone.id)
+    :ets.match_delete(:block_rows, {{gone.id, :_}})
+
+    true =
+      :ets.member(:block_rows, {bob.id, gone.id}) and :ets.member(:block_rows, {cat.id, gone.id})
+
+    {:reductions, before} = Process.info(self(), :reductions)
+    :ok = Hoodride.AccountDeletion.delete(gone.id)
+    {:reductions, later} = Process.info(self(), :reductions)
+
+    left =
+      :ets.member(:block_rows, {bob.id, gone.id}) or :ets.member(:block_rows, {cat.id, gone.id})
+
+    {later - before, left}
+  end
+
+  test "deleting an account: the others' rows naming it go, and only those are read" do
+    # (the 50,000 gone after: a later module that doesn't scrub never sees them)
+    on_exit(fn -> Hoodride.TestHelpers.scrub_live_state() end)
+    {alone, left} = delete_blocked_account("dsc1")
+    refute left, "a row naming the deleted account kept"
+    # 50,000 rows of others in memory
+    :ets.insert(:block_rows, for(i <- 1..50_000, do: {{2_000_000_000 + i, 3_000_000_000 + i}}))
+    {crowded, left} = delete_blocked_account("dsc2")
+    refute left, "a row naming the deleted account kept"
+    assert :ets.info(:block_rows, :size) == 50_000
+
+    assert crowded - alone < 10_000,
+           "#{crowded - alone} more reductions with 50,000 others' block rows: every row read"
   end
 end

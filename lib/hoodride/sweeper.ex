@@ -135,9 +135,9 @@ defmodule Hoodride.Sweeper do
       # the recount trusts membership: repair it first
       {:rebuild_members,
        fn ->
-         Enum.each(Hoodride.Geo.member_drift(), fn user_id ->
+         Enum.each(Hoodride.Geo.member_strays(), fn {user_id, seen} ->
            repaired("membership drift")
-           Hoodride.Geo.rebuild_members(user_id)
+           Hoodride.Geo.rebuild_members(user_id, seen)
          end)
        end},
       {:recompute_aggregates, &Hoodride.Geo.recompute_aggregates/0}
@@ -250,9 +250,9 @@ defmodule Hoodride.Sweeper do
     # (c) cell index drift — a read-only scan finds suspect users, then each
     # is re-derived inside its OWN writer shard (serialized with its live
     # updates, so a false positive from an in-flight write is harmless)
-    Enum.each(Hoodride.Geo.cell_index_drift(), fn user_id ->
+    Enum.each(Hoodride.Geo.cell_index_strays(), fn {user_id, seen} ->
       repaired("cell index drift")
-      Hoodride.Geo.reindex_user(user_id)
+      Hoodride.Geo.reindex_user(user_id, seen)
     end)
   end
 

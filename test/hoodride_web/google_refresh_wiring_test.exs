@@ -123,10 +123,14 @@ defmodule HoodrideWeb.GoogleRefreshWiringTest do
     assert body("checkForUpdate") =~ "const action = updateDecision();"
     assert length(String.split(@app, "HoodUpdate.isBusy(")) - 1 == 2
     assert body("busyView") =~ "form: carSheetOpen(),"
+    # (and an account deletion in flight, or its "signed out" message up: a
+    # reload under it skipped the clean-up or lost the message —
+    # twenty-second review, 2026-11-19)
+    assert body("busyView") =~ "deleting: deleteInFlight || deleteSignedOut,"
     # the third: the reload on return while location is blocked (locator.js
     # onVisible) waits while app.typing() — the car form open counts
     assert @app =~
-             ~s[typing: () => (($("chat-input") && $("chat-input").value) || "").trim() !== "" || carSheetOpen(),]
+             ~s[(($("chat-input") && $("chat-input").value) || "").trim() !== "" || carSheetOpen() || deleteInFlight || deleteSignedOut,]
   end
 
   test "'back' is the page shown again, focus, a restored page, or opening the app" do

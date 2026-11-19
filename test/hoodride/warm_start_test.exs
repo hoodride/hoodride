@@ -358,8 +358,13 @@ defmodule Hoodride.WarmStartTest do
           :block_rows,
           :block_loaded
         ],
-        do: {t, Enum.sort(:ets.tab2list(t))}
+        do: {t, Enum.sort(Enum.map(:ets.tab2list(t), &without_load_number(t, &1)))}
   end
+
+  # (each load's own number — Hoodride.SessionTokens/Blocks read_loaded —
+  # differs from load to load by design: who's loaded is what must match)
+  defp without_load_number(t, {id, _n}) when t in [:session_token_loaded, :block_loaded], do: {id}
+  defp without_load_number(_t, row), do: row
 
   describe "preloaded = read on demand (never a different answer)" do
     test "every kind of person: memory exactly as on-demand reads leave it", %{path: path} do

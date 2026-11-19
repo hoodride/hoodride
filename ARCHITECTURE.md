@@ -34,10 +34,16 @@
     `POST /api/account/delete {confirm}`; a small link under Sign out, beside
     Privacy Policy, then a confirm step — Sign out itself has none, owner's
     choice: reversible):
-    refused (409) in a ride or with your own request waiting; else the
-    account's row and its sign-ins deleted FIRST, then off the map (going offline declines incoming requests, riders
-    told), chats closed (partner told), presence + session stamp forgotten,
-    the row deleted, every device disconnected, session dropped. Signing in
+    refused (409) in a ride or with your own request waiting; else SHUT
+    DOWN first (2026-11-19): signed out (its sign-ins deleted), its
+    connections closed and waited for, off the map (waited for, up to 5 s
+    — going offline declines incoming requests, riders told); THEN the
+    account's row deleted (its blocks with it); then shut down again (a
+    sign-in made just before), its blocks forgotten in memory, chats closed
+    (partner told), presence + session stamp forgotten, every device
+    disconnected, session dropped. A failed erase leaves the account intact
+    but signed out and offline (owner's choice: before, the row went first
+    and someone it blocked could see its car in between). Signing in
     again = a new account. 12 + 8 tests, 16 mutants; Chrome by measurement;
     systemd test 26/26 (journald settings live, no request lines). A
     lawyer's review before a public launch.
@@ -2229,9 +2235,14 @@ requests use the connection's copy. The rest:
   `sign_outs` (user_id key, `at`; the later wins, never the older), loaded
   at start-up; deleting an account is ONE transaction done FIRST (row
   deleted + revocation saved): a database failure → 503, NOTHING changed
-  (still signed in, still on the map) and a retry works — it used to revoke
+  (then: still signed in, still on the map — see the reversal below) and a
+  retry works — it used to revoke
   first, so a failed row delete left the person signed out, unable to
-  retry, and the account came back at their next sign-in. Sign-out saves
+  retry, and the account came back at their next sign-in. (Reversed
+  2026-11-19, owner: the account is shut down — signed out, off the map —
+  before the row goes, because between the erase and the teardown someone
+  it blocked could see it; a failed erase now leaves it signed out, and
+  signing in again the retry works.) Sign-out saves
   to the table too (and the `logged_out_at` column HTTP sessions still
   read). The table stays small with NO database work in the Sweeper (owner
   asked why the sweeper would need the database — it doesn't): rows only
@@ -2852,7 +2863,9 @@ here say the rest.
   account's (`lookup_as`, `lookup_hash_as`). The database unable to answer
   for someone not in memory: "try again" (503, `retry-after: 2`; the app
   retries) — NEVER "signed out" (the sign-in screen); a refused connection
-  isn't counted against the address. Start-up only prunes expired rows.
+  isn't counted against the address. Start-up loads no one; it deletes
+  everyone's expired rows (each sign-in and renewal deletes its own
+  person's — 2026-11-19).
   (SessionTokensOnDemandTest, SignInsOnDemandTest, PresenceTest,
   ReconnectBurstTest.)
 - **The drop race** (found by the capacity run, 2026-11-17: 1 join in
@@ -2862,7 +2875,43 @@ here say the rest.
   "loaded?", reads, then "STILL loaded?" — gone: read again from the
   database (3 tries; then "try again" for sign-ins, "blocked" for blocks
   — never a guess). Proven by tests that pause a read mid-drop (hooks),
-  4 breaks caught.
+  4 breaks caught. "Still loaded?" became "the SAME load still?"
+  (2026-11-19): each load's mark carries its own number, compared before
+  and after the read — a drop followed by a new load (another request of
+  theirs) read as "still loaded", and the read made while they were gone
+  answered "signed out" / "not blocked". 4 more breaks caught.
+- **One person's sign-ins by the per-person index** (2026-11-19): "any
+  sign-in left?" (a ride's start) and the 10-per-account cap (every
+  sign-in and renewal) read only that person's rows — they read everyone's
+  (SessionTokensByUserTest: with 50,000 others in memory, ~200,000 units
+  of work → under 2,000).
+- **An area's snapshot, one layer** (2026-11-19): a viewer's map asks
+  for the layer it watches (Geo.cell_snapshot/2 — a rider the cars, a
+  driver the ✋); it built both and threw one away, every ✋ in a crowded
+  block looked up for a rider (5,000 ✋: ~73,000 units of work for one
+  car → ~5,000: the area's index rows are still walked, one comparison
+  each — the layer is a row's value, not its key). (CellIndexTest.)
+- **A deleted account's block rows, by key — none comes back** (2026-11-19).
+  Deleting an account read every block row of everyone in memory to find
+  the others' rows naming it ({anyone, it} has no leading key). Now the
+  deletion reads its block partners in its own transaction, before the
+  cascade, and Blocks.forget/2 deletes {partner, it} by key — under each
+  partner's lock too: a partner's load holds its lock from its database
+  read to its memory write, so one that read before the deletion committed
+  and wrote after used to put a row naming the deleted account back (it
+  read as "blocked" until the partner was dropped — harmless while ids are
+  never reused: ecto_sqlite3's AUTOINCREMENT). The deletion now waits for
+  that load and removes the row after it. One partner's lock at a time,
+  each only for its own row — all of them at once held up every other
+  partner's load while waiting for a busy one (the standard advice: never
+  hold several locks when each step needs one; a lease or version check,
+  as big caches use, isn't needed — the load's read and write are already
+  inside the partner's lock). Rare (a deletion), one local lock per
+  partner. (BlocksTest: the 50,000-row work count; a partner's load paused
+  across the deletion; no other partner's lock held during each step.) And blocking
+  someone whose account is deleted that very moment answers "not there"
+  (the database refuses the row by its foreign key) — it read as "the
+  database is down: try again".
 - **The sign-in cap never splits a device** (2026-11-14): a sign-in and
   its renewal no request has used yet are one device — its phone may hold
   either (the reply arrived and the app was closed, or the reply was lost).

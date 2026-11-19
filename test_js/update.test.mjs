@@ -58,6 +58,13 @@ test("busy: a form open (the car form)", () => {
   assert.equal(U.isBusy(v({ form: false })), false);
 });
 
+// an account deletion in flight, or its "signed out" message up: a reload
+// skipped the clean-up or lost the message (twenty-second review, 2026-11-19)
+test("busy: deleting the account", () => {
+  assert.equal(U.isBusy(v({ deleting: true })), true);
+  assert.equal(U.isBusy(v({ deleting: false })), false);
+});
+
 test("not busy: just looking at the map, as a rider or an off-duty driver", () => {
   assert.equal(U.isBusy(v({})), false);
   assert.equal(U.isBusy(v({ mode: "driver", online: false })), false);

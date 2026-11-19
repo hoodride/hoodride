@@ -247,3 +247,33 @@ test("newest: the latest of their messages as a bookmark, or null", () => {
   assert.deepEqual(R.newest([{ ts: 5, id: 1 }, { ts: 9, id: 3 }, { ts: 9, id: 2 }]), [9, 3]);
   assert.equal(R.newest([]), null);
 });
+
+// (2026-11-19: every app open dropped this phone's marks for chats on pages
+// not loaded yet — read offline, they came back unread)
+test("keepUnloaded: this phone's marks for chats not loaded are kept beside the loaded ones'", () => {
+  const convs = [{ peerId: 1, theirs: [] }];
+  assert.deepEqual(R.keepUnloaded({ 1: [5, 5] }, { 1: [3, 3], 7: [4, 4] }, convs, 10), { 1: [5, 5], 7: [4, 4] });
+});
+
+test("keepUnloaded: a loaded chat's mark is reconcile's, never the old one", () => {
+  const convs = [{ peerId: 1, theirs: [] }, { peerId: 2, theirs: [] }];
+  // (2 loaded without a mark: none — not the note's)
+  assert.deepEqual(R.keepUnloaded({ 1: [5, 5] }, { 2: [9, 9] }, convs, 10), { 1: [5, 5] });
+});
+
+test("keepUnloaded: at most `max`, the newest — the same-second tie by id", () => {
+  const note = { 10: [1, 1], 11: [3, 1], 12: [2, 1], 13: [3, 2] };
+  assert.deepEqual(R.keepUnloaded({}, note, [], 2), { 13: [3, 2], 11: [3, 1] });
+  assert.deepEqual(R.keepUnloaded({ 5: [0, 0] }, note, [], 0), { 5: [0, 0] });
+});
+
+test("keepUnloaded: no note (first run, storage blocked) or a broken one — only the loaded", () => {
+  assert.deepEqual(R.keepUnloaded({ 1: [5, 5] }, null, [], 10), { 1: [5, 5] });
+  assert.deepEqual(R.keepUnloaded({}, { x: [1, 1], 2: "no" }, [], 10), {});
+});
+
+test("keepUnloaded: equal marks sort as equal — both kept when there's room, either one at the cut", () => {
+  assert.deepEqual(R.keepUnloaded({}, { 20: [5, 5], 21: [5, 5], 22: [1, 1] }, [], 3), { 20: [5, 5], 21: [5, 5], 22: [1, 1] });
+  const two = R.keepUnloaded({}, { 20: [5, 5], 21: [5, 5], 22: [1, 1] }, [], 2);
+  assert.deepEqual(Object.values(two), [[5, 5], [5, 5]]);
+});

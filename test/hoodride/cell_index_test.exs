@@ -141,4 +141,108 @@ defmodule Hoodride.CellIndexTest do
     assert idx("cI") == [{{"cI", 9}, :driver}, {{"cI", 10}, :hand}]
     assert idx("cJ") == []
   end
+
+  # (full-scan audit, 2026-11-19: a person's repair found their index rows
+  # by reading the whole index — {cell, user} has no leading user — inside
+  # their writer shard, stalling its live map updates for the scan)
+  test "repairing one person reads only their rows, however big the index" do
+    # (the 50,000 gone after: a later module that doesn't scrub never sees them)
+    on_exit(fn -> Hoodride.TestHelpers.scrub_live_state() end)
+    Geo.user_connected(11)
+    Geo.driver_update(prof(11), "cK", nil)
+    # 50,000 others in the index (their backing rows aren't needed here)
+    :ets.insert(:geo_by_cell, for(i <- 1..50_000, do: {{"zz#{i}", 5_000_000 + i}, :hand}))
+    # a ghost beside the real row
+    :ets.insert(:geo_by_cell, {{"cL", 11}, :driver})
+
+    repair_one(11)
+    assert_received {:repair_work, work}
+
+    assert idx("cL") == []
+    assert idx("cK") == [{{"cK", 11}, :driver}]
+    assert work < 5_000, "#{work} reductions: the whole index read"
+  end
+
+  # the same for the area memberships (the counts' rows): {parent, user}
+  test "repairing one person's memberships reads only their rows, however many there are" do
+    # (the 50,000 gone after: a later module that doesn't scrub never sees them)
+    on_exit(fn -> Hoodride.TestHelpers.scrub_live_state() end)
+    Geo.user_connected(12)
+    Geo.driver_update(prof(12), "cM", nil, ["pA", "pB"])
+    mine = fn -> :ets.match_object(:geo_members, {{:_, 12}, :_}) |> Enum.sort() end
+    assert mine.() == [{{"pA", 12}, :driver}, {{"pB", 12}, :driver}]
+    :ets.insert(:geo_members, for(i <- 1..50_000, do: {{"zz#{i}", 6_000_000 + i}, :hand}))
+    # a ghost membership, and a real one missing
+    :ets.insert(:geo_members, {{"pZ", 12}, :driver})
+    :ets.delete(:geo_members, {"pB", 12})
+
+    repair_members_one(12)
+    assert_received {:repair_work, work}
+
+    assert mine.() == [{{"pA", 12}, :driver}, {{"pB", 12}, :driver}]
+    assert work < 5_000, "#{work} reductions: every membership read"
+  end
+
+  # (full-scan audit, 2026-11-19: an unblock built the person's whole cell
+  # to find their one marker) — by their keys, the same as the cell's list
+  test "one person's marker by its keys: exactly as their cell's list shows it" do
+    Geo.user_connected(13)
+    Geo.user_connected(14)
+    Geo.driver_update(prof(13), "cN", "cN-s")
+    Geo.hand_up(14, "cN", "cN-h")
+    snap = Geo.cell_snapshot("cN")
+    assert Geo.marker(:drivers, 13) == Enum.find(snap.drivers, &(&1.id == 13))
+    assert Geo.marker(:hands, 14) == Enum.find(snap.hands, &(&1.id == 14))
+    assert Geo.marker(:drivers, 14) == nil
+    assert Geo.marker(:hands, 13) == nil
+    assert Geo.marker(:drivers, 999) == nil
+    # not indexed in its cell: the list doesn't show it — neither does this
+    :ets.delete(:geo_by_cell, {"cN", 13})
+    assert Geo.cell_snapshot("cN").drivers == []
+    assert Geo.marker(:drivers, 13) == nil
+  end
+
+  # (2026-11-19: a rider's area snapshot built the ✋ too, then kept only
+  # the cars — in a crowded block, every ✋ looked up for nothing)
+  test "an area's cars for a rider: the ✋ there aren't looked up" do
+    # (the 5,000 gone after: a later module that doesn't scrub never sees them)
+    on_exit(fn -> Hoodride.TestHelpers.scrub_live_state() end)
+    Geo.user_connected(15)
+    Geo.driver_update(prof(15), "cP", "cP-s")
+    hands = for i <- 1..5_000, do: {7_000_000 + i, "cP-h#{i}"}
+    :ets.insert(:geo_hands, for({id, spot} <- hands, do: {id, "cP", spot}))
+    :ets.insert(:geo_by_cell, for({id, _} <- hands, do: {{"cP", id}, :hand}))
+
+    {:reductions, a} = Process.info(self(), :reductions)
+    cars = layer_snapshot("cP", :drivers)
+    {:reductions, b} = Process.info(self(), :reductions)
+
+    assert cars == [%{id: 15, cell: "cP", spot: "cP-s"}]
+    assert length(layer_snapshot("cP", :hands)) == 5_000
+    # (the old way: ~73,000 — each ✋ looked up; now the area's index walked,
+    # one comparison a row: ~5,000)
+    assert b - a < 15_000, "#{b - a} reductions: the area's ✋ looked up for a rider"
+  end
+
+  defp layer_snapshot(cell, layer), do: Geo.cell_snapshot(cell, layer)
+
+  # the repair for one person, as the Sweeper runs it: the drift pass's
+  # rows for them (the pass reads everything — that's its job, once a
+  # minute), then the repair (inside their shard: here in the test's own
+  # process, to count ITS work)
+  defp repair_one(id) do
+    seen = Map.get(Geo.cell_index_strays(), id, [])
+    {:reductions, before} = Process.info(self(), :reductions)
+    Geo.reindex_user_now(id, seen)
+    {:reductions, later} = Process.info(self(), :reductions)
+    send(self(), {:repair_work, later - before})
+  end
+
+  defp repair_members_one(id) do
+    seen = Map.get(Geo.member_strays(), id, [])
+    {:reductions, before} = Process.info(self(), :reductions)
+    Geo.rebuild_members_now(id, seen)
+    {:reductions, later} = Process.info(self(), :reductions)
+    send(self(), {:repair_work, later - before})
+  end
 end

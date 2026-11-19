@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "アカウントを削除できませんでした。もう一度お試しください。"
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "アカウントを削除できませんでした。ログアウトしました。もう一度試すには、再度ログインしてください。"
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "チャットを終了できませんでした。もう一度お試しください"
 
@@ -1292,8 +1296,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 現在地を待っています。乗客にはまだ表示されていません"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 現在地はおおよその位置です。{why}「正確な位置情報」をオンにしてください：{steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 現在地はおおよその位置です。屋内にいる場合は屋外に出るか、{why}「正確な位置情報」がオンになっているか確認してください：{steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

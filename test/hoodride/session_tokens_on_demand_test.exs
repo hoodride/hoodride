@@ -550,6 +550,45 @@ defmodule Hoodride.SessionTokensOnDemandTest do
       Task.await(sweep)
       assert {:ok, _} = Task.await(check), "read as signed out mid-drop"
     end
+
+    # (fourth review, 2026-11-19: "still loaded?" couldn't tell a person
+    # dropped AND loaded again from one never dropped — a check that read
+    # while they were gone took its empty read for the answer: a valid
+    # sign-in read as signed out — the app signs the person out)
+    test "dropped and loaded again while a check read: still signed in" do
+      u = user("od-drop-reload")
+      {:ok, raw} = SessionTokens.create(u.id)
+      assert {:ok, _} = SessionTokens.lookup_as(raw, u.id)
+      me = self()
+      {:ok, once} = Agent.start_link(fn -> MapSet.new() end)
+
+      Application.put_env(:hoodride, :session_tokens_hook, fn step ->
+        first? = Agent.get_and_update(once, &{not MapSet.member?(&1, step), MapSet.put(&1, step)})
+
+        if step in [:checked, :read_done] and first? do
+          send(me, {step, self()})
+
+          receive do
+            :go -> :ok
+          after
+            3_000 -> :ok
+          end
+        end
+      end)
+
+      check = Task.async(fn -> SessionTokens.lookup_as(raw, u.id) end)
+      assert_receive {:checked, pid}, 2_000
+      # dropped (not around) before the check reads…
+      SessionTokens.sweep()
+      refute SessionTokens.loaded?(u.id)
+      send(pid, :go)
+      assert_receive {:read_done, ^pid}, 2_000
+      # …and loaded again (another request of theirs) before it looks again
+      assert {:ok, _} = SessionTokens.lookup_as(raw, u.id)
+      assert SessionTokens.loaded?(u.id)
+      send(pid, :go)
+      assert {:ok, _} = Task.await(check), "a valid sign-in read as signed out"
+    end
   end
 
   describe "who's kept (the Sweeper)" do

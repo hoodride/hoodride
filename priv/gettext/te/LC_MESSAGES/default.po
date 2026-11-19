@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "మీ ఖాతాను తొలగించడం సాధ్యపడలేదు. దయచేసి మళ్లీ ట్రై చేయండి."
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "మీ ఖాతాను తొలగించడం సాధ్యపడలేదు. మీరు సైన్ అవుట్ అయ్యారు — మళ్లీ ట్రై చేయడానికి మళ్లీ సైన్ ఇన్ చేయండి."
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "చాట్‌ను ముగించడం సాధ్యపడలేదు. మళ్లీ ట్రై చేయండి"
 
@@ -1299,8 +1303,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 మీ లొకేషన్ కోసం వేచి ఉంది. ప్రయాణికులకు మీరు ఇంకా కనిపించడం లేదు"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 మీ లొకేషన్ సుమారుగా మాత్రమే ఉంది. {why} ఖచ్చితమైన లొకేషన్‌ను ఆన్ చేయండి: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 మీ లొకేషన్ సుమారుగా మాత్రమే ఉంది. మీరు లోపల ఉంటే బయటికి వెళ్లండి — లేదా {why} ఖచ్చితమైన లొకేషన్ ఆన్‌లో ఉందో లేదో చూడండి: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

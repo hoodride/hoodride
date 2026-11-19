@@ -65,6 +65,20 @@
     return { unread, note: out };
   }
 
+  // `next` (reconcile's note: the chats loaded) plus this phone's marks for
+  // chats NOT loaded yet — the list comes in pages, and a mark the server
+  // never got (read offline, a failed send) would be lost before its page
+  // came (2026-11-19). The newest `max` only: chats that ended leave marks
+  // that nothing else removes while older pages remain. A new note.
+  function keepUnloaded(next, note, convs, max) {
+    const loaded = new Set(convs.map((c) => String(c.peerId)));
+    const rest = Object.entries(clean(note))
+      .filter(([k]) => !loaded.has(k) && !(k in next))
+      .sort(([, a], [, b]) => (newer({ ts: a[0], id: a[1] }, b) ? -1 : newer({ ts: b[0], id: b[1] }, a) ? 1 : 0))
+      .slice(0, Math.max(0, max));
+    return { ...Object.fromEntries(rest), ...next };
+  }
+
   // the chat was seen: its bookmark moves to the newest of theirs, never
   // back. A new note; the old one is untouched.
   function seen(note, peerId, theirs) {
@@ -130,5 +144,5 @@
     return out;
   }
 
-  return { key, newer, newest, reconcile, seen, merge, read, save, forget, forgetAll };
+  return { key, newer, newest, reconcile, keepUnloaded, seen, merge, read, save, forget, forgetAll };
 });

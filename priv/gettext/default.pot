@@ -251,6 +251,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr ""
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr ""
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr ""
 
@@ -1296,7 +1300,7 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr ""
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
 msgstr ""
 
 #: priv/static/app.js

@@ -52,8 +52,9 @@ defmodule Hoodride.SessionTokens do
   # replacements not used yet by any request: {hash, user_id} (the
   # database's `unused`, so a restart doesn't forget a lost reply)
   @fresh :session_token_fresh
-  # {user_id}: this person's sign-ins are in memory (all of them: the cap
-  # and the renewal rules need the whole account)
+  # {user_id, load number}: this person's sign-ins are in memory (all of
+  # them: the cap and the renewal rules need the whole account; the number:
+  # each load's own — read_loaded)
   @loaded :session_token_loaded
   # {{user_id, hash}}: which sign-ins are whose — sorted, so one person's are
   # a quick range, not a scan of everyone's (the second review, 2026-11-18:
@@ -137,9 +138,7 @@ defmodule Hoodride.SessionTokens do
   database unable to answer: false (no ride starts on a guess).
   """
   def any?(user_id) do
-    case read_loaded(user_id, fn ->
-           :ets.select(@table, [{{:_, user_id, :_, :_}, [], [true]}], 1) != :"$end_of_table"
-         end) do
+    case read_loaded(user_id, fn -> mine(user_id) != [] end) do
       {:ok, any} -> any
       :unavailable -> false
     end
@@ -239,24 +238,43 @@ defmodule Hoodride.SessionTokens do
   @doc false
   def loaded?(user_id), do: :ets.member(@loaded, user_id)
 
+  # each load's own number (the mark is {user_id, number}): nil — not loaded
+  defp load_number(user_id) do
+    case :ets.lookup(@loaded, user_id) do
+      [{_, n}] -> n
+      _ -> nil
+    end
+  end
+
+  defp new_mark(user_id), do: {user_id, :erlang.unique_integer([:monotonic, :positive])}
+
   # Read memory for someone, KNOWING it's complete (owner, 2026-11-17 —
-  # the capacity run: 1 join in ~3,000 refused "signed_out"): "loaded?",
-  # then the read, then "STILL loaded?" — the Sweeper may have dropped them
-  # in between (it takes the mark first, then the rows: a read that could
-  # have missed rows always finds the mark gone after). Gone: read again
-  # from the database. `{:ok, result}`, or `:unavailable` — the database
-  # couldn't answer, or (never seen) dropped three times running: "try
-  # again", never a guess
+  # the capacity run: 1 join in ~3,000 refused "signed_out"): the load's
+  # number, the read, then "the SAME load still?" — the Sweeper may have
+  # dropped them in between (it takes the mark first, then the rows: a read
+  # that could have missed rows always finds the mark gone or changed
+  # after). A plain "still loaded?" couldn't tell a drop followed by a new
+  # load (another request of theirs) from no drop: the read made while they
+  # were gone was taken for the answer — signed out (fourth review,
+  # 2026-11-19). Changed: read again. `{:ok, result}`, or `:unavailable` —
+  # the database couldn't answer, or (never seen) dropped three times
+  # running: "try again", never a guess
   defp read_loaded(user_id, fun, tries \\ 3)
   defp read_loaded(_user_id, _fun, 0), do: unavailable()
 
   defp read_loaded(user_id, fun, tries) do
     case ensure(user_id) do
       :ok ->
+        n = load_number(user_id)
         # (tests: a pause between "loaded" and the read)
         hook(:checked)
         result = fun.()
-        if loaded?(user_id), do: {:ok, result}, else: read_loaded(user_id, fun, tries - 1)
+        # (tests: a pause between the read and "the same load still?")
+        hook(:read_done)
+
+        if n != nil and load_number(user_id) == n,
+          do: {:ok, result},
+          else: read_loaded(user_id, fun, tries - 1)
 
       :unavailable ->
         :unavailable
@@ -302,7 +320,7 @@ defmodule Hoodride.SessionTokens do
         if unused == 1, do: :ets.insert(@fresh, {h, user_id})
       end
 
-      :ets.insert(@loaded, {user_id})
+      :ets.insert(@loaded, new_mark(user_id))
       :ok
     end
   end
@@ -337,7 +355,7 @@ defmodule Hoodride.SessionTokens do
           if unused == 1, do: :ets.insert(@fresh, {h, user_id})
         end
 
-        :ets.insert(@loaded, for(id <- ids, do: {id}))
+        :ets.insert(@loaded, for(id <- ids, do: new_mark(id)))
         :ok
     end
   end
@@ -379,7 +397,7 @@ defmodule Hoodride.SessionTokens do
       Repo.transaction(fn ->
         delete_rows!(Enum.reject([old | dropped], &is_nil/1))
         insert!(user_id, h, now, now)
-        prune_rows(now)
+        prune_rows(now, user_id)
       end)
 
       # the new one in FIRST, then the old one out: never a moment with
@@ -445,6 +463,9 @@ defmodule Hoodride.SessionTokens do
             Repo.transaction(fn ->
               delete_rows!(gone ++ dropped)
               insert!(user_id, h, now, auth, 1)
+              # (its person's expired rows, as a sign-in does: someone who
+              # only ever renews kept every one until a deploy)
+              prune_rows(now, user_id)
 
               from(t in "user_tokens", where: t.token_hash == ^old)
               |> Repo.update_all(set: [replaced_by: h])
@@ -486,7 +507,7 @@ defmodule Hoodride.SessionTokens do
 
       forget_now(user_id)
       # (known now: none — nothing to read)
-      :ets.insert(@loaded, {user_id})
+      :ets.insert(@loaded, new_mark(user_id))
       {:ok, at}
     end)
   rescue
@@ -548,7 +569,7 @@ defmodule Hoodride.SessionTokens do
   # renewed first.
   defp over_cap(user_id, added, keep) do
     now = now()
-    mine = :ets.select(@table, [{{:"$1", user_id, :"$2", :"$3"}, [], [{{:"$1", :"$2", :"$3"}}]}])
+    mine = mine(user_id)
     excess = length(mine) + added - @max_per_account
 
     if excess <= 0 do
@@ -563,6 +584,28 @@ defmodule Hoodride.SessionTokens do
         if length(dropped) >= excess, do: {:halt, dropped}, else: {:cont, dropped}
       end)
     end
+  end
+
+  # this person's sign-ins, {hash, made, signed in}: found by their own
+  # range of @by_user — never by reading everyone's (their cost grew with
+  # everyone signed in; 2026-11-19). The list, then each one: one listed
+  # but gone by its lookup was replaced or removed in between — a sign-in
+  # again puts the new one in BOTH tables before the old one leaves, so a
+  # list made after sees the new one: list again (eighth review: the
+  # silent Google refresh between the two read as "signed out", refusing a
+  # driver's Accept). Still short after 3 (an index row the Sweeper hasn't
+  # cleared yet: expired, gone from the table): what's there
+  defp mine(user_id, tries \\ 3) do
+    hashes = :ets.select(@by_user, [{{{user_id, :"$1"}}, [], [:"$1"]}])
+    # (tests: a pause between the list and the lookups)
+    hook(:listed)
+
+    rows =
+      for h <- hashes,
+          [{^h, ^user_id, made, auth}] <- [:ets.lookup(@table, h)],
+          do: {h, made, auth}
+
+    if length(rows) < length(hashes) and tries > 1, do: mine(user_id, tries - 1), else: rows
   end
 
   # {drop order, when last made, its tokens}
@@ -624,7 +667,7 @@ defmodule Hoodride.SessionTokens do
   def sweep(now \\ now(), secs \\ System.monotonic_time(:second)) do
     # a page at a time (Hoodride.ETS.each_match) — never a copy of everyone
     # loaded (SweeperMemoryTest, 2026-11-18)
-    Hoodride.ETS.each_match(@loaded, [{{:"$1"}, [], [:"$1"]}], fn user_id ->
+    Hoodride.ETS.each_match(@loaded, [{{:"$1", :_}, [], [:"$1"]}], fn user_id ->
       if not Hoodride.Presence.around?(user_id, secs), do: drop_loaded(user_id)
     end)
 
@@ -667,8 +710,10 @@ defmodule Hoodride.SessionTokens do
   Start-up: expired rows deleted — nothing loaded (each person's sign-ins
   are read when first needed). A delete the database refuses (a full disk,
   a lock) is logged and skipped: the app starts anyway (it used to stop the
-  start: crash review 2026-11-13; Hoodride.BootResilienceTest). The next
-  sign-in prunes again.
+  start: crash review 2026-11-13; Hoodride.BootResilienceTest). Each
+  sign-in and renewal still deletes its own person's expired rows; everyone
+  else's wait for the next start (harmless meanwhile: every lookup checks
+  validity, the cap drops expired ones first).
   """
   def start_up(now \\ now()) do
     try do
@@ -690,11 +735,26 @@ defmodule Hoodride.SessionTokens do
     :ok
   end
 
-  # the TABLE is trimmed by code that already writes it (each sign-in) and
-  # at start-up, so the Sweeper stays memory-only
+  # the TABLE is trimmed by code that already writes it and at start-up, so
+  # the Sweeper stays memory-only. A sign-in trims only ITS person's (the
+  # user_id index): it trimmed everyone's, by two unindexed columns — a
+  # read of every row on each sign-in (the silent Google refresh: every
+  # return to the app), holding the database's one write lock (full-scan
+  # audit, 2026-11-19). A renewal trims its person's too. Everyone's at
+  # start-up — every deploy; between two, someone who never returns keeps
+  # their expired rows there (never valid: every lookup checks)
   defp prune_rows(now) do
     from(t in "user_tokens",
       where: t.inserted_at < ^(now - @valid_ms) or t.authenticated_at < ^(now - @cap_ms)
+    )
+    |> Repo.delete_all()
+  end
+
+  defp prune_rows(now, user_id) do
+    from(t in "user_tokens",
+      where:
+        t.user_id == ^user_id and
+          (t.inserted_at < ^(now - @valid_ms) or t.authenticated_at < ^(now - @cap_ms))
     )
     |> Repo.delete_all()
   end

@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "તમારું એકાઉન્ટ ડિલીટ કરી શકાયું નહીં. કૃપા કરીને ફરી પ્રયાસ કરો."
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "તમારું એકાઉન્ટ ડિલીટ કરી શકાયું નહીં. તમે સાઇન આઉટ થઈ ગયા છો — ફરી પ્રયાસ કરવા માટે ફરી સાઇન ઇન કરો."
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "ચેટ સમાપ્ત કરી શકાઈ નહીં. ફરી પ્રયાસ કરો"
 
@@ -1299,8 +1303,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 તમારા સ્થાનની રાહ જોઈ રહ્યાં છીએ. મુસાફરો હજી તમને જોઈ શકતા નથી"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 તમારું સ્થાન માત્ર અંદાજિત છે. {why} સચોટ લોકેશન ચાલુ કરો: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 તમારું સ્થાન માત્ર અંદાજિત છે. જો તમે અંદર હો, તો બહાર જાઓ — અથવા {why} સચોટ લોકેશન ચાલુ છે કે નહીં તે તપાસો: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

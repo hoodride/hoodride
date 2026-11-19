@@ -248,7 +248,7 @@
     if (quality !== "approximate" && permission === "prompt" && waitedMs >= PRECISE_HINT_AFTER_MS)
       return t("📍 Allow location when your browser asks — Hood Ride needs it {why}", { why });
     if (quality === "approximate" || waitedMs >= PRECISE_HINT_AFTER_MS)
-      return t("📍 Your location is only approximate — turn on Precise Location {why}: {steps}", {
+      return t("📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}", {
         why,
         steps: preciseSteps(p, app, standalone),
       });

@@ -24,14 +24,17 @@
   // a shift, a half-typed message, or a form open (the reload restores the
   // first four, but a driver's GPS or a rider meeting up shouldn't blink for
   // an update; the car form's typing was lost — U2, owner 2026-11-11)
-  // view: {mode, online, handRaised, ride: {status} | null, draft, form}
+  // view: {mode, online, handRaised, ride: {status} | null, draft, form,
+  // deleting} — deleting: the account's deletion in flight, or its "signed
+  // out" message up (a reload skipped the clean-up or lost the message)
   function isBusy(view) {
     return (
       !!view.ride ||
       !!view.handRaised ||
       (view.mode === "driver" && !!view.online) ||
       (view.draft || "").trim() !== "" ||
-      !!view.form
+      !!view.form ||
+      !!view.deleting
     );
   }
 

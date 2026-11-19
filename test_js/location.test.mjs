@@ -70,6 +70,15 @@ test("an approximate reading asks for Precise Location at once — with the righ
   assert.match(android, /to drive/);
 });
 
+// (owner, 2026-11-19: Precise already on, indoors, reads "approximate" too —
+// "turn on Precise Location" was wrong advice there)
+test("approximate: says to step outside if indoors, or CHECK Precise Location — not just 'turn it on'", () => {
+  for (const platform of ["ios", "android", "other"]) {
+    const m = F.locationMessage({ status: "searching", quality: "approximate", waitedMs: 500, platform, context: "hand" });
+    assert.match(m, /^📍 Your location is only approximate\. If you're indoors, step outside — or check that Precise Location is on to ask for a ride: /);
+  }
+});
+
 test("denied: never 'waiting' — the steps to allow it again", () => {
   const m = F.locationMessage({ status: "denied", quality: null, waitedMs: 0, platform: "android", context: "request" });
   assert.match(m, /blocked/);

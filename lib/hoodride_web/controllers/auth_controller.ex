@@ -1023,9 +1023,18 @@ defmodule HoodrideWeb.AuthController do
           :ok ->
             conn |> configure_session(drop: true) |> json(%{ok: true})
 
-          # the database couldn't: nothing was deleted, try again
+          # the database couldn't sign them out: NOTHING changed — try again
           {:error, :failed} ->
             conn |> put_status(503) |> json(%{error: "failed"})
+
+          # signed out (and off the map), then the database couldn't erase:
+          # the account intact — this session ends with the sign-out; the
+          # app says to sign in again to retry (twentieth review, 2026-11-19)
+          {:error, :failed_signed_out} ->
+            conn
+            |> configure_session(drop: true)
+            |> put_status(503)
+            |> json(%{error: "failed_signed_out"})
 
           {:error, reason} ->
             conn |> put_status(409) |> json(%{error: Atom.to_string(reason)})

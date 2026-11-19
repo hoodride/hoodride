@@ -22,6 +22,10 @@ defmodule Hoodride.LimitsTest do
     "writer_wait" =>
       "the cleanup pass waits on a map writer at most this long (Hoodride.SweeperStallTest)",
     "pause_target_us" => "…aiming for this per pause",
+    "off_map_wait_ms" =>
+      "deleting an account waits this long for its car and ✋ to leave the map before erasing it (Hoodride.AccountDeletionOrderTest)",
+    "close_wait_ms" =>
+      "deleting an account waits this long for its connections to close, then stops them",
     "ewma_keep" => "the recount's learned batch size (a moving average)",
     "ns_per_ms" => "a unit",
     "check_every" => "how often a ride looks for abandonment",

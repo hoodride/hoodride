@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "ଆପଣଙ୍କ ଆକାଉଣ୍ଟ ଡିଲିଟ କରିହେଲା ନାହିଁ — ଦୟାକରି ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।"
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "ଆପଣଙ୍କ ଆକାଉଣ୍ଟ ଡିଲିଟ କରିହେଲା ନାହିଁ। ଆପଣ ସାଇନ ଆଉଟ ହୋଇଯାଇଛନ୍ତି — ପୁଣି ଚେଷ୍ଟା କରିବାକୁ ପୁଣି ସାଇନ ଇନ କରନ୍ତୁ।"
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "ଚାଟ୍ ଶେଷ କରିହେଲା ନାହିଁ — ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ"
 
@@ -1299,8 +1303,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 ଆପଣଙ୍କ ଲୋକେସନ ପାଇଁ ଅପେକ୍ଷା କରାଯାଉଛି — ଯାତ୍ରୀମାନେ ଏପର୍ଯ୍ୟନ୍ତ ଆପଣଙ୍କୁ ଦେଖିପାରୁନାହାଁନ୍ତି"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 ଆପଣଙ୍କ ଲୋକେସନ କେବଳ ଆନୁମାନିକ — {why} ସଠିକ୍ ଲୋକେଶନ୍ ଚାଲୁ କରନ୍ତୁ: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 ଆପଣଙ୍କ ଲୋକେସନ କେବଳ ଆନୁମାନିକ। ଆପଣ ଭିତରେ ଥିଲେ ବାହାରକୁ ଯାଆନ୍ତୁ — କିମ୍ବା {why} ସଠିକ୍ ଲୋକେଶନ୍ ଚାଲୁ ଅଛି କି ନାହିଁ ଯାଞ୍ଚ କରନ୍ତୁ: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

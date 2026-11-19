@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Impossibile eliminare il tuo account. Riprova."
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "Impossibile eliminare il tuo account. Sei stato disconnesso: accedi di nuovo per riprovare."
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "Impossibile terminare la chat. Riprova"
 
@@ -1306,8 +1310,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 In attesa della tua posizione. I passeggeri non ti vedono ancora"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 La tua posizione è solo approssimativa. Attiva la posizione esatta {why}: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 La tua posizione è solo approssimativa. Se sei al chiuso, esci all'aperto — oppure controlla che la posizione esatta sia attiva {why}: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

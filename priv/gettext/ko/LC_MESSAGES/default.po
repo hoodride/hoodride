@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "계정을 삭제하지 못했어요. 다시 시도해 주세요."
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "계정을 삭제하지 못했어요. 로그아웃되었어요. 다시 시도하려면 다시 로그인해 주세요."
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "채팅을 종료할 수 없어요. 다시 시도해 주세요"
 
@@ -1292,8 +1296,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 위치를 기다리는 중이에요. 아직 탑승자에게 보이지 않아요"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 현재 위치가 대략적이에요. {why} 정확한 위치를 켜세요: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 현재 위치가 대략적이에요. 실내라면 밖으로 나가거나, {why} 정확한 위치가 켜져 있는지 확인하세요: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

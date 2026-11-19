@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Účet se nepodařilo smazat – zkus to prosím znovu."
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "Účet se nepodařilo smazat. Byl(a) jsi odhlášen(a) – přihlas se znovu a zkus to znovu."
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "Chat se nepodařilo ukončit – zkus to znovu"
 
@@ -1306,8 +1310,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 Čeká se na tvou polohu – spolujezdci tě zatím nevidí"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 Tvoje poloha je jen přibližná – zapni přesnou polohu, {why}: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 Tvoje poloha je jen přibližná. Pokud jsi uvnitř, jdi ven – nebo zkontroluj, že je zapnutá přesná poloha, {why}: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

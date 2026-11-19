@@ -254,6 +254,10 @@ msgid "Couldn't delete your account — please try again."
 msgstr "Nem sikerült törölni a fiókodat – kérlek, próbáld újra."
 
 #: priv/static/app.js
+msgid "Couldn't delete your account. You've been signed out — sign in again to try again."
+msgstr "Nem sikerült törölni a fiókodat. Kijelentkeztettünk – jelentkezz be újra, és próbáld újra."
+
+#: priv/static/app.js
 msgid "Couldn't end the chat — try again"
 msgstr "Nem sikerült befejezni a csevegést – próbáld újra"
 
@@ -1299,8 +1303,8 @@ msgid "📍 Waiting for your location — riders can't see you yet"
 msgstr "📍 Várakozás a helyzetedre – az utasok még nem látnak"
 
 #: priv/static/sendfilter.js
-msgid "📍 Your location is only approximate — turn on Precise Location {why}: {steps}"
-msgstr "📍 A helyzeted csak hozzávetőleges – kapcsold be a Pontos helyzet funkciót, {why}: {steps}"
+msgid "📍 Your location is only approximate. If you're indoors, step outside — or check that Precise Location is on {why}: {steps}"
+msgstr "📍 A helyzeted csak hozzávetőleges. Ha bent vagy, menj ki a szabadba – vagy ellenőrizd, hogy be van-e kapcsolva a Pontos helyzet funkció, {why}: {steps}"
 
 #: priv/static/app.js
 msgid "📩 requested a ride"

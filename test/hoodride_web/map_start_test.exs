@@ -64,6 +64,16 @@ defmodule HoodrideWeb.MapStartTest do
     [logout] = Regex.run(~r/\$\("btn-logout"\)\.addEventListener.*?\n}\);\n/s, @app)
     assert logout =~ "HoodViewStore.forget(storageOrNull(), state.realUser.id)"
     assert body("deleteAccount") =~ "HoodViewStore.forget(storageOrNull(), state.realUser.id)"
+    # (a failed erase AFTER the sign-out: said so — not "please try again"
+    # to someone already signed out; twentieth review, 2026-11-19)
+    assert body("deleteAccount") =~
+             ~s|$("delete-error").textContent = t("Couldn't delete your account. You've been signed out — sign in again to try again.");|
+
+    # (its own, longer wait: the server's worst case — a busy database twice,
+    # a stuck map writer — passed the 15 s every other request gets;
+    # twenty-third review)
+    assert body("deleteAccount") =~ "setTimeout(() => stop.abort(), DELETE_TIMEOUT_MS);"
+    assert @app =~ "const DELETE_TIMEOUT_MS = 30_000;"
     [signed_out] = Regex.run(~r/onSignedOut: async \(\) => \{.*?\n  \},/s, @app)
     assert signed_out =~ "HoodViewStore.forgetAll(storageOrNull())"
   end
