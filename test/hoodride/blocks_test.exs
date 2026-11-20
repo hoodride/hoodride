@@ -567,8 +567,10 @@ defmodule Hoodride.BlocksTest do
   # (one driving, one with ✋ up: raising ✋ takes a car off the map, so one
   # account can't show both — the sixteenth review)
   for kind <- [:car, :hand] do
-    test "deleting an account (#{kind}): off the map before its blocks leave memory" do
-      kind = unquote(kind)
+    @tag kind: kind
+    test "deleting an account (#{kind}): off the map before its blocks leave memory", %{
+      kind: kind
+    } do
       [ann, bob] = [user("om-ann-#{kind}"), user("om-bob-#{kind}")]
       :ok = Blocks.block(bob.id, ann.id)
       Hoodride.Geo.user_connected(ann.id)

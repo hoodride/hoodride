@@ -261,6 +261,10 @@ msgstr "No s'ha pogut suprimir el teu compte. Se t'ha tancat la sessió: torna a
 msgid "Couldn't end the chat — try again"
 msgstr "No s'ha pogut acabar el xat. Torna-ho a provar"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "No s'ha pogut carregar Hood Ride. Comprova la connexió"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "No s'han pogut carregar els missatges. Torna-ho a provar."
@@ -789,7 +793,7 @@ msgstr "Aquesta pàgina no existeix."
 msgid "Too late — the request was withdrawn"
 msgstr "Massa tard: la sol·licitud s'ha retirat"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "Torna-ho a provar"
 
@@ -888,6 +892,10 @@ msgstr "Has començat molts xats nous. Torna-ho a provar més tard"
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "Has començat massa xats. Primer acaba'n un"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "El teu navegador és massa antic per a Hood Ride. Actualitza'l per continuar"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

@@ -88,7 +88,8 @@ defmodule HoodrideWeb.LightReloadSourceTest do
     {ok, _} = :binary.match(l, "if (res.ok)")
     assert own < ok
     assert l =~ ~s[if (b && b.error === "none") outcome = "none";]
-    assert l =~ ~s[if (outcome === "none") return closeChatWith(peer);]
+    # (found gone: the neutral line — why, we can't know)
+    assert l =~ ~s[if (outcome === "none") return closeChatWith(peer, "neutral");]
     # anything else is a failure: Try again
     assert l =~ "c.failed = true;"
   end

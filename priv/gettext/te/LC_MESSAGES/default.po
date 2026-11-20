@@ -261,6 +261,10 @@ msgstr "మీ ఖాతాను తొలగించడం సాధ్యప
 msgid "Couldn't end the chat — try again"
 msgstr "చాట్‌ను ముగించడం సాధ్యపడలేదు. మళ్లీ ట్రై చేయండి"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Hood Ride లోడ్ కాలేదు. మీ కనెక్షన్‌ను చెక్ చేయండి"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "సందేశాలను లోడ్ చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి."
@@ -789,7 +793,7 @@ msgstr "ఈ పేజీ లేదు."
 msgid "Too late — the request was withdrawn"
 msgstr "ఆలస్యమైంది: రిక్వెస్ట్ వెనక్కి తీసుకోబడింది"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "మళ్లీ ప్రయత్నించండి"
 
@@ -888,6 +892,10 @@ msgstr "మీరు చాలా కొత్త చాట్‌లు ప్�
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "మీరు చాలా చాట్‌లు ప్రారంభించారు. ముందుగా వాటిలో ఒకటి ముగించండి"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "మీ బ్రౌజర్ Hood Rideకి చాలా పాతది. కొనసాగించడానికి దాన్ని అప్‌డేట్ చేయండి"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

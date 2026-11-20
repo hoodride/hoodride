@@ -101,6 +101,15 @@ defmodule Hoodride.Blocks do
     end
   end
 
+  @doc """
+  From memory ONLY (no database read): a block between them that's already
+  known — for a last look right after `check/2` loaded `a` (a message's
+  write: Hoodride.Chat.send_message). A block saved since is in memory: it's
+  written there for anyone loaded (do_block). Not loaded: false.
+  """
+  def known_blocked?(a, b) when a == b, do: false
+  def known_blocked?(a, b), do: :ets.member(@rows, {a, b})
+
   @doc "This person's blocks into memory now (a map joining): `:ok` or `:unavailable`."
   def preload(user_id) when is_integer(user_id), do: ensure(user_id)
 

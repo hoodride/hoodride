@@ -74,6 +74,71 @@ defmodule HoodrideWeb.CancelAcceptRaceTest do
     assert :ets.lookup(:ride_requests, rider.id) == []
   end
 
+  # (the 2026-11-08 server review's note, still open until 2026-11-20) the
+  # Accept TAKES the request, then claims the seats: a Cancel in between
+  # found neither — "ok", the app said "Request cancelled", then the ride
+  # opened. Now the Accept leaves a mark while it works; a Cancel that finds
+  # nothing but the mark waits for it, then answers by what it did
+  describe "a Cancel landing INSIDE the Accept" do
+    setup do
+      on_exit(fn -> Application.delete_env(:hoodride, :requests_hook) end)
+      :ok
+    end
+
+    # the Accept pauses after taking the request (and, given, its ride start
+    # answers `start_result` instead of starting one)
+    defp pause_accept(start_result \\ nil) do
+      me = self()
+
+      Application.put_env(:hoodride, :requests_hook, fn
+        :taken ->
+          send(me, {:paused, self()})
+          receive do: (:go -> :ok)
+
+        :start ->
+          start_result
+
+        _ ->
+          nil
+      end)
+    end
+
+    test "the ride then starts: 'the driver already accepted' — never 'cancelled'",
+         %{rider: rider, driver: driver} do
+      {rchan, dchan} = requested(rider, driver)
+      pause_accept()
+      accept = push(dchan, "accept_request", %{"rider_id" => rider.id})
+      assert_receive {:paused, acceptor}, 2_000
+      cancel = push(rchan, "cancel_request", %{})
+      # (it waits for the Accept: no answer while it's paused)
+      refute_reply cancel, _, _, 200
+      send(acceptor, :go)
+      assert_reply accept, :ok
+      assert_reply cancel, :error, %{reason: "accepted"}, 2_000
+      assert is_binary(Hoodride.Rides.ride_id_of_user(rider.id))
+    end
+
+    test "the ride then can't start (put back): the Cancel cancels it — never lost",
+         %{rider: rider, driver: driver} do
+      {rchan, dchan} = requested(rider, driver)
+      pause_accept({:error, :failed})
+      accept = push(dchan, "accept_request", %{"rider_id" => rider.id})
+      assert_receive {:paused, acceptor}, 2_000
+      cancel = push(rchan, "cancel_request", %{})
+      # (the Cancel handled WHILE the Accept is paused: it waits for it — it
+      # answered "ok" at once, then the request was put back, the Cancel lost)
+      refute_reply cancel, _, _, 200
+      send(acceptor, :go)
+      assert_reply accept, :error, _
+      assert_reply cancel, :ok, _, 2_000
+
+      assert :ets.lookup(:ride_requests, rider.id) == [],
+             "the request stood again: the Cancel lost"
+
+      assert Hoodride.Rides.ride_id_of_user(rider.id) == nil
+    end
+  end
+
   test "nothing to cancel and no ride: still 'ok'", %{rider: rider} do
     {:ok, _, rchan} = subscribe_and_join(connect_as(rider), "user:#{rider.id}", %{})
     ref = push(rchan, "cancel_request", %{})

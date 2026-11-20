@@ -261,6 +261,10 @@ msgstr "無法刪除你的帳號。你已登出——請重新登入後再試一
 msgid "Couldn't end the chat — try again"
 msgstr "無法結束聊天，請再試一次"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "無法載入 Hood Ride，請檢查網路連線"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "無法載入訊息，請再試一次。"
@@ -789,7 +793,7 @@ msgstr "這個網頁不存在。"
 msgid "Too late — the request was withdrawn"
 msgstr "太晚了，請求已被撤回"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "再試一次"
 
@@ -888,6 +892,10 @@ msgstr "你開啟太多新聊天了，請稍後再試"
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "你發起的聊天太多了，請先結束其中一個"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "你的瀏覽器版本太舊，無法使用 Hood Ride，請更新後繼續"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

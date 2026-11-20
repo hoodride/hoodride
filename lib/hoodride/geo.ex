@@ -88,8 +88,20 @@ defmodule Hoodride.Geo do
   # block-level fuzz as a hand). An older app sends none: the car is then
   # shown at its cell. Never an exact position: those travel only inside a
   # ride (HoodrideWeb.RideChannel).
-  def driver_update(user, cell, spot \\ nil, parents \\ []) when is_binary(spot) or is_nil(spot),
-    do: Hoodride.GeoWriter.exec(user.id, {:driver_update, user, cell, spot || cell, parents})
+  #
+  # `still_signed_in` (a connection's own check: UserChannel.still_signed_in)
+  # is asked again INSIDE the writer, when the car is placed: the sign-out
+  # signs out, then takes the car off in this same writer — an update that
+  # passed the channel's check before it, placed after, put the car back (a
+  # ghost until the sweeper's grace; the 2026-11-08 review's last gap,
+  # closed 2026-11-20)
+  def driver_update(user, cell, spot \\ nil, parents \\ [], still_signed_in \\ nil)
+      when is_binary(spot) or is_nil(spot),
+      do:
+        Hoodride.GeoWriter.exec(
+          user.id,
+          {:driver_update, user, cell, spot || cell, parents, still_signed_in}
+        )
 
   # (`timeout`: how long to wait for the writer — a caller that doesn't
   # need the answer, like a ride starting, waits less; the change lands
@@ -97,8 +109,9 @@ defmodule Hoodride.Geo do
   def driver_offline(user_id, timeout \\ nil),
     do: exec(user_id, {:driver_offline, user_id}, timeout)
 
-  def hand_up(user_id, cell, spot \\ nil, parents \\ []),
-    do: Hoodride.GeoWriter.exec(user_id, {:hand_up, user_id, cell, spot, parents})
+  def hand_up(user_id, cell, spot \\ nil, parents \\ [], still_signed_in \\ nil),
+    do:
+      Hoodride.GeoWriter.exec(user_id, {:hand_up, user_id, cell, spot, parents, still_signed_in})
 
   def hand_down(user_id, timeout \\ nil), do: exec(user_id, {:hand_down, user_id}, timeout)
 

@@ -801,6 +801,46 @@ defmodule HoodrideWeb.LoginLockdownTest do
       end
     end
 
+    # (the 2026-11-08 server review's note, still open until 2026-11-20:
+    # nothing guarded these) a line added while debugging — check_origin:
+    # false, the force_ssl block removed — passed every test, and production
+    # lost the live connection's origin check or HTTPS-only (HSTS)
+    test "prod keeps the socket origin check, HTTPS only (HSTS), and https addresses" do
+      env = %{
+        "DATABASE_PATH" => "/tmp/x.db",
+        "SECRET_KEY_BASE" => String.duplicate("a", 64),
+        "PHX_HOST" => "hood.example"
+      }
+
+      for {k, v} <- env, do: System.put_env(k, v)
+
+      try do
+        # as the release builds it: config.exs (importing prod.exs), then runtime.exs
+        base =
+          Config.Reader.read!("config/config.exs", env: :prod)[:hoodride][HoodrideWeb.Endpoint]
+
+        run =
+          Config.Reader.read!("config/runtime.exs", env: :prod)[:hoodride][HoodrideWeb.Endpoint]
+
+        endpoint = Keyword.merge(base, run)
+
+        # absent means Phoenix's own check (true): never switched off
+        refute Keyword.get(endpoint, :check_origin) == false,
+               "the live connection's origin check is off"
+
+        ssl = endpoint[:force_ssl]
+        assert is_list(ssl), "force_ssl is gone: no HTTPS redirect, no HSTS"
+
+        assert :x_forwarded_proto in Keyword.get(ssl, :rewrite_on, []),
+               "behind the tunnel: HTTPS is read from the header"
+
+        refute Keyword.get(ssl, :hsts) == false, "HSTS switched off"
+        assert endpoint[:url][:scheme] == "https"
+      after
+        for k <- Map.keys(env), do: System.delete_env(k)
+      end
+    end
+
     test "SOCKET_PATH: listen on that Unix socket (port 0) and trust it; unset: neither" do
       env = %{
         "DATABASE_PATH" => "/tmp/x.db",

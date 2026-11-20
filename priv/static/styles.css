@@ -129,6 +129,29 @@ a.btn { text-decoration: none; }
   margin: 24px 0 8px;
 }
 
+/* a file of the app that didn't arrive (HoodLoadCheck, loadcheck.js): over
+   everything, the brand and what to do — the sign-in screen's look */
+.load-fail {
+  /* (the four edges and margins, not inset/gap: Chrome 87 / Safari 14.1 —
+     the old browsers this is FOR ignore those; thirteenth review) */
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--bg);
+  text-align: center;
+}
+.load-fail > * + * { margin-top: 24px; }
+.load-fail[hidden], .load-fail [hidden] { display: none; }
+.load-fail-text, .load-fail-old { max-width: 320px; font-size: 16px; line-height: 1.45; }
+
 /* Signed in, until the app knows where to go (PageController.resuming,
    owner 2026-11-05): only the car — never a sign-in screen that vanishes.
    Hidden, not removed: nothing moves if it IS the sign-in screen after all.

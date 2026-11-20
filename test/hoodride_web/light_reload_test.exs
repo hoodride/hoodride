@@ -271,7 +271,11 @@ line two	tab"
       me = user("lr-c2")
       mo = user("lr-mo")
       :ok = Chat.open(me.id, mo.id)
-      assert json_response(chat(me, Integer.to_string(mo.id)), 200) == %{"messages" => []}
+
+      assert json_response(chat(me, Integer.to_string(mo.id)), 200) == %{
+               "messages" => [],
+               "read" => nil
+             }
     end
 
     test "not mine, my own id, made up, missing or odd: the same 404, nothing told" do

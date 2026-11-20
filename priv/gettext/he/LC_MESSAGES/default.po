@@ -261,6 +261,10 @@ msgstr "לא ניתן היה למחוק את החשבון. בוצעה יציאה
 msgid "Couldn't end the chat — try again"
 msgstr "אי אפשר לסיים את הצ'אט — כדאי לנסות שוב"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "לא ניתן היה לטעון את Hood Ride — כדאי לבדוק את החיבור לאינטרנט"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "לא ניתן לטעון את ההודעות. נסה שוב."
@@ -789,7 +793,7 @@ msgstr "הדף הזה לא קיים."
 msgid "Too late — the request was withdrawn"
 msgstr "מאוחר מדי — הבקשה בוטלה"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "נסה שוב"
 
@@ -888,6 +892,10 @@ msgstr "פתחת הרבה צ׳אטים חדשים — כדאי לנסות שוב
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "התחלת יותר מדי צ'אטים — קודם צריך לסיים אחד מהם"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "הדפדפן שלך ישן מדי בשביל Hood Ride — צריך לעדכן אותו כדי להמשיך"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

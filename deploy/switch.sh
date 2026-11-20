@@ -68,8 +68,16 @@ healthy() {
     return
   fi
   for _ in $(seq 1 30); do
-    code="$(sudo -u cloudflared /usr/local/sbin/hoodride-socket-get --status /api/me || true)"
+    # /api/health: the database can be WRITTEN (HoodrideWeb.Health) — /api/me
+    # read nothing with no session: a read-only database passed
+    code="$(sudo -u cloudflared /usr/local/sbin/hoodride-socket-get --status /api/health || true)"
     [ "$code" = 200 ] && return 0
+    # (a rollback to a release from BEFORE /api/health — its 404 isn't a
+    # failure: that release is checked the old way, /api/me)
+    if [ "${1:-}" = previous ] && [ "$code" = 404 ]; then
+      code="$(sudo -u cloudflared /usr/local/sbin/hoodride-socket-get --status /api/me || true)"
+      [ "$code" = 200 ] && return 0
+    fi
     sleep 1
   done
   return 1
@@ -98,7 +106,7 @@ rollback() {
   if [ -n "$PREV" ] && [ -d "$PREV" ]; then
     point_at "$PREV"
     "${SYSTEMCTL[@]}" start hoodride
-    if healthy; then say "switched back: $PREV"; else say "the previous release doesn't answer either"; fi
+    if healthy previous; then say "switched back: $PREV"; else say "the previous release doesn't answer either"; fi
   fi
   exit 1
 }

@@ -33,8 +33,10 @@ config :phoenix, :json_library, Jason
 # Our own JS, minified at deploy (and for the browser journeys) —
 # Mix.Tasks.Hoodride.Minify. esbuild without bundling never renames
 # top-level names (the files share globals). The browsers: the minimum for
-# what our code uses (`??`: Chrome/Edge 80, Firefox 72, Safari 13.1, iOS
-# 13.4; esbuild rewrites `?.` for Chrome < 91 and Firefox < 74) — so
+# what our code uses (`??`: Chrome/Edge 80, Safari 13.1, iOS 13.4; Firefox
+# 78: car.js's /\p{C}/u, which esbuild only turned into a RegExp call that
+# Firefox < 78 throws on — twelfth review, 2026-11-19; esbuild rewrites `?.`
+# for Chrome < 91) — so
 # minifying never needs a newer phone than the code itself, and syntax the
 # oldest can't run fails the build (bigint: esbuild only warns — made an
 # error). Destructuring: esbuild counts it from Safari 14.1 / iOS 14.5 (older
@@ -47,7 +49,7 @@ config :esbuild,
   version: "0.28.2",
   minify: [
     args:
-      ~w(--minify --target=es2020,safari13.1,ios13.4,chrome80,edge80,firefox72 --supported:destructuring=true --log-override:bigint=error --sourcemap=external --log-level=warning)
+      ~w(--minify --target=es2020,safari13.1,ios13.4,chrome80,edge80,firefox78 --supported:destructuring=true --log-override:bigint=error --sourcemap=external --log-level=warning)
   ]
 
 # Never in a log line, at any level: exact positions (ride "pos", the

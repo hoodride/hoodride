@@ -203,6 +203,56 @@ defmodule HoodrideWeb.SignInTokensTest do
       assert Geo.hand_of(u.id) == nil
       _ = conn
     end
+
+    # (the 2026-11-08 server review's ghost car, its last gap — 2026-11-20):
+    # the check above runs when the channel TAKES the update; the sign-out
+    # can land after that and before the map writer places it (the car's
+    # first update reads the database — has_car?). The sign-out's "off the
+    # map" then found nothing, and the update put the car back: a ghost,
+    # requestable, until the sweeper's grace (~5 min)
+    for {event, what} <- [{"driver_update", "car"}, {"hand_up", "✋"}] do
+      test "signed out between the channel's check and the map: no ghost #{what}" do
+        u = user("tk-gap-#{unquote(event)}")
+
+        {:ok, _} =
+          Accounts.set_car(u.id, %{"color" => "Blue", "make" => "Toyota", "model" => "Camry"})
+
+        {:ok, socket} =
+          Phoenix.ChannelTest.connect(HoodrideWeb.UserSocket, %{},
+            connect_info: %{session: TestHelpers.session_for(u.id)}
+          )
+
+        {:ok, _, chan} = subscribe_and_join(socket, "user:#{u.id}", %{})
+
+        # the whole sign-out (signed out, off the map) inside that window
+        Application.put_env(:hoodride, :user_channel_hook, fn :placing ->
+          :ok = Accounts.mark_logged_out(u.id)
+          Geo.driver_offline(u.id)
+          Geo.hand_down(u.id)
+        end)
+
+        on_exit(fn -> Application.delete_env(:hoodride, :user_channel_hook) end)
+
+        ref = Phoenix.ChannelTest.push(chan, unquote(event), %{"spot" => "892a1072c97ffff"})
+        # (no reply when it goes through: the channel has handled it)
+        _ = :sys.get_state(chan.channel_pid)
+        refute_received %Phoenix.Socket.Reply{ref: ^ref}
+        refute Geo.driver_on_map?(u.id), "the car came back after the sign-out"
+        assert Geo.hand_of(u.id) == nil, "the ✋ came back after the sign-out"
+      end
+    end
+
+    test "a car or ✋ update queued for the map while signed in, run after the sign-out: not placed" do
+      u = user("tk-gap-geo")
+      still = fn -> false end
+      Geo.driver_update(%{id: u.id, name: u.name, photo: nil}, @cell, @cell, [], still)
+      refute Geo.driver_on_map?(u.id)
+      Geo.hand_up(u.id, @cell, @cell, [], still)
+      assert Geo.hand_of(u.id) == nil
+      # (signed in: placed, as always)
+      Geo.hand_up(u.id, @cell, @cell, [], fn -> true end)
+      assert Geo.hand_of(u.id)
+    end
   end
 
   describe "signing in" do

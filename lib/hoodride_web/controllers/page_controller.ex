@@ -43,6 +43,7 @@ defmodule HoodrideWeb.PageController do
       |> with_alternates("", lang, I18n.addressed())
       |> localize_links(lang)
       |> in_language(lang)
+      |> with_load_fail(lang)
       |> resuming(signed_in?(conn))
 
     conn
@@ -230,6 +231,52 @@ defmodule HoodrideWeb.PageController do
         tag <>
           "\n  " <> StaticVersions.stamp(~s(<script src="#{root}#{I18n.script(lang)}"></script>))
       end)
+    )
+  end
+
+  @doc """
+  The "couldn't load" message (#load-fail — HoodLoadCheck, loadcheck.js),
+  and its "browser too old" form, in `lang`, written into the page here: it
+  shows when one of the app's files didn't arrive (or this browser can't
+  read it), and the files that translate the page (i18n.js, its language's
+  catalog) may be the missing ones. English: as written.
+  """
+  def with_load_fail(html, "en"), do: html
+
+  def with_load_fail(html, lang) do
+    text = Plug.HTML.html_escape(I18n.t(lang, "Couldn't load Hood Ride — check your connection"))
+    again = Plug.HTML.html_escape(I18n.t(lang, "Try again"))
+
+    old =
+      Plug.HTML.html_escape(
+        I18n.t(lang, "Your browser is too old for Hood Ride — update it to continue")
+      )
+
+    # (a function, not "\\1…": the words are never read as a pattern)
+    html
+    |> then(
+      &Regex.replace(
+        ~r{(<p class="load-fail-text">)[^<]*(</p>)},
+        &1,
+        fn _, a, b -> a <> text <> b end,
+        global: false
+      )
+    )
+    |> then(
+      &Regex.replace(
+        ~r{(<a id="load-fail-retry"[^>]*>)[^<]*(</a>)},
+        &1,
+        fn _, a, b -> a <> again <> b end,
+        global: false
+      )
+    )
+    |> then(
+      &Regex.replace(
+        ~r{(<p class="load-fail-old"[^>]*>)[^<]*(</p>)},
+        &1,
+        fn _, a, b -> a <> old <> b end,
+        global: false
+      )
     )
   end
 

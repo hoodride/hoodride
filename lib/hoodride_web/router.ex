@@ -80,6 +80,8 @@ defmodule HoodrideWeb.Router do
     pipe_through :api
 
     get "/me", AuthController, :me
+    # the deploy's own check: can the database be WRITTEN? (HoodrideWeb.Health)
+    get "/health", HealthController, :show
     get "/state", AuthController, :state
     get "/socket_token", AuthController, :socket_token
     get "/car", CarController, :show

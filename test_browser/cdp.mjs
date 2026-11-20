@@ -389,6 +389,102 @@ function page(cdp, sessionId, name, browserContextId) {
         },
       };
     },
+    // one file that doesn't arrive (owner, 2026-11-19: one phone's
+    // sendfilter.js never did, and the app broke): every request matching
+    // `urlPattern` (Chrome's wildcards: *) FAILS, as a dropped connection —
+    // the first `times` of them (Infinity: always), then they go through.
+    // Past the offline worker (sw.js), straight to the network: what it
+    // would answer from its saved copies isn't this test's. `count()`: how
+    // many failed; `stop()`: they all go through again
+    async failRequests(urlPattern, times = Infinity) {
+      let failed = 0;
+      let done = false;
+      await send("Network.enable");
+      await send("Network.setBypassServiceWorker", { bypass: true });
+      await send("Fetch.enable", { patterns: [{ urlPattern }] });
+      cdp.on((msg) => {
+        if (msg.sessionId !== sessionId || msg.method !== "Fetch.requestPaused") return;
+        const id = msg.params.requestId;
+        if (!done && failed < times) {
+          failed++;
+          send("Fetch.failRequest", { requestId: id, errorReason: "ConnectionFailed" }).catch(() => {});
+        } else send("Fetch.continueRequest", { requestId: id }).catch(() => {});
+      });
+      return {
+        count: () => failed,
+        async stop() {
+          done = true;
+          await send("Fetch.disable", {}).catch(() => {});
+        },
+      };
+    },
+    // one file that arrives BROKEN (owner, 2026-11-19): the first `times`
+    // requests matching `urlPattern` answered "200 OK" with `body` instead
+    // — empty, cut off, anything — then the real file. Past the offline
+    // worker, as failRequests. `count()`, `stop()` as there
+    // (`headers`: more response headers — e.g. our year-long cache, to see
+    // a broken copy kept by the browser)
+    // (`opts`: { status, type } — a 404 JSON answer, say; else 200 JavaScript)
+    async answerWith(urlPattern, body, times = Infinity, headers = [], opts = {}) {
+      let answered = 0;
+      let done = false;
+      await send("Network.enable");
+      await send("Network.setBypassServiceWorker", { bypass: true });
+      await send("Fetch.enable", { patterns: [{ urlPattern }] });
+      cdp.on((msg) => {
+        if (msg.sessionId !== sessionId || msg.method !== "Fetch.requestPaused") return;
+        const id = msg.params.requestId;
+        if (!done && answered < times) {
+          answered++;
+          send("Fetch.fulfillRequest", {
+            requestId: id,
+            responseCode: opts.status || 200,
+            responseHeaders: [{ name: "content-type", value: opts.type || "text/javascript" }, ...headers],
+            body: Buffer.from(body, "utf8").toString("base64"),
+          }).catch(() => {});
+        } else send("Fetch.continueRequest", { requestId: id }).catch(() => {});
+      });
+      return {
+        count: () => answered,
+        async stop() {
+          done = true;
+          await send("Fetch.disable", {}).catch(() => {});
+        },
+      };
+    },
+    // how many times this page has loaded (each reload one more)
+    loads: () => loads,
+    // hold every ANSWER whose address matches `urlPattern` — the server has
+    // already answered, the page doesn't have it yet — until `release()`:
+    // something can happen in between (a chat ending while a page of older
+    // chats is on its way). `count()`: how many held
+    // (one pattern, or several; `count(part)` / `release(part)`: only those
+    // whose address contains `part` — the rest stay held. `release()`: all,
+    // and holding ends)
+    async holdResponses(urlPatterns) {
+      let done = false;
+      const paused = [];
+      await send("Network.enable");
+      await send("Fetch.enable", { patterns: [].concat(urlPatterns).map((urlPattern) => ({ urlPattern, requestStage: "Response" })) });
+      cdp.on((msg) => {
+        if (done || msg.sessionId !== sessionId || msg.method !== "Fetch.requestPaused") return;
+        paused.push({ id: msg.params.requestId, url: msg.params.request.url });
+      });
+      return {
+        count: (part = "") => paused.filter((r) => r.url.includes(part)).length,
+        async release(part) {
+          const go = part === undefined ? paused.splice(0) : paused.filter((r) => r.url.includes(part));
+          for (const r of go) {
+            if (part !== undefined) paused.splice(paused.indexOf(r), 1);
+            await send("Fetch.continueRequest", { requestId: r.id }).catch(() => {});
+          }
+          if (part === undefined) {
+            done = true;
+            await send("Fetch.disable", {}).catch(() => {});
+          }
+        },
+      };
+    },
     // a recording: every frame as Chrome paints it (JPEG bytes, and its time
     // in seconds) to `onFrame`, until the function this returns is called —
     // for videos of the app (screenshots are too slow to catch a zoom)

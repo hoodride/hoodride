@@ -60,6 +60,8 @@ defmodule Hoodride.Chat do
   # bring is counted from it. Deleted with the conversation; a stray from a
   # read racing a delete goes at the sweeper's repair pass (heal_index)
   @reads :chat_reads
+  # a pair's send and delete, one at a time ({key, holder pid}) — pair_locked/2
+  @pair_locks :chat_pair_locks
 
   def init_tables do
     Hoodride.ETS.new(@conversations, [:named_table, :public, :set])
@@ -69,6 +71,7 @@ defmodule Hoodride.Chat do
     Hoodride.ETS.new(@sent_ids, [:named_table, :public, :set])
     Hoodride.ETS.new(@started, [:named_table, :public, :bag])
     Hoodride.ETS.new(@reads, [:named_table, :public, :set])
+    Hoodride.ETS.new(@pair_locks, [:named_table, :public, :set])
     # the last message id handed out (next_id/0)
     :persistent_term.put({__MODULE__, :last_id}, :atomics.new(1, signed: true))
     :ok
@@ -138,6 +141,10 @@ defmodule Hoodride.Chat do
   """
   def send_message(from, to_id, text, spot \\ nil) do
     key = pair_key(from.id, to_id)
+    pair_locked(key, fn -> write_message(key, from, to_id, text, spot) end)
+  end
+
+  defp write_message(key, from, to_id, text, spot) do
     now = System.system_time(:second)
     id = next_id()
 
@@ -155,21 +162,68 @@ defmodule Hoodride.Chat do
     end
 
     index(key)
+    # (tests: a pause between the conversation's write and its message's)
+    hook(:indexed)
     # only the text's own bytes: a slice of the incoming frame kept the WHOLE
     # frame (up to 64 KB) alive in memory for as long as the message was
     :ets.insert(@messages, {key, id, from.id, :binary.copy(text), now})
     trim_history(key)
     if spot, do: :ets.insert(@spots, {{key, from.id}, spot, System.system_time(:millisecond)})
 
-    HoodrideWeb.Endpoint.broadcast("user:#{to_id}", "msg", %{
-      id: id,
-      from: %{id: from.id, name: from.name, photo: from.photo},
-      text: text,
-      ts: now,
-      spot: spot
-    })
+    # its chat gone AFTER it was found above, BEFORE this message was
+    # written: the message would go to the other person for a chat the
+    # server no longer has — their app made a ghost of it, "none" when
+    # opened (review, 2026-11-20). A delete can't land here any more (the
+    # pair's lock: pair_locked/2) — kept as the net for anything that takes
+    # a conversation without delete_conversation. It starts a new chat:
+    # counted, indexed again (past the caller's new-contact and room checks,
+    # which a message sent a moment later would meet — at most one more).
+    # (A block's: undone just below, as any message after a block)
+    if not :ets.member(@conversations, key) do
+      if :ets.insert_new(@conversations, {key, now}), do: mark_started(from.id, key)
+      index(key)
+    end
 
-    {:ok, %{id: id, ts: now}}
+    # the last look (review of the block journeys, 2026-11-20): the caller's
+    # block check ran BEFORE this write — a block saved in between deleted
+    # their chat, and this message started it again and reached the one who
+    # blocked. A block saves, then deletes; a send writes, then looks: one
+    # always sees the other. From memory only (the caller's check just loaded
+    # the sender's blocks; a block saved since is written there) — never a
+    # database read here, and so never "unknown": a hiccup can't delete a
+    # chat that may be theirs
+    if Hoodride.Blocks.known_blocked?(from.id, to_id) do
+      forget_blocked(key)
+      {:error, :unavailable}
+    else
+      HoodrideWeb.Endpoint.broadcast("user:#{to_id}", "msg", %{
+        id: id,
+        from: %{id: from.id, name: from.name, photo: from.photo},
+        text: text,
+        ts: now,
+        spot: spot
+      })
+
+      {:ok, %{id: id, ts: now}}
+    end
+  end
+
+  # a message written after its pair was blocked: their chat gone again, both
+  # told plainly (as a block's own close) — and everything of the pair
+  # removed even when the block's delete took the conversation first (its
+  # messages, spots, "started by" rows written after it would be left behind)
+  defp forget_blocked({a, b} = key) do
+    delete_conversation(key, :neutral)
+    :ets.delete(@by_user, {a, key})
+    :ets.delete(@by_user, {b, key})
+    :ets.delete(@messages, key)
+    :ets.delete(@spots, {key, a})
+    :ets.delete(@spots, {key, b})
+    :ets.delete_object(@started, {a, key})
+    :ets.delete_object(@started, {b, key})
+    :ets.delete(@reads, {key, a})
+    :ets.delete(@reads, {key, b})
+    :ok
   end
 
   @doc """
@@ -355,9 +409,13 @@ defmodule Hoodride.Chat do
       # per chat, only those with any: a chat not loaded that gets a new
       # message takes its own over in the app, and they go when it's read
       # (owner, 2026-11-14 — one total stayed after that chat was read)
+      # (not the chat on screen: it comes in full — `extra` — and its unread
+      # with it; counted here too, the app's 💬 kept them after it was read:
+      # review of the older chats, 2026-11-20)
       unread_rest:
         for(
-          {_, peer, key} <- rest,
+          {_, peer, key} = c <- rest,
+          c not in extra,
           n = unread(user_id, peer, key),
           n > 0,
           into: %{},
@@ -427,6 +485,58 @@ defmodule Hoodride.Chat do
 
   def mark_read(_user_id, _peer_id, _ts, _id), do: {:error, :none}
 
+  defp hook(step) do
+    if f = Application.get_env(:hoodride, :chat_hook), do: f.(step)
+    :ok
+  end
+
+  # A pair's send and its chat's delete, one at a time (the 2026-11-08
+  # server review's "ghost empty chat around a deletion", done 2026-11-20):
+  # a send between a delete's take and its wipe made the chat again, the wipe
+  # took its message — an empty chat left, the message lost though "sent".
+  # No check by either side alone closes it; both short write sections run
+  # under this. Held a few microseconds. Re-entered by its holder (a send
+  # undoing itself after a block deletes inside its own section); a holder
+  # that died never blocks the pair (its row taken over)
+  defp pair_locked(key, fun) do
+    me = self()
+
+    case :ets.lookup(@pair_locks, key) do
+      [{^key, ^me}] ->
+        fun.()
+
+      _ ->
+        take_pair_lock(key, me, 0)
+
+        try do
+          fun.()
+        after
+          :ets.delete_object(@pair_locks, {key, me})
+        end
+    end
+  end
+
+  defp take_pair_lock(key, me, tries) do
+    cond do
+      :ets.insert_new(@pair_locks, {key, me}) ->
+        :ok
+
+      true ->
+        case :ets.lookup(@pair_locks, key) do
+          # its holder died holding it: taken over
+          [{^key, pid}] when is_pid(pid) ->
+            if not Process.alive?(pid), do: :ets.delete_object(@pair_locks, {key, pid})
+
+          _ ->
+            :ok
+        end
+
+        # (first a few quick tries: it's held for microseconds)
+        if tries < 50, do: :erlang.yield(), else: Process.sleep(1)
+        take_pair_lock(key, me, tries + 1)
+    end
+  end
+
   defp messages_of(key) do
     @messages
     |> :ets.lookup(key)
@@ -493,7 +603,10 @@ defmodule Hoodride.Chat do
   is already gone) never say "closed" twice. Write order as documented
   above: the index rows, THEN the conversation.
   """
-  def delete_conversation({a, b} = key, by \\ nil) do
+  def delete_conversation(key, by \\ nil),
+    do: pair_locked(key, fn -> delete_locked(key, by) end)
+
+  defp delete_locked({a, b} = key, by) do
     :ets.delete(@by_user, {a, key})
     :ets.delete(@by_user, {b, key})
 
@@ -502,6 +615,8 @@ defmodule Hoodride.Chat do
         :ok
 
       [_] ->
+        # (tests: a pause just after the take)
+        hook(:taken)
         :ets.delete(@messages, key)
         :ets.delete(@spots, {key, a})
         :ets.delete(@spots, {key, b})

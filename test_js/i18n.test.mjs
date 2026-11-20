@@ -206,3 +206,47 @@ test("translatePage: an element between the words is left alone (the collector r
     I.load(null);
   }
 });
+
+// (thirteenth review, 2026-11-19) Element.replaceChildren — the app's and
+// this file's — came in Chrome 86 / Safari 14, newer than our minimum
+// (chrome 80, safari 13.1): added where missing, by the page's first
+// shared file (i18n.js), never replacing a browser's own
+test("replaceChildren, where the browser lacks it: added — and it does the same", async () => {
+  const { readFileSync } = await import("node:fs");
+  const vm = await import("node:vm");
+  class Node0 {
+    constructor() {
+      this.kids = [];
+    }
+    get firstChild() {
+      return this.kids[0] || null;
+    }
+    get lastChild() {
+      return this.kids[this.kids.length - 1] || null;
+    }
+    removeChild(k) {
+      this.kids.splice(this.kids.indexOf(k), 1);
+    }
+    append(...ns) {
+      this.kids.push(...ns);
+    }
+  }
+  const ctx = { Element: Node0 };
+  ctx.self = ctx;
+  vm.runInNewContext(readFileSync(new URL("../priv/static/i18n.js", import.meta.url), "utf8"), vm.createContext(ctx));
+  const el = new Node0();
+  el.append("a", "b");
+  assert.equal(typeof Node0.prototype.replaceChildren, "function");
+  el.replaceChildren("c", "d");
+  assert.deepEqual(el.kids, ["c", "d"]);
+  el.replaceChildren();
+  assert.deepEqual(el.kids, []);
+  // a browser's own: kept
+  const own = function own() {};
+  class Node1 {}
+  Node1.prototype.replaceChildren = own;
+  const ctx1 = { Element: Node1 };
+  ctx1.self = ctx1;
+  vm.runInNewContext(readFileSync(new URL("../priv/static/i18n.js", import.meta.url), "utf8"), vm.createContext(ctx1));
+  assert.equal(Node1.prototype.replaceChildren, own);
+});

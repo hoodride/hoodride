@@ -132,7 +132,7 @@ defmodule HoodrideWeb.ChatRebuildTest do
       b = body("openChat")
 
       assert b =~
-               ~s[const c = chatFor(peer);\n  // the box holds THIS chat's draft (another's stays with them)\n  $("chat-input").value = c.draft;]
+               ~s[const c = olderChat(peer, false);\n  // the box holds THIS chat's draft (another's stays with them)\n  $("chat-input").value = c.draft;]
 
       refute @app =~ "chatDraftFor"
     end

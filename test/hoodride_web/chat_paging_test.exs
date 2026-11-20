@@ -134,6 +134,35 @@ defmodule HoodrideWeb.ChatPagingTest do
       assert [%{"text" => "hi 1"}] = c["messages"]
     end
 
+    # (review of the older chats, 2026-11-20) the chat on screen comes in
+    # full — and its unread was counted AGAIN among the older chats' (the
+    # app's 💬 count kept them after it was read: a phantom)
+    test "the chat on screen in full: not counted again among the older chats' unread" do
+      me = user("pg5b-me")
+      [oldest | _] = crowd(me, @page + 5, "pg5b")
+
+      plain = list(me)
+      assert plain["unread_rest"][Integer.to_string(oldest.id)] == 1
+
+      body = list(me, "&open_peer=#{oldest.id}")
+      refute Map.has_key?(body["unread_rest"], Integer.to_string(oldest.id))
+      assert body["unread_more"] == plain["unread_more"] - 1
+    end
+
+    # (review of the older chats, 2026-11-20) a chat's messages fetched when
+    # it's opened came without the server's "read up to": a phone with no
+    # mark of its own then counted every kept message as unread
+    test "a chat's messages come with the server's 'read up to'" do
+      me = user("pg7-me")
+      [peer | _] = crowd(me, 1, "pg7")
+      body = json_response(get(signed_in(me), "/api/chat?peer=#{peer.id}"), 200)
+      assert body["read"] == nil
+      [%{"ts" => ts, "id" => id}] = body["messages"]
+      :ok = Hoodride.Chat.mark_read(me.id, peer.id, ts, id)
+      body = json_response(get(signed_in(me), "/api/chat?peer=#{peer.id}"), 200)
+      assert body["read"] == [ts, id]
+    end
+
     test "a cursor that isn't one: 400" do
       me = user("pg6-me")
 

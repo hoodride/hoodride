@@ -253,9 +253,20 @@ defmodule HoodrideWeb.UserChannel do
           case room_for_chat(me, to_id) do
             :ok ->
               spot = shareable_spot(socket, payload)
-              {:ok, receipt} = Hoodride.Chat.send_message(socket.assigns.user, to_id, text, spot)
-              Hoodride.Chat.remember_sent(me, client_id(payload), receipt)
-              {:reply, {:ok, receipt}, socket}
+
+              case Hoodride.Chat.send_message(socket.assigns.user, to_id, text, spot) do
+                {:ok, receipt} ->
+                  Hoodride.Chat.remember_sent(me, client_id(payload), receipt)
+                  {:reply, {:ok, receipt}, socket}
+
+                # blocked in the moment between the check and the write (the
+                # send's own last look — Chat.send_message): as any refusal,
+                # its allowances given back
+                {:error, :unavailable} ->
+                  Hoodride.Throttle.give_back_message(me, to_id)
+                  if cold?, do: Hoodride.Throttle.give_back_new_conversation(me)
+                  {:reply, {:error, %{reason: "unavailable"}}, socket}
+              end
 
             {:error, reply} ->
               Hoodride.Throttle.give_back_message(me, to_id)
@@ -316,9 +327,11 @@ defmodule HoodrideWeb.UserChannel do
   defp event("cancel_request", _payload, socket) do
     uid = socket.assigns.user_id
 
-    if Hoodride.Requests.cancel(uid) == :ok or is_nil(Hoodride.Rides.ride_id_of_user(uid)),
-      do: {:reply, :ok, socket},
-      else: {:reply, {:error, %{reason: "accepted"}}, socket}
+    # (the rider's own: it waits for an Accept at work on it — Requests.cancel_by_rider)
+    if Hoodride.Requests.cancel_by_rider(uid) == :ok or
+         is_nil(Hoodride.Rides.ride_id_of_user(uid)),
+       do: {:reply, :ok, socket},
+       else: {:reply, {:error, %{reason: "accepted"}}, socket}
   end
 
   defp event("accept_request", %{"rider_id" => rider_id}, socket)
@@ -402,6 +415,13 @@ defmodule HoodrideWeb.UserChannel do
   end
 
   # mid-ride users don't appear on the browse map, whatever their client says
+  # (tests only: a moment between the channel's sign-in check and the map —
+  # SignInTokensTest's sign-out in that window)
+  defp placing_hook do
+    if f = Application.get_env(:hoodride, :user_channel_hook), do: f.(:placing)
+    :ok
+  end
+
   defp place(name, areas, socket) do
     me = socket.assigns.user_id
 
@@ -410,7 +430,8 @@ defmodule HoodrideWeb.UserChannel do
         {:noreply, socket}
 
       name == "hand_up" ->
-        Geo.hand_up(me, areas.cell, areas.spot, areas.parents)
+        placing_hook()
+        Geo.hand_up(me, areas.cell, areas.spot, areas.parents, still_signed_in(socket))
         {:noreply, socket}
 
       # a car needs a car on file — the app asks for one before going
@@ -422,7 +443,16 @@ defmodule HoodrideWeb.UserChannel do
       true ->
         case socket.assigns[:has_car] == true or Hoodride.Accounts.has_car?(me) do
           true ->
-            Geo.driver_update(socket.assigns.user, areas.cell, areas.spot, areas.parents)
+            placing_hook()
+
+            Geo.driver_update(
+              socket.assigns.user,
+              areas.cell,
+              areas.spot,
+              areas.parents,
+              still_signed_in(socket)
+            )
+
             {:noreply, assign(socket, :has_car, true)}
 
           false ->

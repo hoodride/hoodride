@@ -16,6 +16,14 @@ function reportError(e, where = "other") {
   // a network failure (no signal, a blip, the map's files) is the network,
   // not a bug — not reported (found by its own journey, 2026-11-10)
   if (HoodErrors.isNetwork(e)) return;
+  // one of the page's files didn't arrive: what crashes now is its echo —
+  // the load check (loadcheck.js) reports the file itself, once (the one
+  // phone, 2026-11-19: two crash reports, the cause in neither). Only a
+  // language's words or the check missing: the app runs — reported on
+  if (HoodErrors.appFileMissing()) return;
+  // made during the start, before the load check has looked: it waits for
+  // it — an echo of a file that arrived empty is dropped (seventh review)
+  if (!HoodErrors.settledYet()) return void HoodErrors.whenSettled(() => reportError(e, where));
   if (!errorReports) {
     const br = typeof HoodSendFilter !== "undefined" ? HoodSendFilter.browserOf(navigator.userAgent, !!navigator.brave) : {};
     errorReports = HoodErrors.create({
@@ -279,8 +287,22 @@ let unreadRest = new Map();
 function setUnreadRest(byPeer) {
   unreadRest = new Map();
   if (byPeer && typeof byPeer === "object")
-    for (const [k, n] of Object.entries(byPeer)) if (/^\d+$/.test(k) && Number.isFinite(n) && n > 0) unreadRest.set(Number(k), n);
+    for (const [k, n] of Object.entries(byPeer)) {
+      if (!(/^\d+$/.test(k) && Number.isFinite(n) && n > 0)) continue;
+      // a chat that's HERE counts its own unread: never again apart (the
+      // chat on screen came in full AND among the rest — a phantom in the
+      // 💬 count after it was read; review of the older chats, 2026-11-20)
+      const here = realPeersById.get(Number(k));
+      if (here && chats.has(here)) continue;
+      unreadRest.set(Number(k), n);
+    }
   unreadMore = [...unreadRest.values()].reduce((a, n) => a + n, 0);
+}
+// the later of two "read up to" marks ([ts, id]; either may be missing)
+function laterMark(a, b) {
+  if (!Array.isArray(a)) return Array.isArray(b) ? b : null;
+  if (!Array.isArray(b)) return a;
+  return b[0] > a[0] || (b[0] === a[0] && b[1] > a[1]) ? b : a;
 }
 function takeUnreadRest(peerId) {
   const n = unreadRest.get(peerId) || 0;
@@ -322,6 +344,31 @@ function chatFor(peer) {
     chats.set(peer, { msgs: [], unread: 0, replyIdx: 0, server: false, lastAt: now, emptyAt: now, draft: "", loaded: true, summary: null });
   }
   return chats.get(peer);
+}
+
+// A chat with `peer` that's here now — and, not here while older chats
+// aren't all loaded yet (chatsMore), one that may be among them: NOT a new
+// empty one — its messages come when it's opened (loadChat), its unread
+// counted apart moves to it. `sure`: the server has it (a message just came,
+// a ride opened it); else it may be new — opened from someone's card: if the
+// server has none, it becomes a new empty chat (loadChat), never "gone".
+// A message (owner, 2026-11-14: it opened with only the new message, the
+// badge kept its old unread after reading); opened from a card or a ride
+// starting (review, 2026-11-20: its history never shown, its unread kept)
+function olderChat(peer, sure) {
+  const older = !DEMO && !chats.has(peer) && chatsMore !== null;
+  const c = chatFor(peer);
+  if (older) {
+    c.loaded = false;
+    c.summary = { last: null, theirs: [] };
+    c.restUnread = takeUnreadRest(peer.id);
+    c.unread = c.restUnread;
+    // (unread counted for it: the server has it for sure — kept, never
+    // pruned as empty with its unread gone from the count)
+    if (sure || c.restUnread > 0) c.server = true;
+    else c.maybeNew = true;
+  }
+  return c;
 }
 
 // every chat's unsent text, and the box's: a reload or an update waits
@@ -1538,6 +1585,12 @@ async function connectSocket() {
   // ended_by: someone tapped End chat (the chat fix, 2026-11-12) — else the
   // server ended it (someone away past grace)
   userChannel.on("chat_closed", ({ peer_id, ended_by, reason }) => {
+    // a chat past the first page (not loaded yet): its unread, counted
+    // apart, goes with it — it stayed in the 💬 count for a chat gone
+    // (review of the block journeys, 2026-11-20). closeChatWith redraws it
+    takeUnreadRest(peer_id);
+    // (and a page of older chats on its way must not bring it back)
+    if (endedWhileLoading) endedWhileLoading.add(peer_id);
     const peer = realPeersById.get(peer_id);
     // (closed by your own block — HoodBlocks: yours, nothing to tell you)
     const mine = peer && peer.blocking;
@@ -1662,7 +1715,15 @@ function reloadForUpdate() {
   if (steppedAside()) return;
   // not a choice: the reloaded page keeps this tab's stamp (session.js)
   HoodSession.noteQuietReload(tabStorage(), sessionStamp);
-  const sw = "serviceWorker" in navigator ? navigator.serviceWorker.getRegistration() : Promise.resolve(null);
+  // (in a try: Firefox with cookies blocked THROWS on reading
+  // navigator.serviceWorker — the update never reloaded nor was offered;
+  // nineteenth review's note, owner 2026-11-19: fix it)
+  let sw = Promise.resolve(null);
+  try {
+    if ("serviceWorker" in navigator) sw = navigator.serviceWorker.getRegistration();
+  } catch (_) {
+    // no offline worker to update: reload all the same
+  }
   sw.then((r) => r && r.update())
     .catch(() => {})
     .finally(() => {
@@ -1831,31 +1892,89 @@ function applyConversation(c) {
   if (c.peer_spot) rememberShared(peer, c.peer_spot);
 }
 
+// the chat the last /api/state asked for in full (open_peer)
+let askedOpenId = null;
+
 // the chat list's next page (owner, 2026-11-14): fetched when its last row
 // comes into view; one at a time
+// a chat ENDED while a page is on its way (chat_closed): the page, answered
+// before, brought it back — the chat, or its unread into the 💬 count
+// (review of the block journeys, 2026-11-20)
+let endedWhileLoading = null;
+// counts the list's restarts (resetMirror): a page asked for before one
+// isn't the new list's next — its cursor can be the same (page 1 unchanged),
+// and it brought back a chat that ended while away (review, 2026-11-20)
+let listEpoch = 0;
+
 async function loadOlderChats() {
   if (DEMO || !chatsMore || olderLoading) return;
   olderLoading = true;
   olderFailed = false;
   const cursor = chatsMore;
+  const epoch = listEpoch;
+  const ended = new Set();
+  endedWhileLoading = ended;
   try {
     const res = await apiFetch("/api/chats?before=" + encodeURIComponent(cursor));
     if (!res.ok) throw new Error(`chats ${res.status}`);
     const body = await res.json();
     // a reload meanwhile started the list again: this page is not its next
-    if (chatsMore !== cursor) return;
-    // (a chat already here — news since, or the one on screen — is newer than the page's)
-    (body.conversations || []).forEach((c) => {
-      const known = c.peer && realPeersById.get(c.peer.id);
-      if (!(known && chats.has(known) && chats.get(known).server)) applyConversation(c);
-    });
-    chatsMore = typeof body.more === "string" ? body.more : null;
-    setUnreadRest(body.unread_rest);
-    applyReadState();
+    // — dropped (and the list drawn again below, as always: returning here
+    // left "Loading older chats…" stuck — its row was drawn while this load
+    // still ran, so its watcher's first look was ignored)
+    if (chatsMore === cursor && listEpoch === epoch) {
+      // a chat already HERE is never touched by a page — news since, the one
+      // on screen, one opened from a card (olderChat): its messages are its
+      // own (loadChat); the page only says the server has it. Replacing it
+      // emptied one opened from a card — a live message lost — or left it
+      // "Loading…" with Send doing nothing (review, 2026-11-20)
+      (body.conversations || []).forEach((c) => {
+        if (c.peer && ended.has(c.peer.id)) return;
+        const known = c.peer && realPeersById.get(c.peer.id);
+        if (known && chats.has(known)) {
+          const here = chats.get(known);
+          here.server = true;
+          // (the server has it: not a new one — a "none" later means it ended)
+          here.maybeNew = false;
+          // one not loaded yet (opened from a card, its load slow or failed):
+          // the page's preview and time for the list — its messages untouched
+          // the server's "read up to", the later of the two — for any chat
+          // here (one loaded off screen had none: its kept messages all
+          // counted unread; review of the older chats, 2026-11-20)
+          if (Array.isArray(c.read)) here.serverRead = laterMark(here.serverRead, c.read);
+          if (here.loaded === false) {
+            if (!(here.summary && here.summary.last)) {
+              here.summary = { last: c.last || null, theirs: c.theirs || [] };
+              // the summary's own messages now count its unread (applyReadState):
+              // the count it took over (olderChat) counted them AGAIN — twice
+              // (review, 2026-11-20)
+              here.restUnread = 0;
+            }
+            if (typeof c.last_activity === "number") here.emptyAt = HoodChatList.localAt(c.last_activity, chatSkew);
+            settleLast(here);
+          }
+        } else applyConversation(c);
+      });
+      chatsMore = typeof body.more === "string" ? body.more : null;
+      // …and its unread isn't counted apart again: a chat here counts its own
+      // (one opened from a card took it over — a page fetched after still
+      // carried it: counted twice; review, 2026-11-20)
+      const rest = Object.assign({}, body.unread_rest);
+      ended.forEach((id) => delete rest[id]);
+      for (const k of Object.keys(rest)) {
+        const here = realPeersById.get(Number(k));
+        if (here && chats.has(here)) delete rest[k];
+      }
+      setUnreadRest(rest);
+      applyReadState();
+    }
   } catch (_) {
-    olderFailed = true;
+    // (only for the list it was asked for: a reload since started a new one
+    // — it said "Couldn't load older chats" for that; review, 2026-11-20)
+    if (listEpoch === epoch) olderFailed = true;
   } finally {
     olderLoading = false;
+    if (endedWhileLoading === ended) endedWhileLoading = null;
   }
   if (!$("chat").classList.contains("hidden") && state.chatView === "list") renderChat();
   refreshControls();
@@ -2206,6 +2325,8 @@ async function softReload() {
         // the chat list (light reload); the chat on screen comes in full, so
         // it stays where you were reading (asked again on each try)
         const onScreen = !$("chat").classList.contains("hidden") && state.chatView === "msgs" && state.chatPeer;
+        // (remembered: only the chat ASKED for can be judged ended by the answer)
+        askedOpenId = onScreen ? onScreen.id : null;
         const res = await apiFetch("/api/state?chats=list" + (onScreen ? `&open_peer=${encodeURIComponent(onScreen.id)}` : ""));
         const body = await res.json().catch(() => null);
         const verdict = HoodBoot.classify({ status: res.status, body });
@@ -2257,9 +2378,12 @@ async function softReload() {
   const armedRide = state.pinArmed && state.ride ? state.ride.id : null;
   resetMirror();
   hydrate(st);
+  // (an older chat's draft: its chat made as one not loaded yet — not an
+  // empty shell, which a page never fills: its history was gone — olderChat;
+  // review, 2026-11-20)
   carried.forEach(({ id, draft }) => {
     const p = realPeersById.get(id);
-    if (p) chatFor(p).draft = draft;
+    if (p) olderChat(p, false).draft = draft;
   });
   // …so it stays armed, if it's still that ride: a reload in between left
   // "Tap the map where you want to meet" on screen, and the tap did nothing
@@ -2281,10 +2405,31 @@ async function softReload() {
   // …unless it was a real chat and the server no longer has it: it ended
   // while we were away — closed, with a line that gives no reason (we can't
   // know it: owner, 2026-11-15). It used to come back EMPTY, unexplained
-  if (reopen && openWasReal && !chats.has(reopen)) {
+  // (only judged so when it was ON SCREEN — asked for by name: fetchState's
+  // open_peer — or every page of chats is here: with the list showing, one
+  // from a later page is simply not among page 1's. It said "Chat with …
+  // ended" for a chat still there; review, 2026-11-20)
+  // (and only the chat ASKED for: one opened while the answer was on its
+  // way wasn't asked — closed as "ended" though it was there; review of the
+  // older chats, 2026-11-20)
+  const judged = chatsMore === null || (state.chatView !== "list" && askedOpenId === (reopen && reopen.id));
+  if (reopen && openWasReal && !chats.has(reopen) && judged) {
     state.chatPeer = null;
-    closeChat();
+    // the list showing (‹ from that chat): the list stays, the other chats in
+    // it — not the whole panel closed (as closeChatWith: owner, 2026-11-07;
+    // review, 2026-11-20)
+    if (state.chatView === "list" && chats.size > 0) renderChat();
+    else closeChat();
     transientBanner(t("Chat with {name} ended", { name: reopen.name }));
+  } else if (reopen && !chats.has(reopen) && state.chatView === "list") {
+    // the list showing, that chat on a later page: it comes with its page
+    state.chatPeer = null;
+    renderChat();
+  } else if (reopen && !chats.has(reopen) && openWasReal) {
+    // on screen, not asked for: its messages fetched now — a chat really
+    // gone says so then (loadChat's "none")
+    olderChat(reopen, true);
+    openChat(reopen);
   } else if (reopen && state.chatView !== "list" && !(wasLoaded && chatFor(reopen).loaded)) {
     // on screen but not drawn before (it was still loading), or back only as
     // a summary: opened as a tap opens it — "Loading…", then the line and
@@ -2339,6 +2484,8 @@ async function softReload() {
 // peer objects behind map markers, and the socket are kept)
 function resetMirror() {
   chats.clear();
+  // (a page of older chats asked for before this is not the new list's)
+  listEpoch++;
   // (and the chat list's pages: hydrate sets them again)
   chatsMore = null;
   setUnreadRest(null);
@@ -3043,7 +3190,7 @@ function startRealRide(r) {
   joinRideChannel();
   // the server opened this pair's conversation at ride start: keep it in
   // the inbox after the ride, even if nobody typed (the lost-phone case)
-  chatFor(peer).server = true;
+  olderChat(peer, true).server = true;
   // accepting takes both of you to the MAP (the car coming, Navigate, the
   // countdown); the chat is one tap away on 💬 Chat, and the partner's
   // messages still show as a banner
@@ -4253,7 +4400,7 @@ function markSeen(peer) {
 }
 
 function openChat(peer) {
-  const c = chatFor(peer);
+  const c = olderChat(peer, false);
   // the box holds THIS chat's draft (another's stays with them)
   $("chat-input").value = c.draft;
   updateChatCount();
@@ -4324,13 +4471,27 @@ async function loadChat(peer, c) {
   }
   // a reload or a closed chat since: this answer is for a chat that's gone
   if (chats.get(peer) !== c) return;
-  if (outcome === "none") return closeChatWith(peer);
+  // the server answered with it: it has it — kept in the list, empty too (a
+  // ride's chat nobody wrote in)
+  if (outcome === "ok") c.server = true;
+  // opened before older chats were all here, and the server has none with
+  // them: a NEW chat (empty, open) — not one that's gone (olderChat)
+  if (outcome === "none" && c.maybeNew) {
+    outcome = "ok";
+    body = { messages: [] };
+  } else if (outcome === "none") return closeChatWith(peer, "neutral");
+  // (found gone: why, we can't know — the neutral line, not "away a while":
+  // owner, 2026-11-15; review, 2026-11-20)
+  // (cleared only by an answer: a failure tried again may still find none)
+  if (outcome === "ok") c.maybeNew = false;
   if (outcome !== "ok" || !body || !Array.isArray(body.messages)) {
     c.failed = true;
     if (chatOnScreen(peer)) renderChat();
     return;
   }
   c.msgs = HoodChatMerge.keep(HoodChatMerge.merge(body.messages.map(fromServer), c.msgs), CHAT_KEEP);
+  // (the server's "read up to" with them: the later of the two)
+  if (Array.isArray(body.read)) c.serverRead = laterMark(c.serverRead, body.read);
   c.loaded = true;
   c.summary = null;
   c.failed = false;
@@ -4549,16 +4710,12 @@ function receiveMsg(peer, text, meta) {
   // empty one — its earlier messages come when it's opened, and its unread
   // counted on the server moves to it (owner, 2026-11-14: it opened with
   // only the new message, and the badge kept its old unread after reading)
-  const older = !DEMO && !chats.has(peer) && chatsMore !== null;
-  const c = chatFor(peer);
-  if (older) {
-    c.server = true;
-    c.loaded = false;
-    c.summary = { last: null, theirs: [] };
-    c.restUnread = takeUnreadRest(peer.id);
-    c.unread = c.restUnread;
-  }
+  // (sure the server has it only for a real message — one with an id: a
+  // request's note is this phone's own, and the server may have no chat
+  // with them at all — taken as its, opening said "Chat with … ended" and
+  // lost the note; review, 2026-11-20)
   const id = meta ? meta.id : null;
+  const c = olderChat(peer, id != null);
   // already here — a message a reload or a chat's opening brought, heard
   // live too: once (counted once, no banner). Local notes have no id: never
   if (id != null && (c.msgs.some((m) => m.id === id) || ((c.summary && c.summary.theirs) || []).some((m) => m.id === id))) return;
@@ -4680,7 +4837,8 @@ $("chat-form").addEventListener("submit", (e) => {
         // else only a reload rebuilt the chats (a first message still on
         // its way isn't one the server has yet): back, with your text as
         // its draft — nothing typed is lost (owner, 2026-11-08)
-        c = chatFor(peer);
+        // (as one not loaded yet when older chats aren't all here: olderChat)
+        c = olderChat(peer, false);
       }
       const arr = c.msgs;
       const i = arr.indexOf(sentMsg);
@@ -6465,8 +6623,19 @@ if (!DEMO && !HoodDevice.here(window)) {
   });
 }
 
-if ("serviceWorker" in navigator) {
-  // (a failed install — a flaky first visit, a private window — is let go:
-  // nothing to do, and no "unhandled" error report: crash review 2026-11-14)
-  navigator.serviceWorker.register("sw.js").catch(() => {});
+// (a failed install — a flaky first visit, a private window — is let go:
+// nothing to do, and no "unhandled" error report: crash review 2026-11-14.
+// And in a try: Firefox with cookies blocked THROWS on reading
+// navigator.serviceWorker — past this, the last line below never ran:
+// "check your connection" over a working page; eighteenth review)
+try {
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+} catch (_) {
+  // no offline copy here: the app runs all the same
 }
+
+// LAST: this file ran to its end (HoodLoadCheck). It isn't one wrapped
+// function like the others: cut between two statements, what arrived still
+// reads, its functions there — and it never started (seventeenth review,
+// 2026-11-19). Nothing may come after this line
+self.HoodAppRan = true;

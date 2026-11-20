@@ -218,7 +218,8 @@ defmodule HoodrideWeb.LogoutAcceptRaceTest do
 
     test "a start that fails otherwise puts the request back — unless someone signed out meanwhile" do
       src = File.read!("lib/hoodride/requests.ex")
-      [accept] = Regex.run(~r/  def accept\(driver, rider_id.*?\n  end\n/s, src)
+      # (the Accept's work, under its "at work" mark — Requests.accept/3)
+      [accept] = Regex.run(~r/  defp accept_marked\(driver, rider_id.*?\n  end\n/s, src)
 
       [_, back] =
         String.split(accept, ":ets.insert_new(@requests, {rider_id, driver_id, ts})", parts: 2)

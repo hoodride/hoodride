@@ -261,6 +261,10 @@ msgstr "Contul nu a putut fi șters. Ai fost deconectat – conectează-te din n
 msgid "Couldn't end the chat — try again"
 msgstr "Nu s-a putut încheia chatul – încearcă din nou"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Hood Ride nu s-a putut încărca – verifică-ți conexiunea"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Mesajele nu au putut fi încărcate. Încearcă din nou."
@@ -789,7 +793,7 @@ msgstr "Pagina aceasta nu există."
 msgid "Too late — the request was withdrawn"
 msgstr "Prea târziu – cererea a fost retrasă"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "Încearcă din nou"
 
@@ -888,6 +892,10 @@ msgstr "Ai început multe chaturi noi – încearcă mai târziu"
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "Ai început prea multe chaturi – încheie mai întâi unul dintre ele"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "Browserul tău e prea vechi pentru Hood Ride – actualizează-l ca să continui"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

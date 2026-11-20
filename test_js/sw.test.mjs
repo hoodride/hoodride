@@ -53,6 +53,8 @@ function worker({ network, saved = {} }) {
     },
     URL,
     Promise,
+    // (a network error, as the browser makes it)
+    Response: { error: () => ({ type: "error", status: 0, ok: false }) },
     setTimeout: (fn, ms) => timers.push({ fn, ms }),
     clearTimeout: () => {},
   };
@@ -121,6 +123,24 @@ test("no signal at all: the saved copy (as before)", async () => {
   assert.equal((await w.get("/")).body, "saved app");
 });
 
+// (owner, 2026-11-19: one phone's sendfilter.js never arrived) "nothing" is
+// no answer: the spec makes it a network error, Chrome tries the network
+// again, Firefox fails it — one answer for every browser: a network error,
+// which the page hears as the file not arriving (HoodLoadCheck)
+test("no signal and nothing saved: a network error — never 'nothing'", async () => {
+  const w = worker({
+    network: () => {
+      throw new TypeError("Failed to fetch");
+    },
+  });
+  const res = await w.get("/sendfilter.js?vsn=abc");
+  assert.ok(res, "an answer, not nothing");
+  assert.equal(res.type, "error");
+  // …and a page opened: the same (nothing saved to open)
+  const page = await w.get("/", "GET", "navigate");
+  assert.equal(page && page.type, "error");
+});
+
 test("/api/, /auth/, /avatars/ and non-GETs are left to the browser (never saved)", async () => {
   const w = worker({ network: () => answer(502) });
   for (const path of ["/api/state", "/auth/google", "/avatars/1.jpg"]) assert.equal(await w.get(path), null, path);
@@ -169,8 +189,8 @@ test("offline, / opens the home the person last used, in their language", async 
 test("offline and no home saved yet: the English page (index.html)", async () => {
   const w = worker({ network: offline, saved: { "/index.html": "English" } });
   assert.equal((await w.get("/", "GET", "navigate")).body, "English");
-  // a file isn't a page: never answered with the page
-  assert.equal(await w.get("/app.js?vsn=1", "GET", "cors"), undefined);
+  // a file isn't a page: never answered with the page — a network error
+  assert.equal((await w.get("/app.js?vsn=1", "GET", "cors")).type, "error");
 });
 
 // ----- a weak signal (server review, 2026-11-13): connected, but nothing

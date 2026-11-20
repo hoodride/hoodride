@@ -24,6 +24,9 @@ defmodule Mix.Tasks.Hoodride.Minify do
   use Mix.Task
 
   @skip ~w(maplibre-gl.js phoenix.min.js h3-js.umd.js bowser.js sw.js)
+  # minified for older browsers than the rest (see minify/4)
+  @for_older_browsers ~w(errors.js loadcheck.js)
+  @older_target "es2017,chrome58,edge16,safari11,ios11,firefox54"
 
   @doc "The files minified: our own JS that's served."
   # (and not the languages' catalogs, i18n-<lang>.js: generated, already
@@ -117,7 +120,22 @@ defmodule Mix.Tasks.Hoodride.Minify do
 
     # (the configured version, checked just above: kept for the next deploy)
     if keep, do: save_kept(keep)
-    Esbuild.run(:minify, entries ++ ["--outdir=#{out}" | extra])
+
+    # the two files that tell a browser it's too old for our code (errors.js
+    # first, loadcheck.js last — HoodLoadCheck) for OLDER browsers than the
+    # rest: they must read them to say so. A later --target wins (eleventh
+    # review, 2026-11-19: the shared target wrote `catch{}`, which Chrome
+    # < 66, old Edge and iOS < 11.1 can't read — a broken page, no word)
+    {older, rest} = Enum.split_with(entries, &(Path.basename(&1) in @for_older_browsers))
+
+    statuses =
+      [{rest, []}, {older, ["--target=#{@older_target}"]}]
+      |> Enum.reject(fn {files, _} -> files == [] end)
+      |> Enum.map(fn {files, target} ->
+        Esbuild.run(:minify, files ++ ["--outdir=#{out}" | extra ++ target])
+      end)
+
+    Enum.find(statuses, 0, &(&1 != 0))
   end
 
   @doc "Put the kept program in place if it's missing there and the configured version. → :restored | :not_kept"

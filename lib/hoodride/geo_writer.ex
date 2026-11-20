@@ -122,18 +122,23 @@ defmodule Hoodride.GeoWriter do
 
   defp op_name(_), do: :unknown
 
-  defp run({:driver_update, user, cell, spot, parents}) do
+  # (no check given — a caller with no connection, e.g. a test: placed)
+  defp signed_in?(nil), do: true
+  defp signed_in?(f) when is_function(f, 0), do: f.() == true
+
+  defp run({:driver_update, user, cell, spot, parents, still_signed_in}) do
     # race-proof twin of the channel's mid-ride guard: this check runs INSIDE
-    # the serialized section, so it sees any ride start that already landed
-    if Hoodride.Rides.ride_id_of_user(user.id) == nil do
+    # the serialized section, so it sees any ride start that already landed —
+    # and, the same way, a sign-out (Geo.driver_update)
+    if Hoodride.Rides.ride_id_of_user(user.id) == nil and signed_in?(still_signed_in) do
       Hoodride.Geo.driver_update_now(user, cell, spot, parents)
     end
 
     :ok
   end
 
-  defp run({:hand_up, user_id, cell, spot, parents}) do
-    if Hoodride.Rides.ride_id_of_user(user_id) == nil do
+  defp run({:hand_up, user_id, cell, spot, parents, still_signed_in}) do
+    if Hoodride.Rides.ride_id_of_user(user_id) == nil and signed_in?(still_signed_in) do
       Hoodride.Geo.hand_up_now(user_id, cell, spot, parents)
     end
 

@@ -261,6 +261,10 @@ msgstr "Rho koj tus account tsis tau. Koj twb tawm lawm — nkag dua thiaj sim d
 msgid "Couldn't end the chat — try again"
 msgstr "Xaus kev sib tham tsis tau — sim dua"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Qhib tsis tau Hood Ride — kuaj koj kev txuas"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Thauj tsis tau cov lus. Sim dua."
@@ -789,7 +793,7 @@ msgstr "Tsis muaj nplooj no."
 msgid "Too late — the request was withdrawn"
 msgstr "Lig dhau lawm — kev thov raug rho tawm lawm"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "Sim dua"
 
@@ -888,6 +892,10 @@ msgstr "Koj pib kev sib tham tshiab ntau heev lawm — sim dua tom qab"
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "Koj tau pib kev sib tham ntau dhau lawm — xaus ib qho ntawm cov ntawd ua ntej"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "Koj lub browser qub dhau rau Hood Ride — hloov tshiab nws kom mus ntxiv"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

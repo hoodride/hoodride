@@ -8,6 +8,9 @@ defmodule Hoodride.Requests do
   """
 
   @requests :ride_requests
+  # an Accept at work on a rider's request ({rider_id, its pid}): a Cancel
+  # that finds no request waits for it (accepting/1)
+  @accepting :ride_requests_accepting
   # per-driver index: {{driver_id, rider_id}, ts}, ts = the request's own.
   # "Who is waiting on me" is a bound-prefix range read — O(log n + k) —
   # instead of a copy of every open request in town.
@@ -30,6 +33,7 @@ defmodule Hoodride.Requests do
 
   def init_tables do
     Hoodride.ETS.new(@requests, [:named_table, :public, :set])
+    Hoodride.ETS.new(@accepting, [:named_table, :public, :bag])
     Hoodride.ETS.new(@by_driver, [:named_table, :public, :ordered_set])
     Hoodride.ETS.new(@spots, [:named_table, :public, :set])
     :ok
@@ -118,22 +122,71 @@ defmodule Hoodride.Requests do
     {:error, :already_requested}
   end
 
-  def cancel(rider_id) do
-    case :ets.take(@requests, rider_id) do
-      [{_, driver_id, ts}] ->
-        consumed(rider_id, driver_id, ts)
-        # no request -> cancel -> request loop popping up on the driver's screen
-        Hoodride.Throttle.start_request_cooldown(rider_id, driver_id)
+  # (tests only: env :requests_hook — a pause, or an answer given; nil: none)
+  defp hook(step) do
+    if f = Application.get_env(:hoodride, :requests_hook), do: f.(step)
+  end
 
-        HoodrideWeb.Endpoint.broadcast("user:#{driver_id}", "request_cancelled", %{
-          from_id: rider_id
-        })
+  # how long a Cancel waits for an Accept at work (a few microseconds, or a
+  # ride starting: well under this)
+  @accept_wait_ms 5_000
 
-        :ok
+  @doc """
+  The rider's OWN Cancel (the app's button — HoodrideWeb.UserChannel): as
+  cancel/1, but finding nothing while an Accept is at work on it, waits for
+  that Accept, then looks again — a ride now: the caller says "accepted";
+  put back: cancelled after all. Never used by the server's own cancels (a
+  ride starting cancels its people's other asks — waiting there for the
+  Accept that is starting it would wait for itself).
+  """
+  def cancel_by_rider(rider_id) do
+    case take_to_cancel(rider_id) do
+      :none ->
+        if accepting?(rider_id) do
+          wait_accepting(rider_id, System.monotonic_time(:millisecond) + @accept_wait_ms)
+          take_to_cancel(rider_id) |> cancelled(rider_id)
+        else
+          {:error, :none}
+        end
 
-      [] ->
-        {:error, :none}
+      found ->
+        cancelled(found, rider_id)
     end
+  end
+
+  @doc "The rider's request withdrawn now (the driver told): `:ok` or `{:error, :none}`."
+  def cancel(rider_id), do: take_to_cancel(rider_id) |> cancelled(rider_id)
+
+  defp take_to_cancel(rider_id) do
+    case :ets.take(@requests, rider_id) do
+      [row] -> row
+      [] -> :none
+    end
+  end
+
+  # an Accept at work on this rider's request (its process alive)
+  defp accepting?(rider_id),
+    do: Enum.any?(:ets.lookup(@accepting, rider_id), fn {_, pid} -> Process.alive?(pid) end)
+
+  defp wait_accepting(rider_id, deadline) do
+    if accepting?(rider_id) and System.monotonic_time(:millisecond) < deadline do
+      Process.sleep(1)
+      wait_accepting(rider_id, deadline)
+    end
+  end
+
+  defp cancelled(:none, _rider_id), do: {:error, :none}
+
+  defp cancelled({_, driver_id, ts}, rider_id) do
+    consumed(rider_id, driver_id, ts)
+    # no request -> cancel -> request loop popping up on the driver's screen
+    Hoodride.Throttle.start_request_cooldown(rider_id, driver_id)
+
+    HoodrideWeb.Endpoint.broadcast("user:#{driver_id}", "request_cancelled", %{
+      from_id: rider_id
+    })
+
+    :ok
   end
 
   # Take the rider's request ONLY if it's this driver's — one atomic step.
@@ -201,12 +254,33 @@ defmodule Hoodride.Requests do
   sign-out deletes every sign-in, THEN looks for a ride: whichever is second
   sees the other). nil (the default: tests, server tools): no look.
   """
+  # The Accept TAKES the request, then claims the seats: a Cancel in between
+  # found neither — "ok", "Request cancelled", then the ride opened; and if
+  # the ride couldn't start the request was put back after the Cancel had
+  # answered — the Cancel lost (the 2026-11-08 server review's note, still
+  # open until 2026-11-20). Now the Accept leaves a mark while it works; a
+  # Cancel finding nothing but the mark waits for it, then answers by what
+  # it did (cancel/1)
   def accept(driver, rider_id, still_signed_in \\ nil) do
+    me = self()
+    :ets.insert(@accepting, {rider_id, me})
+
+    try do
+      accept_marked(driver, rider_id, still_signed_in)
+    after
+      :ets.delete_object(@accepting, {rider_id, me})
+    end
+  end
+
+  defp accept_marked(driver, rider_id, still_signed_in) do
     driver_id = driver.id
     look = ride_look(still_signed_in, rider_id, driver_id)
 
     case take_if_ours(rider_id, driver_id) do
       {:ok, ts} ->
+        # (tests: a pause between the take and the seats)
+        hook(:taken)
+
         cond do
           Hoodride.Rides.ride_id_of_user(driver.id) != nil ->
             # driver already busy — busy means unavailable: decline, don't
@@ -221,7 +295,10 @@ defmodule Hoodride.Requests do
             {:error, :gone}
 
           true ->
-            case Hoodride.Rides.start_ride(rider_id, driver.id, look) do
+            # (tests: a ride start's answer given instead)
+            started = hook(:start) || Hoodride.Rides.start_ride(rider_id, driver.id, look)
+
+            case started do
               {:ok, ride_id} ->
                 consumed(rider_id, driver_id, ts)
                 {:ok, ride_id}

@@ -55,6 +55,8 @@ defmodule HoodrideWeb.NearCoversTest do
     "blocked-backdrop" => "the Blocked people list: a dialog with its own backdrop",
     "blocked-sheet" => "the Blocked people list: a dialog (mapOutOfSight)",
     # straight in <body>
+    "load-fail" =>
+      "the \"couldn't load\" message: over the whole screen, shown only when the app itself didn't load (no map, no search)",
     "lang-backdrop" => "the language choice: a dialog with its own backdrop",
     "lang-sheet" => "the language choice: a dialog (mapOutOfSight)",
     # added by the app itself (document.body.appendChild)

@@ -286,6 +286,28 @@ defmodule HoodrideWeb.BlocksEnforcedTest do
       refute Chat.exists?(ann.user.id, bob.user.id)
     end
 
+    # (review of the block journeys, 2026-11-20) a message that passed the
+    # block check just before the block was saved, written just after its
+    # chat was deleted: it must not start their chat again, nor reach the
+    # one who blocked. The send's own last look (Chat.send_message): block
+    # saves then deletes; a send writes then looks — one always sees the other
+    test "a message in the moment of the block never brings their chat back" do
+      ann = person(:ann, user!("bx6-ann"))
+      bob = person(:bob, user!("bx6-bob"))
+      bob_as = %{id: bob.user.id, name: "bx6-bob", photo: nil}
+      {:ok, _} = Chat.send_message(bob_as, ann.user.id, "hi")
+      assert_receive {:ann, "msg", _}, 1_000
+
+      block!(ann, bob)
+      assert_receive {:bob, "chat_closed", _}, 1_000
+
+      # Bob's send, its block check already passed: the message lands now
+      assert {:error, :unavailable} = Chat.send_message(bob_as, ann.user.id, "still there?")
+      refute Chat.exists?(ann.user.id, bob.user.id)
+      refute_receive {:ann, "msg", _}, 300
+      refute Enum.any?(Chat.conversations_for(ann.user.id), &(&1.peer_id == bob.user.id))
+    end
+
     test "a request between them: the blocked rider's is declined (as any decline)" do
       bob = person(:bob, driver!("bx2-bob"))
       online(bob)

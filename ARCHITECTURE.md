@@ -643,7 +643,11 @@ Design notes:
     AND at every join (`HoodrideWeb.SessionGate`: Phoenix subscribes a
     socket to its "disconnect" only after connect/3, so a connect racing the
     sign-out could miss it) AND before every user-channel action (a ✋
-    queued meanwhile left a ghost hand). The app, refused `signed_out`,
+    queued meanwhile left a ghost hand) AND again inside the map writer when
+    a car or ✋ is placed (`Geo.driver_update`/`hand_up` take the
+    connection's `still_signed_in`: an update past the channel's check,
+    placed after the sign-out took the car off, put it back — a ghost car
+    for ~5 min; closed 2026-11-20, SignInTokensTest). The app, refused `signed_out`,
     asks the server: really signed out → the sign-in screen; else a fresh
     pass. Only Hood Ride's own JSON 401/403 reloads (not a proxy's page).
     The first failed reconnect after being connected asks for a pass at once
@@ -2606,7 +2610,7 @@ release untouched. Settings and why: `config :esbuild` (config/config.exs).
   time: now `--keep ~/.cache/hoodride` holds it, put back only when it's the
   configured version (a version bump downloads the new one and keeps that),
   and minifying with any other version stops the deploy. MinifyTest.
-- **Browsers:** `--target=es2020,safari13.1,ios13.4,chrome80,edge80,firefox72`
+- **Browsers:** `--target=es2020,safari13.1,ios13.4,chrome80,edge80,firefox78`
   — the minimum for what our code uses (`??`), so minifying never needs a
   newer phone than the code itself (`?.` is rewritten for Chrome < 91 /
   Firefox < 74). Not a standard list on purpose: Vite's "baseline widely
@@ -2781,7 +2785,106 @@ here say the rest.
   sent once; a car's 20 s heartbeat brings a car back).
 - **The offline worker gives the network 4 s**, then shows the saved app
   (Workbox's `networkTimeoutSeconds` pattern; `sw.js NETWORK_WAIT_MS`;
-  journey `weaksignal`).
+  journey `weaksignal`). No signal and nothing saved: a network error
+  (`Response.error()`), never "nothing" — Chrome tried the network again,
+  Firefox failed it (2026-11-19).
+- **The 2026-11-08 server review's last lows, closed 2026-11-20:**
+  - a send and its chat's delete run one at a time per pair (`Chat`
+    `pair_locked/2`, re-entrant, a dead holder taken over): a send between
+    a delete's take and its wipe left an EMPTY chat on the server, the
+    message lost though "sent" (the "ghost chat around a deletion";
+    `ChatEndRaceTest`);
+  - a rider's own Cancel landing INSIDE a driver's Accept (taken, seats
+    not yet claimed) answered "ok" before the ride opened, or was lost when
+    the ride then couldn't start (put back): the Accept leaves a mark while
+    it works, `Requests.cancel_by_rider/1` waits for it, then answers by
+    what it did (`CancelAcceptRaceTest`). Only the rider's own — the
+    server's cancels (a ride starting withdraws its people's other asks)
+    never wait: that would wait for the Accept starting it;
+  - the deploy's check asks `/api/health` (`HoodrideWeb.Health`): the
+    write lock taken and a no-op write rolled back — a read-only or locked
+    database fails it (`/api/me` read nothing with no session). At most
+    once a second (public);
+  - production's socket origin check, HTTPS-only (HSTS) and https
+    addresses guarded by a test (`LoginLockdownTest`, "config").
+- **A file of the app that didn't arrive** (2026-11-19 — one phone's
+  `sendfilter.js` never did; `ridepos.js` and `app.js` crashed on it and the
+  app sat broken, no word): `loadcheck.js` (`HoodLoadCheck`), the page's LAST
+  script, reloads the page — the whole page, not the file: those after it
+  already ran without it — at most twice in 5 minutes, counted in
+  `sessionStorage` (a timer alone loops forever when a failing load is
+  slower than it; storage that can't keep the count: no reload). Still
+  missing: `#load-fail` over everything — its words put in by the server in
+  the reader's language (`PageController.with_load_fail`: the files that
+  translate may be the missing ones), "Try again" a plain link — and a try
+  by itself back online. Which files: `errors.js`, now the page's FIRST
+  script, hears every later one fail (`HoodErrors.failedScripts`, an
+  `error` caught while it passes down — it doesn't bubble) — only our own
+  files, only while the page is read: Cloudflare's analytics script, added
+  in production and blocked by Brave and ad blockers, counted, muted every
+  report after (first review); itself and the
+  libraries by their globals. One report, `LoadError: file missing: … 
+  (reloading, try N | gave up)`; the crashes it sets off aren't reported.
+  Only files the app runs WITHOUT missing (`HoodLoadCheck.optional`): a
+  language's words (`i18n-ja.js` — in English; second review), the reporter
+  (no reports), the check itself — the same two reloads, then on, no
+  message, reports on (`gave up: runs without it`; third review). A file
+  that ARRIVES broken (owner, 2026-11-19): cut off, it fails to parse — a
+  syntax error of the ENDING-EARLY kind ("Unexpected end of input",
+  "unterminated string literal", "Unexpected EOF" — never Chrome's
+  "Invalid or unexpected token": an old Chrome says it for `60_000`, which
+  we ship; sixth review) from the script RUNNING (`document.currentScript`,
+  not where it was thrown) while the page is read counts as not arrived;
+  any other syntax error (not JSON, not a refused selector) means this
+  browser can't READ our code — too old for it (owner, 2026-11-19): no
+  reload, no "Try again", the same screen saying "Your browser is too old
+  for Hood Ride — update it to continue" (50 languages, by the server),
+  ONE report `OldBrowser: can't read: <files> (<its words>)` naming the
+  browser and its main version from its own description — but only a
+  browser OLDER than the build target says so (`olderThanUs`: chrome/edge
+  80, firefox 78, safari 13.1, ios 13.4; the engine counts); a current one
+  can't read a file only if it arrived cut off (Chrome's words for half the
+  cuts look like an old browser's): reloaded like any cut (eleventh
+  review). `errors.js` and `loadcheck.js` are minified for OLDER browsers
+  (es2017, chrome 58, edge 16, safari/ios 11, firefox 54 — `Minify`
+  `@for_older_browsers`): the shared target wrote `catch{}`, which the
+  very browsers to be told can't read. The minimum itself checked
+  against what the code really needs (twelfth/thirteenth reviews): Firefox
+  78, not 72 (car.js's `/\p{C}/u`); `Element.replaceChildren` (Chrome 86,
+  Safari 14) added where missing, at the top of i18n.js — Chrome 83 and
+  iOS 13.5 crashed drawing the app's buttons, every file read fine; the
+  message box by its four edges, not `inset` (Chrome 87, Safari 14.1);
+  its lists walked with `forEach.call`, never `for…of` (old Edge can't
+  iterate them — fourteenth review); and a browser older than us with ANY
+  needed file broken — unreadable, crashed, missing — is told "too old"
+  whatever its error's words (old Edge's may not say "SyntaxError";
+  `oldFiles`, fifteenth review), the report naming what it couldn't read;
+  app.js — not one wrapped function like the others: cut between two
+  statements, what arrived still reads, its functions there — is checked
+  by a marker its LAST line sets (`HoodAppRan`), and unfinished after a
+  crash it counts as not arrived when it's the only file that crashed
+  (else the crash is another's echo); its report is kept (a real bug at
+  its top level reaches the log) — seventeenth review;
+  empty, it says nothing — so every file is also checked by the name it
+  makes (`MAKES`, kept equal to the page's scripts by a test), except one
+  that CRASHED as it ran (`HoodErrors.crashedScripts`): a bug, reported,
+  never reloaded or "check your connection". The reporter missing, it
+  heard nothing: names alone. The start-up's error reports — uncaught,
+  and the app's own (`reportError` → `whenSettled`) — wait for the check
+  (`HoodErrors.settle`): a needed file missing — dropped, its echo; else
+  sent (no check: once the page is read); a cut-off file's own syntax
+  error never. Before each reload — and "Try again", and back online —
+  the missing files are fetched afresh (`cache: "reload"`, each read to
+  its end, ≤ 5 s): a broken copy that came as a full answer is kept a year
+  (versioned, immutable) and a plain reload took it from the cache again
+  (seventh, eighth reviews). Only the APP's files count — each stamped
+  `?vsn=` (LoadFailTest): Cloudflare's own same-site scripts (`/cdn-cgi/`)
+  never (eighth review). No report from the demo
+  (it talks to no server); the report names the browser when it can.
+  Vite's "reload on a failed load", with the counted guard the write-ups
+  settled on; no library fits plain in-order scripts (Rsbuild's retry
+  skips them: a file re-fetched late arrives after those needing it).
+  `LoadFailTest`, `loadcheck.test.mjs`, journey `loadfail`.
 - **Clock jumps:** the app starts only once the clock is synced
   (`time-sync.target`, with the wait capped at 3 minutes, as chrony's own — Ubuntu's has no
   limit, and a reboot without a time server kept the site down); the
@@ -2984,7 +3087,21 @@ here say the rest.
   ends at once (`Hoodride.BlockEffects`): a request (withdrawn or declined,
   as any other), a ride, their chat (closed with a neutral line, "Chat
   with … ended" — no "ended by", and not "they've been away", which was
-  untrue: the other was here), and both maps drop the other's marker. A ride STARTING in that moment can't slip through: its
+  untrue: the other was here), and both maps drop the other's marker. A
+  MESSAGE in that moment can't bring the chat back (2026-11-20): its block
+  check runs before its write, so `Chat.send_message` looks again after
+  writing — from memory only (`Blocks.known_blocked?`: never a database
+  read, so a hiccup can't delete a chat) — and undoes it ("unavailable",
+  allowances given back). A block saves then deletes; a send writes then
+  looks: one always sees the other. A chat ended while past the first page
+  (not loaded) takes its unread out of the 💬 count too (`chat_closed` →
+  `takeUnreadRest`) — and a page of older chats already answered but not
+  yet arrived can't bring it back, the chat nor its unread
+  (`endedWhileLoading`). Journeys `blockchat` (the blocked one's side: an
+  open chat, the list, away meanwhile, unblocked — from the server's copy
+  too) and `chatunread` (the 💬 count: every way a chat ends, a page on
+  its way, a message just before, inside another chat, a reload).
+  A ride STARTING in that moment can't slip through: its
   own last look, once its seats are its own, checks blocks too
   (`Requests.accept`). Unblocked: each one's marker sent to the other at
   once if it's in view — a parked car sends nothing itself.

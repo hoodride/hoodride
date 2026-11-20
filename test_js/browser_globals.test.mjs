@@ -52,7 +52,10 @@ test("in the browser, each registers its global — the name app.js uses", () =>
     assert.ok(g && (typeof g === "object" || typeof g === "function"), `${file}: no ${name} on the page`);
     assert.ok(Object.keys(g).length > 0, `${file}: ${name} is empty`);
     // used as Name.fn(…), or taken apart: `const { t, … } = Name;` (HoodI18n)
-    assert.ok(app.includes(name + ".") || app.includes("} = " + name + ";"), `${file}: app.js never uses ${name}`);
+    // — but loadcheck.js: the page's LAST script, after app.js, acting on
+    // its own (did every file arrive?), used by no one
+    if (file !== "loadcheck.js")
+      assert.ok(app.includes(name + ".") || app.includes("} = " + name + ";"), `${file}: app.js never uses ${name}`);
   }
 });
 

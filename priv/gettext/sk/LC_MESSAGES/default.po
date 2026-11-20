@@ -261,6 +261,10 @@ msgstr "Účet sa nepodarilo vymazať. Bol(a) si odhlásený(-á) – prihlás s
 msgid "Couldn't end the chat — try again"
 msgstr "Chat sa nepodarilo ukončiť – skús to znova"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Hood Ride sa nepodarilo načítať – skontroluj pripojenie"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Správy sa nepodarilo načítať. Skús to znova."
@@ -789,7 +793,7 @@ msgstr "Táto stránka neexistuje."
 msgid "Too late — the request was withdrawn"
 msgstr "Neskoro – žiadosť bola stiahnutá"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "Skúsiť znova"
 
@@ -888,6 +892,10 @@ msgstr "Zakladáš priveľa nových chatov – skús to neskôr"
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "Začal(a) si priveľa chatov – najprv jeden z nich ukonči"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "Tvoj prehliadač je pre Hood Ride príliš starý – aktualizuj ho a pokračuj"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

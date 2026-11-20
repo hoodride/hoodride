@@ -32,6 +32,30 @@ defmodule HoodrideWeb.MinifyTest do
     for f <- Minify.files(), do: assert(File.exists?(Path.join(out, f)), f)
   end
 
+  # (eleventh review, 2026-11-19) the two files that tell a browser it's
+  # too old for our code (HoodErrors first, HoodLoadCheck last) must be
+  # readable by it: minified for older browsers than the rest — no
+  # `catch{}` without its name, no object spread, no ?. or ??
+  test "errors.js and loadcheck.js: minified for older browsers (they say 'too old')", %{out: out} do
+    for f <- ~w(errors.js loadcheck.js) do
+      min = File.read!(Path.join(out, f))
+      refute min =~ "catch{", "#{f}: catch without its name"
+      refute min =~ ~r/\{\.\.\./, "#{f}: object spread"
+      refute min =~ ~r/[,(]\.\.\.[A-Za-z_$][\w$]*\}/, "#{f}: object spread"
+      refute min =~ "??", "#{f}: ??"
+      refute min =~ ~r/\?\.[A-Za-z_$\[(]/, "#{f}: ?."
+      # …nor what old Edge (16) lacks: URLSearchParams, url.searchParams
+      # (twelfth review)
+      refute min =~ "URLSearchParams", "#{f}: URLSearchParams"
+      refute min =~ "searchParams", "#{f}: searchParams"
+      # …still minified
+      assert byte_size(min) < byte_size(File.read!(Path.join(@static, f))) * 0.6, f
+    end
+
+    # the rest keeps the newer target (smaller): app.js has `catch{`
+    assert File.read!(Path.join(out, "app.js")) =~ "catch{"
+  end
+
   test "much smaller: under 60% of the readable files", %{out: out} do
     size = fn dir ->
       Minify.files() |> Enum.map(&File.stat!(Path.join(dir, &1)).size) |> Enum.sum()

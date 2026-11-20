@@ -16,6 +16,22 @@
 // catalog lacks — Spanish's "many" (exact millions, CLDR) when its .po has
 // only two forms — falls back to "other", then to the English.
 // Shared by the browser (HoodI18n) and test_js/i18n.test.mjs.
+
+// Element.replaceChildren — used here and by app.js — came in Chrome 86 /
+// Safari 14, newer than our minimum (chrome 80, safari 13.1: config
+// :esbuild): where missing, the same from older parts (append: Chrome 54,
+// Safari 10). Here, the first shared file that uses it, before app.js; a
+// browser's own never replaced (thirteenth review, 2026-11-19: Chrome 83
+// or iOS 13.5 crashed drawing the app's buttons, no word)
+(function (scope) {
+  const E = scope && scope.Element;
+  if (!E || typeof E.prototype.replaceChildren === "function") return;
+  E.prototype.replaceChildren = function (...nodes) {
+    while (this.lastChild) this.removeChild(this.lastChild);
+    this.append(...nodes);
+  };
+})(typeof self !== "undefined" ? self : this);
+
 (function (root, factory) {
   if (typeof module === "object" && module.exports) module.exports = factory();
   else root.HoodI18n = factory();

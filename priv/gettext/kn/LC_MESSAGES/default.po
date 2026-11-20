@@ -261,6 +261,10 @@ msgstr "ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಅಳಿಸಲು ಸಾಧ
 msgid "Couldn't end the chat — try again"
 msgstr "ಚಾಟ್ ಮುಗಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Hood Ride ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — ನಿಮ್ಮ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಿ"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "ಸಂದೇಶಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ."
@@ -789,7 +793,7 @@ msgstr "ಈ ಪುಟ ಅಸ್ತಿತ್ವದಲ್ಲಿಲ್ಲ."
 msgid "Too late — the request was withdrawn"
 msgstr "ತುಂಬಾ ತಡವಾಯಿತು — ವಿನಂತಿಯನ್ನು ಹಿಂಪಡೆಯಲಾಗಿದೆ"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ"
 
@@ -888,6 +892,10 @@ msgstr "ನೀವು ತುಂಬಾ ಹೊಸ ಚಾಟ್‌ಗಳನ್ನು
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "ನೀವು ಬಹಳ ಚಾಟ್‌ಗಳನ್ನು ಆರಂಭಿಸಿದ್ದೀರಿ — ಮೊದಲು ಅವುಗಳಲ್ಲಿ ಒಂದನ್ನು ಮುಗಿಸಿ"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "ನಿಮ್ಮ ಬ್ರೌಸರ್ Hood Ride ಗೆ ತುಂಬಾ ಹಳೆಯದು — ಮುಂದುವರಿಯಲು ಅದನ್ನು ಅಪ್‌ಡೇಟ್ ಮಾಡಿ"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

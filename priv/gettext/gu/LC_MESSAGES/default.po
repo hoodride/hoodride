@@ -261,6 +261,10 @@ msgstr "તમારું એકાઉન્ટ ડિલીટ કરી શ�
 msgid "Couldn't end the chat — try again"
 msgstr "ચેટ સમાપ્ત કરી શકાઈ નહીં. ફરી પ્રયાસ કરો"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Hood Ride લોડ થઈ શક્યું નહીં. તમારું કનેક્શન તપાસો"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "મેસેજ લોડ થઈ શક્યા નહીં. ફરી પ્રયાસ કરો."
@@ -789,7 +793,7 @@ msgstr "આ પેજ અસ્તિત્વમાં નથી."
 msgid "Too late — the request was withdrawn"
 msgstr "ઘણું મોડું થયું: વિનંતી પાછી ખેંચી લેવામાં આવી"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "ફરી પ્રયાસ કરો"
 
@@ -888,6 +892,10 @@ msgstr "તમે ઘણી નવી ચૅટ શરૂ કરી છે. પ�
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "તમે ઘણી બધી ચેટ શરૂ કરી છે. પહેલાં તેમાંથી એક સમાપ્ત કરો"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "તમારું બ્રાઉઝર Hood Ride માટે ખૂબ જૂનું છે. ચાલુ રાખવા માટે તેને અપડેટ કરો"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

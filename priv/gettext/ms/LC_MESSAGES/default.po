@@ -261,6 +261,10 @@ msgstr "Tidak dapat memadamkan akaun anda. Anda telah dilog keluar — log masuk
 msgid "Couldn't end the chat — try again"
 msgstr "Tidak dapat menamatkan sembang — cuba lagi"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Tidak dapat memuatkan Hood Ride — semak sambungan anda"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Mesej tidak dapat dimuatkan. Cuba lagi."
@@ -789,7 +793,7 @@ msgstr "Halaman ini tidak wujud."
 msgid "Too late — the request was withdrawn"
 msgstr "Terlambat — permintaan telah ditarik balik"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "Cuba lagi"
 
@@ -888,6 +892,10 @@ msgstr "Anda telah memulakan banyak sembang baharu — cuba lagi nanti"
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "Anda memulakan terlalu banyak sembang — tamatkan salah satu dahulu"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "Pelayar anda terlalu lama untuk Hood Ride — kemas kininya untuk meneruskan"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

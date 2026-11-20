@@ -226,6 +226,26 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     end
   end
 
+  # every person here comes from one address: its few error reports a
+  # minute (ClientErrorController's per-address share) start afresh — for a
+  # journey whose people each send some (loadfail)
+  defp server("client_error_share_reset") do
+    :ets.delete_all_objects(:rate_budgets)
+    "ok"
+  end
+
+  # exactly `n` client error reports contain this text (given 1 s to arrive)
+  defp server("client_error_count " <> args) do
+    [n, text] = String.split(args, " ", parts: 2)
+    Process.sleep(1000)
+    lines = Agent.get(Process.get(:client_errors), & &1)
+    got = Enum.count(lines, &String.contains?(&1, text))
+
+    if got == String.to_integer(n),
+      do: "ok",
+      else: "#{got} reports with #{inspect(text)}, not #{n} — got: #{inspect(lines)}"
+  end
+
   # Cloudflare Turnstile on (HoodrideWeb.Turnstile): Cloudflare's public
   # always-pass test keys, its check answered here ("passed", for this host
   # and the sign-in action — nothing leaves the machine), and a Google
@@ -269,17 +289,6 @@ defmodule HoodrideWeb.BrowserJourneysTest do
   defp server("new_build") do
     :persistent_term.put(@build_key, "journey-new-build")
     "ok"
-  end
-
-  defp turnstile_off do
-    for k <- [
-          :turnstile_site_key,
-          :turnstile_secret,
-          :turnstile_req,
-          :google_client_id,
-          :google_client_secret
-        ],
-        do: Application.delete_env(:hoodride, k)
   end
 
   # this person has no car saved (one account per tab: a refused save left
@@ -517,6 +526,36 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     if Hoodride.Chat.started_open(id) >= n, do: "ok", else: "not counted"
   end
 
+  # the chat between BT-C<i> (of chat_crowd) and this person ends (as the
+  # cleanup ends one) — by name: which id is the crowd's oldest isn't known
+  # to a journey
+  defp server("crowd_close " <> args) do
+    [i, id] = args |> String.split() |> Enum.map(&String.to_integer/1)
+    name = "BT-C#{i}"
+
+    {:ok, u} =
+      Hoodride.Accounts.upsert_oauth_user(%{provider: "dev", provider_id: name, name: name})
+
+    Hoodride.Chat.delete_conversation(Hoodride.Chat.pair_key(u.id, id))
+    "ok"
+  end
+
+  # `a` blocks `b`, as the block itself does (saved, then what's between them
+  # ends — Hoodride.BlockEffects): for someone with no page of their own here
+  defp server("block_pair " <> ids) do
+    [a, b] = ids |> String.split() |> Enum.map(&String.to_integer/1)
+    :ok = Hoodride.Blocks.block(a, b)
+    Hoodride.BlockEffects.apply(a, b)
+    "ok"
+  end
+
+  # `a` taps End chat on their chat with `b` (b is told "{a} ended the chat")
+  defp server("end_chat " <> ids) do
+    [a, b] = ids |> String.split() |> Enum.map(&String.to_integer/1)
+    Hoodride.Chat.end_chat(a, b)
+    "ok"
+  end
+
   # these two's conversation is deleted (as when one of them has gone) —
   # both are told, as by the sweeper
   defp server("close_chat " <> ids) do
@@ -618,6 +657,17 @@ defmodule HoodrideWeb.BrowserJourneysTest do
   end
 
   defp server(other), do: "unknown request: #{other}"
+
+  defp turnstile_off do
+    for k <- [
+          :turnstile_site_key,
+          :turnstile_secret,
+          :turnstile_req,
+          :google_client_id,
+          :google_client_secret
+        ],
+        do: Application.delete_env(:hoodride, k)
+  end
 
   defp older_device(socket) do
     receive do

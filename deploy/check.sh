@@ -3,6 +3,7 @@
 #   - the home page answers, and names the build it is
 #   - the app's own files are served (app.js, errors.js)
 #   - sign-in answers (/api/me: 200 signed in, 401 not — never a 5xx)
+#   - the database can be WRITTEN (/api/health: 200; a read-only or locked one 503)
 #   - nothing went wrong in the last few minutes (deploy/errors.sh)
 # Prints each check; exits non-zero if one fails.
 set -uo pipefail
@@ -37,6 +38,9 @@ case "$me" in
   200 | 401) ok "sign-in answers: $me" ;;
   *) bad "sign-in: $me" ;;
 esac
+
+health=$(curl -s -o /dev/null -w '%{http_code}' "$SITE/api/health")
+if [ "$health" = "200" ]; then ok "database writable: 200"; else bad "database: $health (/api/health)"; fi
 
 echo "what went wrong since $SINCE:"
 report=$("$(dirname "$0")/errors.sh" "$SINCE")

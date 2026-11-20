@@ -261,6 +261,10 @@ msgstr "Je account kon niet worden verwijderd. Je bent uitgelogd — log opnieuw
 msgid "Couldn't end the chat — try again"
 msgstr "Chat beëindigen lukt niet. Probeer het opnieuw"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Hood Ride kon niet worden geladen. Controleer je verbinding"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Berichten konden niet worden geladen. Probeer het opnieuw."
@@ -789,7 +793,7 @@ msgstr "Deze pagina bestaat niet."
 msgid "Too late — the request was withdrawn"
 msgstr "Te laat: het verzoek is ingetrokken"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "Opnieuw proberen"
 
@@ -888,6 +892,10 @@ msgstr "Je bent veel nieuwe chats begonnen. Probeer het later opnieuw"
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "Je bent te veel chats begonnen. Beëindig er eerst een"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "Je browser is te oud voor Hood Ride. Werk hem bij om door te gaan"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

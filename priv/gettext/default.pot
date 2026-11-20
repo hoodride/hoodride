@@ -258,6 +258,10 @@ msgstr ""
 msgid "Couldn't end the chat — try again"
 msgstr ""
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr ""
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr ""
@@ -786,7 +790,7 @@ msgstr ""
 msgid "Too late — the request was withdrawn"
 msgstr ""
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr ""
 
@@ -884,6 +888,10 @@ msgstr ""
 
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
+msgstr ""
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
 msgstr ""
 
 #: priv/static/app.js, priv/static/index.html

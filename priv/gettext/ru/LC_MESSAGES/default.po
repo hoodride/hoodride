@@ -261,6 +261,10 @@ msgstr "Не удалось удалить аккаунт. Вы вышли из 
 msgid "Couldn't end the chat — try again"
 msgstr "Не удалось завершить чат. Попробуйте ещё раз"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Не удалось загрузить Hood Ride. Проверьте интернет"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Не удалось загрузить сообщения. Попробуй ещё раз."
@@ -789,7 +793,7 @@ msgstr "Такой страницы нет."
 msgid "Too late — the request was withdrawn"
 msgstr "Слишком поздно: запрос отозван"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "Повторить"
 
@@ -888,6 +892,10 @@ msgstr "Вы начали слишком много новых чатов. По�
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "Вы начали слишком много чатов. Сначала завершите один из них"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "Ваш браузер слишком старый для Hood Ride. Обновите его, чтобы продолжить"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

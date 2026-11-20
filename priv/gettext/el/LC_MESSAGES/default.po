@@ -261,6 +261,10 @@ msgstr "Δεν ήταν δυνατή η διαγραφή του λογαριασ
 msgid "Couldn't end the chat — try again"
 msgstr "Δεν ήταν δυνατός ο τερματισμός της συνομιλίας — δοκίμασε ξανά"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Δεν ήταν δυνατή η φόρτωση του Hood Ride — έλεγξε τη σύνδεσή σου"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Δεν ήταν δυνατή η φόρτωση των μηνυμάτων. Δοκίμασε ξανά."
@@ -789,7 +793,7 @@ msgstr "Αυτή η σελίδα δεν υπάρχει."
 msgid "Too late — the request was withdrawn"
 msgstr "Πολύ αργά — το αίτημα ανακλήθηκε"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "Δοκίμασε ξανά"
 
@@ -888,6 +892,10 @@ msgstr "Ξεκίνησες πολλές νέες συνομιλίες — δοκ
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "Έχεις ξεκινήσει πάρα πολλές συνομιλίες — τερμάτισε πρώτα μία από αυτές"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "Το πρόγραμμα περιήγησής σου είναι πολύ παλιό για το Hood Ride — ενημέρωσέ το για να συνεχίσεις"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

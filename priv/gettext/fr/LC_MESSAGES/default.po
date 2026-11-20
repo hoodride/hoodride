@@ -261,6 +261,10 @@ msgstr "Impossible de supprimer votre compte. Vous avez été déconnecté — r
 msgid "Couldn't end the chat — try again"
 msgstr "Impossible de terminer la discussion. Réessayez"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Impossible de charger Hood Ride. Vérifiez votre connexion"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Impossible de charger les messages. Réessaie."
@@ -789,7 +793,7 @@ msgstr "Cette page n'existe pas."
 msgid "Too late — the request was withdrawn"
 msgstr "Trop tard : la demande a été retirée"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "Réessayer"
 
@@ -888,6 +892,10 @@ msgstr "Vous avez lancé beaucoup de nouvelles discussions. Réessayez plus tard
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "Vous avez lancé trop de discussions. Terminez-en d'abord une"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "Votre navigateur est trop ancien pour Hood Ride. Mettez-le à jour pour continuer"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

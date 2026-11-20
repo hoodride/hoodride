@@ -261,6 +261,10 @@ msgstr "Không thể xóa tài khoản của bạn. Bạn đã bị đăng xuấ
 msgid "Couldn't end the chat — try again"
 msgstr "Không thể kết thúc cuộc trò chuyện — hãy thử lại"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Không tải được Hood Ride — hãy kiểm tra kết nối mạng"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Không tải được tin nhắn. Hãy thử lại."
@@ -789,7 +793,7 @@ msgstr "Trang này không tồn tại."
 msgid "Too late — the request was withdrawn"
 msgstr "Quá muộn — yêu cầu đã bị rút lại"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "Thử lại"
 
@@ -888,6 +892,10 @@ msgstr "Bạn đã bắt đầu nhiều cuộc trò chuyện mới — hãy th�
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "Bạn đã bắt đầu quá nhiều cuộc trò chuyện — hãy kết thúc một cuộc trước"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "Trình duyệt của bạn quá cũ để dùng Hood Ride — hãy cập nhật để tiếp tục"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

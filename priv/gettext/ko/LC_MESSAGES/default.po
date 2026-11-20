@@ -261,6 +261,10 @@ msgstr "계정을 삭제하지 못했어요. 로그아웃되었어요. 다시 �
 msgid "Couldn't end the chat — try again"
 msgstr "채팅을 종료할 수 없어요. 다시 시도해 주세요"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Hood Ride를 불러오지 못했어요. 인터넷 연결을 확인해 주세요"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "메시지를 불러오지 못했어요. 다시 시도해 주세요."
@@ -789,7 +793,7 @@ msgstr "이 페이지는 존재하지 않아요."
 msgid "Too late — the request was withdrawn"
 msgstr "너무 늦었어요. 요청이 취소됐어요"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "다시 시도"
 
@@ -888,6 +892,10 @@ msgstr "새 채팅을 너무 많이 시작했어요. 나중에 다시 시도해 
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "시작한 채팅이 너무 많아요. 먼저 그중 하나를 종료하세요"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "브라우저가 너무 오래되어 Hood Ride를 쓸 수 없어요. 계속하려면 브라우저를 업데이트해 주세요"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

@@ -261,6 +261,10 @@ msgstr "Akoonkaaga lama tirtiri karin. Waa lagaa saaray — mar kale gal si aad 
 msgid "Couldn't end the chat — try again"
 msgstr "Lama dhammayn karin wada sheekaysiga — isku day mar kale"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Hood Ride lama soo dejin karin — hubi xiriirkaaga"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Fariimaha lama soo rari karin. Isku day mar kale."
@@ -789,7 +793,7 @@ msgstr "Boggan ma jiro."
 msgid "Too late — the request was withdrawn"
 msgstr "Waa goor dambe — codsiga waa la laabtay"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "Isku day mar kale"
 
@@ -888,6 +892,10 @@ msgstr "Sheekeysiyo badan oo cusub ayaad bilowday — mar dambe isku day"
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "Waxaad bilowday wada sheekaysi aad u badan — marka hore mid ka mid ah dhammee"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "Browser-kaagu aad buu ugu duug yahay Hood Ride — cusbooneysii si aad u sii wadato"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

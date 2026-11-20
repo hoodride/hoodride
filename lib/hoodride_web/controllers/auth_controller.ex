@@ -825,10 +825,24 @@ defmodule HoodrideWeb.AuthController do
 
           true ->
             case Hoodride.Chat.conversation_messages(user.id, params["peer"]) do
-              {:ok, messages} -> json(conn, %{messages: messages})
-              :none -> conn |> put_status(404) |> json(%{error: "none"})
+              # (with the server's "read up to": a phone with no mark of its
+              # own counted every kept message unread — review, 2026-11-20)
+              {:ok, messages} ->
+                json(conn, %{messages: messages, read: chat_read(user.id, params["peer"])})
+
+              :none ->
+                conn |> put_status(404) |> json(%{error: "none"})
             end
         end
+    end
+  end
+
+  # this person's "read up to" in their chat with `peer` (its id as text —
+  # conversation_messages has just found it theirs)
+  defp chat_read(user_id, peer) do
+    case Integer.parse(peer) do
+      {id, ""} -> Hoodride.Chat.read_of(user_id, Hoodride.Chat.pair_key(user_id, id))
+      _ -> nil
     end
   end
 

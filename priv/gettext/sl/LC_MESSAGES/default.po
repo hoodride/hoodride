@@ -261,6 +261,10 @@ msgstr "Računa ni bilo mogoče izbrisati. Odjavljen(a) si – znova se prijavi,
 msgid "Couldn't end the chat — try again"
 msgstr "Klepeta ni bilo mogoče končati – poskusi znova"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Hood Ride se ni naložil – preveri povezavo"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Sporočil ni bilo mogoče naložiti. Poskusi znova."
@@ -789,7 +793,7 @@ msgstr "Ta stran ne obstaja."
 msgid "Too late — the request was withdrawn"
 msgstr "Prepozno – prošnja je bila umaknjena"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "Poskusi znova"
 
@@ -888,6 +892,10 @@ msgstr "Začenjaš preveč novih klepetov – poskusi pozneje"
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "Začel(a) si preveč klepetov – najprej končaj enega od njih"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "Tvoj brskalnik je prestar za Hood Ride – posodobi ga za nadaljevanje"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

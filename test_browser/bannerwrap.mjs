@@ -3,7 +3,8 @@
 // box is fitted to its lines each time its text changes (fitBanner) — the
 // same text must come out the same size every time, however often it's
 // shown, never a line more.
-import { journey, step, check } from "./cdp.mjs";
+import { journey, step, check, HOME } from "./cdp.mjs";
+import { goOnline } from "./app.mjs";
 
 const settled = (p) =>
   p.waitFor(`!document.getElementById("banner").classList.contains("fitting")`, `${p.name}: the banner fitted`, 5000);
@@ -41,4 +42,52 @@ await journey("bannerwrap: ✋ tapped again and again — the same banner, the s
     "the same height every time — never a line more",
     up.map((s) => ({ h: s.h, w: s.w, styleW: s.styleW }))
   );
+
+  // (owner, 2026-11-19: "does it apply also for driver?") the same banner
+  // code (setBanner, fitBanner) — the driver's line: "🟢 You're online",
+  // and "· nobody nearby yet" added and taken away; a narrow phone, so the
+  // long one wraps
+  step("Dan, a driver alone on a very narrow screen, online: 'nobody nearby yet' added and taken away five times — each the same size every time");
+  // (far from Ann, whose ✋ he would find: alone — "nobody nearby yet")
+  const dan = await browser.person("BT-WrapDan", { latitude: HOME.latitude + 0.5, longitude: HOME.longitude + 0.5 });
+  // (260 px: on 320 — the narrowest common phone — his long line still
+  // fits on one; this narrow it wraps, as with a larger text setting)
+  await dan.phone(260, 640);
+  await goOnline(dan);
+  await dan.waitFor(`state.online && state.haveFix && !nearLooking && !map.isMoving() && nobodyNear`, "Dan online, his search over: nobody near", 30000);
+  await frames(dan, 6);
+  await settled(dan);
+  const longs = [await size(dan)];
+  const shorts = [];
+  for (let i = 0; i < 5; i++) {
+    await dan.eval(`(setNobodyNear(false), true)`);
+    await frames(dan, 6);
+    await settled(dan);
+    shorts.push(await size(dan));
+    await dan.eval(`(setNobodyNear(true), true)`);
+    await frames(dan, 6);
+    await settled(dan);
+    longs.push(await size(dan));
+  }
+  check(longs.every((s) => s.text.includes("You're online") && s.text.includes("nobody nearby yet")), "the long line each time", longs.map((s) => s.text));
+  check(shorts.every((s) => s.text.includes("You're online") && !s.text.includes("nobody")), "the short line each time", shorts.map((s) => s.text));
+  check(longs[0].h > shorts[0].h, "(on this phone the long line wraps)", { long: longs[0], short: shorts[0] });
+  const same = (list) => list.every((s) => s.h === list[0].h && s.w === list[0].w);
+  check(same(longs), "'· nobody nearby yet': the same size every time — never a line more", longs.map((s) => ({ h: s.h, w: s.w, styleW: s.styleW })));
+  check(same(shorts), "taken away: back to the short line's own size every time", shorts.map((s) => ({ h: s.h, w: s.w, styleW: s.styleW })));
+
+  step("…and offline, online again — five times: the same banner, the same size");
+  const again = [];
+  for (let i = 0; i < 5; i++) {
+    await dan.click("btn-online");
+    await dan.waitFor(`!state.online`, "offline");
+    await frames(dan, 2);
+    await dan.click("btn-online");
+    await dan.waitFor(`state.online && !nearLooking && !map.isMoving() && nobodyNear`, "online again, nobody near", 30000);
+    await frames(dan, 6);
+    await settled(dan);
+    again.push(await size(dan));
+  }
+  check(again.every((s) => s.text === longs[0].text), "the long line each time", again.map((s) => s.text));
+  check(again.every((s) => s.h === longs[0].h && s.w === longs[0].w), "the same size as before, every time", again.map((s) => ({ h: s.h, w: s.w })));
 });

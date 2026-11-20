@@ -261,6 +261,10 @@ msgstr "உங்கள் கணக்கை நீக்க முடியவ
 msgid "Couldn't end the chat — try again"
 msgstr "அரட்டையை முடிக்க முடியவில்லை. மீண்டும் முயலவும்"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Hood Ride-ஐ ஏற்ற முடியவில்லை. உங்கள் இணைப்பைச் சரிபார்க்கவும்"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "செய்திகளை ஏற்ற முடியவில்லை. மீண்டும் முயலவும்."
@@ -789,7 +793,7 @@ msgstr "இந்தப் பக்கம் இல்லை."
 msgid "Too late — the request was withdrawn"
 msgstr "தாமதமாகிவிட்டது: கோரிக்கை திரும்பப் பெறப்பட்டது"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "மீண்டும் முயலவும்"
 
@@ -888,6 +892,10 @@ msgstr "நிறையப் புதிய அரட்டைகளைத் 
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "நீங்கள் நிறைய அரட்டைகளைத் தொடங்கியுள்ளீர்கள். முதலில் அவற்றில் ஒன்றை முடிக்கவும்"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "உங்கள் உலாவி Hood Ride-க்கு மிகவும் பழையது. தொடர அதைப் புதுப்பிக்கவும்"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

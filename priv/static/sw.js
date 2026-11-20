@@ -46,6 +46,7 @@ const ASSETS = [
   "turnstile.js",
   "bowser.js",
   "device.js",
+  "loadcheck.js",
   "qr-hoodride.svg",
   "translate.svg",
   "phoenix.min.js",
@@ -175,7 +176,11 @@ self.addEventListener("fetch", (e) => {
 
   // the fresh copy, if it comes after all, is still saved for next time
   e.waitUntil(network);
-  e.respondWith(Promise.race([network, slow]));
+  // nothing at all (no signal, nothing saved): a network error, said so —
+  // "nothing" (undefined) is one in the spec, but Chrome tried the network
+  // again and Firefox failed it: one answer everywhere. A script the page
+  // then hears as not arrived (HoodLoadCheck; owner, 2026-11-19)
+  e.respondWith(Promise.race([network, slow]).then((res) => res || Response.error()));
 });
 
 // how long the network gets before the saved copy is shown

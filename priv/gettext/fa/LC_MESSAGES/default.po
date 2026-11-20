@@ -261,6 +261,10 @@ msgstr "حذف حسابتان ممکن نشد. از حساب خارج شده‌�
 msgid "Couldn't end the chat — try again"
 msgstr "پایان دادن به گفتگو ممکن نشد — دوباره امتحان کنید"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "بارگیری Hood Ride ممکن نشد — اینترنتتان را بررسی کنید"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "پیام‌ها بارگیری نشد. دوباره امتحان کنید."
@@ -789,7 +793,7 @@ msgstr "این صفحه وجود ندارد."
 msgid "Too late — the request was withdrawn"
 msgstr "دیر شد — درخواست پس گرفته شد"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "دوباره امتحان کنید"
 
@@ -888,6 +892,10 @@ msgstr "گفتگوهای جدید زیادی شروع کرده‌اید — بع
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "گفتگوهای زیادی را شروع کرده‌اید — اول یکی از آنها را تمام کنید"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "مرورگرتان برای Hood Ride خیلی قدیمی است — برای ادامه آن را به‌روز کنید"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

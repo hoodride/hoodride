@@ -261,6 +261,10 @@ msgstr "Nem sikerült törölni a fiókodat. Kijelentkeztettünk – jelentkezz 
 msgid "Couldn't end the chat — try again"
 msgstr "Nem sikerült befejezni a csevegést – próbáld újra"
 
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Couldn't load Hood Ride — check your connection"
+msgstr "Nem sikerült betölteni a Hood Ride-ot – ellenőrizd a kapcsolatot"
+
 #: priv/static/app.js
 msgid "Couldn't load messages — try again"
 msgstr "Nem sikerült betölteni az üzeneteket. Próbáld újra."
@@ -789,7 +793,7 @@ msgstr "Ez az oldal nem létezik."
 msgid "Too late — the request was withdrawn"
 msgstr "Túl késő – a kérést visszavonták"
 
-#: priv/static/app.js
+#: lib/hoodride_web/controllers/page_controller.ex, priv/static/app.js
 msgid "Try again"
 msgstr "Újra"
 
@@ -888,6 +892,10 @@ msgstr "Sok új csevegést indítottál – próbáld újra később"
 #: priv/static/app.js
 msgid "You've started too many chats — end one of them first"
 msgstr "Túl sok csevegést kezdtél – előbb fejezz be egyet közülük"
+
+#: lib/hoodride_web/controllers/page_controller.ex
+msgid "Your browser is too old for Hood Ride — update it to continue"
+msgstr "A böngésződ túl régi a Hood Ride-hoz – frissítsd a folytatáshoz"
 
 #: priv/static/app.js, priv/static/index.html
 msgid "Your car"

@@ -7,7 +7,11 @@ defmodule HoodrideWeb.SitemapTest do
   full addresses, UTF-8, canonical pages only; robots.txt names it by its
   full address.
   """
-  use HoodrideWeb.ConnCase, async: true
+  # (not async: two of these walk every page, ~5 s each, holding the test
+  # database's ONE connection all along — the async tests queued behind them
+  # and, on a slow run, were dropped from the queue: precommit 2026-11-20,
+  # 4 tests failed in setup with "dropped from queue after 10894ms")
+  use HoodrideWeb.ConnCase, async: false
 
   # the pages need no database: the page walks (20 s) leave the test
   # database's one connection to the tests that do

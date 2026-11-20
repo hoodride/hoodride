@@ -340,6 +340,22 @@
     </div>
   </section>
 
+  <!-- a file of the app that didn't arrive, after two reloads (HoodLoadCheck,
+       loadcheck.js): over everything. Its words in the reader's language
+       are put here by the server (PageController.with_load_fail) — the
+       files that translate may be the missing ones. Try again: a plain link
+       to this same page, working with no script at all -->
+  <div id="load-fail" class="load-fail" role="alert" hidden>
+    <div class="brand"><img class="brand-car" src="car.png" alt="" /><h1>Hood Ride</h1></div>
+    <p class="load-fail-text">Couldn't load Hood Ride — check your connection</p>
+    <!-- a browser too old for our code (HoodLoadCheck): this instead, no Try again -->
+    <p class="load-fail-old" hidden>Your browser is too old for Hood Ride — update it to continue</p>
+    <a id="load-fail-retry" class="btn btn-primary" href="">Try again</a>
+  </div>
+
+  <!-- the error reporter FIRST: it hears every script after it that fails to
+       load (HoodErrors.failedScripts) -->
+  <script src="errors.js"></script>
   <script src="maplibre-gl.js"></script>
   <script src="phoenix.min.js"></script>
   <script src="h3-js.umd.js"></script>
@@ -357,7 +373,6 @@
     <p id="lang-none" class="lang-none hidden" role="status" data-t>No languages found</p>
     <button id="lang-cancel" type="button" class="btn btn-small" data-t>Cancel</button>
   </div>
-  <script src="errors.js"></script>
   <script src="i18n.js"></script>
   <script src="viewport.js"></script>
   <script src="sync.js"></script>
@@ -392,5 +407,7 @@
   <script src="bowser.js"></script>
   <script src="device.js"></script>
   <script src="app.js"></script>
+  <!-- LAST: did every file above arrive? (HoodLoadCheck) -->
+  <script src="loadcheck.js"></script>
 </body>
 </html>
