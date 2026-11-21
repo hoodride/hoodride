@@ -182,7 +182,7 @@ defmodule Hoodride.AccountDeletion do
     case answer do
       # that writer is gone (or none yet): what it held is lost — again
       {:error, :unavailable} ->
-        Process.sleep(10)
+        Process.sleep(writer_retry_ms())
         off_map(user_id, deadline)
 
       _ ->
@@ -248,4 +248,10 @@ defmodule Hoodride.AccountDeletion do
     HoodrideWeb.Endpoint.broadcast("user_socket:#{user_id}", "disconnect", %{})
     :ok
   end
+
+  @doc false
+  # a map writer restarting: asked again after a spread pause (5–15 ms) —
+  # deletions running together asked on one 10 ms beat (owner, 2026-11-20:
+  # "make sure nowhere in code got a hardcoded wait")
+  def writer_retry_ms, do: 4 + :rand.uniform(11)
 end

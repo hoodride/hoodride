@@ -325,10 +325,20 @@ defmodule Hoodride.OverloadTest do
       assert :sys.get_state(pid).unnamed == []
     end
 
-    test "the waits grow from the pool's patience and stop at 30 s" do
-      assert Rides.Ride.name_retry_ms(1) == Accounts.retry_wait_ms()
-      assert Rides.Ride.name_retry_ms(2) == 2 * Accounts.retry_wait_ms()
-      assert Rides.Ride.name_retry_ms(20) == 30_000
+    # (owner, 2026-11-20: "with jitter? make sure nowhere in code got a
+    # hardcoded wait") each wait within ±20% of its step — rides started
+    # together in a database stall never ask again all at once
+    test "the waits grow from the pool's patience and stop at 30 s — each spread ±20%" do
+      base = Accounts.retry_wait_ms()
+
+      for {attempt, step} <- [{1, base}, {2, 2 * base}, {20, 30_000}] do
+        waits = for _ <- 1..50, do: Rides.Ride.name_retry_ms(attempt)
+
+        assert Enum.all?(waits, &(&1 >= round(step * 0.8) and &1 <= round(step * 1.2))),
+               "attempt #{attempt}: #{inspect(Enum.min_max(waits))} not within ±20% of #{step}"
+
+        assert length(Enum.uniq(waits)) > 10, "attempt #{attempt}: not spread out"
+      end
     end
   end
 end

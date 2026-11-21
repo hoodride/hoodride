@@ -416,6 +416,10 @@ function show(screenId) {
 }
 
 // ===== Banner =====
+// each showing's own number: a fitting from an earlier one (the same text,
+// shown again before it ran) does nothing — the box is measured once a
+// showing, never again once narrowed
+let bannerShowing = 0;
 function setBanner(text) {
   const b = $("banner");
   if (!text) {
@@ -442,7 +446,12 @@ function setBanner(text) {
     // a long text is drawn at once as it is; a list never matched its own
     // dataset copy and was kept hidden for its whole time: review, 2026-11-11)
     const fits = typeof text === "string" && text.length <= 300;
-    const changed = fits && b.dataset.text !== text;
+    // (shown again, the same text: afresh too — it kept the width fitted to
+    // it the time before, and iPhones' engine, laying it out anew at that
+    // tight width, wrapped a word more: the demo's ✋, up and down — owner,
+    // 2026-11-20, Brave on an iPhone)
+    const changed = fits && (b.dataset.text !== text || b.classList.contains("hidden"));
+    const showing = changed ? ++bannerShowing : bannerShowing;
     if (changed) {
       holdBanner(b);
       b.classList.add("fitting");
@@ -450,22 +459,24 @@ function setBanner(text) {
       b.style.textWrap = "wrap";
       b.style.width = "";
     } else if (!fits) {
+      // (an earlier text's fitting, still to come: not for this one)
+      bannerShowing++;
       b.dataset.text = "";
       b.style.width = "";
       bannerFitted(b);
     }
-    // shown again unfitted (a rotation while it was hidden): fitted then
-    const refit = !changed && !b.style.width && b.classList.contains("hidden") && b.dataset.text === text;
-    if (refit) b.classList.add("fitting");
     setIconText(b, text);
     b.classList.remove("hidden");
-    if (refit) requestAnimationFrame(() => requestAnimationFrame(() => (fitBanner(b, text), bannerFitted(b, text))));
     if (changed)
       requestAnimationFrame(() =>
         requestAnimationFrame(() => {
-          if (b.dataset.text !== text) return;
+          if (bannerShowing !== showing) return;
           b.style.textWrap = "";
-          requestAnimationFrame(() => (fitBanner(b, text), bannerFitted(b, text)));
+          requestAnimationFrame(() => {
+            if (bannerShowing !== showing) return;
+            fitBanner(b, text);
+            bannerFitted(b, text);
+          });
         })
       );
   }
@@ -2374,10 +2385,23 @@ async function softReload() {
     [...chats].map(([p, c]) => ({ id: p.id, server: c.server, msgs: c.msgs, draft: c.draft })),
     !$("chat").classList.contains("hidden")
   );
+  // where you were in chats you'd left (keepPlace): by the server's id, to
+  // the chats made afresh — a phone locked a minute reconnects, and every
+  // kept place was lost (review, 2026-11-20)
+  const places = [...chats]
+    .filter(([, c]) => c.place && c.place.id != null)
+    .map(([p, c]) => ({ id: p.id, place: { msg: null, offset: 0, id: c.place.id, idOffset: c.place.idOffset } }));
   // 📍 Meet here tapped, the map tap not yet: the server doesn't know
   const armedRide = state.pinArmed && state.ride ? state.ride.id : null;
   resetMirror();
   hydrate(st);
+  // (a chat not among the first page's: its place waits for it — applied
+  // when it's opened; review, 2026-11-20)
+  places.forEach(({ id, place }) => {
+    const p = realPeersById.get(id);
+    if (p && chats.has(p)) chats.get(p).place = place;
+    else placesWaiting.set(id, place);
+  });
   // (an older chat's draft: its chat made as one not loaded yet — not an
   // empty shell, which a page never fills: its history was gone — olderChat;
   // review, 2026-11-20)
@@ -2440,10 +2464,8 @@ async function softReload() {
     // read only if it's the one ON SCREEN: with the list showing (‹ from
     // that chat) its news was marked read unseen — no unread, and saved as
     // read (owner, 2026-11-07)
-    if (state.chatView !== "list") {
-      chatFor(reopen).unread = 0;
-      markSeen(reopen);
-    }
+    // (as seen: readSeen, once it's drawn and placed — owner, 2026-11-20)
+    if (state.chatView !== "list") readSeenSoon();
     // the "New messages" line: above the same message (the reload rebuilt
     // them all — the same server id)
     if (reading && reading.lineId != null) chatLineMsg = chatFor(reopen).msgs.find((m) => m.id === reading.lineId) || null;
@@ -2451,6 +2473,11 @@ async function softReload() {
     // scrolled up reading: back where you were — what came in meantime
     // counts on ↓ (at the newest: it stays there, as renderChat leaves it)
     if (reading && !reading.stuck) backToReadingPlace(reading, chatFor(reopen).msgs);
+    // (at the bottom — or put there, the place not found: only this phone's
+    // notes from the top of the screen down, which a reload drops — what
+    // came while it was down, at its line, not read unseen as scrolled past:
+    // backToUnread, which does nothing unless at the bottom with unread)
+    if (state.chatView !== "list") backToUnread();
     // (always someone the app knows: the open chat holds them — peerInUse)
   } else if (panelOpen) {
     // the chat list, opened from 💬 Chat before any chat was: drawn again
@@ -3928,6 +3955,7 @@ function openChatList() {
 }
 
 function closeChat() {
+  keepPlace();
   $("chat").classList.add("hidden");
   // an armed End chat goes with the panel: reopened, it asks again (review,
   // 2026-11-12: armed, closed, reopened in 3 s — one tap ended it)
@@ -4004,6 +4032,7 @@ $("chat-end").addEventListener("click", () => {
 // open: a chat you opened and haven't written in yet stays in the list, to
 // go back to without finding them on the map again; ✕ drops it
 function backToList() {
+  keepPlace();
   state.chatView = "list";
   renderChat();
   refreshControls();
@@ -4259,6 +4288,7 @@ $("chat-messages").addEventListener("scroll", () => {
   chatStick.onScroll($("chat-messages"));
   if (chatStick.stuck) hideChatJump();
   else updateChatJump();
+  readSeenSoon();
 });
 
 // the list or the visible area changed size (the keyboard opening or
@@ -4270,6 +4300,7 @@ $("chat-messages").addEventListener("scroll", () => {
 // isn't (openAtLine), and was sent to the bottom past its unread messages
 // (the gate caught it on a busy machine, owner 2026-11-07)
 function onChatResize() {
+  readSeenSoon();
   const keep = chatStick.resizeStarted();
   requestAnimationFrame(() => {
     // (never the list: its newest are on top — it stays where it is)
@@ -4373,36 +4404,150 @@ function applyReadState() {
     // (+ a chat not loaded yet: what the server counted before its new message)
     // (never past what a chat keeps: CHAT_KEEP — else the "New messages"
     // line had no message to go above, and the chat opened at the newest)
-    if (c.server) c.unread = Math.min((r.unread[p.id] || 0) + (c.loaded === false ? c.restUnread || 0 : 0), CHAT_KEEP);
+    // (not the chat being read: its count is what's on screen — readSeen —
+    // with this phone's notes in it, which the marks can't count: a page of
+    // older chats arriving made 2 unread 1, Fay's message taken as read
+    // unseen; review, 2026-11-20)
+    if (chatOnScreen(p) && c.loaded !== false) return;
+    // (+ this phone's notes still unread — the marks can't count them: a
+    // page of older chats arriving made a list chat's 2 unread 1; review,
+    // 2026-11-20)
+    if (c.server)
+      c.unread = Math.min(
+        (r.unread[p.id] || 0) + (c.loaded === false ? c.restUnread || 0 : 0) + unreadNotes(c, r.note[p.id]),
+        c.loaded === false ? CHAT_KEEP : theirsKept(c)
+      );
   });
   // (+ this phone's marks for chats on pages not loaded yet: kept until
   // their page comes — every page here, a chat not among them has ended)
   HoodReadStore.save(s, state.realUser.id, chatsMore ? HoodReadStore.keepUnloaded(r.note, note, convs, READ_KEEP_UNLOADED) : r.note);
-}
-
-// this chat was seen: its bookmark moves to its newest message
-function markSeen(peer) {
-  if (DEMO) return;
-  const s = storageOrNull();
-  const theirs = theirMsgs(peer);
-  HoodReadStore.save(s, state.realUser.id, HoodReadStore.seen(HoodReadStore.read(s, state.realUser.id) || {}, peer.id, theirs));
-  // …and the server's (owner, 2026-11-14): the 💬 badge counts chats not
-  // loaded yet from it. Only when it moves; a failed send is caught up by
-  // the next read of this chat
-  const top = HoodReadStore.newest(theirs);
-  const c = chatFor(peer);
-  const sent = c.serverRead;
-  if (!top || !liveNow() || (sent && !HoodReadStore.newer({ ts: top[0], id: top[1] }, sent))) return;
-  userChannel.push("read", { peer: peer.id, ts: top[0], id: top[1] }).receive("ok", () => {
-    const now = chatFor(peer);
-    if (!now.serverRead || HoodReadStore.newer({ ts: top[0], id: top[1] }, now.serverRead)) now.serverRead = top;
+  // this phone read further than the server knows (read offline, or the
+  // push failed): told now — the other phone, and the counts a later reload
+  // takes from the server, showed them unread (review, 2026-11-20)
+  // (only what was READ here and not yet confirmed — readsToSend)
+  [...readsToSend].forEach(([id, mark]) => {
+    const p = realPeersById.get(id);
+    if (p && chats.has(p) && chats.get(p).server) pushRead(p, mark);
   });
 }
 
+// this chat was seen: its bookmark moves to its newest message
+function markSeen(peer, upTo = null) {
+  if (DEMO) return;
+  const s = storageOrNull();
+  // read up to `upTo` ([ts, id]: the last of theirs SEEN — owner,
+  // 2026-11-20), else all of theirs
+  const theirs = upTo ? theirMsgs(peer).filter((m) => !HoodReadStore.newer(m, upTo)) : theirMsgs(peer);
+  HoodReadStore.save(s, state.realUser.id, HoodReadStore.seen(HoodReadStore.read(s, state.realUser.id) || {}, peer.id, theirs));
+  // …and the server's (owner, 2026-11-14): the 💬 badge counts chats not
+  // loaded yet from it. Only when it moves; one that couldn't go (offline,
+  // or it failed) is sent again after the next reload — applyReadState
+  pushRead(peer, HoodReadStore.newest(theirs));
+}
+
+// what this phone READ that the server hasn't confirmed yet (offline, or
+// the push failed): by the person's id, sent again after the next reload
+// (applyReadState). Only real reading puts a mark here — never the first
+// run's made-up ones (no marks anywhere: every chat taken as read on this
+// phone), which, saved and sent later, told the server everything was read
+// unseen (review, 2026-11-20)
+const readsToSend = new Map();
+
+// the server told "read up to `mark`" ([ts, id]) for this chat — only if
+// it's ahead of what the server has; until it says ok, it waits to be sent
+// again (readsToSend). Batched: reading as you scroll moved the mark every
+// frame, a push each — a slow scroll through a busy chat spent the
+// account's shared events budget, a driver's car updates and messages then
+// refused (review, 2026-11-20). Each chat: its newest mark, sent a moment
+// later, one push on its way at a time
+const READ_BATCH_MS = 1000;
+// (refused — the events budget spent — or no answer: tried again later,
+// 5 s, then doubling to a minute, each spread ±20% — HoodSync.spreadBackoff;
+// a fixed 5 s retried chats refused together all at once: owner, 2026-11-20)
+const READ_RETRY_MS = 5000;
+const READ_RETRY_MAX_MS = 60000;
+const readRetries = new Map();
+const readTimers = new Map();
+const readsInFlight = new Set();
+const markNewer = (a, b) => HoodReadStore.newer({ ts: a[0], id: a[1] }, b);
+// a waiting mark dropped (the server has it, or it can't be sent): its
+// retry count with it — a stale count made the next refusal wait a minute
+// (review, 2026-11-20)
+function forgetRead(id) {
+  readsToSend.delete(id);
+  readRetries.delete(id);
+}
+function pushRead(peer, mark) {
+  if (DEMO || !mark || !chats.has(peer)) return;
+  const sent = chats.get(peer).serverRead;
+  if (sent && !markNewer(mark, sent)) return forgetRead(peer.id);
+  const waiting = readsToSend.get(peer.id);
+  if (!waiting || markNewer(mark, waiting)) readsToSend.set(peer.id, mark);
+  scheduleRead(peer.id);
+}
+function scheduleRead(id, ms = READ_BATCH_MS) {
+  if (readTimers.has(id) || readsInFlight.has(id)) return;
+  readTimers.set(
+    id,
+    setTimeout(() => {
+      readTimers.delete(id);
+      sendRead(id);
+    }, ms)
+  );
+}
+// (offline: it waits — sent again after the reload the reconnect makes)
+function sendRead(id) {
+  const mark = readsToSend.get(id);
+  const peer = realPeersById.get(id);
+  if (!mark || !peer || !chats.has(peer) || !liveNow()) return;
+  const sent = chats.get(peer).serverRead;
+  if (sent && !markNewer(mark, sent)) return forgetRead(id);
+  readsInFlight.add(id);
+  const done = () => {
+    const w = readsToSend.get(id);
+    if (w && !markNewer(w, mark)) forgetRead(id);
+  };
+  // (answered: a newer mark meanwhile goes next; refused or unanswered,
+  // what still waits is tried again a while later — it sat unsent until
+  // another reading or a reload: review, 2026-11-20)
+  const next = (retry = false) => {
+    readsInFlight.delete(id);
+    // (answered: the next refusal starts from the first step again)
+    const w = readsToSend.get(id);
+    const tries = retry ? (readRetries.get(id) || 0) + 1 : 0;
+    if (retry && w) readRetries.set(id, tries);
+    else readRetries.delete(id);
+    if (w && (retry || markNewer(w, mark)))
+      scheduleRead(id, retry ? HoodSync.spreadBackoff(tries, READ_RETRY_MS, READ_RETRY_MAX_MS) : READ_BATCH_MS);
+  };
+  userChannel
+    .push("read", { peer: id, ts: mark[0], id: mark[1] })
+    .receive("ok", () => {
+      done();
+      if (chats.has(peer)) {
+        const now = chats.get(peer);
+        if (!now.serverRead || markNewer(mark, now.serverRead)) now.serverRead = mark;
+      }
+      next();
+    })
+    // ("none": the message, or the chat, gone from the server — nothing to
+    // send; "rate_limited": tried again later; anything else would be
+    // refused for ever — dropped, as "none": review, 2026-11-20)
+    .receive("error", (e) => {
+      if (!(e && e.reason === "rate_limited")) done();
+      next(!!e && e.reason === "rate_limited");
+    })
+    .receive("timeout", () => next(true));
+}
+
 function openChat(peer) {
+  if (state.chatPeer !== peer) keepPlace();
   const c = olderChat(peer, false);
   // the box holds THIS chat's draft (another's stays with them)
   $("chat-input").value = c.draft;
+  // a place kept before a reload, its chat not on the first page then
+  if (!c.place && placesWaiting.has(peer.id)) c.place = placesWaiting.get(peer.id);
+  placesWaiting.delete(peer.id);
   updateChatCount();
   state.chatPeer = peer;
   state.chatView = "msgs";
@@ -4417,18 +4562,169 @@ function openChat(peer) {
     if (!c.loading) loadChat(peer, c);
     return;
   }
-  // the line goes above the first of what's unread now (opening reads all)
+  // the line goes above the first of what's unread now — read only as
+  // they're SEEN (readSeen: owner, 2026-11-20 — opening read them all, most
+  // below the screen)
   const first = HoodChatScroll.firstUnread(c.msgs, c.unread);
   chatLineMsg = first >= 0 ? c.msgs[first] : null;
-  c.unread = 0;
-  markSeen(peer);
   // the panel shown FIRST, then drawn: a hidden box can't scroll, so drawn
   // while hidden the chat appeared at its oldest message and jumped to the
   // newest a frame later (owner, 2026-11-05 — measured: the top painted)
   $("chat").classList.remove("hidden");
   renderChat();
-  openAtLine();
+  // scrolled up when you left it: back exactly there (owner, 2026-11-20);
+  // else — first opened, or caught up at the bottom — at the line, or the
+  // newest
+  if (!backToPlace(c)) openAtLine();
+  chatBelow = c.unread;
+  updateChatJump();
+  readSeenSoon();
   refreshControls();
+}
+
+// kept places whose chat a reload didn't bring (a later page of the list):
+// by the person's id, until their chat is opened (softReload, openChat)
+const placesWaiting = new Map();
+
+// where you were in a chat when you left it (closed, ‹ to the list, another
+// chat opened): scrolled up, the message at the top of the screen and how
+// far down — and the first from there the server knows (its id: a reload,
+// after a phone's lock, makes every chat afresh — review, 2026-11-20); at
+// the bottom (caught up), nothing — it opens as a new one does
+function keepPlace() {
+  const peer = state.chatPeer;
+  if (!peer || !chatOnScreen(peer) || !chats.has(peer)) return;
+  const c = chats.get(peer);
+  if (c.loaded === false) return;
+  const box = $("chat-messages");
+  c.place = null;
+  if (chatStick.stuck) return;
+  const boxTop = box.getBoundingClientRect().top;
+  let place = null;
+  for (const m of c.msgs) {
+    const el = bubbleOf.get(m);
+    if (!el || !el.isConnected) continue;
+    const r = el.getBoundingClientRect();
+    if (r.bottom <= boxTop) continue;
+    if (!place) place = { msg: m, offset: r.top - boxTop, id: null, idOffset: 0 };
+    if (m.id != null) {
+      place.id = m.id;
+      place.idOffset = r.top - boxTop;
+      break;
+    }
+  }
+  c.place = place;
+}
+
+// …and back there, the chat drawn: that message where it was (or, the chat
+// made afresh by a reload, the one with its id) → true; gone (no longer
+// kept), or none kept → false
+function backToPlace(c) {
+  const place = c.place;
+  c.place = null;
+  if (!place) return false;
+  let el = place.msg && bubbleOf.get(place.msg);
+  let offset = place.offset;
+  if (!el || !el.isConnected) {
+    const m = place.id != null && c.msgs.find((x) => x.id === place.id);
+    el = m && bubbleOf.get(m);
+    offset = place.idOffset;
+  }
+  if (!el || !el.isConnected) return false;
+  const box = $("chat-messages");
+  chatScrollTo(box.scrollTop + (el.getBoundingClientRect().top - box.getBoundingClientRect().top) - offset);
+  chatStick.stuck = HoodChatScroll.atBottom(box);
+  return true;
+}
+
+// The open chat's unread, read only as they're SEEN (owner, 2026-11-20 — as
+// Telegram): a message once its end is on screen (HoodChatScroll.seenThrough)
+// — the count goes down as you scroll, the server told "read up to here",
+// never more. Never while the app is out of sight. Measured once a frame,
+// after the browser's own layout (a scroll, a new message, opening, a
+// resize, coming back to the app)
+let readSeenPending = false;
+function readSeenSoon() {
+  if (readSeenPending) return;
+  readSeenPending = true;
+  requestAnimationFrame(() => {
+    readSeenPending = false;
+    readSeen();
+  });
+}
+function readSeen() {
+  const peer = state.chatPeer;
+  if (!peer || document.hidden || !chatOnScreen(peer) || !chats.has(peer)) return;
+  const c = chats.get(peer);
+  if (c.loaded === false) return;
+  // nothing unread (read on another phone meanwhile, say): ↓ counts none
+  // either — it kept its number (review, 2026-11-20)
+  if (!(c.unread > 0)) {
+    if (chatBelow !== 0) {
+      chatBelow = 0;
+      if (!chatStick.stuck) updateChatJump();
+    }
+    return;
+  }
+  const first = HoodChatScroll.firstUnread(c.msgs, c.unread);
+  if (first < 0) return;
+  // "at the newest" allows a few pixels short of the very bottom (a finger's
+  // nudge isn't scrolling up — HoodChatScroll.SLACK_PX): the chat grown a
+  // little under you, the newest message sat just below the edge, never
+  // counted seen (2026-11-20, a rare miss caught by its log). At the newest
+  // means at the very bottom
+  const msgBox = $("chat-messages");
+  if (chatStick.stuck && msgBox.scrollHeight - msgBox.scrollTop - msgBox.clientHeight > 1) chatScrollTo(msgBox.scrollHeight);
+  const unread = c.msgs.slice(first).filter((m) => !m.mine);
+  const items = [];
+  for (const m of unread) {
+    const el = bubbleOf.get(m);
+    if (!el || !el.isConnected) break;
+    const r = el.getBoundingClientRect();
+    items.push({ top: r.top, bottom: r.bottom });
+  }
+  const box = $("chat-messages").getBoundingClientRect();
+  const n = HoodChatScroll.seenThrough({ items, viewTop: box.top, viewBottom: box.bottom });
+  if (!n) {
+    // (the count lowered elsewhere — keepChat: ↓ follows it)
+    if (chatBelow !== c.unread) {
+      chatBelow = c.unread;
+      if (!chatStick.stuck) updateChatJump();
+    }
+    return;
+  }
+  c.unread -= n;
+  // the server's mark: the last SEEN of theirs it knows (an id)
+  const known = unread.slice(0, n).filter((m) => m.id != null && m.ts != null);
+  const last = known[known.length - 1];
+  if (last) markSeen(peer, [last.ts, last.id]);
+  chatBelow = c.unread;
+  if (!chatStick.stuck) updateChatJump();
+  refreshControls();
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) return;
+  backToUnread();
+  readSeenSoon();
+});
+
+// At the bottom while what came was out of sight (the app in the background,
+// or a reconnect after a phone's lock): the chat followed them down unseen —
+// everything above the screen would count as scrolled past, read though
+// never seen (review, 2026-11-20). Placed as opening does instead: at the
+// "New messages" line above the first of them, if they don't fit
+function backToUnread() {
+  const peer = state.chatPeer;
+  if (!peer || !chatOnScreen(peer) || !chats.has(peer) || !chatStick.stuck) return;
+  const c = chats.get(peer);
+  if (c.loaded === false || !(c.unread > 0)) return;
+  const first = HoodChatScroll.firstUnread(c.msgs, c.unread);
+  if (first < 0) return;
+  chatLineMsg = c.msgs[first];
+  renderChat();
+  openAtLine();
+  chatBelow = c.unread;
+  updateChatJump();
 }
 
 // ===== Light reload: a chat's messages when it's opened (owner, 2026-11-08) =====
@@ -4493,6 +4789,18 @@ async function loadChat(peer, c) {
   // (the server's "read up to" with them: the later of the two)
   if (Array.isArray(body.read)) c.serverRead = laterMark(c.serverRead, body.read);
   c.loaded = true;
+  // never more unread than of theirs now kept (as keepChat) — once LOADED:
+  // before, theirsKept counts nothing yet (the count stayed over them, no
+  // line, never read: review, 2026-11-20)
+  c.unread = Math.min(c.unread, theirsKept(c));
+  // …nor more than what's past the read marks — read on another phone
+  // meanwhile, the server's came with the messages: the count, the line and
+  // ↓ stayed (review, 2026-11-20)
+  const readTo = laterMark((HoodReadStore.read(storageOrNull(), state.realUser.id) || {})[peer.id] || null, c.serverRead);
+  if (readTo) {
+    const past = c.msgs.filter((m) => !m.mine && m.id != null && m.ts != null && HoodReadStore.newer(m, readTo)).length;
+    c.unread = Math.min(c.unread, past + unreadNotes(c, readTo));
+  }
   c.summary = null;
   c.failed = false;
   // its last item's time and id (today's rule)
@@ -4502,10 +4810,12 @@ async function loadChat(peer, c) {
     // drawn, then placed at the line (openAtLine looks for it on screen)
     const first = HoodChatScroll.firstUnread(c.msgs, c.unread);
     chatLineMsg = first >= 0 ? c.msgs[first] : null;
-    c.unread = 0;
-    markSeen(peer);
     renderChat();
-    openAtLine();
+    // (left scrolled up before a reload: back there — keepPlace)
+    if (!backToPlace(c)) openAtLine();
+    chatBelow = c.unread;
+    updateChatJump();
+    readSeenSoon();
     refreshControls();
   } else if (chatListShown()) {
     renderChat();
@@ -4547,6 +4857,10 @@ function keepChat(c) {
   const dropped = c.msgs.slice(0, Math.max(0, c.msgs.length - CHAT_KEEP));
   if (!dropped.length) return;
   HoodChatMerge.keep(c.msgs, CHAT_KEEP);
+  // never more unread than of theirs still kept: your reply pushing out
+  // their oldest left 20 unread with 19 of theirs — the first unread never
+  // found, stuck for ever (review, 2026-11-20 — read as seen)
+  c.unread = Math.min(c.unread, theirsKept(c));
   const box = $("chat-messages");
   // (both read BEFORE anything goes: removing shrinks the scroll range,
   // and the browser pulls scrollTop inside it the moment it's read)
@@ -4734,12 +5048,15 @@ function receiveMsg(peer, text, meta) {
   // its messages (and no banner — it's the chat you're on)
   const viewingThis = onScreen && c.loaded !== false;
   if (viewingThis) {
+    // unread until seen: at the bottom (and the app in sight) at once;
+    // scrolled up, once you scroll to it — ↓ counts it meanwhile
+    c.unread = Math.min(c.unread + 1, theirsKept(c));
     bubbleOf.set(msg, appendBubble(text, false));
-    markSeen(peer);
+    readSeenSoon();
   } else {
     // (never more than a chat keeps — the server's own cap: 20 unread or
     // more are every message kept, the "New messages" line above them all)
-    c.unread = Math.min(c.unread + 1, CHAT_KEEP);
+    c.unread = Math.min(c.unread + 1, theirsKept(c));
     // mid-ride, only the ride partner may interrupt the ride banner —
     // everyone else ticks the unread badge quietly
     const inRide = state.ride && ["connected", "arrived"].includes(state.ride.status);
@@ -4749,6 +5066,36 @@ function receiveMsg(peer, text, meta) {
     if (chatOpen && state.chatView === "list") renderChat();
   }
   refreshControls();
+}
+
+// this phone's own notes (no server id: "📩 requested a ride") still unread:
+// among the chat's unread now (the newest `unread` of theirs — a note SEEN
+// is out of it, though no mark can say so) AND after the last of their
+// messages read (`mark`, [ts, id]: a note above a message read on another
+// phone was counted once, then dropped — review, 2026-11-20)
+function unreadNotes(c, mark) {
+  let seen = 0;
+  let notes = 0;
+  for (let i = c.msgs.length - 1; i >= 0 && seen < c.unread; i--) {
+    const m = c.msgs[i];
+    if (m.mine) continue;
+    seen++;
+    if (m.id == null) notes++;
+    else if (mark && m.ts != null && !HoodReadStore.newer(m, mark)) break;
+  }
+  return notes;
+}
+
+// their messages still kept: never more unread than these (keepChat; the
+// count went one past them when their newest pushed out their oldest with
+// one of yours among them — review, 2026-11-20)
+function theirsKept(c) {
+  // (not loaded yet — a reload's summary, an older page's chat: what it
+  // holds is only what came live since; its unread is the server's count,
+  // settled when its messages come — loadChat. Capped here, 3 unread and
+  // one more came to 1: review, 2026-11-20)
+  if (c.loaded === false) return CHAT_KEEP;
+  return c.msgs.filter((m) => !m.mine).length;
 }
 
 // the newest message id this chat knows: its last with one, else (not
@@ -4939,10 +5286,18 @@ $("chat-form").addEventListener("submit", (e) => {
     return;
   }
 
+  // (the demo: no server to answer — your message is the chat's first: End
+  // chat shows now, as the real one's does once it's delivered; it showed
+  // only when the pretend person answered — owner, 2026-11-20)
+  if (state.chatPeer === peer) showEndChat(peer);
   const c = chatFor(peer);
   const replies = peer.kind === "driver" ? DRIVER_REPLIES() : RIDER_REPLIES();
   const line = replies[Math.min(c.replyIdx++, replies.length - 1)];
   setTimeout(() => {
+    // the chat ended meanwhile (End chat, Block): no answer — it brought
+    // the chat back (and a pretend rider's request with it: review,
+    // 2026-11-20)
+    if (chats.get(peer) !== c) return;
     receiveMsg(peer, line);
     // a pretend rider asks for a ride only while you're online — the server
     // refuses requests to offline drivers (else: "Decline" with no Accept)

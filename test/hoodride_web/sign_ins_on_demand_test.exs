@@ -104,7 +104,8 @@ defmodule HoodrideWeb.SignInsOnDemandTest do
         res = get(conn, path)
         assert res.status == 503, path
         assert Jason.decode!(res.resp_body) == %{"error" => "unavailable"}, path
-        assert get_resp_header(res, "retry-after") == ["2"], path
+        assert [secs] = get_resp_header(res, "retry-after"), path
+        assert secs in ["2", "3"], path
       end
 
       up()
@@ -248,5 +249,14 @@ defmodule HoodrideWeb.SignInsOnDemandTest do
 
       assert Rides.ride_id_of_user(rider.id) == nil
     end
+  end
+
+  # (owner, 2026-11-20: "make sure nowhere in code got a hardcoded wait")
+  # every phone opening the app in a database stall was told "2": all asked
+  # again on one beat. 2 or 3 s (whole seconds: the header's own unit)
+  test "the 'try again' wait is spread: 2 or 3 s, never one beat for everyone" do
+    waits = for _ <- 1..60, do: HoodrideWeb.CurrentUser.retry_after()
+    assert Enum.all?(waits, &(&1 in ["2", "3"])), inspect(Enum.uniq(waits))
+    assert Enum.sort(Enum.uniq(waits)) == ["2", "3"]
   end
 end

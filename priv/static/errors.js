@@ -91,6 +91,22 @@
     );
   }
 
+  // another site's script failing (Brave's own, Cloudflare's analytics):
+  // the browser MUTES it — "Script error.", no file, no line, no error (the
+  // HTML standard: a cross-origin script's error never shows the page its
+  // details). Never ours (every file of ours is this site's: its errors
+  // carry their file), nothing to act on — not sent, as Sentry's default
+  // filter (owner, 2026-11-20: 12 a day from Brave on an iPhone)
+  function muted(ev) {
+    return (
+      !!ev &&
+      !ev.error &&
+      /^Script error\.?$/.test(String(ev.message || "")) &&
+      !ev.filename &&
+      !ev.lineno
+    );
+  }
+
   // in the page: errors caught from the very START — this file loads before
   // the app's own — and queued (up to 5) until the app attaches its handler
   // (attach, the app's first lines): a crash while the app is starting is
@@ -252,7 +268,10 @@
     return echo || failed.some((f) => !languageFile(f) && f !== "loadcheck.js");
   }
   if (typeof window !== "undefined" && window.addEventListener) {
-    window.addEventListener("error", (ev) => deliver(ev.error || ev.message));
+    window.addEventListener("error", (ev) => {
+      if (muted(ev)) return;
+      deliver(ev.error || ev.message);
+    });
     window.addEventListener("unhandledrejection", (ev) => deliver(ev.reason));
     window.addEventListener(
       "error",

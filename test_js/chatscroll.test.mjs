@@ -119,3 +119,33 @@ test("the ↓ button: shown while scrolled up; the badge counts what arrived bel
   assert.deepEqual(S.jump({ stuck: false, below: 120 }), { show: true, badge: "99+" }, "big counts shortened, as the ‹ count");
   assert.deepEqual(S.jump({ stuck: true, below: 4 }), { show: false, badge: null }, "back at the bottom: nothing waiting");
 });
+
+// ── read only as SEEN (owner, 2026-11-20: opening a chat of 10 unread read
+// them all at once — most were below the screen). The unread messages, top
+// to bottom, as they sit on screen: how many of them have been seen — a
+// message once its END is on screen (or, taller than the screen, once it
+// starts on it). Those above the screen were scrolled past: seen.
+test("how many of the unread have been seen: each once its end is on screen", () => {
+  const view = { viewTop: 100, viewBottom: 700 };
+  const at = (...tops) => tops.map((t) => ({ top: t, bottom: t + 50 }));
+  // four: two wholly on screen, one cut by the bottom edge, one below
+  assert.equal(S.seenThrough({ items: at(200, 400, 680, 900), ...view }), 2);
+  // all on screen
+  assert.equal(S.seenThrough({ items: at(150, 300, 600), ...view }), 3);
+  // all below the screen
+  assert.equal(S.seenThrough({ items: at(720, 800), ...view }), 0);
+  // scrolled past (above the screen): seen
+  assert.equal(S.seenThrough({ items: at(-300, -100, 500, 800), ...view }), 3);
+  // its end exactly on the edge: seen (a rounding pixel)
+  assert.equal(S.seenThrough({ items: [{ top: 640, bottom: 701 }], ...view }), 1);
+  // none
+  assert.equal(S.seenThrough({ items: [], ...view }), 0);
+});
+
+test("a message taller than the screen: seen once it starts on screen", () => {
+  const view = { viewTop: 100, viewBottom: 700 };
+  assert.equal(S.seenThrough({ items: [{ top: 300, bottom: 1500 }], ...view }), 1, "it starts on screen");
+  assert.equal(S.seenThrough({ items: [{ top: 750, bottom: 1950 }], ...view }), 0, "still below");
+  // a short one after it, below the screen: not yet
+  assert.equal(S.seenThrough({ items: [{ top: 300, bottom: 1500 }, { top: 1510, bottom: 1560 }], ...view }), 1);
+});

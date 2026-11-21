@@ -180,7 +180,7 @@ defmodule HoodrideWeb.RevealBatchTest do
       # ONE lookup for the batch, so it fails as one; not "unavailable"
       # (that reads "Not available" for good): all asked again, in order
       assert later == [a.id, b.id, c.id]
-      assert wait == HoodrideWeb.WorldChannel.busy_wait_ms()
+      assert_spread(wait)
     end
 
     test "names someone may not see are refused even when the database is busy" do
@@ -221,7 +221,23 @@ defmodule HoodrideWeb.RevealBatchTest do
       assert {:error, %{reason: "busy", retry_ms: wait}} =
                request(rider, "world", "reveal", %{"id" => a.id})
 
-      assert wait == HoodrideWeb.WorldChannel.busy_wait_ms()
+      assert_spread(wait)
+    end
+
+    # (owner, 2026-11-20: "with jitter? make sure nowhere in code got a
+    # hardcoded wait") every phone with a list of names open during a
+    # database stall was told the same 1 s — all asking again on one beat,
+    # at a database already struggling. Each told its own: ±20%
+    # (review, 2026-11-20) the other "busy" answers too: one spread helper
+    test "no busy answer anywhere tells the pool's patience unspread" do
+      for f <- Path.wildcard("lib/**/*.ex"),
+          do: refute(File.read!(f) =~ "retry_ms: Hoodride.Accounts.retry_wait_ms()", f)
+    end
+
+    test "the wait told is spread ±20% around the pool's patience — never the same for everyone" do
+      waits = for _ <- 1..50, do: HoodrideWeb.WorldChannel.busy_retry_ms()
+      Enum.each(waits, &assert_spread/1)
+      assert length(Enum.uniq(waits)) > 10, "not spread out: #{inspect(Enum.uniq(waits))}"
     end
 
     test "the wait is the database pool's own patience (queue_target), not a made-up number" do
@@ -230,6 +246,13 @@ defmodule HoodrideWeb.RevealBatchTest do
       Application.put_env(:hoodride, Hoodride.Repo, Keyword.put(old, :queue_target, 1234))
       assert HoodrideWeb.WorldChannel.busy_wait_ms() == 1234
     end
+  end
+
+  defp assert_spread(wait) do
+    base = HoodrideWeb.WorldChannel.busy_wait_ms()
+
+    assert is_integer(wait) and wait >= round(base * 0.8) and wait <= round(base * 1.2),
+           "#{wait} not within ±20% of #{base}"
   end
 
   test "the app's batch size is the server's limit" do

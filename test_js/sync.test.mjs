@@ -1315,3 +1315,22 @@ test("a kept cell carried over a rejoin, held again, then left: dropped exactly 
   ch.reply(ch.last(), "ok", {});
   assert.deepEqual(dropped.geo.filter((c) => c === "g1"), ["g1"], JSON.stringify(dropped));
 });
+
+// ── a retry after a refusal, spread out (owner, 2026-11-20: "with jitter?
+// make sure nowhere in code got a hardcoded wait"): the step doubles to a
+// cap, each wait within ±20% of it — never all at once (two chats refused
+// together retry apart), never near zero (a "slow down" isn't over at once)
+test("spreadBackoff: doubling to a cap, each within ±20% — never the same for two, never near zero", () => {
+  const at = (r) => () => r;
+  assert.equal(S.spreadBackoff(1, 5000, 60000, at(0.5)), 5000, "the middle: the step itself");
+  assert.equal(S.spreadBackoff(1, 5000, 60000, at(0)), 4000, "the least: 80%");
+  assert.equal(S.spreadBackoff(1, 5000, 60000, at(0.999999)), 6000, "the most: 120%");
+  assert.equal(S.spreadBackoff(2, 5000, 60000, at(0.5)), 10000, "doubling");
+  assert.equal(S.spreadBackoff(3, 5000, 60000, at(0.5)), 20000);
+  assert.equal(S.spreadBackoff(20, 5000, 60000, at(0.5)), 60000, "capped");
+  assert.equal(S.spreadBackoff(20, 5000, 60000, at(0.999999)), 72000, "the cap's spread too");
+  // real randomness: two retries of the same step rarely the same
+  const many = new Set(Array.from({ length: 50 }, () => S.spreadBackoff(1, 5000, 60000)));
+  assert.ok(many.size > 40, `spread out: ${many.size} different of 50`);
+  for (const w of many) assert.ok(w >= 4000 && w <= 6000, `within ±20%: ${w}`);
+});

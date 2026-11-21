@@ -40,7 +40,7 @@ defmodule HoodrideWeb.RideChannel do
       # the app retries this join (HoodRehydrate.rideJoinLost); "gone" here
       # closed a live ride (Hoodride.RideBusyTest)
       {:error, :busy} ->
-        {:error, %{reason: "busy", retry_ms: Hoodride.Accounts.retry_wait_ms()}}
+        {:error, %{reason: "busy", retry_ms: Hoodride.Accounts.retry_spread_ms()}}
 
       _ ->
         {:error, %{reason: "gone"}}

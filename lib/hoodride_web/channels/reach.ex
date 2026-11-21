@@ -51,7 +51,7 @@ defmodule HoodrideWeb.Reach do
         :cold
 
       :busy ->
-        {:error, %{reason: "busy", retry_ms: Hoodride.Accounts.retry_wait_ms()}}
+        {:error, %{reason: "busy", retry_ms: Hoodride.Accounts.retry_spread_ms()}}
 
       false ->
         if out_of_view?(me, other),

@@ -978,14 +978,14 @@ defmodule HoodrideWeb.NearCoversTest do
     assert b =~ ~s[b.style.textWrap = "wrap";]
     assert b =~ "requestAnimationFrame(() =>
         requestAnimationFrame(() => {"
-    assert b =~ ~s[if (b.dataset.text !== text) return;\n          b.style.textWrap = "";]
+    assert b =~ ~s[if (bannerShowing !== showing) return;\n          b.style.textWrap = "";]
     assert b =~ ~s[b.style.width = "";]
   end
 
   # the box fitted to its lines (owner, 2026-11-10) reads the layout — ONLY at
   # the start of a frame, after the browser's own layout (free), never from
   # setBanner itself (every tick calls it): each call sits in a frame callback
-  test "fitBanner reads the layout only inside a frame callback: three calls, each one in requestAnimationFrame" do
+  test "fitBanner reads the layout only inside a frame callback: two calls, each one in requestAnimationFrame" do
     src = File.read!(Path.join(File.cwd!(), "priv/static/app.js"))
 
     calls =
@@ -994,10 +994,15 @@ defmodule HoodrideWeb.NearCoversTest do
       |> Enum.reject(&String.starts_with?(&1, "function fitBanner("))
 
     assert calls == [
-             "    if (refit) requestAnimationFrame(() => requestAnimationFrame(() => (fitBanner(b, text), bannerFitted(b, text))));",
-             "          requestAnimationFrame(() => (fitBanner(b, text), bannerFitted(b, text)));",
+             "            fitBanner(b, text);",
              "      fitBanner(b, b.dataset.text);"
            ]
+
+    # a showing's: in the third frame, once — and only for the showing
+    # still current (owner, 2026-11-20: a re-shown banner never measured
+    # again; a box once narrowed never measured twice)
+    assert body("setBanner") =~
+             ~s[requestAnimationFrame(() => {\n            if (bannerShowing !== showing) return;\n            fitBanner(b, text);\n            bannerFitted(b, text);]
 
     # the resize one: inside two frames, once per burst
     r = Regex.run(~r/window\.addEventListener\("resize", \(\) => \{.*?\n\}\);/s, src) |> hd()
@@ -1013,7 +1018,12 @@ defmodule HoodrideWeb.NearCoversTest do
   test "a new text, or a rotation, is drawn only once fitted; the old banner shows meanwhile" do
     b = body("setBanner")
     assert b =~ ~s[if (changed) {\n      holdBanner(b);\n      b.classList.add("fitting");]
-    assert b =~ ~s[if (refit) b.classList.add("fitting");]
+    # shown again — the same text too — measured afresh (owner, 2026-11-20,
+    # an iPhone: the width fitted the time before, laid out anew, wrapped a
+    # word more; test_browser/bannerwrap.mjs)
+    assert b =~
+             ~s[const changed = fits && (b.dataset.text !== text || b.classList.contains("hidden"));]
+
     # hidden, or a list (a message's icon + text) or a long text (never
     # fitted): drawn at once, the copy gone
     assert b =~ ~s[const fits = typeof text === "string" && text.length <= 300;]

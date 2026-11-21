@@ -100,7 +100,8 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   check((await unreadFrom(rita, fayId)) === 1, "the list didn't read it");
   // opening her chat does — everywhere: ‹, the list, 💬 Chat
   await openChatWith(rita, fayId);
-  check((await unreadFrom(rita, fayId)) === 0, "read once her chat opens");
+  // (read as it's SEEN: a frame or two after it's drawn — owner, 2026-11-20)
+  await rita.waitFor(`chatFor(realPeersById.get(${fayId})).unread === 0`, "read once her chat opens", 5000);
   await openChatWith(rita, danId);
   check(!(await backCount()).shown, "back in Dan's chat: a plain ‹ again", await backCount());
   await rita.click("chat-back");
@@ -111,7 +112,7 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   // a long chat opens on its newest message (owner, 2026-11-05) — and again
   // after reading back to the top and closing it. All THEIR messages: your
   // own always pull the chat down, which hid a missing scroll
-  step("a long chat (40 messages) opens at the bottom — again after scrolling up");
+  step("a long chat (40 messages) opens at the bottom; scrolled up and closed, it opens where she was");
   await rita.eval(`(() => { const c = chatFor(realPeersById.get(${fayId})); for (let i = 1; i <= 40; i++) c.msgs.push({ text: "line " + i, mine: false, at: Date.now(), ts: null, id: null }); return true; })()`);
   const scroll = () => rita.eval(`(() => { const b = document.getElementById("chat-messages"); const last = [...b.querySelectorAll(".msg")].pop(); const lr = last?.getBoundingClientRect(), br = b.getBoundingClientRect(); return { scrolls: b.scrollHeight > b.clientHeight + 100, fromBottom: Math.round(b.scrollHeight - b.scrollTop - b.clientHeight), lastText: last?.textContent, lastInView: !!lr && lr.bottom <= br.bottom + 1 && lr.top >= br.top - 1 }; })()`);
   // opened from the map (the panel closed): at the newest message at once
@@ -151,13 +152,15 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   await closeChatPanel(rita);
   await openChatWith(rita, fayId);
   const reopened = await scroll();
-  check(reopened.fromBottom <= 2 && reopened.lastInView, "reopened: at the newest message again", reopened);
+  // (owner, 2026-11-20: reopened, she was sent to the bottom — "exactly
+  // where you were"; test_browser/chatread.mjs)
+  check(Math.abs(reopened.fromBottom - up.fromBottom) <= 2 && !reopened.lastInView, "reopened: back where she was (the top), not the newest", { up, reopened });
   // and from the list (the panel stays open — no resize puts it right: the
   // open's own scroll must)
   await rita.click("chat-back");
   await openChatWith(rita, fayId);
   const fromList = await scroll();
-  check(fromList.fromBottom <= 2 && fromList.lastInView, "from the list: at the newest message too", fromList);
+  check(Math.abs(fromList.fromBottom - up.fromBottom) <= 2 && !fromList.lastInView, "from the list: back where she was too", { up, fromList });
   // scrolled up, then a chat opened straight away, the panel open (Message
   // on a car), in a chat with none of YOUR messages (someone wrote first;
   // no reply yet): only the open's own scroll brings it down. (Your own
@@ -210,11 +213,14 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   const atLine = await view();
   check(!!atLine.line && atLine.line.lines === 1 && atLine.line.text === "New messages" && atLine.after === "new 11", "a 'New messages' line, just above the first new one kept", atLine);
   check(atLine.line.fromTop >= 0 && atLine.line.fromTop < 40 && atLine.fromBottom > 100, "opened at the line, near the top — not the newest", atLine);
-  check(atLine.jump && atLine.badge === null && atLine.corner, "↓ in the bottom corner, no count: nothing came in since", atLine);
+  // (↓ counts what's still unread below — read only as seen: owner,
+  // 2026-11-20; test_browser/chatread.mjs)
+  const leftAtLine = await unreadFrom(rita, fayId);
+  check(atLine.jump && atLine.badge === String(leftAtLine) && atLine.corner, "↓ in the bottom corner, counting the unread still below", { atLine, leftAtLine });
   // (this browser's scrollbar takes room — else the next check couldn't fail)
   check(atLine.bar > 0, "the test browser's scrollbar takes room", atLine);
   check(atLine.clear, "↓ clear of the scrollbar", atLine);
-  check((await unreadFrom(rita, fayId)) === 0, "opening read them all");
+  check(leftAtLine > 0 && leftAtLine < 20, "opening read only what's on screen", leftAtLine);
 
   await rita.click("chat-jump");
   const down = await view();
@@ -231,6 +237,9 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   await rita.click("chat-jump");
   const down3 = await view();
   check(down3.fromBottom <= 2 && !down3.jump && down3.badge === null, "↓ 3 tapped: at the newest; the button and its count gone", down3);
+  // (read as they're SEEN: once a frame shows them — owner, 2026-11-20;
+  // replying and closing within that frame left them unread)
+  await rita.waitFor(`chatFor(realPeersById.get(${fayId})).unread === 0`, "the 3 read", 5000);
 
   await typeText(rita, "thanks Fay");
   await send(rita);
@@ -277,6 +286,9 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   const raced = await view();
   await rita.eval(`document.getElementById("chat-messages").style.maxHeight = "", true`);
   check(!!raced.line && raced.line.fromTop >= 0 && raced.line.fromTop < 40 && raced.fromBottom > 100 && raced.jump, "at the line, near the top, ↓ showing — not sent to the bottom", raced);
+  // (read to the end before she leaves: read only as seen — owner, 2026-11-20)
+  await rita.click("chat-jump");
+  await rita.waitFor(`chatFor(realPeersById.get(${fayId})).unread === 0`, "Fay's chat read to the end");
   await closeChatPanel(rita);
 
   // two other chats add up; opening one takes off ALL of its messages at
@@ -305,7 +317,8 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   check(five.shown && five.count === "5", "‹ 5: both chats, added up", five);
   await rita.click("chat-back");
   await openChatWith(rita, fayId);
-  check((await unreadFrom(rita, fayId)) === 0, "all 3 of Fay's read at once");
+  // (read as it's SEEN: a frame or two after it's drawn — owner, 2026-11-20)
+  await rita.waitFor(`chatFor(realPeersById.get(${fayId})).unread === 0`, "all 3 of Fay's read at once", 5000);
   await openChatWith(rita, danId);
   const two = await backCount();
   check(two.shown && two.count === "2", "‹ 2: Gus's left", two);
@@ -337,7 +350,8 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
 
   step("Rita reads it; the app closes; Dan writes; the app opens — unread again");
   await openChatWith(rita, danId);
-  check((await unreadFrom(rita, danId)) === 0, "read once opened");
+  // (read as it's seen: a frame or two after it's drawn — owner, 2026-11-20)
+  await rita.waitFor(`chatFor(realPeersById.get(${danId})).unread === 0`, "read once opened", 5000);
   await closeChatPanel(rita);
   await rita.goto(`${BASE}/privacy`);
   await typeText(dan, "while your app was closed");

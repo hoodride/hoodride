@@ -62,7 +62,8 @@ await journey("lightreload2: reconnects, failures, a refused message, a ride, a 
   await loaded(sam, annId);
   check(await sam.eval(`state.chatPeer.id === ${annId} && !document.querySelector("#chat-messages .chat-loading") && document.querySelectorAll("#chat-messages .msg").length === 18`), "drawn, not 'Loading…'");
   check((await sam.eval(`chatLineMsg && chatLineMsg.text`)) === "a1", "the line above the first unread", await sam.eval(`chatLineMsg && chatLineMsg.text`));
-  check((await sam.eval(`${chatOf(annId)}.unread`)) === 0, "read");
+  // (read only as SEEN — owner, 2026-11-20: what's on screen)
+  await sam.waitFor(`${chatOf(annId)}.unread < 18`, "what's on screen read");
   // the old load's answer comes now: for a chat that's gone (dropped)
   await sam.eval(`window.__hold = false, window.__release(), true`);
   await new Promise((r) => setTimeout(r, 1000));

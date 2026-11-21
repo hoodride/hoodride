@@ -11,6 +11,14 @@ defmodule Hoodride.Requests do
   # an Accept at work on a rider's request ({rider_id, its pid}): a Cancel
   # that finds no request waits for it (accepting/1)
   @accepting :ride_requests_accepting
+  # a rider's Cancel that gave up waiting for the Accepts still at work: each
+  # of THOSE Accepts, failing, cancels the request instead of putting it
+  # back ({rider_id, work} — work: {pid, ref}, ONE Accept's, never reused:
+  # a mark the rider's alone was wiped by any other Accept on them; one the
+  # accepting process's (a driver's connection, which lives on) cancelled
+  # its later Accept's request — reviews, 2026-11-20; cancel_by_rider/1,
+  # accept/3). @accepting holds the same: {rider_id, work}
+  @cancel_wanted :ride_requests_cancel_wanted
   # per-driver index: {{driver_id, rider_id}, ts}, ts = the request's own.
   # "Who is waiting on me" is a bound-prefix range read — O(log n + k) —
   # instead of a copy of every open request in town.
@@ -34,6 +42,7 @@ defmodule Hoodride.Requests do
   def init_tables do
     Hoodride.ETS.new(@requests, [:named_table, :public, :set])
     Hoodride.ETS.new(@accepting, [:named_table, :public, :bag])
+    Hoodride.ETS.new(@cancel_wanted, [:named_table, :public, :bag])
     Hoodride.ETS.new(@by_driver, [:named_table, :public, :ordered_set])
     Hoodride.ETS.new(@spots, [:named_table, :public, :set])
     :ok
@@ -128,14 +137,15 @@ defmodule Hoodride.Requests do
   end
 
   # how long a Cancel waits for an Accept at work (a few microseconds, or a
-  # ride starting: well under this)
+  # ride starting: well under this; tests shorten it: env :accept_wait_ms)
   @accept_wait_ms 5_000
 
   @doc """
   The rider's OWN Cancel (the app's button — HoodrideWeb.UserChannel): as
   cancel/1, but finding nothing while an Accept is at work on it, waits for
   that Accept, then looks again — a ride now: the caller says "accepted";
-  put back: cancelled after all. Never used by the server's own cancels (a
+  put back: cancelled after all; still at work after the wait,
+  `{:error, :accepting}`. Never used by the server's own cancels (a
   ride starting cancels its people's other asks — waiting there for the
   Accept that is starting it would wait for itself).
   """
@@ -143,8 +153,15 @@ defmodule Hoodride.Requests do
     case take_to_cancel(rider_id) do
       :none ->
         if accepting?(rider_id) do
-          wait_accepting(rider_id, System.monotonic_time(:millisecond) + @accept_wait_ms)
-          take_to_cancel(rider_id) |> cancelled(rider_id)
+          wait = Application.get_env(:hoodride, :accept_wait_ms, @accept_wait_ms)
+          wait_accepting(rider_id, System.monotonic_time(:millisecond) + wait)
+
+          # still at work when the wait ran out (a stalled database): not
+          # "cancelled" — the ride may start any moment (the app waits for
+          # it, else asks the server what's true)
+          if accepting?(rider_id),
+            do: leave_cancel(rider_id),
+            else: take_to_cancel(rider_id) |> cancelled(rider_id)
         else
           {:error, :none}
         end
@@ -153,6 +170,51 @@ defmodule Hoodride.Requests do
         cancelled(found, rider_id)
     end
   end
+
+  # The Cancel left with the Accepts at work now: each, failing, cancels
+  # instead of putting the request back. The marks first, THEN the request
+  # looked for again — one put back before they were there is here now
+  # (taken: cancelled); one put back after, its Accept sees its mark. Marks
+  # of Accepts no longer at work are dropped, then looked once more: one put
+  # back by an Accept that ended meanwhile is here by then (it puts back
+  # BEFORE it stops counting as at work) — its mark taken by it, or dropped
+  # here: one or the other, never neither.
+  defp leave_cancel(rider_id) do
+    drop_done_marks(rider_id)
+    marks = for {_, work} <- :ets.lookup(@accepting, rider_id), do: {rider_id, work}
+    # (tests: a pause before the marks, and after the look again)
+    hook(:marking)
+    :ets.insert(@cancel_wanted, marks)
+
+    case take_to_cancel(rider_id) do
+      :none ->
+        hook(:relooked)
+        at_work = Enum.any?(marks, fn {_, work} -> at_work?(rider_id, work) end)
+        drop_done_marks(rider_id)
+
+        case take_to_cancel(rider_id) do
+          # still at work: "accepted" (the ride may start); all done: a ride
+          # (the caller says "accepted"), or the request ended (declined, or
+          # cancelled by its mark)
+          :none -> if at_work, do: {:error, :accepting}, else: {:error, :none}
+          found -> cancelled(found, rider_id)
+        end
+
+      found ->
+        drop_done_marks(rider_id)
+        cancelled(found, rider_id)
+    end
+  end
+
+  # (killed Accepts' too — their clean-up never ran)
+  defp drop_done_marks(rider_id) do
+    for {_, work} = mark <- :ets.lookup(@cancel_wanted, rider_id),
+        not at_work?(rider_id, work),
+        do: :ets.delete_object(@cancel_wanted, mark)
+  end
+
+  defp at_work?(rider_id, {pid, _} = work),
+    do: Process.alive?(pid) and :ets.match_object(@accepting, {rider_id, work}) != []
 
   @doc "The rider's request withdrawn now (the driver told): `:ok` or `{:error, :none}`."
   def cancel(rider_id), do: take_to_cancel(rider_id) |> cancelled(rider_id)
@@ -166,7 +228,7 @@ defmodule Hoodride.Requests do
 
   # an Accept at work on this rider's request (its process alive)
   defp accepting?(rider_id),
-    do: Enum.any?(:ets.lookup(@accepting, rider_id), fn {_, pid} -> Process.alive?(pid) end)
+    do: Enum.any?(:ets.lookup(@accepting, rider_id), fn {_, {pid, _}} -> Process.alive?(pid) end)
 
   defp wait_accepting(rider_id, deadline) do
     if accepting?(rider_id) and System.monotonic_time(:millisecond) < deadline do
@@ -187,6 +249,13 @@ defmodule Hoodride.Requests do
     })
 
     :ok
+  end
+
+  # this very request (rider, driver, ts) cancelled, if it's still there —
+  # never a newer one the rider made since
+  defp cancel_exact(rider_id, driver_id, ts) do
+    if :ets.select_delete(@requests, [{{rider_id, driver_id, ts}, [], [true]}]) == 1,
+      do: cancelled({rider_id, driver_id, ts}, rider_id)
   end
 
   # Take the rider's request ONLY if it's this driver's — one atomic step.
@@ -262,17 +331,21 @@ defmodule Hoodride.Requests do
   # Cancel finding nothing but the mark waits for it, then answers by what
   # it did (cancel/1)
   def accept(driver, rider_id, still_signed_in \\ nil) do
-    me = self()
-    :ets.insert(@accepting, {rider_id, me})
+    work = {self(), make_ref()}
+    :ets.insert(@accepting, {rider_id, work})
+    # (tests: a pause with the Accept marked at work, nothing taken yet)
+    hook(:accepting)
 
     try do
-      accept_marked(driver, rider_id, still_signed_in)
+      accept_marked(driver, rider_id, still_signed_in, work)
     after
-      :ets.delete_object(@accepting, {rider_id, me})
+      :ets.delete_object(@accepting, {rider_id, work})
+      # (a Cancel left with THIS Accept: done with — another's untouched)
+      :ets.delete_object(@cancel_wanted, {rider_id, work})
     end
   end
 
-  defp accept_marked(driver, rider_id, still_signed_in) do
+  defp accept_marked(driver, rider_id, still_signed_in, work) do
     driver_id = driver.id
     look = ride_look(still_signed_in, rider_id, driver_id)
 
@@ -324,7 +397,19 @@ defmodule Hoodride.Requests do
                 # the rider made in the meantime
                 :ets.insert_new(@requests, {rider_id, driver_id, ts})
 
-                # put back — THEN: either of them signed out meanwhile (their
+                # put back — THEN: the rider's Cancel, given up waiting for
+                # this, left with it? Cancelled now (the mark looked at only
+                # once this Accept no longer counts as at work: a Cancel
+                # that saw it at work had marked first)
+                :ets.delete_object(@accepting, {rider_id, work})
+                # (tests: a pause here — no longer at work, its mark not looked at)
+                hook(:done_working)
+
+                # (taken in one step: it, or the Cancel's drop — never both)
+                if :ets.select_delete(@cancel_wanted, [{{rider_id, work}, [], [true]}]) == 1,
+                  do: cancel_exact(rider_id, driver_id, ts)
+
+                # …and: either of them signed out meanwhile (their
                 # sign-out may have looked for a request before this — A1)?
                 # Taken back: declined, never left for someone gone
                 unless look.() do

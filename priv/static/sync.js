@@ -47,6 +47,15 @@
     return random() * Math.min(capMs, baseMs * 2 ** (attempt - 1));
   }
 
+  // A retry after a refusal ("slow down", no answer) — spread out (owner,
+  // 2026-11-20: "with jitter?"): the step doubles to a cap, each wait within
+  // ±20% of it. Never near zero, as the full spread above can be — a refusal
+  // for spending too fast isn't over at once — and two things refused
+  // together retry apart
+  function spreadBackoff(attempt, baseMs, capMs, random = Math.random) {
+    return Math.round(Math.min(capMs, baseMs * 2 ** (attempt - 1)) * (0.8 + 0.4 * random()));
+  }
+
   // Socket reconnect / channel rejoin, passed to Phoenix as reconnectAfterMs
   // and rejoinAfterMs. Phoenix's defaults are fixed tables with no jitter,
   // so after a deploy every phone would retry in lockstep. Capped at 10 s:
@@ -347,6 +356,7 @@
   return {
     createWorldSync,
     jitteredBackoff,
+    spreadBackoff,
     reconnectBackoff,
     restartWait,
     RESTART_MAX_MS,

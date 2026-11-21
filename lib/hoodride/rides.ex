@@ -285,10 +285,14 @@ defmodule Hoodride.Rides.Ride do
   @doc """
   The wait before asking for a name the ride started without: the database
   pool's own patience (Hoodride.Accounts.retry_wait_ms/0), doubling, at most
-  30 s — for as long as the ride lasts.
+  30 s — each spread ±20% — for as long as the ride lasts.
   """
-  def name_retry_ms(attempt),
-    do: min(Hoodride.Accounts.retry_wait_ms() * 2 ** (attempt - 1), 30_000)
+  def name_retry_ms(attempt) do
+    step = min(Hoodride.Accounts.retry_wait_ms() * 2 ** (attempt - 1), 30_000)
+    # each within ±20% of its step: rides started together in a database
+    # stall never all ask again at once (owner, 2026-11-20: "with jitter?")
+    round(step * (0.8 + :rand.uniform() * 0.4))
+  end
 
   defp start(id, rider, driver, starter, peers, unnamed, still_signed_in) do
     now = steady_s()

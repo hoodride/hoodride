@@ -31,6 +31,14 @@ defmodule Hoodride.Accounts do
   end
 
   @doc """
+  The wait TOLD to someone asked to try again (a "busy" answer's
+  `retry_ms`): retry_wait_ms/0 spread ±20% — everyone told the same wait
+  asked again on one beat, at a database already struggling (owner,
+  2026-11-20).
+  """
+  def retry_spread_ms, do: round(retry_wait_ms() * (0.8 + :rand.uniform() * 0.4))
+
+  @doc """
   Save a driver's car (ARCHITECTURE.md "Your car"): `{:ok, car}`,
   `{:error, :invalid, fields}` (which of "color", "make", "model" are
   wrong — nothing changed), or `{:error, :unavailable}` when the database

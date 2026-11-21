@@ -14,7 +14,7 @@ defmodule HoodrideWeb.CurrentUser do
       :unavailable ->
         conn
         |> Plug.Conn.put_resp_content_type("application/json")
-        |> Plug.Conn.put_resp_header("retry-after", "2")
+        |> Plug.Conn.put_resp_header("retry-after", retry_after())
         |> Plug.Conn.send_resp(503, ~s({"error":"unavailable"}))
         |> Plug.Conn.halt()
 
@@ -22,4 +22,11 @@ defmodule HoodrideWeb.CurrentUser do
         Plug.Conn.assign(conn, :current_user, user)
     end
   end
+
+  @doc """
+  The "try again" wait, in whole seconds (the header's unit): 2 or 3 — every
+  phone opening the app in a database stall was told "2" and asked again on
+  one beat (owner, 2026-11-20).
+  """
+  def retry_after, do: Integer.to_string(1 + :rand.uniform(2))
 end

@@ -388,6 +388,18 @@ defmodule HoodrideWeb.AuthController do
 
   defp token(_p, other), do: other
 
+  # The profile's answer: as it is — but the provider throttling us (a 429,
+  # Facebook's 4, 17, 32, 613) is throttling, as for the token: told to
+  # SignInFailures, "busy, try again in a moment" — it read "sign-in failed"
+  # (review, 2026-11-20)
+  defp profile(_p, {:ok, %{status: 429} = r}), do: {:throttled, retry_after_ms(r)}
+
+  defp profile("facebook", {:ok, %{body: %{"error" => %{"code" => c}}} = r})
+       when c in [4, 17, 32, 613],
+       do: {:throttled, retry_after_ms(r)}
+
+  defp profile(_p, other), do: other
+
   # the provider's Retry-After (seconds), as ms — or nil
   defp retry_after_ms(r) do
     with [v | _] <- Req.Response.get_header(r, "retry-after"),
@@ -458,7 +470,10 @@ defmodule HoodrideWeb.AuthController do
          # an account ID that is TEXT, in a profile that is a map: anything
          # else used to crash (Ecto refuses a nil comparison)
          {:ok, %{status: 200, body: %{"sub" => sub} = info}} when is_binary(sub) <-
-           Req.get(@google_userinfo, [auth: {:bearer, token}] ++ req_options("google")),
+           profile(
+             "google",
+             Req.get(@google_userinfo, [auth: {:bearer, token}] ++ req_options("google"))
+           ),
          :ok <- same_account(only, sub) do
       old = Accounts.photo_of("google", sub)
       # our own small copy, made now (Hoodride.Avatars) — viewers never
@@ -499,10 +514,13 @@ defmodule HoodrideWeb.AuthController do
              )
            ),
          {:ok, %{status: 200, body: %{"id" => id} = info}} when is_binary(id) <-
-           Req.get(
-             @fb_me,
-             [params: [fields: "id,first_name"], auth: {:bearer, token}] ++
-               req_options("facebook")
+           profile(
+             "facebook",
+             Req.get(
+               @fb_me,
+               [params: [fields: "id,first_name"], auth: {:bearer, token}] ++
+                 req_options("facebook")
+             )
            ),
          :ok <- if(only == nil, do: :ok, else: :other_account) do
       old = Accounts.photo_of("facebook", id)
@@ -1079,8 +1097,15 @@ defmodule HoodrideWeb.AuthController do
   end
 
   # extra Req options (tests stub each provider with Req.Test)
-  defp req_options("google"), do: Application.get_env(:hoodride, :google_req, [])
-  defp req_options("facebook"), do: Application.get_env(:hoodride, :facebook_req, [])
+  # (never the HTTP client's own retries: on a provider's "slow down" it
+  # waited exactly the provider's time, every sign-in at that moment asking
+  # again together, and our own throttling — SignInFailures — not told until
+  # they ran out: review, 2026-11-20)
+  defp req_options("google"),
+    do: [retry: false] ++ Application.get_env(:hoodride, :google_req, [])
+
+  defp req_options("facebook"),
+    do: [retry: false] ++ Application.get_env(:hoodride, :facebook_req, [])
 
   # prod: the configured public URL (behind an HTTPS proxy the request says
   # http://…:4000); dev/test: the request's own host, so phone-on-LAN works

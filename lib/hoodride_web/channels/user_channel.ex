@@ -328,10 +328,20 @@ defmodule HoodrideWeb.UserChannel do
     uid = socket.assigns.user_id
 
     # (the rider's own: it waits for an Accept at work on it — Requests.cancel_by_rider)
-    if Hoodride.Requests.cancel_by_rider(uid) == :ok or
-         is_nil(Hoodride.Rides.ride_id_of_user(uid)),
-       do: {:reply, :ok, socket},
-       else: {:reply, {:error, %{reason: "accepted"}}, socket}
+    # (an Accept still at work after its wait: "accepted" too — never
+    # "cancelled" just before the ride starts)
+    case Hoodride.Requests.cancel_by_rider(uid) do
+      :ok ->
+        {:reply, :ok, socket}
+
+      {:error, :accepting} ->
+        {:reply, {:error, %{reason: "accepted"}}, socket}
+
+      {:error, :none} ->
+        if is_nil(Hoodride.Rides.ride_id_of_user(uid)),
+          do: {:reply, :ok, socket},
+          else: {:reply, {:error, %{reason: "accepted"}}, socket}
+    end
   end
 
   defp event("accept_request", %{"rider_id" => rider_id}, socket)
@@ -459,7 +469,7 @@ defmodule HoodrideWeb.UserChannel do
             {:reply, {:error, %{reason: "no_car"}}, socket}
 
           {:error, :unavailable} ->
-            {:reply, {:error, %{reason: "busy", retry_ms: Hoodride.Accounts.retry_wait_ms()}},
+            {:reply, {:error, %{reason: "busy", retry_ms: Hoodride.Accounts.retry_spread_ms()}},
              socket}
         end
     end

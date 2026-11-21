@@ -51,11 +51,10 @@ defmodule HoodrideWeb.ChatRebuildTest do
       refute b =~ "if (reopen && chats.has(reopen))"
     end
 
-    test "reopened is read: no unread, bookmark moved — if it's the chat on screen, not the list" do
+    test "reopened: read as it's seen — if it's the chat on screen, not the list" do
       [reopen] = Regex.run(~r/if \(reopen\) \{.*?\n  \}/s, body("softReload"))
-
-      assert reopen =~
-               ~s[if (state.chatView !== "list") {\n      chatFor(reopen).unread = 0;\n      markSeen(reopen);]
+      assert reopen =~ ~s[if (state.chatView !== "list") readSeenSoon();]
+      refute reopen =~ "chatFor(reopen).unread = 0;"
     end
   end
 
@@ -166,9 +165,14 @@ defmodule HoodrideWeb.ChatRebuildTest do
       assert a =~ "HoodReadStore.merge(mine === null && readKnown ? {} : mine, fromServer)"
       assert a =~ "HoodReadStore.reconcile(note, convs, null)"
       # (+ a chat not loaded yet: the server's count from before its new
-      # message — never past what a chat keeps, CHAT_KEEP: 2026-11-19)
+      # message; + this phone's unread notes, which the marks can't count —
+      # never past what a chat keeps: 2026-11-19, 2026-11-20)
       assert a =~
-               "if (c.server) c.unread = Math.min((r.unread[p.id] || 0) + (c.loaded === false ? c.restUnread || 0 : 0), CHAT_KEEP);"
+               "(r.unread[p.id] || 0) + (c.loaded === false ? c.restUnread || 0 : 0) + unreadNotes(c, r.note[p.id]),"
+
+      assert a =~ "c.loaded === false ? CHAT_KEEP : theirsKept(c)"
+      # the chat being read: its count is what's on screen (readSeen)
+      assert a =~ "if (chatOnScreen(p) && c.loaded !== false) return;"
 
       refute body("softReload") =~ "unread.get(p.id)"
     end
@@ -177,10 +181,36 @@ defmodule HoodrideWeb.ChatRebuildTest do
       assert body("theirMsgs") =~ ".filter((m) => !m.mine && m.id != null)"
     end
 
-    test "opening a chat, or a message arriving in the one on screen, marks it read" do
-      assert body("openChat") =~ "markSeen(peer);"
+    # read only as SEEN (owner, 2026-11-20: opening read every unread one,
+    # most below the screen): opening, a message arriving in the chat on
+    # screen — unread until it's on screen (readSeen; test_browser/chatread.mjs)
+    test "opening a chat, or a message arriving in the one on screen: read as it's seen" do
+      o = body("openChat")
+      assert o =~ "readSeenSoon();"
+      refute o =~ "c.unread = 0;"
+      refute o =~ "markSeen(peer);"
       [viewing] = Regex.run(~r/if \(viewingThis\) \{.*?\n  \}/s, body("receiveMsg"))
-      assert viewing =~ "markSeen(peer);"
+      assert viewing =~ "c.unread = Math.min(c.unread + 1, theirsKept(c));"
+      assert viewing =~ "readSeenSoon();"
+      refute viewing =~ "markSeen(peer);"
+      # the server's mark: the last one seen, never more
+      assert body("readSeen") =~ "markSeen(peer, [last.ts, last.id]);"
+      # a refused or unanswered push: retried spread out, never a fixed wait
+      # (owner, 2026-11-20: "with jitter?")
+      assert body("sendRead") =~ "HoodSync.spreadBackoff(tries, READ_RETRY_MS, READ_RETRY_MAX_MS)"
+      assert body("sendRead") =~ ~s[.receive("timeout", () => next(true));]
+      # (review, 2026-11-20) only "slow down" is retried — anything else the
+      # server refuses would be refused for ever
+      assert body("sendRead") =~ ~s[next(!!e && e.reason === "rate_limited");]
+      # a mark dropped takes its retry count with it (a stale count made the
+      # next refusal wait a minute)
+      for f <- ["pushRead", "sendRead"], do: refute(body(f) =~ "readsToSend.delete(")
+      assert body("forgetRead") =~ "readsToSend.delete(id);"
+      assert body("forgetRead") =~ "readRetries.delete(id);"
+      # (review, 2026-11-20) a retry counted only while a mark still waits —
+      # a push failing after its mark was dropped set the count again
+      assert body("sendRead") =~ "if (retry && w) readRetries.set(id, tries);"
+      assert body("readSeen") =~ "document.hidden"
     end
 
     test "erased on sign-out, account deletion, and a signed-out start" do

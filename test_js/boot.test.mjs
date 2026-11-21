@@ -49,7 +49,7 @@ test("Retry-After in seconds is honoured; anything else is ignored", () => {
 });
 
 // a boot with a scripted server and fake timers
-function harness(answers, { backoff = (n) => n * 1000 } = {}) {
+function harness(answers, { backoff = (n) => n * 1000, random = () => 0 } = {}) {
   const h = { calls: 0, signedIn: null, signedOut: 0, waiting: [], timers: [] };
   h.boot = create({
     fetchState: async () => {
@@ -61,6 +61,7 @@ function harness(answers, { backoff = (n) => n * 1000 } = {}) {
     onSignedOut: () => h.signedOut++,
     onWaiting: (attempt) => h.waiting.push(attempt),
     backoff,
+    random,
     setTimer: (f, ms) => {
       const t = { f, ms, cleared: false };
       h.timers.push(t);
@@ -115,6 +116,23 @@ test("the server's Retry-After beats the backoff", async () => {
   h.boot.start();
   await settle();
   assert.equal(h.live()[0].ms, 5000);
+});
+
+// (owner, 2026-11-20: "make sure nowhere in code got a hardcoded wait") a
+// database stall answers every phone opening the app "retry after 2 s":
+// followed exactly, they all asked again on one beat. Never sooner than
+// the server said — and up to 40% later, each its own
+test("the server's Retry-After: never sooner, spread up to 40% later", async () => {
+  for (const [r, ms] of [
+    [0, 2000],
+    [0.5, 2400],
+    [0.999999, 2800],
+  ]) {
+    const h = harness([{ status: 503, retryAfter: "2" }, ok({ user: { id: 7 } })], { random: () => r });
+    h.boot.start();
+    await settle();
+    assert.equal(h.live()[0].ms, ms, `random ${r}`);
+  }
 });
 
 test("back online / app shown again: try at once, not after the wait", async () => {

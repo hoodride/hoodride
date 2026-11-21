@@ -38,6 +38,8 @@ await journey("chatolder: chats older than the pages loaded — opened early, a 
   const texts = await pam.eval(`chats.get(state.chatPeer).msgs.map((m) => m.text)`);
   check(texts.length === 1 && texts[0].startsWith("hi from BT-C"), "its earlier message shown — not an empty chat", texts);
   check(!(await pam.eval(`unreadRest.has(${olderId})`)), "no longer counted apart");
+  // (read as it's SEEN: a frame or two after it's drawn — owner, 2026-11-20)
+  await pam.waitFor(`[...chats.values()].reduce((s, c) => s + c.unread, 0) + unreadMore <= ${before - olderUnread}`, "read: the count dropped", 5000);
   check((await total(pam)) === before - olderUnread, "read: the 💬 count dropped by its unread — once", { before, after: await total(pam), olderUnread });
   await pam.eval(`closeChat(), true`);
   check(await pam.eval(`chats.has(realPeersById.get(${olderId}))`), "kept in the list after closing (the server has it)");

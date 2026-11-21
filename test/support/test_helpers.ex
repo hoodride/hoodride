@@ -3,6 +3,7 @@ defmodule Hoodride.TestHelpers do
 
   @tables [
     :ride_requests,
+    :ride_requests_cancel_wanted,
     :requests_by_driver,
     :rides_by_user,
     :chat_conversations,

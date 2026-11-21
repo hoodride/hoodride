@@ -100,5 +100,21 @@
     return { show: true, badge: below > 0 ? (below > 99 ? "99+" : String(below)) : null };
   }
 
-  return { SLACK_PX, LINE_GAP, atBottom, onNew, createStick, firstUnread, openAt, jump };
+  // ── read only as SEEN (owner, 2026-11-20: opening a chat read every
+  // unread message at once, most of them below the screen — as Telegram,
+  // the count goes down as you scroll). items: the unread messages, top to
+  // bottom, where they are on screen ({top, bottom}); the box's own top and
+  // bottom → how many of them have been seen: a message once its END is on
+  // screen, or — taller than the screen — once it starts on it. Those above
+  // the screen were scrolled past: seen. (1 px for rounding)
+  function seenThrough({ items, viewTop, viewBottom }) {
+    const tall = viewBottom - viewTop;
+    let n = 0;
+    items.forEach((r, i) => {
+      if (r.bottom <= viewBottom + 1 || (r.bottom - r.top > tall && r.top < viewBottom)) n = i + 1;
+    });
+    return n;
+  }
+
+  return { SLACK_PX, LINE_GAP, atBottom, onNew, createStick, firstUnread, openAt, jump, seenThrough };
 });

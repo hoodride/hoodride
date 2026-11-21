@@ -92,9 +92,14 @@ await journey("lightreload: the chat list on reload, a chat's messages when it's
   check(q(await texts(sam, annId)) === q(all18), "her 18 messages", await texts(sam, annId));
   check((await sam.eval(`chatLineMsg && chatLineMsg.text`)) === "ann1", "the line above the first unread", await sam.eval(`chatLineMsg && chatLineMsg.text`));
   check(await sam.eval(`!!document.querySelector("#chat-messages .chat-line")`), "drawn");
-  check((await sam.eval(`${chatOf(sam, annId)}.unread`)) === 0, "read now");
+  // (read only as SEEN — owner, 2026-11-20: opened at the line, what's on
+  // screen; the rest still unread, test_browser/chatread.mjs)
+  await sam.waitFor(`${chatOf(sam, annId)}.unread < 18`, "what's on screen read");
   check((await box(sam)) === "hi Ann", "the text still there", await box(sam));
   await sam.eval(`(document.getElementById("chat-input").value = "", ${chatOf(sam, annId)}.draft = ""), true`);
+  // (read to the end: read only as seen — owner, 2026-11-20)
+  await sam.eval(`(() => { const b = document.getElementById("chat-messages"); b.scrollTop = b.scrollHeight; b.dispatchEvent(new Event("scroll")); return true; })()`);
+  await sam.waitFor(`${chatOf(sam, annId)}.unread === 0`, "her chat read to the end");
 
   step("a message that comes while her chat loads: shown once, counted, no banner over it");
   await sam.eval(`closeChat(), true`);

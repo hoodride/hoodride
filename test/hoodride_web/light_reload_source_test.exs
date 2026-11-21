@@ -94,7 +94,7 @@ defmodule HoodrideWeb.LightReloadSourceTest do
     assert l =~ "c.failed = true;"
   end
 
-  test "loaded: put together, then — only for the chat on screen — the line, read, drawn, placed" do
+  test "loaded: put together, then — only for the chat on screen — the line, drawn, placed, read as seen" do
     l = body("loadChat")
     # (then kept to the newest CHAT_KEEP, as everywhere — 2026-11-19)
     assert l =~
@@ -104,14 +104,16 @@ defmodule HoodrideWeb.LightReloadSourceTest do
     assert l =~ "c.summary = null;"
     [on_screen] = Regex.run(~r/if \(chatOnScreen\(peer\)\) \{\n.*?\n  \} else if/s, l)
 
+    # (read as SEEN once drawn and placed — owner, 2026-11-20)
     order = [
       "HoodChatScroll.firstUnread",
       "chatLineMsg =",
-      "c.unread = 0;",
-      "markSeen(peer);",
       "renderChat();",
-      "openAtLine();"
+      "openAtLine();",
+      "readSeenSoon();"
     ]
+
+    refute on_screen =~ "c.unread = 0;"
 
     positions = Enum.map(order, fn s -> elem(:binary.match(on_screen, s), 0) end)
     assert positions == Enum.sort(positions), inspect(Enum.zip(order, positions))

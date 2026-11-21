@@ -252,7 +252,7 @@ defmodule HoodrideWeb.WorldChannel do
         %{} = u -> {:ok, revealed(u, role)}
         # the database couldn't answer right now — NOT gone: "unavailable"
         # reads "Not available" for good, so say when to ask again
-        {:error, :unavailable} -> {:error, %{reason: "busy", retry_ms: busy_wait_ms()}}
+        {:error, :unavailable} -> {:error, %{reason: "busy", retry_ms: busy_retry_ms()}}
         nil -> {:error, %{reason: "unavailable"}}
       end
     else
@@ -279,6 +279,13 @@ defmodule HoodrideWeb.WorldChannel do
 
   @doc "How long to wait before asking again when the database couldn't answer (Hoodride.Accounts.retry_wait_ms/0)."
   def busy_wait_ms, do: Hoodride.Accounts.retry_wait_ms()
+
+  @doc """
+  The wait TOLD: busy_wait_ms/0 spread ±20% — every phone with names to
+  look up during a database stall was told the same 1 s, all asking again
+  on one beat at a database already struggling (owner, 2026-11-20).
+  """
+  def busy_retry_ms, do: Hoodride.Accounts.retry_spread_ms()
 
   defp reveal_batch(ids, socket) do
     role = Roles.of(socket.assigns.user_id)
@@ -307,7 +314,7 @@ defmodule HoodrideWeb.WorldChannel do
         answer(ids, users, refused ++ gone, later, reveal_wait(socket))
 
       {:error, :unavailable} ->
-        answer(ids, [], refused, allowed ++ later, max(busy_wait_ms(), reveal_wait(socket)))
+        answer(ids, [], refused, allowed ++ later, max(busy_retry_ms(), reveal_wait(socket)))
     end
   end
 

@@ -26,7 +26,10 @@ await journey("demoblock: in the demo, End chat closes the chat; Block hides the
   check(!(await dee.eval(shown("chat-end"))), "an empty chat: no End chat");
   await typeText(dee, "hi");
   await send(dee);
-  await dee.waitFor(shown("chat-end"), "End chat shown");
+  // (owner, 2026-11-20) on Dee's own message — not only once the pretend
+  // driver answers (1.1 s later): it showed only then
+  await dee.waitFor(shown("chat-end"), "End chat shown", 500);
+  check((await dee.eval(`chats.get(state.chatPeer).msgs.length`)) === 1, "before any answer: only Dee's message");
   await dee.click("chat-end");
   check((await dee.eval(`document.getElementById("chat-end").textContent`)) === "Tap again to end", "the first tap asks again");
   // the second tap at once, once it's armed: two separate taps from the test
@@ -34,6 +37,10 @@ await journey("demoblock: in the demo, End chat closes the chat; Block hides the
   // precommit, 2026-11-19) — the arming then lapsed and the tap re-armed
   await dee.eval(`(() => { const b = document.getElementById("chat-end"); if (b.textContent !== "Tap again to end") throw new Error("not armed: " + b.textContent); b.click(); return true; })()`);
   await dee.waitFor(`!${chatOpen} && !chats.has(drivers[0])`, "the chat gone");
+  // (review, 2026-11-20) ended before the pretend driver's answer (1.1 s
+  // after the send): it stays ended — the answer brought the chat back
+  await new Promise((r) => setTimeout(r, 1500));
+  check(!(await dee.eval(`chats.has(drivers[0])`)), "still gone once the answer was due");
 
   step("two chats, End chat in one: the list, with the other (owner, 2026-11-17)");
   await message(dee, "drivers[0]");

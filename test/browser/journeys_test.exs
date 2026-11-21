@@ -449,6 +449,29 @@ defmodule HoodrideWeb.BrowserJourneysTest do
 
   # `n` new people each message this person once — BT-C1 the quietest, a
   # second apart (the chat list in pages: owner, 2026-11-14)
+  # `reader` has read the chat with `peer` up to its newest message — as on
+  # another phone (test_browser/chatread.mjs)
+  defp server("read_all " <> args) do
+    [reader, peer] = args |> String.split() |> Enum.map(&String.to_integer/1)
+    key = Hoodride.Chat.pair_key(reader, peer)
+
+    {_, id, _, _, ts} =
+      :ets.match_object(:chat_messages, {key, :_, peer, :_, :_})
+      |> Enum.max_by(fn {_, id, _, _, ts} -> {ts, id} end)
+
+    :ok = Hoodride.Chat.mark_read(reader, peer, ts, id)
+    "ok"
+  end
+
+  # a chat made older (its last activity `secs` ago): past the list's first
+  # page once newer ones are there (test_browser/chatread.mjs)
+  defp server("chat_age " <> args) do
+    [a, b, secs] = args |> String.split() |> Enum.map(&String.to_integer/1)
+    key = Hoodride.Chat.pair_key(a, b)
+    true = :ets.update_element(:chat_conversations, key, {2, System.system_time(:second) - secs})
+    "ok"
+  end
+
   defp server("chat_crowd " <> args) do
     [n, id] = args |> String.split() |> Enum.map(&String.to_integer/1)
     now = System.system_time(:second)

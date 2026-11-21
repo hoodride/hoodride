@@ -36,7 +36,11 @@
   // fetchState() → {status, body, retryAfter} (may throw); backoff(attempt)
   // → ms; onWaiting(attempt) after each failure; onError(e) if entering the
   // app itself throws (that is not a server failure: no retry, no sign-out)
-  function create({ fetchState, onSignedIn, onSignedOut, onWaiting, backoff, setTimer, clearTimer, onError }) {
+  // the server's Retry-After: never sooner — and up to 40% later, each
+  // phone its own (followed exactly, a database stall's "2" made every phone
+  // opening the app ask again on one beat: owner, 2026-11-20)
+  const RETRY_AFTER_SPREAD = 0.4;
+  function create({ fetchState, onSignedIn, onSignedOut, onWaiting, backoff, setTimer, clearTimer, onError, random = Math.random }) {
     let done = false;
     let busy = false;
     let timer = null;
@@ -58,7 +62,8 @@
       if (verdict === "retry") {
         attempt++;
         onWaiting(attempt);
-        timer = setTimer(check, retryAfterMs(r && r.retryAfter) ?? backoff(attempt));
+        const told = retryAfterMs(r && r.retryAfter);
+        timer = setTimer(check, told != null ? Math.round(told * (1 + RETRY_AFTER_SPREAD * random())) : backoff(attempt));
         return;
       }
       done = true;

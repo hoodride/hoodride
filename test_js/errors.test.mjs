@@ -210,7 +210,9 @@ function pageWithErrors() {
     doc.readyState = "interactive";
     docListeners.filter((l) => l.type === "DOMContentLoaded").forEach((l) => l.fn({}));
   };
-  return { E: ctx.HoodErrors, doc, failLoad, throwIn, pageRead };
+  // an error event exactly as the browser gives it, to the app's listener
+  const fire = (ev) => listeners.filter((l) => l.type === "error" && !l.capture).forEach((l) => l.fn({ target: win, ...ev }));
+  return { E: ctx.HoodErrors, doc, failLoad, throwIn, pageRead, fire };
 }
 
 // (fifth review, 2026-11-19) only an END-OF-FILE syntax error is a file
@@ -446,4 +448,28 @@ test("an error while none of our scripts runs: never counted, whatever its addre
   throwIn("https://hoodride.app/maplibre-gl.js?vsn=1", new TypeError("from a timer"), null);
   throwIn("https://hoodride.app/app.js?vsn=1", new SyntaxError("Unexpected token '?'"), null);
   assert.deepEqual([[...E.failedScripts()], [...E.unreadableScripts()], [...E.crashedScripts()]], [[], [], []]);
+});
+
+// (owner, 2026-11-20: 12 "Error: Script error." from Brave on an iPhone in a
+// day) another site's script failing — Brave's own, Cloudflare's analytics
+// — reaches the page MUTED (the HTML standard: a cross-origin script's
+// error says only "Script error.", no file, no line, no error). Never ours
+// (every file of ours is this site's: its errors carry their file), nothing
+// to act on: not sent — as Sentry's own default filter does
+test("another site's muted 'Script error.' (no file, no line, no error): never sent", () => {
+  const { E, fire, pageRead } = pageWithErrors();
+  const got = [];
+  E.attach((e) => got.push(e));
+  E.settle(false);
+  pageRead();
+  fire({ message: "Script error.", filename: "", lineno: 0, colno: 0, error: null });
+  fire({ message: "Script error", filename: "", lineno: 0, colno: 0, error: null });
+  fire({ message: "Script error." });
+  assert.equal(got.length, 0, "muted: none sent");
+  // anything with something to go on: sent, as always
+  fire({ message: "Script error.", filename: "https://hoodride.app/app.js?vsn=1", lineno: 3, colno: 9, error: null });
+  fire({ message: "Uncaught TypeError: x is undefined", filename: "", lineno: 0, colno: 0, error: null });
+  const thrown = new TypeError("Script error.");
+  fire({ message: "Uncaught TypeError: Script error.", filename: "", lineno: 0, colno: 0, error: thrown });
+  assert.deepEqual(got, ["Script error.", "Uncaught TypeError: x is undefined", thrown]);
 });

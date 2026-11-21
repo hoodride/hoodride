@@ -3,7 +3,7 @@
 // box is fitted to its lines each time its text changes (fitBanner) — the
 // same text must come out the same size every time, however often it's
 // shown, never a line more.
-import { journey, step, check, HOME } from "./cdp.mjs";
+import { journey, step, check, HOME, BASE } from "./cdp.mjs";
 import { goOnline } from "./app.mjs";
 
 const settled = (p) =>
@@ -90,4 +90,81 @@ await journey("bannerwrap: ✋ tapped again and again — the same banner, the s
   }
   check(again.every((s) => s.text === longs[0].text), "the long line each time", again.map((s) => s.text));
   check(again.every((s) => s.h === longs[0].h && s.w === longs[0].w), "the same size as before, every time", again.map((s) => ({ h: s.h, w: s.w })));
+
+  // (owner, 2026-11-20, Brave on an iPhone: "in demo mode, press Need a
+  // ride, cancel it, press it again — the banner adds a newline", fast or
+  // slow) the demo shows the very same text again (the real app says
+  // "Finding your location…" first: a new text, measured afresh): the box
+  // kept the width fitted to it the time before, never measured again —
+  // and iPhones' engine, laying it out anew at that tight width, wrapped a
+  // word more. Shown again, it's measured afresh — every time
+  step("the demo on a narrow phone: Need a ride, cancel, again — measured afresh each time, the same size every time");
+  const dee = await browser.visitor("BT-WrapDee");
+  // (narrow: the line wraps — on a 390 px screen it fits on one, and a
+  // one-line box is never narrowed)
+  await dee.phone(300, 640);
+  await dee.goto(`${BASE}/?demo`);
+  await dee.waitFor(`typeof DEMO !== "undefined" && DEMO && !!map && !document.getElementById("btn-hand").classList.contains("hidden")`, "the demo, ✋ shown", 15000);
+  // every measuring of the banner, and whether the box was still as fitted
+  // before (a width already set: not measured afresh)
+  await dee.eval(`(() => {
+    const fit = fitBanner;
+    window.__fits = [];
+    fitBanner = (b, text) => {
+      if (!b.classList.contains("hidden") && b.dataset.text === text) window.__fits.push(b.style.width);
+      return fit(b, text);
+    };
+    return true;
+  })()`);
+  const raise = async (p, gap) => {
+    const before = await p.eval(`window.__fits.length`);
+    if (gap === null) await p.click("btn-hand");
+    else
+      // (taps from the page itself, `gap` frames apart: the harness's own
+      // clicks come slower than a fast thumb) — up, down, up
+      await p.eval(`new Promise((ok) => {
+        const btn = document.getElementById("btn-hand");
+        const after = (n, f) => (n <= 0 ? f() : requestAnimationFrame(() => after(n - 1, f)));
+        btn.click();
+        after(${gap}, () => { btn.click(); after(${gap}, () => { btn.click(); ok(true); }); });
+      })`);
+    await p.waitFor(`state.handRaised === true`, "✋ up");
+    await frames(p, 8);
+    await settled(p);
+    const fits = await p.eval(`window.__fits.slice(${before})`);
+    const s = await size(p);
+    await p.click("btn-hand");
+    await p.waitFor(`state.handRaised === false`, "✋ down");
+    await frames(p, 6);
+    await settled(p);
+    return { ...s, fits };
+  };
+  const slow = [];
+  for (let i = 0; i < 5; i++) slow.push(await raise(dee, null));
+  check(slow.every((s) => s.text.includes("Nearby drivers can see you need a ride")), "the ✋ banner each time", slow.map((s) => s.text));
+  check(slow[0].h > 30 && slow[0].styleW !== "", "(on this phone it wraps: the box fitted to its lines)", slow[0]);
+  check(
+    slow.every((s) => s.fits.length > 0 && s.fits[0] === ""),
+    "shown again: measured afresh every time — never the width it was fitted to before",
+    slow.map((s) => s.fits)
+  );
+  check(
+    slow.every((s) => s.h === slow[0].h && s.w === slow[0].w),
+    "the same size every time — never a line more",
+    slow.map((s) => ({ h: s.h, w: s.w, styleW: s.styleW }))
+  );
+
+  step("…and tapped fast (up, down, up, a frame or two apart): the same, every time");
+  const fast = [];
+  for (let i = 0; i < 6; i++) fast.push(await raise(dee, i % 3));
+  check(
+    fast.every((s) => s.fits.length > 0 && s.fits[0] === ""),
+    "measured afresh every time",
+    fast.map((s) => s.fits)
+  );
+  check(
+    fast.every((s) => s.h === slow[0].h && s.w === slow[0].w),
+    "the same size as tapped slowly, every time",
+    fast.map((s) => ({ h: s.h, w: s.w, styleW: s.styleW }))
+  );
 });

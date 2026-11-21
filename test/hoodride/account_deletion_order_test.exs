@@ -262,4 +262,13 @@ defmodule Hoodride.AccountDeletionOrderTest do
     refute Hoodride.SessionTokens.any?(ann.id)
     refute Geo.driver_on_map?(ann.id)
   end
+
+  # (owner, 2026-11-20: "make sure nowhere in code got a hardcoded wait")
+  # a map writer restarting: deletions running together asked again on one
+  # 10 ms beat — now each its own pause
+  test "waiting for a map writer: a spread pause, never one fixed beat" do
+    waits = for _ <- 1..50, do: Hoodride.AccountDeletion.writer_retry_ms()
+    assert Enum.all?(waits, &(&1 >= 5 and &1 <= 15)), inspect(Enum.min_max(waits))
+    assert length(Enum.uniq(waits)) > 5, inspect(Enum.uniq(waits))
+  end
 end

@@ -195,6 +195,42 @@ defmodule HoodrideWeb.FacebookLoginTest do
                sign_in_with(build_conn(), %{"id" => "fb-db", "first_name" => "Dee"})
     end
 
+    # (review, 2026-11-20 — "make sure nowhere in code got a hardcoded
+    # wait") Facebook saying "slow down": the HTTP client retried it by
+    # itself, waiting exactly Facebook's time — every sign-in at that moment
+    # asking again together, and our own throttling (SignInFailures) not
+    # told until those retries ran out. Asked once; ours decides
+    test "Facebook saying 'slow down' (429): asked once — never retried at its fixed wait", %{
+      conn: conn
+    } do
+      {conn1, _, q} = start_sign_in(conn)
+      test = self()
+
+      Req.Test.stub(HoodrideWeb.Facebook, fn c ->
+        case c.request_path do
+          "/#{@graph}/oauth/access_token" ->
+            Req.Test.json(c, %{"access_token" => "fb-at"})
+
+          "/#{@graph}/me" ->
+            send(test, :me_asked)
+
+            c
+            |> Plug.Conn.put_resp_header("retry-after", "1")
+            |> Plug.Conn.put_resp_content_type("application/json")
+            |> Plug.Conn.send_resp(429, ~s({"error":"slow down"}))
+        end
+      end)
+
+      conn1 =
+        get(recycle(conn1), "/auth/facebook/callback", %{"code" => "c-1", "state" => q["state"]})
+
+      # our throttling told: "busy, try again in a moment" — not a failure
+      assert conn1.status == 503
+      assert conn1.resp_body =~ "Sign-in is busy"
+      assert_received :me_asked
+      refute_received :me_asked
+    end
+
     test "a wrong state is refused before Facebook is asked anything", %{conn: conn} do
       {conn, _, _q} = start_sign_in(conn)
       test = self()

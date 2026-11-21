@@ -142,7 +142,8 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   await unheard(ed, "ok?");
   await reload(sam);
   check(await sam.eval(`state.chatView !== "list" && state.chatPeer.id === ${edId} && chatFor(state.chatPeer).msgs.some((m) => m.text === "ok?")`), "Ed's chat open, 'ok?' in it");
-  check((await sam.eval(`chatFor(realPeersById.get(${edId})).unread`)) === 0, "read");
+  // (read as it's SEEN: a frame or two after it's drawn — owner, 2026-11-20)
+  await sam.waitFor(`chatFor(realPeersById.get(${edId})).unread === 0`, "read", 5000);
   await sam.eval(`closeChat(), true`);
 
   // the list opened from 💬 Chat on a fresh start, before any chat was: a
@@ -507,6 +508,11 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   // a reload while reading a chat: still there (it went to the newest; the
   // "New messages" line and ↓ gone) — at the line, and scrolled up
   step("18 new from Dora; Sam opens her chat at the 'New messages' line; a reload: the line still there, where he was");
+  // (her chat read to the end first: read only as SEEN — owner, 2026-11-20 —
+  // and some of hers came while another chat was open)
+  await doraChatOpen();
+  await sam.eval(`(() => { const b = document.getElementById("chat-messages"); b.scrollTop = b.scrollHeight; b.dispatchEvent(new Event("scroll")); return true; })()`);
+  await sam.waitFor(`chatFor(realPeersById.get(${doraId})).unread === 0`, "Dora's chat read to the end");
   await sam.eval(`(window.__drop = true), true`); // (heard only through the reload)
   await onServer(`many_msgs ${doraId} ${samId} 18`);
   await new Promise((r) => setTimeout(r, 1000));
@@ -560,9 +566,16 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   // the 3 that came while it loaded count on ↓
   step("30 from Dora heard live (20 kept, as the server), Sam scrolled up to one of them; 3 more while a reload loads: the same message where it was, ↓ 3");
   await doraChatOpen();
+  // (reopened where he'd left it — scrolled up, owner 2026-11-20: to the
+  // newest first, so the 30 come in on screen)
+  await sam.eval(`(() => { const b = document.getElementById("chat-messages"); b.scrollTop = b.scrollHeight; b.dispatchEvent(new Event("scroll")); return true; })()`);
+  await sam.waitFor(`chatStick.stuck`, "at the newest");
   await onServer(`many_msgs ${doraId} ${samId} 30 c`);
   await sam.waitFor(`chatFor(realPeersById.get(${doraId})).msgs.some((m) => m.text === "c30")`, "the 30 heard live");
   check((await sam.eval(`chatFor(realPeersById.get(${doraId})).msgs.length`)) === 20, "(the newest 20 on his phone, as on the server)");
+  // (at the bottom as they came: read once on screen — read only as seen,
+  // owner 2026-11-20; scrolled up before a frame showed them, they'd count)
+  await sam.waitFor(`chatFor(realPeersById.get(${doraId})).unread === 0`, "the 30 read (on screen as they came)");
   const pinned = await sam.eval(`(() => {
     const b = document.getElementById("chat-messages");
     const el = [...b.querySelectorAll(".msg")].find((e) => e.textContent === "c20");
@@ -590,6 +603,8 @@ await journey("reloadscreens: what's open on screen stays open across a reload",
   // and brought by the reload
   step("scrolled up: 2 from Dora heard live and 2 notes, then 1 missed; a reload: ↓ 3 (the notes gone, not counted)");
   await sam.click("chat-jump");
+  // (at the newest: read once a frame shows them — read only as seen)
+  await sam.waitFor(`chatFor(realPeersById.get(${doraId})).unread === 0`, "read to the newest");
   await sam.eval(`(() => { const b = document.getElementById("chat-messages"); b.scrollTop = Math.max(0, b.scrollHeight - b.clientHeight - 400); b.dispatchEvent(new Event("scroll")); return true; })()`);
   await sam.eval(`new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => done(true), 50))))`);
   await onServer(`many_msgs ${doraId} ${samId} 2 e`);
