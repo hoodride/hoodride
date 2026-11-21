@@ -56,16 +56,9 @@ defmodule HoodrideWeb.WsFrameLimitTest do
       :ok =
         :gen_tcp.send(
           s,
-          "GET /socket/websocket?vsn=#{vsn}&token=#{URI.encode_www_form(token)} HTTP/1.1
-" <>
-            "Host: localhost
-Upgrade: websocket
-Connection: Upgrade
-" <>
-            "Sec-WebSocket-Version: 13
-Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
-
-"
+          "GET /socket/websocket?vsn=#{vsn}&token=#{URI.encode_www_form(token)} HTTP/1.1\r\n" <>
+            "Host: localhost\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n" <>
+            "Sec-WebSocket-Version: 13\r\nSec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n\r\n"
         )
 
       {:ok, head} = :gen_tcp.recv(s, 0, 3_000)
