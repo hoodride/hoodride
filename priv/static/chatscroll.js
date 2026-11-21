@@ -10,6 +10,12 @@
   // "at the bottom" within about one message's height: a small nudge of
   // the finger isn't reading history
   const SLACK_PX = 60;
+  // the very bottom (a pixel or two for rounding; past it: an iPhone's
+  // bounce) — where YOUR scroll makes the chat follow again
+  const EDGE_PX = 2;
+  function atEdge(el) {
+    return el.scrollHeight - el.scrollTop - el.clientHeight <= EDGE_PX;
+  }
 
   // el: {scrollTop, scrollHeight, clientHeight} (the messages box)
   function atBottom(el) {
@@ -44,15 +50,20 @@
       ownScroll(top) {
         lastTop = top;
       },
-      // el: the messages box, on its scroll event
+      // el: the messages box, on its scroll event. Back to the bottom only
+      // AT it (EDGE_PX for rounding) — near it counted as at it: the ↓ and
+      // its count hid with one unread still below, then that one was read
+      // (owner, 2026-11-20). And there, a move up never unsticks: an
+      // iPhone's bounce past the end springs back up — ↓ showed at the
+      // bottom
       onScroll(el) {
         const top = el.scrollTop;
         if (resizing) {
           lastTop = top;
           return;
         }
-        if (top < lastTop) stuck = false;
-        else if (atBottom(el)) stuck = true;
+        if (atEdge(el)) stuck = true;
+        else if (top < lastTop) stuck = false;
         lastTop = top;
       },
       // the box or the visible area changed size → true: keep at the bottom
@@ -116,5 +127,5 @@
     return n;
   }
 
-  return { SLACK_PX, LINE_GAP, atBottom, onNew, createStick, firstUnread, openAt, jump, seenThrough };
+  return { SLACK_PX, EDGE_PX, LINE_GAP, atBottom, atEdge, onNew, createStick, firstUnread, openAt, jump, seenThrough };
 });

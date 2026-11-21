@@ -41,7 +41,12 @@ test("it starts stuck", () => {
   assert.equal(S.createStick().stuck, true);
 });
 
-test("your upward scroll unsticks; scrolling back near the bottom re-sticks", () => {
+// (owner, 2026-11-20: within 60 px of the bottom counted as AT it — the ↓
+// and its count vanished with one unread still below, then that one was
+// read; and at the very bottom, an iPhone's bounce back read as scrolling
+// up — ↓ showed at the bottom) back at the bottom only AT it; there, a
+// bounce never unsticks
+test("your upward scroll unsticks; only the very bottom re-sticks", () => {
   const s = S.createStick();
   s.ownScroll(600);
   s.onScroll(el(300));
@@ -49,7 +54,24 @@ test("your upward scroll unsticks; scrolling back near the bottom re-sticks", ()
   s.onScroll(el(450));
   assert.equal(s.stuck, false, "still reading");
   s.onScroll(el(600 - S.SLACK_PX));
-  assert.equal(s.stuck, true, "back near the bottom");
+  assert.equal(s.stuck, false, "near the bottom, not at it: still reading (↓ shows what's below)");
+  s.onScroll(el(600 - 30));
+  assert.equal(s.stuck, false, "30 px short: still not");
+  s.onScroll(el(600));
+  assert.equal(s.stuck, true, "at the very bottom");
+});
+
+test("at the very bottom, an iPhone's bounce (past the end and back) never unsticks", () => {
+  const s = S.createStick();
+  s.ownScroll(500);
+  s.onScroll(el(300));
+  assert.equal(s.stuck, false);
+  s.onScroll(el(612)); // past the end (rubber band)
+  assert.equal(s.stuck, true);
+  s.onScroll(el(600)); // springing back: an upward move — at the bottom
+  assert.equal(s.stuck, true, "the bounce isn't you scrolling up");
+  s.onScroll(el(598)); // a pixel or two short (rounding): still the bottom
+  assert.equal(s.stuck, true);
 });
 
 test("the app's own scrolls never unstick (opening a chat, the button)", () => {

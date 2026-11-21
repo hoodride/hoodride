@@ -4203,7 +4203,7 @@ function backToReadingPlace(place, msgs) {
   // gone with the reload, so the newest, where renderChat left it)
   // (the scroll event after the redraw would say so too, a frame later —
   // ↓ flashed up for that frame)
-  chatStick.stuck = HoodChatScroll.atBottom(box);
+  chatStick.stuck = HoodChatScroll.atEdge(box);
   chatBelow = chatStick.stuck
     ? 0
     : Math.min(place.below + msgs.filter((x) => !x.mine && x.id != null && x.id > place.lastId).length, CHAT_KEEP);
@@ -4305,7 +4305,19 @@ function onChatResize() {
   requestAnimationFrame(() => {
     // (never the list: its newest are on top — it stays where it is)
     if (keep && chatStick.stuck && state.chatView !== "list") chatScrollTo($("chat-messages").scrollHeight);
-    setTimeout(() => chatStick.resizeDone(), 1);
+    setTimeout(() => {
+      chatStick.resizeDone();
+      // left AT the very bottom by the resize (the keyboard closing a few
+      // px from the end): following again, no ↓ — it stayed showing at the
+      // bottom (review, 2026-11-20)
+      // (the panel open: closed, the box shrinks to nothing — "at its very
+      // end", a reader who'd scrolled up taken for one at the bottom)
+      if (!chatStick.stuck && state.chatView !== "list" && !$("chat").classList.contains("hidden") && HoodChatScroll.atEdge($("chat-messages"))) {
+        chatStick.stuck = true;
+        hideChatJump();
+        readSeenSoon();
+      }
+    }, 1);
   });
 }
 if ("ResizeObserver" in window) new ResizeObserver(onChatResize).observe($("chat-messages"));
@@ -4633,7 +4645,9 @@ function backToPlace(c) {
   if (!el || !el.isConnected) return false;
   const box = $("chat-messages");
   chatScrollTo(box.scrollTop + (el.getBoundingClientRect().top - box.getBoundingClientRect().top) - offset);
-  chatStick.stuck = HoodChatScroll.atBottom(box);
+  // (at the bottom only AT it, as your own scroll: within 60 px it hid ↓
+  // and read the one still below — review, 2026-11-20)
+  chatStick.stuck = HoodChatScroll.atEdge(box);
   return true;
 }
 

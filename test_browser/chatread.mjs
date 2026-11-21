@@ -373,6 +373,67 @@ await journey("chatread: unread read only as seen; the count goes down as you sc
   await rita.click("chat-jump");
   await rita.waitFor(`chatStick.stuck`, "at the newest");
 
+  // (owner, 2026-11-20, an iPhone: "unread 2, I scroll one message down —
+  // it should show 1, but it just disappears; and at the very bottom the
+  // ↓ button still shows") near the bottom counted as AT it: ↓ and its
+  // count hidden, then the last one read too; and the bounce at the bottom
+  // read as scrolling up
+  step("2 unread below her; she scrolls the first fully into view: 1 unread, ↓ 1 — at the very bottom: none, no ↓");
+  await rita.eval(`(() => { const b = document.getElementById("chat-messages"); b.scrollTop = b.scrollHeight; b.dispatchEvent(new Event("scroll")); return true; })()`);
+  await rita.waitFor(`chatStick.stuck && ${chatOf(fayId)}.unread === 0`, "at the newest, all read");
+  await scrollBy(rita, -400);
+  await server(`many_msgs ${fayId} ${ritaId} 2 two`);
+  await rita.waitFor(`${chatOf(fayId)}.msgs.some((m) => m.text === "two2")`, "the 2 came");
+  await frames(rita, 3);
+  check((await unread(rita, fayId)) === 2, "2 unread below her", await unread(rita, fayId));
+  // scrolled so "two1" is wholly on screen, "two2" not yet
+  await rita.eval(`(() => {
+    const b = document.getElementById("chat-messages");
+    const el = [...b.querySelectorAll(".msg")].find((e) => e.textContent === "two1");
+    b.scrollTop += el.getBoundingClientRect().bottom - b.getBoundingClientRect().bottom + 2;
+    b.dispatchEvent(new Event("scroll"));
+    return true;
+  })()`);
+  await frames(rita, 4);
+  check((await unread(rita, fayId)) === 1, "1 unread — the one still below", await unread(rita, fayId));
+  check((await view(rita)).badge === "1", "↓ 1", await view(rita));
+  // (review, 2026-11-20) closed and opened again — back where she was, a
+  // few px short of the end: put back "at the bottom" by the old 60 px rule,
+  // ↓ hid and the last one was read
+  await rita.eval(`closeChat(), true`);
+  await rita.eval(`openChat(realPeersById.get(${fayId})), true`);
+  await frames(rita, 4);
+  check((await unread(rita, fayId)) === 1, "reopened: still 1 unread", await unread(rita, fayId));
+  check((await view(rita)).badge === "1", "reopened: ↓ 1", await view(rita));
+  // the very bottom, with an iPhone's bounce: past the end, then back
+  await rita.eval(`(() => { const b = document.getElementById("chat-messages"); b.scrollTop = b.scrollHeight; b.dispatchEvent(new Event("scroll")); chatStick.onScroll({ scrollTop: b.scrollTop + 12, scrollHeight: b.scrollHeight, clientHeight: b.clientHeight }); b.dispatchEvent(new Event("scroll")); return true; })()`);
+  await frames(rita, 4);
+  check((await unread(rita, fayId)) === 0, "none unread", await unread(rita, fayId));
+  check(await rita.eval(`document.getElementById("chat-jump").classList.contains("hidden")`), "no ↓ at the very bottom", await view(rita));
+  // (review, 2026-11-20) a few px from the end, the keyboard closes (the box
+  // grows): she's at the very bottom — ↓ stayed showing there
+  await rita.eval(`(() => { const b = document.getElementById("chat-messages"); b.scrollTop -= 20; b.dispatchEvent(new Event("scroll")); return true; })()`);
+  await frames(rita, 3);
+  check(!(await rita.eval(`chatStick.stuck`)), "(a little short of the end: scrolled up)");
+  await rita.eval(`(() => { const b = document.getElementById("chat-messages"); b.style.minHeight = (b.clientHeight + 40) + "px"; return true; })()`);
+  await frames(rita, 6);
+  await new Promise((r) => setTimeout(r, 50));
+  const grown = await rita.eval(`(() => { const b = document.getElementById("chat-messages"); return { stuck: chatStick.stuck, jump: !document.getElementById("chat-jump").classList.contains("hidden"), gap: b.scrollHeight - b.scrollTop - b.clientHeight }; })()`);
+  await rita.eval(`(document.getElementById("chat-messages").style.minHeight = "", true)`);
+  check(grown.gap <= 2 && grown.stuck && !grown.jump, "the box grew to the bottom: following again, no ↓", grown);
+  // (review, 2026-11-20) the panel closed shrinks the box to nothing — an
+  // empty box is "at its very end": the re-check above took a reader who'd
+  // scrolled up for one at the bottom, ↓'s count cleared
+  await scrollBy(rita, -300);
+  check(!(await rita.eval(`chatStick.stuck`)), "(scrolled up)");
+  await rita.eval(`(chatBelow = 2, closeChat(), true)`);
+  await frames(rita, 6);
+  await new Promise((r) => setTimeout(r, 50));
+  check(!(await rita.eval(`chatStick.stuck`)) && (await rita.eval(`chatBelow`)) === 2, "closed: never taken for 'at the bottom'", await rita.eval(`({ stuck: chatStick.stuck, below: chatBelow })`));
+  await rita.eval(`openChat(realPeersById.get(${fayId})), true`);
+  await rita.eval(`(() => { const b = document.getElementById("chat-messages"); b.scrollTop = b.scrollHeight; b.dispatchEvent(new Event("scroll")); return true; })()`);
+  await rita.waitFor(`chatStick.stuck`, "back at the newest");
+
   step("a few unread that fit on screen: all read at once, at the newest");
   await rita.eval(`closeChat(), true`);
   await server(`many_msgs ${fayId} ${ritaId} 2 few`);

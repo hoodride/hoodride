@@ -46,6 +46,37 @@ defmodule HoodrideWeb.WsFrameLimitTest do
     s
   end
 
+  # (owner, 2026-11-21 — EEF-CVE-2026-129344: a client choosing the old V1
+  # format could crash broadcasts with binary payloads) the app speaks V2
+  # only: V1 isn't offered at all — whatever a later change broadcasts
+  test "the old V1 format is refused; V2 (the app's) connects", %{port: port, token: token} do
+    for {vsn, upgraded} <- [{"1.0.0", false}, {"2.0.0", true}] do
+      {:ok, s} = :gen_tcp.connect(~c"127.0.0.1", port, [:binary, active: false, nodelay: true])
+
+      :ok =
+        :gen_tcp.send(
+          s,
+          "GET /socket/websocket?vsn=#{vsn}&token=#{URI.encode_www_form(token)} HTTP/1.1
+" <>
+            "Host: localhost
+Upgrade: websocket
+Connection: Upgrade
+" <>
+            "Sec-WebSocket-Version: 13
+Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
+
+"
+        )
+
+      {:ok, head} = :gen_tcp.recv(s, 0, 3_000)
+
+      assert head =~ "101 Switching Protocols" == upgraded,
+             "vsn #{vsn}: #{String.slice(head, 0, 60)}"
+
+      :gen_tcp.close(s)
+    end
+  end
+
   # one masked text frame (clients must mask, RFC 6455 §5.3)
   defp text_frame(payload) do
     len = byte_size(payload)

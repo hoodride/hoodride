@@ -34,9 +34,15 @@ defmodule HoodrideWeb.Endpoint do
     # max_frame_size: what the server ACCEPTS per message (default 10 MB);
     # the largest real one is a chat message, ≤ 20 KB (UserChannel). Over:
     # closed with 1009 "message too big" (WsFrameLimitTest)
+    # serializer: the app speaks V2 only (phoenix.min.js, vsn=2.0.0) — the
+    # old V1 format isn't offered: a client choosing it could crash
+    # broadcasts with binary payloads (EEF-CVE-2026-129344, owner
+    # 2026-11-21; fixed in Phoenix 1.8.17 too — this keeps it shut whatever
+    # a later change broadcasts). WsFrameLimitTest
     websocket: [
       connect_info: [:peer_data, :x_headers, session: @session_options],
-      max_frame_size: Hoodride.Limits.ws_frame_bytes()
+      max_frame_size: Hoodride.Limits.ws_frame_bytes(),
+      serializer: [{Phoenix.Socket.V2.JSONSerializer, "~> 2.0.0"}]
     ],
     longpoll: false,
     auth_token: true
