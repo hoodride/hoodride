@@ -26,6 +26,9 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     dir =
       Path.join(System.tmp_dir!(), "hoodride_journeys_min_#{System.unique_integer([:positive])}")
 
+    # (emptied first: a run stopped part-way never ran its on_exit — the
+    # number may be one an old run's leftovers already have, 2026-11-22)
+    File.rm_rf!(dir)
     File.mkdir_p!(dir)
     on_exit(fn -> File.rm_rf!(dir) end)
     # (and our CSS too — the whole deploy build, Minify.build/4)

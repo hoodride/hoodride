@@ -16,9 +16,16 @@ defmodule Hoodride.DeletionBusyTest do
 
   alias Exqlite.Sqlite3
 
-  setup do
-    path = Path.join(System.tmp_dir!(), "deletion-busy-#{System.unique_integer([:positive])}.db")
-    on_exit(fn -> Enum.each(["", "-wal", "-shm"], &File.rm(path <> &1)) end)
+  # each test its own folder, emptied before it starts (ExUnit's tmp_dir):
+  # a file left by an earlier run never meets this one. (It was the system
+  # temp folder, numbered System.unique_integer — unique within ONE run
+  # only — and never deleted: its connections stayed open, and Windows
+  # can't delete an open file. A later run drew a number already used and
+  # found the old table — "table users already exists", 2026-11-22)
+  @moduletag :tmp_dir
+
+  setup %{tmp_dir: dir} do
+    path = Path.join(dir, "deletion-busy.db")
     {:ok, setup} = Sqlite3.open(path)
     :ok = Sqlite3.execute(setup, "PRAGMA journal_mode = WAL")
     :ok = Sqlite3.execute(setup, "CREATE TABLE users (id INTEGER PRIMARY KEY)")
@@ -31,7 +38,10 @@ defmodule Hoodride.DeletionBusyTest do
       c
     end
 
-    %{deleter: open.(), other: open.()}
+    deleter = open.()
+    other = open.()
+    on_exit(fn -> Enum.each([deleter, other], &Sqlite3.close/1) end)
+    %{deleter: deleter, other: other}
   end
 
   defp read(c), do: Sqlite3.execute(c, "SELECT count(*) FROM users")

@@ -100,4 +100,67 @@ await journey("demoblock: in the demo, End chat closes the chat; Block hides the
   check(!(await dee.eval(`drivers[1].blocked`)), "unblocked");
   await dee.eval(`(closeBlockedSheet(), true)`);
   await dee.waitFor(`drivers[1].visible`, "their car back on the map", 10000);
+
+  // (owner, 2026-11-21: "when you press Request ride everything at the top
+  // shifts up when the Block button disappears") the demo hid Block with
+  // your ride partner — the real app keeps it (blocking ends the ride) —
+  // and with End chat hidden too, their row went: the header shifted up
+  step("Request ride: the header stays put — Block still there (as the real app); blocking your ride partner ends the ride");
+  await dee.eval(`(closeSettings(), true)`);
+  await message(dee, "drivers[3]");
+  await dee.waitFor(shown("chat-block"), "Block shown");
+  const headerH = () => dee.eval(`Math.round(document.querySelector("#chat .chat-header").getBoundingClientRect().height)`);
+  const nameTop = () => dee.eval(`Math.round(document.getElementById("chat-name").getBoundingClientRect().top)`);
+  const before = { h: await headerH(), top: await nameTop() };
+  await dee.waitFor(`document.getElementById("btn-ride-action").textContent === "Request ride"`, "Request ride");
+  await dee.click("btn-ride-action");
+  await dee.waitFor(`state.ride && state.ride.peer === drivers[3]`, "requested");
+  check(await dee.eval(shown("chat-block")), "Block still shown once you've asked");
+  const asked = { h: await headerH(), top: await nameTop() };
+  check(asked.h === before.h && asked.top === before.top, "the header didn't move", { before, asked });
+  // the header keeps its room even with both links hidden (a ride's chat
+  // with nothing said: no End chat; Block hidden — as for no one to block)
+  await dee.eval(`(document.getElementById("chat-block").classList.add("hidden"), true)`);
+  check((await headerH()) === before.h, "no links showing: the header keeps its height", { before: before.h, now: await headerH() });
+  await dee.eval(`(showEndChat(state.chatPeer), true)`);
+  // block your ride partner: the ride ends, as the server does in the real app
+  await dee.waitFor(`state.ride && state.ride.status === "connected"`, "accepted", 8000);
+  await dee.click("chat-block");
+  await dee.waitFor(shown("block-sheet"), "the Block sheet");
+  await dee.click("block-yes");
+  await dee.waitFor(`!state.ride && !${chatOpen} && drivers[3].blocked`, "blocked: the ride over, the chat closed");
+  check(!(await dee.eval(`drivers[3].visible`)), "their car gone from the map");
+
+  // (review, 2026-11-21) the pretend ✋ blocked, then offline and online
+  // again: the same person's ✋ came back — the pretend request already
+  // checked the blocked list, the ✋ never did
+  step("driving, Dee blocks the pretend ✋; offline and online again: that ✋ never comes back");
+  await dee.click("btn-mode");
+  await dee.waitFor(`state.mode === "driver"`, "Drive mode");
+  await dee.click("btn-online");
+  await dee.waitFor(`state.online && !!mockHand && mockHand.visible`, "the ✋", 5000);
+  await dee.eval(`(openBlockSheet(mockHand, "block", document.getElementById("chat-block")), true)`);
+  await dee.waitFor(shown("block-sheet"), "the Block sheet");
+  await dee.click("block-yes");
+  await dee.waitFor(`!${shown("block-sheet")}`, "blocked");
+  await dee.click("btn-online");
+  await dee.waitFor(`!state.online`, "offline");
+  await dee.click("btn-online");
+  await dee.waitFor(`state.online`, "online again");
+  await new Promise((r) => setTimeout(r, 2500));
+  check(!(await dee.eval(`!!mockHand`)), "no ✋ from someone she blocked", await dee.eval(`mockHand && mockHand.name`));
+  // (owner, 2026-11-21: "if you unblock they come back?") unblocked while
+  // online: their ✋ back at once, as the real app (it came back only at the
+  // next time online)
+  await dee.eval(`(openSettings(), true)`);
+  await dee.waitFor(shown("blocked-wrap"), "the Blocked people row");
+  await dee.click("btn-blocked");
+  await dee.waitFor(`[...document.querySelectorAll("#blocked-list .blocked-row strong")].some((s) => s.textContent === HAND_RIDER.name)`, "the ✋ rider listed");
+  await dee.eval(`([...document.querySelectorAll("#blocked-list .blocked-row")].find((r) => r.querySelector("strong").textContent === HAND_RIDER.name).querySelector("button").click(), true)`);
+  await dee.waitFor(shown("block-sheet"), "the Unblock sheet");
+  await dee.click("block-yes");
+  await dee.waitFor(`!${shown("block-sheet")}`, "unblocked");
+  await dee.eval(`(closeBlockedSheet(), closeSettings(), true)`);
+  await dee.waitFor(`!!mockHand && mockHand.visible`, "their ✋ back at once", 3000);
+  check(dee.errors.length === 0, "no page errors", dee.errors);
 });

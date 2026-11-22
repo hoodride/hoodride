@@ -545,6 +545,17 @@ window.addEventListener("resize", () => {
   );
 });
 
+// "· 0.4 mi away" for a rider's driver on the way — to the pin, else where
+// you are — once their position is fresh, else "" (lastSeen says how old).
+// Part of the line itself: written two ways (with it as the driver moved,
+// without it by any other redraw — a location reading, a message banner
+// ending), the distance flashed away and back (owner, 2026-11-21)
+function onTheWayDistance(peer) {
+  const meetAt = state.pinPos || (DEMO ? state.me : loc.best);
+  const fresh = DEMO ? !!peer.pos : HoodRidePos.fresh(partnerAgeMs());
+  return meetAt && peer.pos && fresh ? " · " + away(metersBetween(peer.pos, meetAt)) : "";
+}
+
 function contextBanner() {
   // the connection is down: say so first (the reconnect then re-reads
   // everything) — in a ride after the ride's own line, so who's coming
@@ -582,7 +593,7 @@ function situationBanner() {
     // Maps — a backgrounded web app gets no GPS)
     const seen = HoodRidePos.lastSeen(partnerAgeMs());
     return state.mode === "rider"
-      ? CAR + t("{name} is on the way", { name: peer.name }) + HoodCar.inLine(peer.car) + (seen ? " · " + seen : "")
+      ? CAR + t("{name} is on the way", { name: peer.name }) + HoodCar.inLine(peer.car) + (seen ? " · " + seen : onTheWayDistance(peer))
       : seen
         ? t("Picking up {name} · {seen} · tap 🧭 to navigate", { name: peer.name, seen })
         : t("Picking up {name} · tap 🧭 to navigate", { name: peer.name });
@@ -3255,18 +3266,9 @@ function joinRideChannel() {
     // (and not over "📍 Tap the map where you want to meet" while you place
     // the pin: it was gone within a second of a moving driver's update —
     // owner, 2026-11-07; placing it brings the distance back)
-    if (state.ride.status === "connected" && state.ride.role === "rider" && !bannerTimer && !state.pinArmed) {
-      const meetAt = state.pinPos || loc.best;
-      setBanner(
-        meetAt && HoodRidePos.fresh(partnerAgeMs())
-          ? CAR +
-            t("{name} is on the way", { name: state.ride.peer.name }) +
-            HoodCar.inLine(state.ride.peer.car) +
-            " · " +
-            away(metersBetween(state.ride.peer.pos, meetAt))
-          : contextBanner()
-      );
-    }
+    // (the line itself carries the distance: onTheWayDistance)
+    if (state.ride.status === "connected" && state.ride.role === "rider" && !bannerTimer && !state.pinArmed)
+      setBanner(contextBanner());
   });
 
   rideChannel.on("pin", ({ pin }) => applyRemotePin(pin));
@@ -3824,7 +3826,8 @@ function tick() {
           receiveMsg(d, t("here! {car}", { car: d.car }));
         } else if (!state.pinArmed) {
           // (placing the pin: its hint stays — contextBanner)
-          setBanner(CAR + t("{name} is on the way", { name: d.name }) + HoodCar.inLine(d.car) + " · " + away(metersBetween(d.pos, target)));
+          // (the line itself carries the distance: onTheWayDistance)
+          setBanner(contextBanner());
         }
       }
     } else if (!inRide) {
@@ -4048,6 +4051,7 @@ function renderChat() {
   const listShown = !!box.querySelector(".chat-item");
   const listTop = listShown ? box.scrollTop : 0;
   box.innerHTML = "";
+  $("chat").classList.toggle("chat-list-view", state.chatView === "list");
   if (state.chatView === "list") {
     $("chat-name").textContent = t("Chats");
     $("chat-dist").textContent = "";
@@ -4324,56 +4328,157 @@ if ("ResizeObserver" in window) new ResizeObserver(onChatResize).observe($("chat
 if (window.visualViewport) window.visualViewport.addEventListener("resize", onChatResize);
 
 // ===== The chat over the keyboard (owner, 2026-11-17: on an iPhone the
-// chat was squished) =====
-// Typing, with the on-screen keyboard up: the chat fills what you can see
-// above it — the visual viewport (W3C Visual Viewport API, the one keyboard
-// measure Safari has: iOS never resizes the page for the keyboard, it
-// shrinks what's visible and may scroll the page to the text box). Placed
-// by the visible area's place IN THE PAGE (pageTop), so a page Safari has
-// scrolled still fits; followed on its resize AND scroll (the scroll to the
-// text box arrives as a scroll). Not typing: back to half the screen —
-// only while you type is the keyboard area trusted (iOS 26 can report a
-// leftover one after it closes; Apple forums 800125, WebKit 297779).
-const KB_GAP = 8; // px kept above the chat
+// chat was squished; 2026-11-21: "I just want it to push up, the same size
+// it had before") =====
+// Typing, with the on-screen keyboard up: the chat keeps the height it had
+// and sits right on top of the keyboard — shorter only when there isn't
+// room above it. Measured as the guides do (visualViewport: the one keyboard
+// measure Safari has — iOS never resizes the page for it, it shrinks what's
+// visible and may scroll the page to the text box): the visible area's
+// bottom, in the page (pageTop + height), is the keyboard's top. Followed on
+// its resize AND scroll. The keyboard is told from the page's own height —
+// its layout, never window.innerHeight alone: on some iPhones that shrinks
+// with the keyboard too, and the first fix, comparing the two, saw no
+// keyboard and never ran (owner's iPhone, 2026-11-21). A browser that
+// shrinks the whole page instead: the height the chat had before you tapped
+// is kept, not 48% of a smaller page. Not typing: back where it was — only
+// while you type is the keyboard area trusted (iOS 26 can report a leftover
+// one after it closes; Apple forums 800125, WebKit 297779).
+const KB_GAP = 8; // px kept above the chat when it has to be shorter
 const KB_MIN = 80; // px: less than this left out isn't a keyboard (a toolbar)
+// the page's height and the chat's, as they were when you tapped the box
+let kbBefore = null;
 function chatTyping() {
   return document.activeElement === $("chat-input") && !$("chat").classList.contains("hidden");
 }
+function pageHeight() {
+  return Math.max(document.documentElement.clientHeight, window.innerHeight);
+}
+function noteKbBefore() {
+  const chat = $("chat");
+  if (chat.classList.contains("hidden")) return;
+  // (lifted already — the screen turned while typing: measured as it lies,
+  // the lift taken off for that one reading)
+  const lifted = chat.classList.contains("kb");
+  if (lifted) {
+    chat.classList.remove("kb");
+    chat.style.top = chat.style.bottom = chat.style.height = "";
+  }
+  const prev = kbBefore;
+  const width = window.innerWidth;
+  const facing = screenFacing();
+  let page = pageHeight();
+  let height = chat.getBoundingClientRect().height;
+  // turned while typing on a browser that shrinks the whole page for the
+  // keyboard: what's measured now is ALREADY shrunk by it — the keyboard
+  // lost, the chat 48% of the smaller page (review, 2026-11-21). The turned
+  // page's height from the old one (its width and height swap places), and
+  // the chat as the stylesheet sizes it there — only for a real turn
+  if (prev && touchScreen() && prev.facing !== facing) {
+    const turned = (prev.page * prev.width) / width;
+    if (page < turned - KB_MIN) {
+      page = turned;
+      height = Math.min(CHAT_SHARE * turned, CHAT_MAX);
+    }
+  }
+  kbBefore = { page, chat: height, width, facing };
+  if (lifted) chat.classList.add("kb");
+}
+// a phone's or a tablet's screen — the only ones with a keyboard ON it: a
+// computer's window made shorter while typing was taken for one. By its
+// main pointer being a finger: a touch laptop has touch points too, but a
+// touchpad or a mouse first (reviews, 2026-11-21)
+function touchScreen() {
+  return !!window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+}
+// which way the screen faces — a real turn, not a narrower window (an
+// iPad's Split View, a Fold folded: those were taken for a turn — review,
+// 2026-11-21)
+function screenFacing() {
+  const o = screen.orientation;
+  if (o && o.type) return o.type.startsWith("portrait") ? "portrait" : "landscape";
+  return screen.width > screen.height ? "landscape" : "portrait";
+}
+// the chat's height as styles.css sets it (.chat: min(48dvh, 420px)) — for
+// a page the keyboard is shrinking, where it can't be measured
+const CHAT_SHARE = 0.48;
+const CHAT_MAX = 420;
 function fitChatToKeyboard() {
   const chat = $("chat");
   const vv = window.visualViewport;
-  const keyboard = !!vv && chatTyping() && window.innerHeight - vv.height > KB_MIN;
+  // (the screen turned while typing: its size afresh — tapped sideways and
+  // turned upright, the chat kept the sideways height: review, 2026-11-21)
+  if (chatTyping() && (!kbBefore || kbBefore.width !== window.innerWidth)) noteKbBefore();
+  // (the page's height as it was when you tapped: only a phone's or a
+  // tablet's whole page shrinks for a keyboard)
+  const full = Math.max(pageHeight(), kbBefore && touchScreen() ? kbBefore.page : 0);
+  const keyboard = !!vv && chatTyping() && !!kbBefore && full - vv.height > KB_MIN;
   if (!keyboard) {
     if (chat.classList.contains("kb")) {
       chat.classList.remove("kb");
       chat.style.top = chat.style.bottom = chat.style.height = "";
     }
+    if (!chatTyping()) kbBefore = null;
     return;
   }
   const host = chat.offsetParent || document.body;
   const hostTop = host.getBoundingClientRect().top + window.scrollY;
+  // (never taller than what's visible: a 120 px minimum put the name and
+  // close button above it, ~100 px left on a sideways phone — review,
+  // 2026-11-21)
+  const height = Math.min(Math.max(Math.min(kbBefore.chat, vv.height - KB_GAP), 120), vv.height);
   chat.classList.add("kb");
-  chat.style.top = `${vv.pageTop - hostTop + KB_GAP}px`;
+  chat.style.top = `${vv.pageTop + vv.height - height - hostTop}px`;
   chat.style.bottom = "auto";
-  chat.style.height = `${Math.max(vv.height - KB_GAP, 120)}px`;
+  chat.style.height = `${height}px`;
 }
 if (window.visualViewport) {
   window.visualViewport.addEventListener("resize", fitChatToKeyboard);
   window.visualViewport.addEventListener("scroll", fitChatToKeyboard);
 }
-$("chat-input").addEventListener("focus", () => requestAnimationFrame(fitChatToKeyboard));
+// (the chat's height noted at once, before the keyboard moves anything)
+$("chat-input").addEventListener("focus", () => {
+  noteKbBefore();
+  requestAnimationFrame(fitChatToKeyboard);
+});
+// iOS 26: after the keyboard closes, the visible area can stay OFFSET
+// (offsetTop left non-zero — Apple forums 800154) or SHORT with its offset
+// back at 0 (forums 800125); WebKit 297779, 300523 — Apple's bug, fixed in
+// 26.1 per the forums, back in reports since. What's reported to work on
+// real iPhones: the page scrolled 1 px and back, so iOS measures again
+// (Sedna.UI #172; glazelab #6). This page is exactly the screen's height —
+// nothing to scroll: the nudge was clamped to nothing and never worked. It
+// gets 1 px to scroll for that moment, and is put back at once (owner,
+// 2026-11-21: "fix it according to what online says works"). Not while
+// pinched in: the visible area is smaller on purpose then. Back a moment
+// LATER: down and straight back in one go reach iOS as one "stay put"
+// (WebKit merges pending scroll requests — review, 2026-11-21); the working
+// fixes scroll back ~50 ms on, by a timer, not a frame (glazelab #6;
+// Sedna.UI f5fa53c: "under load the pixel scrolled down could stay down")
+const NUDGE_BACK_MS = 50;
+let nudging = false;
+function nudgeViewport() {
+  if (nudging) return;
+  nudging = true;
+  const html = document.documentElement;
+  const before = html.style.minHeight;
+  html.style.minHeight = "calc(100% + 1px)";
+  const y = window.scrollY;
+  window.scrollTo(window.scrollX, y + 1);
+  setTimeout(() => {
+    window.scrollTo(window.scrollX, y);
+    html.style.minHeight = before;
+    nudging = false;
+  }, NUDGE_BACK_MS);
+}
 $("chat-input").addEventListener("blur", () => {
   requestAnimationFrame(fitChatToKeyboard);
-  // iOS 26: the visible area can stay shifted after the keyboard closes
-  // (offsetTop left non-zero), fixed things stuck mid-screen. A 1 px scroll
-  // and back makes it measure again — only then, only once (the community
-  // workaround: Sedna.UI #172, nxlx #264)
   setTimeout(() => {
     const vv = window.visualViewport;
-    if (!vv || chatTyping() || vv.offsetTop < 1) return;
-    const y = window.scrollY;
-    window.scrollTo(window.scrollX, y + 1);
-    window.scrollTo(window.scrollX, y);
+    if (!vv || chatTyping() || Math.abs((vv.scale || 1) - 1) >= 0.01) return;
+    const short = Math.max(document.documentElement.clientHeight, window.innerHeight) - vv.height - vv.offsetTop;
+    if (vv.offsetTop < 1 && short <= 1) return;
+    nudgeViewport();
   }, 350);
 });
 
@@ -5407,9 +5512,12 @@ $("btn-ride-action").addEventListener("click", () => {
 
   if (state.mode === "rider") {
     state.ride = { peer, status: "requested" };
+    // (THIS request's answer: cancelled and asked again at once, the first
+    // one's took the new one early — review, 2026-11-21)
+    const asked = state.ride;
     setBanner(contextBanner());
     setTimeout(() => {
-      if (!state.ride || state.ride.peer !== peer || state.ride.status !== "requested") return;
+      if (state.ride !== asked || state.ride.status !== "requested") return;
       state.ride.status = "connected";
       state.handRaised = false;
       // as in the real app (startRealRide): to the MAP — the chat one tap
@@ -6219,6 +6327,9 @@ function scheduleDemand() {
   clearTimeout(demandTimer);
   demandTimer = setTimeout(() => {
     if (!state.online || state.mode !== "driver" || state.ride || mockHand) return;
+    // blocked: never their ✋ again (as the pretend request: review,
+    // 2026-11-21 — offline and online again, the same ✋ came back)
+    if (demoBlocked.some((p) => p.name === HAND_RIDER.name)) return;
     const angle = Math.random() * Math.PI * 2;
     const dist = 400 + Math.random() * 600;
     const exactPos = offsetPos(state.me, Math.cos(angle) * dist, Math.sin(angle) * dist);
@@ -6735,7 +6846,10 @@ const booting = HoodBoot.create({
 // Not your demo ride partner (the pretend ride has no "ended by a block")
 const demoBlocked = []; // the demo's blocked pretend people, oldest first
 function canBlock(peer) {
-  if (DEMO) return !!peer && (drivers.includes(peer) || peer.kind === "rider") && !(state.ride && state.ride.peer === peer);
+  // (the demo: your ride partner too, as the real app — blocking ends the
+  // ride; it hid Block mid-ride, and the chat's header shifted up when you
+  // asked for a ride: owner, 2026-11-21)
+  if (DEMO) return !!peer && (drivers.includes(peer) || peer.kind === "rider");
   return !!peer && Number.isInteger(peer.id) && realPeersById.get(peer.id) === peer && !!state.realUser && peer.id !== state.realUser.id;
 }
 
@@ -6854,6 +6968,9 @@ $("block-list-open").addEventListener("click", () => {
 // the demo's Block / Unblock: the same sheet, list and words, no server
 function demoBlockAnswer({ peer, mode, row }) {
   if (mode === "block") {
+    // your ride partner: the ride ends first, as the server ends it in the
+    // real app (HoodrideWeb.BlockEffects)
+    if (state.ride && state.ride.peer === peer) endRide();
     peer.blocked = true;
     demoBlocked.push(peer);
     afterBlocked(peer);
@@ -6863,6 +6980,10 @@ function demoBlockAnswer({ peer, mode, row }) {
   } else {
     peer.blocked = false;
     demoBlocked.splice(demoBlocked.indexOf(peer), 1);
+    // the pretend ✋ unblocked while you drive: back at once, as the real
+    // app shows an unblocked ✋ (it came back only the next time online —
+    // owner, 2026-11-21). (scheduleDemand: online, driving, no ride or ✋)
+    if (peer.name === HAND_RIDER.name) scheduleDemand();
     refreshWorldMarkers();
     if (row) row.remove();
     closeBlockSheet();

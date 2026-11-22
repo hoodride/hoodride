@@ -3,7 +3,14 @@ defmodule HoodrideWeb.ResumingTest do
   # sign-in screen that /api/state replaced a moment later (owner,
   # 2026-11-05: "why does changing languages show the sign in page for a
   # brief moment"). PageController.resuming; styles.css html.resuming.
-  use HoodrideWeb.ConnCase, async: true
+  # Not async (precommit, 2026-11-22): its sign-ins need the database's ONE
+  # connection (config/test.exs) for the whole test, and with the whole
+  # suite running each page here took 4-6 s (every request checks every app
+  # file — StaticVersions.live — behind the file-heavy async tests): it held
+  # the connection 13-15 s and a test queued behind it could be dropped
+  # (DBConnection drops a wait past 2 x queue_target, 10 s). Run with the
+  # sync tests, one at a time, nobody waits on it.
+  use HoodrideWeb.ConnCase, async: false
 
   # a real sign-in (Hoodride.SessionTokens), made `age` ms ago
   defp signed_in(conn, age \\ 0) do

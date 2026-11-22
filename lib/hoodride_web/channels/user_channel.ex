@@ -405,7 +405,8 @@ defmodule HoodrideWeb.UserChannel do
     end
   end
 
-  # (they see each other again from their next update or map move)
+  # (they see each other again at once, if in view — a car or a ✋: parked,
+  # they send no update of their own; Hoodride.BlockEffects.unblocked)
   defp event("unblock", %{"peer" => peer}, socket) when is_integer(peer) do
     me = socket.assigns.user_id
 

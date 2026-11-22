@@ -10,6 +10,11 @@ defmodule HoodrideWeb.NotFoundTest do
   """
   use HoodrideWeb.ConnCase, async: true
 
+  # pages only, no database: never holds its ONE connection (ConnCase) —
+  # untagged, a page made slow by the whole suite held it seconds while
+  # tests queued behind it were dropped (precommit, 2026-11-22)
+  @moduletag db: false
+
   @paths ~w(/anything /some/deep/path /.env /wp-login.php /app.js.map /index.htm)
 
   test "an address that doesn't exist: 404, and a page that says so", %{conn: conn} do

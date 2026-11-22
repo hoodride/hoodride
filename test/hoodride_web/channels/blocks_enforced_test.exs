@@ -236,6 +236,22 @@ defmodule HoodrideWeb.BlocksEnforcedTest do
       assert {:ok, _} = act(ann, :user, "unblock", %{"peer" => bob.user.id})
       assert got?(:ann, "driver_update", bob.user.id, 1_000)
     end
+
+    # (owner, 2026-11-21: "if you unblock a ✋ it doesn't show up at once?")
+    # a raised hand too: back on the driver's map at once — a hand still
+    # sends no update of its own
+    test "unblocked: a raised hand seen again at once by the driver" do
+      ann = person(:ann, user!("be9-ann"))
+      bob = person(:bob, driver!("be9-bob"))
+      online(bob)
+      assert {:ok, _} = act(bob, :world, "sync", %{"geo" => [@cell]})
+      act(ann, :user, "hand_up", %{"spot" => @spot})
+      assert got?(:bob, "hand_update", ann.user.id, 1_000)
+      block!(ann, bob)
+      refute got?(:bob, "hand_update", ann.user.id)
+      assert {:ok, _} = act(ann, :user, "unblock", %{"peer" => bob.user.id})
+      assert got?(:bob, "hand_update", ann.user.id, 1_000)
+    end
   end
 
   describe "contact" do

@@ -66,7 +66,10 @@ await journey("chatpages: the chat list in pages; the 💬 badge counts every ch
   const texts = await sam.eval(`chats.get(realPeersById.get(${c3})).msgs.map((m) => m.text)`);
   check(texts.includes("hi from BT-C3") && texts.includes("are you around?"), "its earlier message too", texts);
   check(texts.filter((x) => x === "are you around?").length === 1, "the new one once", texts);
-  check((await unreadTotal(sam)) === 33, "read: the badge 33", await unreadTotal(sam));
+  // (marked read once SEEN — readSeen, on the frame after it's drawn: not
+  // the moment its messages load. Checked at once, a busy machine's late
+  // frame read 35 — precommit, 2026-11-22)
+  await sam.waitFor(`[...chats.values()].reduce((s, c) => s + c.unread, 0) + unreadMore === 33`, "read: the badge 33");
   await sam.eval(`closeChat(), true`);
   // BT-C4 too, left unopened: its 1 old + 1 new stay counted when the older
   // chats load (the recount)

@@ -324,6 +324,8 @@ await journey("chats: across a reconnect or a reopen", async (browser) => {
   check(two.shown && two.count === "2", "‹ 2: Gus's left", two);
   await rita.click("chat-back");
   await openChatWith(rita, gusId);
+  // (read as they're SEEN: a frame or two after it's drawn — owner, 2026-11-20)
+  await rita.waitFor(`chatFor(realPeersById.get(${gusId})).unread === 0`, "Gus's read", 5000);
   await openChatWith(rita, danId);
   check(!(await backCount()).shown, "Gus's read too: a plain ‹", await backCount());
   await closeChatPanel(rita);

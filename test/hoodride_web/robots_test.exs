@@ -9,6 +9,11 @@ defmodule HoodrideWeb.RobotsTest do
   """
   use HoodrideWeb.ConnCase, async: true
 
+  # pages only, no database: never holds its ONE connection (ConnCase) —
+  # untagged, a page made slow by the whole suite held it seconds while
+  # tests queued behind it were dropped (precommit, 2026-11-22)
+  @moduletag db: false
+
   @robots File.read!("priv/static/robots.txt")
 
   # the Disallow rules for every crawler (User-agent: *), as Google reads them

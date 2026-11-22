@@ -787,10 +787,15 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
 .chat-end {
   align-self: flex-start; background: none; border: 0; padding: 2px 0; margin: 0;
   color: var(--accent); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+  line-height: 18px;
 }
 .chat-end.armed { color: var(--danger); }
-/* End chat and Block, side by side under the name */
-.chat-links { display: flex; gap: 16px; align-items: center; }
+/* End chat and Block, side by side under the name — their row keeps its
+   room in an open chat even with neither showing: hiding them (a ride
+   asked for, nothing said yet) shifted the whole header up (owner,
+   2026-11-21). One line of the links' own size */
+.chat-links { display: flex; gap: 16px; align-items: center; min-height: 22px; }
+.chat-list-view .chat-links { min-height: 0; }
 .chat-block { color: var(--muted); font-weight: 500; }
 /* the card's Block: small and quiet, under who they are (owner, 2026-11-15) */
 .peer-block {

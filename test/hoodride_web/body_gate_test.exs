@@ -14,6 +14,11 @@ defmodule HoodrideWeb.BodyGateTest do
   """
   use HoodrideWeb.ConnCase, async: true
 
+  # pages only, no database: never holds its ONE connection (ConnCase) —
+  # untagged, a page made slow by the whole suite held it seconds while
+  # tests queued behind it were dropped (precommit, 2026-11-22)
+  @moduletag db: false
+
   @limit Hoodride.Limits.http_body_bytes()
 
   test "a body declared over the limit: 413 at once, the connection closed" do

@@ -4,6 +4,11 @@ defmodule HoodrideWeb.StaticFilesTest do
   # the offline cache's install fails outright).
   use HoodrideWeb.ConnCase, async: true
 
+  # pages only, no database: never holds its ONE connection (ConnCase) —
+  # untagged, a page made slow by the whole suite held it seconds while
+  # tests queued behind it were dropped (precommit, 2026-11-22)
+  @moduletag db: false
+
   @static Path.expand("../../priv/static", __DIR__)
 
   defp page_files do

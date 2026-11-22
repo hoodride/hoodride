@@ -58,6 +58,10 @@ await journey("chatunread: a chat ended while not loaded — its unread leaves t
   const inside = await sam.eval(`[...chats.keys()][0].id`);
   await sam.eval(`openChat(realPeersById.get(${inside})), true`);
   await sam.waitFor(`!document.getElementById("chat").classList.contains("hidden") && state.chatPeer && state.chatPeer.id === ${inside} && chats.get(state.chatPeer).loaded !== false`, "inside a chat");
+  // (its own unread read once SEEN — readSeen, the frame after it's drawn —
+  // before the count is taken: else that read landed inside the step and
+  // the drop looked like two — precommit, 2026-11-22)
+  await sam.waitFor(`chats.get(state.chatPeer).unread === 0`, "the chat she's in read");
   const besideBefore = await sam.eval(`document.getElementById("chat-back-count").textContent`);
   await endsPast(sam, past[3], "the cleanup", () => server(`close_chat ${past[3]} ${samId}`));
   const besideAfter = await sam.eval(`document.getElementById("chat-back-count").textContent`);

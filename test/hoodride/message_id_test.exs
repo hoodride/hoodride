@@ -39,7 +39,34 @@ defmodule Hoodride.MessageIdTest do
     second = send!(@a, @b)
     later = System.os_time(:microsecond)
 
-    for id <- [first, second], do: assert(id >= before and id <= later + 1_000, "id #{id}")
+    for id <- [first, second], do: assert_send_time(id, before, later)
+  end
+
+  # the time it was sent — within a second of the clock (a count of
+  # messages is nowhere near it): ahead of it after a step back, never by
+  # much (send!/2's few microseconds' worth of "one past the last")
+  @slack 1_000_000
+  defp assert_send_time(id, before, later) do
+    assert id >= before - @slack and id <= later + @slack,
+           "id #{id}: clock #{before}..#{later}"
+  end
+
+  # (precommit, 2026-11-21: "id 1795311101497379" outside a 1 ms window) an
+  # id is the send time OR one past the last — ahead of the clock whenever
+  # the clock steps back (the PC's or the server's time corrected): the
+  # window allowed 1 ms. The clock 5 ms behind the last id, as after a step
+  # back:
+  test "the clock stepped back: ids still rise, still the send time (not a count)" do
+    ref = :persistent_term.get({Chat, :last_id})
+    ahead = System.os_time(:microsecond) + 5_000
+    :atomics.put(ref, 1, ahead)
+    before = System.os_time(:microsecond)
+    first = send!(@a, @b)
+    second = send!(@a, @b)
+    later = System.os_time(:microsecond)
+
+    assert first > ahead and second > first
+    for id <- [first, second], do: assert_send_time(id, before, later)
   end
 
   test "still strictly in order, even many in the same instant" do

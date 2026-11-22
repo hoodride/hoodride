@@ -213,6 +213,26 @@ await journey("visitor: the signed-out screen, signing in, the demo", async (bro
   await dee.click("btn-chat");
   await dee.waitFor(`state.chatPeer === drivers[${driver}] && !document.getElementById("chat").classList.contains("hidden")`, "the chat opens from its button");
 
+  // (review, 2026-11-21) a request cancelled and made again at once: the
+  // FIRST one's pretend accept took the new one early
+  step("Dee asks, cancels and asks again at once: the new request answered in its own time, not the old one's");
+  await dee.waitFor(`document.getElementById("btn-ride-action").textContent === "Request ride"`, "Request ride button");
+  await dee.click("btn-ride-action");
+  await dee.waitFor(`state.ride && state.ride.status === "requested"`, "requested");
+  // (cancelled early: the old request's accept still ~1.2 s off — room for
+  // the steps below before it fires, even on a slow machine)
+  await new Promise((r) => setTimeout(r, 600));
+  await dee.eval(`(endRide(), true)`);
+  await dee.waitFor(`!state.ride`, "cancelled");
+  await dee.waitFor(`document.getElementById("btn-ride-action").textContent === "Request ride"`, "Request ride again");
+  const again = Date.now();
+  await dee.click("btn-ride-action");
+  await dee.waitFor(`state.ride && state.ride.status === "connected"`, "accepted", 8000);
+  check(Date.now() - again >= 1500, "accepted in its own time — not the cancelled one's", Date.now() - again);
+  await dee.eval(`(endRide(), true)`);
+  await dee.waitFor(`!state.ride`, "ended");
+  await dee.eval(`(openChat(drivers[${driver}]), true)`);
+
   step("Dee asks for a ride: accepted, on the way; then ends it");
   await dee.waitFor(`document.getElementById("btn-ride-action").textContent === "Request ride"`, "Request ride button");
   await dee.click("btn-ride-action");
@@ -220,6 +240,22 @@ await journey("visitor: the signed-out screen, signing in, the demo", async (bro
   const name = await dee.eval(`drivers[${driver}].name`);
   await bannerLike(dee, `${name} is on the way`);
   await bannerHasCar(dee);
+  // (owner, 2026-11-21: "X is on the way · 0.5 mi away" flashed to something
+  // real quick, then back to 0.4 mi) the line was written two ways: with the
+  // distance (as the driver moved) and without (any other redraw — a
+  // location reading, a message banner ending). Every redraw: the distance
+  await dee.eval(`(() => {
+    window.__onTheWay = [];
+    const b = document.getElementById("banner");
+    new MutationObserver(() => { const t = b.textContent; if (t.includes("is on the way")) window.__onTheWay.push(t); }).observe(b, { childList: true, characterData: true, subtree: true });
+    return true;
+  })()`);
+  // (as another part of the app redrawing the banner does)
+  const redrawn = await dee.eval(`(setBanner(contextBanner()), document.getElementById("banner").textContent)`);
+  check(/is on the way/.test(redrawn) && / away/.test(redrawn), "redrawn by anything else: still the distance", redrawn);
+  await new Promise((r) => setTimeout(r, 2500));
+  const lines = await dee.eval(`window.__onTheWay`);
+  check(lines.every((t) => / away/.test(t)), "every 'on the way' line has the distance — never a flash without it", [...new Set(lines)]);
   await dee.click("btn-endride");
   await dee.waitFor(`!state.ride`, "ended");
 

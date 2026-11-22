@@ -113,7 +113,7 @@ defmodule HoodrideWeb.ChatAndPinTest do
 
     test "the demo's moving driver doesn't write over it" do
       assert @app =~
-               ~r/else if \(!state\.pinArmed\) \{\s*(\/\/[^\n]*\n\s*)*setBanner\(CAR \+ t\("\{name\} is on the way", \{ name: d\.name \}\)/
+               ~r/else if \(!state\.pinArmed\) \{\s*(\/\/[^\n]*\n\s*)*setBanner\(contextBanner\(\)\);/
     end
   end
 
@@ -131,5 +131,14 @@ defmodule HoodrideWeb.ChatAndPinTest do
       assert handler =~ "const at = state.pinPos || state.me;"
       assert handler =~ ~r/if \(state\.pinArmed\) \{/
     end
+  end
+
+  # (review, 2026-11-21) the keyboard code sizes the chat as the stylesheet
+  # does when the page can't be measured (a page the keyboard shrinks,
+  # turned): the two must agree
+  test "the chat's height: the app's copy matches styles.css" do
+    assert File.read!("priv/static/styles.css") =~ "height: min(48dvh, 420px);"
+    assert @app =~ "const CHAT_SHARE = 0.48;"
+    assert @app =~ "const CHAT_MAX = 420;"
   end
 end
