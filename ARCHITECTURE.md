@@ -3119,6 +3119,19 @@ here say the rest.
   blocked"; the database unable to answer counts as blocked. Every change
   takes both people's locks, database first; a load takes the person's
   lock too, so a block can't fall between a load's read and its write.
+- **Next, not built — the table as WITHOUT ROWID (owner, 2026-11-22):**
+  (blocker_id, blocked_id) becomes the primary key and the unused `id`
+  goes, so each pair is stored once instead of twice (table + unique
+  index). SQLite's advice ([withoutrowid](https://www.sqlite.org/withoutrowid.html)):
+  for a two-column key with small rows; not a default — measure, keep it
+  where it helps. Measured on a scratch copy (1,000,000 fake blocks):
+  76.6 → 51.5 bytes a block (−33%); the "did A block B?" check and
+  adding a block unchanged; the Blocked list and "who blocked me" ~2x
+  faster. The app never uses the row number, and nothing needs
+  autoincrement or SQLite's update hook. SQLite can't convert a table in
+  place, so a new migration copies the rows and rebuilds the `blocked_id`
+  index (cheap while the table is young). Built with the memory packing,
+  with a test that every block and the newest-first order survive the copy.
 - **The map never misses a parked car to a database hiccup:** a viewer's
   blocks load as their map joins; an update that came while the database
   couldn't answer is held back, the load tried again (full jitter, 1 s
@@ -3154,16 +3167,101 @@ here say the rest.
   text box; CSS units (dvh) don't follow it, and the VirtualKeyboard API /
   `keyboard-inset-height` are Chromium-only. So, the standard way
   (W3C Visual Viewport API): while the chat's text box is focused and the
-  visible area is > 80 px short of the page, the chat (`.chat.kb`) is
-  placed at `visualViewport.pageTop` + 8 px and sized to its height − 8 —
-  followed on the viewport's `resize` AND `scroll`. Not typing: half the
-  screen again. The keyboard area is trusted only while typing: iOS 26 can
+  visible area is > 80 px short of the page, the chat (`.chat.kb`) keeps
+  the height it had and sits right on the keyboard (the visible area's
+  bottom, `pageTop + height`) — shorter only when there isn't room, 8 px
+  under the top (owner, 2026-11-21) — followed on the viewport's `resize`
+  AND `scroll`. Not typing: half the screen again. On the keyboard
+  (2026-11-22, owner's iPhone: white in the chat's bottom corners): its
+  shape as at the screen's bottom, rounded on top only; its color carried
+  down behind the keyboard to the page's bottom (`::after`, height
+  `--kb-below` = whichever is further down, the page's `clientHeight` or
+  the map screen's (`#screen-map`) bottom — iOS 26's 100dvh can run a few
+  px over (Apple forums 803987) — minus the visible area's bottom,
+  rounded down):
+  the iOS 26 keyboard is see-through with rounded corners and showed the
+  light map (Apple forums 801060; native sheets do the same,
+  wolt_modal_sheet #395); and the text box loses the home bar's inset,
+  which Safari keeps with the keyboard up (WebKit 217754). Everything
+  that places the chat uses page places only (`offsetTop` up the
+  offsetParents, `pageTopOf`) plus the visible area's own page numbers
+  (`pageTop`, `height`) — never an on-screen place plus a scroll. Safari's
+  `window.scrollY` is the visible area's top, not the page's (WebKit
+  170981): read in, the chat sat that far above the keyboard, the map
+  between; and where Safari measures on-screen places from is reported
+  both ways (WebKit 257375; a real iPhone, shyden #934). The journey plays
+  both. (The 1 px nudge below still uses `scrollY` with `scrollTo` — the
+  same numbers both ways, so that's fine.)
+  The keyboard area is trusted only while typing: iOS 26 can
   leave `offsetTop` non-zero after the keyboard closes (Apple forums
   800125, WebKit 297779) — 350 ms after the blur, if it's still shifted, a
   1 px scroll and back makes it measure again (Sedna.UI #172, nxlx #264).
   `fitChatToKeyboard` in app.js; journey `chatkeyboard` (hands the page an
   iPhone's viewport — Chrome has no phone keyboard; real-device check is
   the owner's).
+- **Sideways: a side sheet** (2026-11-22, owner's iPhone: "so squished,
+  can't see text" — 48% of a 390 px screen left the messages ~30 px).
+  Material 2's sheets guidance: in landscape, swap a bottom sheet for a
+  side sheet (Material 3 puts side sheets on the end side as a rule; the
+  start side here is the owner's choice). Under
+  `(orientation: landscape) and (max-height: 480px) and
+  (min-aspect-ratio: 3/2)` (Material's compact height; truly wide, as a
+  phone page an upright keyboard shrank can be just wider than tall —
+  MDN's orientation note; `SIDE_SHEET` in app.js, the same in
+  styles.css) the chat
+  docks on the start side (left; right in right to left), from under the
+  top bar (`--topbar-h`; the bar spans the width and stays tappable) to
+  the bottom, `clamp(300px, 45vw, 400px)` wide plus the notch's inset.
+  `updateSideSheet` (on the chat's class changing, its border box
+  resizing — the notch's inset is padding, a content-box observer never
+  fired — a turn, a resize, the top bar resizing) marks `html.chat-side`
+  + `--sheet-w`, `--map-shift`, `--map-w`: what's centered over the map is
+  centered in the map beside the sheet — the banner (wrapping there), a
+  car's card, the pile list, "Share location" (still `left: 50%`, moved
+  by `translate: var(--map-shift)`, worked out for either side: a lone
+  left/right would break the pages mirroring by themselves, lang_test)
+  — the bottom buttons too;
+  the sheet and the top bar measured from page places, never on-screen
+  ones (Safari's scrolled page put the sheet over the bar); and the map
+  gets that side as
+  padding (Google Maps SDK's `setPadding` pattern), so "center on me" and
+  every camera move center in what you see. The chat opening or closing:
+  the map's middle moved to the place already shown at the new middle,
+  so the picture holds still (DEFRA interactive-map #570) — marked
+  `sideSheet`, so it isn't "you moved the map" (find the nearest and its
+  watch go on), and held until a move on its way (a glide, a search's
+  step) arrives, never cutting it short. Re-centred instead of held
+  still while find the nearest is looking (its sums take where it looks
+  from as drawn in the middle of what's shown) or when the place in the
+  middle would end up under the sheet (24 px or closer — a real iPhone
+  sideways reports its insets on BOTH sides, ~44–59 px each, so there the
+  sheet is always wider than half the screen); closing what opening
+  re-centred re-centres back (both keep the map's middle: an open and
+  close returns exactly — held still on close, each cycle walked the view
+  ~190 px), but not a turn's re-centring, nor once you've moved the map
+  yourself while it's open (closing then holds what you see still). The
+  top bar and ◎ keep clear of the side insets too. The far side's
+  notch counts too — the map's padding on that side, `--map-shift`,
+  `--map-end` for the bottom buttons, so the banner, the buttons and
+  "center on me" share one middle (`#safe-probe`'s own observer catches
+  an inset changing alone). A turn: the
+  map resized first (its own observer runs after the window's resize and
+  the media query's change — padded against its old size, it jumped;
+  only right before a padding change, never on every window resize),
+  then the middle you were looking at stays the middle of what you see.
+  Find the nearest's screen sums take where the middle is drawn
+  (`mapSize().cx/cy`, `HoodNearby.screenPoint/screenAt`) — unpadded they
+  put everyone ~200 px off. `rememberView` saves the screen's middle, not
+  the padded `getCenter()`. Typing there, the name bar is one row (no
+  distance line, no End chat/Block row). The hexes listened to don't
+  change with the sheet: the map's whole box is still in view. Journey
+  `chatsideways`.
+- **Turning the phone re-plans the hexes:** MapLibre resizes the map
+  (`trackResize`), a resize fires `moveend` → `syncGeoSubscriptions`:
+  hexes now in view joined, those out of view (past the margin) left; a
+  smaller screen still inside the old padded area keeps it (the
+  margin's rule). Journey `turnhexes` (a car in a hex seen only
+  sideways reaches the rider once she turns).
 - **Banner tap:** "💬 {name}: {text}" opens that chat when tapped while
   it shows (`bannerPeer`, `.banner.tappable`); nothing if the chat's gone
   meanwhile; no other banner is tappable. Journey `bannertap`.

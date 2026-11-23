@@ -419,7 +419,18 @@ await journey("chatread: unread read only as seen; the count goes down as you sc
   await frames(rita, 6);
   await new Promise((r) => setTimeout(r, 50));
   const grown = await rita.eval(`(() => { const b = document.getElementById("chat-messages"); return { stuck: chatStick.stuck, jump: !document.getElementById("chat-jump").classList.contains("hidden"), gap: b.scrollHeight - b.scrollTop - b.clientHeight }; })()`);
-  await rita.eval(`(document.getElementById("chat-messages").style.minHeight = "", true)`);
+  // (the box shrinking back is a resize: a scroll before it has settled
+  // counts as the resize's, not hers — HoodChatScroll's stick. Unwaited, a
+  // busy machine's precommit saw her still "at the bottom", 2026-11-22.
+  // Waited for KNOWN, not guessed: an observer of our own, made after the
+  // app's, runs after it; then a frame and a 1 ms timer, as onChatResize —
+  // set after the app's, they run after its resizeDone)
+  await rita.eval(`new Promise((done) => {
+    const b = document.getElementById("chat-messages");
+    const ro = new ResizeObserver(() => { ro.disconnect(); requestAnimationFrame(() => setTimeout(() => done(true), 1)); });
+    b.style.minHeight = "";
+    ro.observe(b);
+  })`);
   check(grown.gap <= 2 && grown.stuck && !grown.jump, "the box grew to the bottom: following again, no ↓", grown);
   // (review, 2026-11-20) the panel closed shrinks the box to nothing — an
   // empty box is "at its very end": the re-check above took a reader who'd

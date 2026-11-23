@@ -836,6 +836,20 @@ defmodule HoodrideWeb.LoginLockdownTest do
 
         refute Keyword.get(ssl, :hsts) == false, "HSTS switched off"
         assert endpoint[:url][:scheme] == "https"
+
+        # (the bug list's last unguarded ones, 2026-11-22) dev's error pages
+        # (stack traces, code to anyone), code reloading, and debug logs —
+        # which print every request's details — never in production
+        refute endpoint[:debug_errors], "error pages with stack traces on"
+        refute endpoint[:code_reloader], "code reloading on"
+
+        # (runtime.exs too, as the release applies it after — full review)
+        level =
+          Config.Reader.read!("config/runtime.exs", env: :prod)[:logger][:level] ||
+            Config.Reader.read!("config/config.exs", env: :prod)[:logger][:level]
+
+        assert level in [:info, :notice, :warning, :error],
+               "prod logs at #{inspect(level)}: debug lines in production"
       after
         for k <- Map.keys(env), do: System.delete_env(k)
       end

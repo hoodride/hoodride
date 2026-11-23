@@ -4,6 +4,8 @@ defmodule Hoodride.TestHelpers do
   @tables [
     :ride_requests,
     :ride_requests_cancel_wanted,
+    # an Accept's "at work" mark (tests plant them — full review, 2026-11-22)
+    :ride_requests_accepting,
     :requests_by_driver,
     :rides_by_user,
     :chat_conversations,

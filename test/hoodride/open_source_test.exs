@@ -172,4 +172,22 @@ defmodule Hoodride.OpenSourceTest do
       end
     end
   end
+
+  # gitleaks missing used to pass precommit with a note — the only secret
+  # scan quietly off (bug list, 2026-11-13; fixed 2026-11-22). Now it
+  # fails, unless the person asks to skip it by name.
+  describe "gitleaks not installed" do
+    test "fails the check" do
+      assert_raise Mix.Error, ~r/gitleaks isn't installed/, fn -> Secrets.missing(nil) end
+      assert_raise Mix.Error, fn -> Secrets.missing("") end
+      assert_raise Mix.Error, fn -> Secrets.missing("0") end
+    end
+
+    test "skipped only when asked: HOODRIDE_SKIP_SECRETS=1" do
+      # (the note returned, not printed: Mix's shell is global, and this
+      # module runs alongside others)
+      assert {:skip, note} = Secrets.missing("1")
+      assert note =~ "SKIPPED"
+    end
+  end
 end

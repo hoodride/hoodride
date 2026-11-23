@@ -70,6 +70,8 @@ defmodule Hoodride.Requests do
     # a request's age is a length of time: the steady clock (wall_ts/1 for
     # anything shown — ClockJumpTest, 2026-11-18)
     now = steady_s()
+    # (tests: a pause after create/4's checks, before the save)
+    hook(:saving)
 
     # index first: the request is findable the instant it exists
     :ets.insert(@by_driver, {{driver_id, rider.id}, now})
@@ -78,32 +80,119 @@ defmodule Hoodride.Requests do
       not :ets.insert_new(@requests, {rider.id, driver_id, now}) ->
         lost_create(rider, driver_id, now)
 
+      # FIRST: the two are already in a STARTED ride
+      # together — this driver's Accept of an earlier request, made since
+      # create/4's checks. It went through: :ok, not "finish your ride
+      # first" (review, 2026-11-22), nor "gone offline" — its start takes
+      # the car off the map (third review). This request, saved anyway (a
+      # second tab), taken back quietly, never left standing through the
+      # ride (second review)
+      riding_together?(rider.id, driver_id) ->
+        taken_back_quietly(rider.id, driver_id, now)
+
       # the driver went offline between the check and this save: withdraw
       # it at once, before telling them (Geo.offline_core declines again
       # after the car is off the map — together, nothing waits on an offline
       # driver for the 60 s repair)
-      not Hoodride.Geo.driver_on_map?(driver_id) ->
-        case take_if_ours(rider.id, driver_id) do
-          {:ok, ts} -> consumed(rider.id, driver_id, ts)
-          _ -> :ok
-        end
+      # (tests: a pause after the first look)
+      hook(:looked) == :never ->
+        :ok
 
-        {:error, :driver_offline}
+      not Hoodride.Geo.driver_on_map?(driver_id) ->
+        withdraw(rider.id, driver_id, now, :driver_offline)
 
       # saved — THEN: still signed in? Signed out since the channel's
       # check, the sign-out may have looked for a request before this (A1,
       # Rides.after_sign_out): withdrawn, never shown
       not still_signed_in.() ->
-        case take_if_ours(rider.id, driver_id) do
-          {:ok, ts} -> consumed(rider.id, driver_id, ts)
-          _ -> :ok
-        end
+        withdraw(rider.id, driver_id, now, :signed_out)
 
-        {:error, :signed_out}
+      # the rider's OWN ride started since create/4's check (another
+      # driver's Accept): that ride's start cancels the rider's other
+      # request — but it may have looked before this save and found
+      # nothing. Saved first, then this look: whichever comes second sees
+      # the other (bug list; 2026-11-22 — it showed until the 60 s repair)
+      in_started_ride?(rider.id) ->
+        withdraw(rider.id, driver_id, now, :in_ride)
+
+      # the DRIVER's ride started since create/4's check (another rider):
+      # its start declines what it finds waiting, maybe before this save —
+      # the same look, the driver's side (second review, 2026-11-22)
+      in_started_ride?(driver_id) ->
+        withdraw(rider.id, driver_id, now, :driver_busy)
 
       true ->
+        hook(:saved)
         announce(rider, driver_id, now, spot)
     end
+  end
+
+  # Every look after the save that takes this request back goes through
+  # here: a ride between these same two, started at ANY moment since the
+  # first look (its start also takes the car off the map), means
+  # it went through — quietly, :ok — never "offline", "busy" or "finish
+  # your ride first" for the ride that's opening (fourth review, 2026-11-22)
+  defp withdraw(rider_id, driver_id, ts, reason) do
+    if riding_together?(rider_id, driver_id) do
+      taken_back_quietly(rider_id, driver_id, ts)
+    else
+      withdraw_unsent(rider_id, driver_id, ts)
+      {:error, reason}
+    end
+  end
+
+  # this request, saved as a ride between the same two started: gone, no
+  # word (the ride is the news) — :ok, it went through
+  defp taken_back_quietly(rider_id, driver_id, ts) do
+    if :ets.select_delete(@requests, [{{rider_id, driver_id, ts}, [], [true]}]) == 1,
+      do: consumed(rider_id, driver_id, ts)
+
+    :ok
+  end
+
+  # After the save, only a STARTED ride counts — never seats merely claimed
+  # by a start that can still fail (fifth review, 2026-11-22: a request
+  # taken back for one, the start then failing and its put-back finding
+  # this request in the slot, left the rider with none and no word). The
+  # sweeper's rule too (heal_unlawful_requests). A start that succeeds
+  # withdraws what it must itself (Rides started/6: the rider's other
+  # request, the driver's waiting ones), after taking its seats over.
+  # (a ride takes its two seats over one at a time — ETS swaps each row
+  # alone: for an instant one seat has the ride and the other still this
+  # pair's claim. That IS a started ride between them; eighth review)
+  defp riding_together?(rider_id, driver_id) do
+    {rs, ds} = seats(rider_id, driver_id)
+    together?(rs, ds, rider_id, driver_id)
+  end
+
+  defp seats(rider_id, driver_id),
+    do: {Hoodride.Rides.ride_id_of_user(rider_id), Hoodride.Rides.ride_id_of_user(driver_id)}
+
+  defp together?(rs, ds, rider_id, driver_id),
+    do:
+      (is_binary(rs) and (ds == rs or claim_of?(ds, rider_id, driver_id))) or
+        (is_binary(ds) and claim_of?(rs, rider_id, driver_id))
+
+  # seats claimed by a start between exactly these two
+  defp claim_of?({:pending, _, rider_id, driver_id}, rider_id, driver_id), do: true
+  defp claim_of?(_, _, _), do: false
+
+  defp in_started_ride?(user_id), do: is_binary(Hoodride.Rides.ride_id_of_user(user_id))
+
+  # this very request, saved but not announced, taken back — and the driver
+  # told: for that moment it was in their waiting list (/api/state reads
+  # it), so an app loading its state then shows it (bug list; 2026-11-22).
+  # (The app ignores the word for a request it never showed.)
+  defp withdraw_unsent(rider_id, driver_id, ts) do
+    if :ets.select_delete(@requests, [{{rider_id, driver_id, ts}, [], [true]}]) == 1 do
+      consumed(rider_id, driver_id, ts)
+
+      HoodrideWeb.Endpoint.broadcast("user:#{driver_id}", "request_cancelled", %{
+        from_id: rider_id
+      })
+    end
+
+    :ok
   end
 
   defp announce(rider, driver_id, now, spot) do
@@ -113,8 +202,54 @@ defmodule Hoodride.Requests do
 
     HoodrideWeb.Endpoint.broadcast("user:#{driver_id}", "request", %{
       from: %{id: rider.id, name: rider.name, photo: rider.photo},
-      spot: spot
+      spot: spot,
+      # which request this is: a Decline names it (decline/3)
+      req: now
     })
+
+    # ended between the save's checks and the line above (a sign-out's
+    # cancel): its "request_cancelled" went out BEFORE this "request", and
+    # the driver would show a request that's gone. Said again, after —
+    # from this process, so in order (bug list; 2026-11-22). Not when an
+    # Accept took it (at work, or their ride starting): a ride, not a cancel
+    # (review, 2026-11-22)
+    # (an Accept at work counts only while the rider isn't in a started
+    # ride: one with ANOTHER driver started meanwhile, and its start-up's
+    # cancel of this request came first — the driver kept it on screen
+    # until a reload; sixth review)
+    # "Accept at work" read FIRST, "riding together" after: an Accept's
+    # mark goes only once its ride has started, so one of the two always
+    # sees it — read the other way round, one finishing in between was
+    # missed by both (seventh review, 2026-11-22)
+    # The pair's seats read once, after: THIS pair's ride in any stage —
+    # claimed, half taken over, started — is never "another ride" (eighth
+    # review: a third read after "together" let a finishing Accept through)
+    gone = :ets.match_object(@requests, {rider.id, driver_id, now}) == []
+    # (tests: a pause between the first two reads)
+    hook(:resend_gone)
+    at_work = accepting?(rider.id)
+    # …and gone STILL: an Accept that failed puts the request back, THEN
+    # drops its mark — between the two reads above it was neither "there"
+    # nor "at work" (full review, 2026-11-22). (Gone at the first read
+    # because an Accept took it: its mark was set before the take, so
+    # "at work" saw it, unless it had already finished)
+    gone = gone and :ets.match_object(@requests, {rider.id, driver_id, now}) == []
+    # (tests: a pause between the reads)
+    hook(:resend_reads)
+    {rs, ds} = seats(rider.id, driver_id)
+
+    ours =
+      together?(rs, ds, rider.id, driver_id) or claim_of?(rs, rider.id, driver_id) or
+        claim_of?(ds, rider.id, driver_id)
+
+    # in a started ride with someone else
+    other_ride = is_binary(rs) and not ours
+
+    if gone and not ours and (not at_work or other_ride) do
+      HoodrideWeb.Endpoint.broadcast("user:#{driver_id}", "request_cancelled", %{
+        from_id: rider.id
+      })
+    end
 
     :ok
   end
@@ -296,16 +431,31 @@ defmodule Hoodride.Requests do
     end
   end
 
+  @doc """
+  The driver's Decline of the request they SAW — `ts`, its stamp (the
+  "request" broadcast's and the waiting list's `req`). A newer request
+  from the same rider is left alone: the first expired, the rider asked
+  again, and the Decline was on its way, or queued on a bad connection (bug
+  list; 2026-11-22 — it wiped the newer one and started the cooldown).
+  (Stamps are whole seconds: a new request in the same second as the old
+  one's end is the one gap — the expiry is 5 minutes in.)
+  """
+  def decline(driver_id, rider_id, ts) when is_integer(ts) do
+    if :ets.select_delete(@requests, [{{rider_id, driver_id, ts}, [], [true]}]) == 1 do
+      declined(driver_id, rider_id, ts)
+    else
+      case :ets.lookup(@requests, rider_id) do
+        [{_, other, _}] when other != driver_id -> {:error, :not_yours}
+        _ -> {:error, :none}
+      end
+    end
+  end
+
+  # (an app from before the stamp: whatever request of theirs stands)
   def decline(driver_id, rider_id) do
     case take_if_ours(rider_id, driver_id) do
       {:ok, ts} ->
-        consumed(rider_id, driver_id, ts)
-        # "no" sticks for a full minute from the moment it's said
-        Hoodride.Throttle.start_request_cooldown(rider_id, driver_id)
-
-        HoodrideWeb.Endpoint.broadcast("user:#{rider_id}", "request_declined", %{by_id: driver_id})
-
-        :ok
+        declined(driver_id, rider_id, ts)
 
       :not_yours ->
         {:error, :not_yours}
@@ -313,6 +463,14 @@ defmodule Hoodride.Requests do
       :none ->
         {:error, :none}
     end
+  end
+
+  defp declined(driver_id, rider_id, ts) do
+    consumed(rider_id, driver_id, ts)
+    # "no" sticks for a full minute from the moment it's said
+    Hoodride.Throttle.start_request_cooldown(rider_id, driver_id)
+    HoodrideWeb.Endpoint.broadcast("user:#{rider_id}", "request_declined", %{by_id: driver_id})
+    :ok
   end
 
   @doc """
@@ -394,8 +552,22 @@ defmodule Hoodride.Requests do
               error ->
                 # the ride couldn't start: the request stands again — but
                 # only into an EMPTY slot (insert_new), never over a request
-                # the rider made in the meantime
-                :ets.insert_new(@requests, {rider_id, driver_id, ts})
+                # the rider made in the meantime. Its index row too: a
+                # second request in that moment (another tab) replaced and
+                # removed it, and the driver's list missed this one (third
+                # review, 2026-11-22). Only once it's back — never over a
+                # newer request's own row
+                # (fourth review) and if it isn't back after all — the slot
+                # taken, or a cancel in between — this exact row undone
+                # (consumed/3: never another request's)
+                if :ets.insert_new(@requests, {rider_id, driver_id, ts}) do
+                  :ets.insert(@by_driver, {{driver_id, rider_id}, ts})
+
+                  if :ets.match_object(@requests, {rider_id, driver_id, ts}) == [],
+                    do: consumed(rider_id, driver_id, ts)
+                else
+                  consumed(rider_id, driver_id, ts)
+                end
 
                 # put back — THEN: the rider's Cancel, given up waiting for
                 # this, left with it? Cancelled now (the mark looked at only
@@ -411,8 +583,11 @@ defmodule Hoodride.Requests do
 
                 # …and: either of them signed out meanwhile (their
                 # sign-out may have looked for a request before this — A1)?
+                # Or the driver gone off the map (their going offline found
+                # nothing to decline: this Accept held it — sixth review,
+                # 2026-11-22: the rider waited a minute for the sweeper)?
                 # Taken back: declined, never left for someone gone
-                unless look.() do
+                unless look.() and Hoodride.Geo.driver_on_map?(driver_id) do
                   case take_if_ours(rider_id, driver_id) do
                     {:ok, back} ->
                       consumed(rider_id, driver_id, back)

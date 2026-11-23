@@ -202,6 +202,67 @@ defmodule Hoodride.AvatarsTest do
       Req.Test.stub(Hoodride.Avatars, &Req.Test.transport_error(&1, :timeout))
       assert Avatars.from_google(@google, nil) == nil
     end
+
+    # (bug list, 2026-11-13) a zipped answer unzipped before any size check
+    # can unpack to gigabytes in memory. Req 0.7 neither asks for nor
+    # unzips one unless told to (`compressed: true`) — this keeps it so:
+    # a zipped photo isn't one
+    test "a zipped answer: never asked for, never unzipped" do
+      test = self()
+
+      Req.Test.stub(Hoodride.Avatars, fn conn ->
+        send(test, {:accept_encoding, Plug.Conn.get_req_header(conn, "accept-encoding")})
+
+        conn
+        |> Plug.Conn.put_resp_header("content-encoding", "gzip")
+        |> Plug.Conn.send_resp(200, :zlib.gzip(@jpeg))
+      end)
+
+      # (a good photo, zipped: unzipped, it would be taken)
+      assert Avatars.from_google(@google, nil) == nil
+      assert_received {:accept_encoding, asked}
+      refute Enum.any?(asked, &(&1 =~ ~r/gzip|br|zstd|deflate/)), inspect(asked)
+    end
+
+    # the time limit is for the WHOLE photo (a per-read limit let a slow
+    # trickle hold a sign-in as long as it kept sending)
+    test "an answer slower than the whole allowance: given up in time" do
+      serve(fn conn ->
+        receive do
+          :never -> :ok
+        after
+          Hoodride.Limits.avatar_fetch_ms() + 5_000 -> :ok
+        end
+
+        image(conn, @jpeg)
+      end)
+
+      started = System.monotonic_time(:millisecond)
+      assert Avatars.from_google(@google, "/avatars/kept.jpg") == "/avatars/kept.jpg"
+      took = System.monotonic_time(:millisecond) - started
+      assert took < Hoodride.Limits.avatar_fetch_ms() + 1_000, "took #{took} ms"
+    end
+
+    # Facebook's first step (where the photo is) counts too: one allowance
+    # for both steps, as Google's two tries share one
+    test "Facebook answering slower than the whole allowance: given up in time" do
+      serve(fn conn ->
+        receive do
+          :never -> :ok
+        after
+          Hoodride.Limits.avatar_fetch_ms() + 5_000 -> :ok
+        end
+
+        Req.Test.json(conn, %{
+          "data" => %{"url" => "https://scontent.xx.fbcdn.net/p.jpg", "is_silhouette" => false}
+        })
+      end)
+
+      started = System.monotonic_time(:millisecond)
+      assert Avatars.from_facebook("t", "/avatars/kept.jpg", @graph) == "/avatars/kept.jpg"
+      took = System.monotonic_time(:millisecond) - started
+      assert took < Hoodride.Limits.avatar_fetch_ms() + 1_000, "took #{took} ms"
+    end
   end
 
   describe "storing" do

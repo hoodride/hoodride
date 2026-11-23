@@ -525,9 +525,12 @@ function fitBanner(b, text) {
 // rotated or resized: the cap changed — the box fitted afresh (once per
 // resize burst: cleared now, read two frames on, after the browser's layout).
 // Not drawn unfitted meanwhile — the banner as it was shows instead, as for a
-// new text. A new text's own fitting under way: left to finish it
+// new text. A new text's own fitting under way: left to finish it. (Also
+// when the chat docks or undocks as a side sheet: the room beside it is
+// the cap then — updateSideSheet)
 let bannerRefit = false;
-window.addEventListener("resize", () => {
+window.addEventListener("resize", refitBanner);
+function refitBanner() {
   const b = $("banner");
   if (!b || (!b.style.width && !bannerRefit)) return;
   holdBanner(b);
@@ -543,7 +546,7 @@ window.addEventListener("resize", () => {
       bannerFitted(b);
     })
   );
-});
+}
 
 // "· 0.4 mi away" for a rider's driver on the way — to the pin, else where
 // you are — once their position is fresh, else "" (lastSeen says how old).
@@ -1639,17 +1642,23 @@ async function connectSocket() {
     refreshChatDistance();
   });
 
-  userChannel.on("request", ({ from, spot }) => {
+  userChannel.on("request", ({ from, spot, req }) => {
     const peer = ensurePeer(from);
     if (spot) rememberShared(peer, { spot, age_ms: 0 });
     peer.pending = true;
+    // which request: a Decline names it, so a late one never ends a newer
+    // request from the same rider (Requests.decline/3; 2026-11-22)
+    peer.pendingReq = typeof req === "number" ? req : null;
     receiveMsg(peer, t("📩 requested a ride"));
     refreshControls();
   });
 
+  // only for a request this app shows: the server also says it of one
+  // withdrawn as it was saved, which a state load may have listed — never
+  // shown here, no "withdrawn" line (2026-11-22)
   userChannel.on("request_cancelled", ({ from_id }) => {
     const peer = realPeersById.get(from_id);
-    if (peer) {
+    if (peer && peer.pending) {
       peer.pending = false;
       receiveMsg(peer, t("(request withdrawn)"));
       refreshControls();
@@ -2026,6 +2035,7 @@ function hydrate(st) {
     const peer = ensurePeer(r.rider);
     if (r.spot) rememberShared(peer, r.spot);
     peer.pending = true;
+    peer.pendingReq = typeof r.req === "number" ? r.req : null;
     // a pending request implies a driver context
     state.mode = "driver";
   });
@@ -3433,7 +3443,11 @@ let movedByYou = false;
 // opens where you were — real accounts only
 function rememberView() {
   if (DEMO || !state.realUser) return;
-  const c = map.getCenter();
+  // (the screen's middle — not getCenter(): with the chat a side sheet the
+  // map's middle is the part beside it (its padding), and the view would
+  // open half a chat's width off: updateSideSheet)
+  const box = map.getContainer();
+  const c = map.unproject([box.clientWidth / 2, box.clientHeight / 2]);
   HoodViewStore.save(storageOrNull(), state.realUser.id, { lng: c.lng, lat: c.lat, zoom: map.getZoom() });
 }
 
@@ -3455,6 +3469,9 @@ function initMap() {
     probe.id = "safe-probe";
     probe.setAttribute("aria-hidden", "true");
     document.body.appendChild(probe);
+    // (a notch on the FAR side moves the map's end beside the chat's side
+    // sheet — --map-shift — and changes no other size: updateSideSheet)
+    new ResizeObserver(updateSideSheet).observe(probe, { box: "border-box" });
   }
   // where it opens: the area you last used here, else the placeholder (a
   // location reading then centres it on you — onReading)
@@ -3507,12 +3524,34 @@ function initMap() {
   // only gestures carry an originalEvent (a camera move of the app's doesn't)
   map.on("movestart", (e) => {
     if (e.originalEvent) movedByYou = true;
+    // (you moved the map yourself with the side sheet open: closing it
+    // holds what you now see still, not back by half the sheet —
+    // updateSideSheet; sixth review, 2026-11-22)
+    if (e.originalEvent) sideSheetRecentred = false;
     // (a ◎ tap still waiting for its reading: your own drag or pinch cancels
     // it — the app's own moves, a resize, don't)
     if (e.originalEvent && !DEMO) loc.cancelCentre();
     // any move but find-the-nearest's own ends it (and its "nobody nearby
-    // yet": what's on screen no longer says who's near you)
-    if (!e.nearSearch) movedByHand();
+    // yet": what's on screen no longer says who's near you) — and the side
+    // sheet's padding, which leaves what's on screen where it is
+    // (updateSideSheet)
+    if (!e.nearSearch && !e.sideSheet) movedByHand();
+  });
+  // a Shift-drag box zoom (a computer) is yours too — the one gesture
+  // MapLibre moves without its event (box_zoom: fitScreenCoordinates with
+  // no originalEvent): read as the app's own move, closing the side sheet
+  // after it went back by half the sheet; nor did it count as you moving
+  // the map, or cancel a ◎ still waiting (seventh review, 2026-11-22).
+  // Starting the box: you're handling the map — a ◎ or a first reading
+  // mustn't move it under the box half-drawn. The view's change, for the
+  // side sheet: only a zoom that happens (end) — one cancelled (Escape)
+  // moved nothing, and closing still goes back (box zoom review)
+  map.on("boxzoomstart", () => {
+    movedByYou = true;
+    if (!DEMO) loc.cancelCentre();
+  });
+  map.on("boxzoomend", () => {
+    sideSheetRecentred = false;
   });
   // a finger put down on the bare map while the search is STEPPING ends it
   // at once — before any move: the press stops the step's move, and the
@@ -3670,10 +3709,12 @@ function showSharePrompt(text) {
   btn.id = "share-location";
   btn.textContent = text;
   btn.style.cssText =
-    "position:fixed;left:50%;transform:translateX(-50%);" +
+    // (centered in the map beside the chat when it's a side sheet:
+    // --map-shift/--map-w, updateSideSheet — second review, 2026-11-22)
+    "position:fixed;left:50%;transform:translateX(-50%);translate:var(--map-shift, 0px) 0;" +
     "bottom:calc(150px + env(safe-area-inset-bottom));z-index:9997;padding:12px 22px;border:0;" +
     "border-radius:999px;background:#1a73e8;color:#fff;font:700 15px system-ui,sans-serif;" +
-    "box-shadow:0 4px 16px rgba(0,0,0,.4);cursor:pointer;max-width:calc(100% - 32px)";
+    "box-shadow:0 4px 16px rgba(0,0,0,.4);cursor:pointer;max-width:calc(var(--map-w, 100%) - 32px)";
   btn.addEventListener("click", () => loc.shareTapped());
   document.body.appendChild(btn);
 }
@@ -4378,7 +4419,8 @@ function noteKbBefore() {
     const turned = (prev.page * prev.width) / width;
     if (page < turned - KB_MIN) {
       page = turned;
-      height = Math.min(CHAT_SHARE * turned, CHAT_MAX);
+      // (turned sideways: a side sheet then, under the top bar to the bottom)
+      height = width >= 1.5 * turned && turned <= SIDE_MAX_H ? turned - topbarHeight() : Math.min(CHAT_SHARE * turned, CHAT_MAX);
     }
   }
   kbBefore = { page, chat: height, width, facing };
@@ -4403,6 +4445,17 @@ function screenFacing() {
 // a page the keyboard is shrinking, where it can't be measured
 const CHAT_SHARE = 0.48;
 const CHAT_MAX = 420;
+// an element's top in the page, from page places only (offsetTop up its
+// offsetParents) — the same in every browser however the page or the
+// visible area is scrolled (fitChatToKeyboard). Whole pixels, and a
+// positioned parent's border or transform is left out — exact here: the
+// chat's chain is body alone (#screen-map isn't positioned), at 0, no
+// borders or transforms (styles.css resets them)
+function pageTopOf(el) {
+  let top = 0;
+  for (let e = el; e; e = e.offsetParent) top += e.offsetTop;
+  return top;
+}
 function fitChatToKeyboard() {
   const chat = $("chat");
   const vv = window.visualViewport;
@@ -4417,21 +4470,183 @@ function fitChatToKeyboard() {
     if (chat.classList.contains("kb")) {
       chat.classList.remove("kb");
       chat.style.top = chat.style.bottom = chat.style.height = "";
+      chat.style.removeProperty("--kb-below");
     }
     if (!chatTyping()) kbBefore = null;
     return;
   }
-  const host = chat.offsetParent || document.body;
-  const hostTop = host.getBoundingClientRect().top + window.scrollY;
+  // (the host's place in the PAGE, from page places only — never an
+  // on-screen place plus a scroll: Safari's window.scrollY is the visible
+  // area's top, not the page's (WebKit 170981 — the chat sat that far above
+  // the keyboard, the map between: second review, 2026-11-22), and where
+  // Safari measures on-screen places from is reported both ways (WebKit
+  // 257375 vs a real iPhone, shyden #934 — fifth review). Only the visible
+  // area's own page numbers (pageTop, height) decide where the chat goes)
+  const hostTop = pageTopOf(chat.offsetParent || document.body);
   // (never taller than what's visible: a 120 px minimum put the name and
   // close button above it, ~100 px left on a sideways phone — review,
   // 2026-11-21)
   const height = Math.min(Math.max(Math.min(kbBefore.chat, vv.height - KB_GAP), 120), vv.height);
-  chat.classList.add("kb");
+  // (only when it isn't yet: adding it again still rewrites the attribute —
+  // the side sheet's observer re-ran on every keyboard event: fifth review)
+  if (!chat.classList.contains("kb")) chat.classList.add("kb");
   chat.style.top = `${vv.pageTop + vv.height - height - hostTop}px`;
   chat.style.bottom = "auto";
   chat.style.height = `${height}px`;
+  // what the keyboard covers, from its top to the page's bottom: the chat's
+  // own color is carried down over it (styles.css .chat.kb::after) — the
+  // iOS 26 keyboard is see-through with rounded corners, and the light map
+  // under it lit its corners white (owner's iPhone, 2026-11-22). In the
+  // page's own numbers, to its bottom and never past it: nothing new to
+  // scroll; scrolled all the way down to the text box there's nothing of the
+  // page under the keyboard (0), nor in a browser that shrinks the whole
+  // page. Never window.scrollY: Safari's is the visible area's top, not the
+  // page's (WebKit 170981) — the color hung past the bottom and the page
+  // grew with every drag (review, 2026-11-22)
+  // (…to the map's bottom where that's lower: iOS 26 can make 100dvh a few
+  // px more than the page's measured height — a strip of map was left;
+  // whole pixels rounded DOWN: half a pixel past the bottom is a page to
+  // scroll — third review, 2026-11-22)
+  const map = $("screen-map");
+  // (its exact height: offsetHeight is rounded, up as well — the color
+  // could end a fraction of a pixel past the map, a page to scroll. A size
+  // is the same however on-screen places are measured — sixth review)
+  const mapBottom = pageTopOf(map) + map.getBoundingClientRect().height;
+  const below = Math.max(document.documentElement.clientHeight, mapBottom) - (vv.pageTop + vv.height);
+  chat.style.setProperty("--kb-below", `${Math.max(0, Math.floor(below))}px`);
 }
+// ===== Sideways: the chat a side sheet (owner's iPhone, 2026-11-22: "so
+// squished, can't see text") — styles.css does the sheet (the same query);
+// here what's BESIDE it: html.chat-side + --sheet-w move the banner and the
+// bottom buttons into the map beside it, and the map is told the sheet
+// covers that side — its padding (as map apps do: Google Maps SDK
+// setPadding), so "center on me" and every move centers in what you see.
+// The padding changed without the picture moving: the map's middle set to
+// the place already shown at the new middle (a jump when it opens or closes
+// is what padding alone does — DEFRA interactive-map #570). The hexes
+// listened to don't change: the map's whole box is still in view, the cars
+// under the sheet only hidden by it.
+const SIDE_MAX_H = 480; // px: Material 3's "compact height" (< 480dp)
+// (and truly wide — a turned phone is ~1.8–2.4 times as wide as tall: a
+// page an upright phone's keyboard shrank can come out just wider than
+// tall, "landscape" to the media query — MDN's orientation note; review,
+// 2026-11-22)
+const SIDE_SHEET = `(orientation: landscape) and (max-height: ${SIDE_MAX_H}px) and (min-aspect-ratio: 3/2)`;
+const sideSheetQuery = window.matchMedia(SIDE_SHEET); // (one, kept: it's live)
+// (a page place plus a size — never an on-screen place: with Safari's page
+// scrolled for a keyboard the bar's on-screen bottom came out short,
+// negative even, and the sheet started over it — second review, 2026-11-22)
+function topbarHeight() {
+  const tb = document.querySelector(".topbar");
+  return Math.round(pageTopOf(tb) + tb.getBoundingClientRect().height);
+}
+function updateSideSheet() {
+  const chat = $("chat");
+  const html = document.documentElement;
+  const on = !chat.classList.contains("hidden") && sideSheetQuery.matches;
+  const rtl = html.dir === "rtl";
+  const W = document.documentElement.clientWidth;
+  // (page places, as fitChatToKeyboard: never an on-screen place)
+  const w = on ? (rtl ? W - chat.offsetLeft : chat.offsetLeft + chat.offsetWidth) : 0;
+  // the notch on the far side: the map beside the sheet ends there — its
+  // middle, the banner's and the buttons' all between the two (third and
+  // fourth reviews, 2026-11-22: counted for the banner only, "center on
+  // me" ~23 px off it)
+  const ins = on ? safeInsets() : null;
+  const end = on ? Math.round(rtl ? ins.left : ins.right) : 0;
+  const was = html.classList.contains("chat-side") ? html.style.getPropertyValue("--sheet-w") : "";
+  html.classList.toggle("chat-side", on);
+  if (on) {
+    html.style.setProperty("--sheet-w", `${w}px`);
+    // the map beside it: its middle and its width
+    const mapW = W - w - end;
+    const mid = rtl ? end + mapW / 2 : w + mapW / 2;
+    // (how far that is from the screen's middle: what's centred there moves
+    // by it — styles.css html.chat-side, `translate`)
+    html.style.setProperty("--map-shift", `${mid - W / 2}px`);
+    html.style.setProperty("--map-w", `${mapW}px`);
+    html.style.setProperty("--map-end", `${end}px`);
+  } else ["--sheet-w", "--map-shift", "--map-w", "--map-end"].forEach((v) => html.style.removeProperty(v));
+  if ((on ? `${w}px` : "") !== was) refitBanner();
+  if (!map) return;
+  // (the map on its way somewhere — a glide, a search's step: padded when
+  // it gets there, not cut short — second review, 2026-11-22)
+  if (map.isMoving()) {
+    if (!sideSheetWaiting) {
+      sideSheetWaiting = true;
+      map.once("moveend", () => {
+        sideSheetWaiting = false;
+        updateSideSheet();
+      });
+    }
+    return;
+  }
+  const box = map.getContainer();
+  const size = `${box.clientWidth}x${box.clientHeight}`;
+  const turned = sideSheetBox !== null && sideSheetBox !== size;
+  sideSheetBox = size;
+  const pad = { top: 0, bottom: 0, left: rtl ? end : w, right: rtl ? w : end };
+  const cur = map.getPadding();
+  if (Math.round(cur.left) === pad.left && Math.round(cur.right) === pad.right) return;
+  // (the map resizes itself only from its own observer, which runs AFTER
+  // the window's resize and the media query's change — padded against its
+  // old size mid-turn, the map jumped: what you looked at went off screen.
+  // Sized first — review, 2026-11-22. Only before a padding change: on
+  // every window resize it was ~60 resizes a second dragging a computer's
+  // window edge, each a move — fourth review)
+  const canvas = map.getCanvas();
+  if (canvas.clientWidth !== box.clientWidth || canvas.clientHeight !== box.clientHeight) map.resize();
+  // turned (the screen a new size): what you were looking at — the map's
+  // middle — stays the middle of what you see, beside the sheet now. The
+  // chat opened or closed (the same screen): the picture holds still, the
+  // middle set to the place already shown at the new middle
+  // (marked as the sheet's: what's shown doesn't move, so it isn't "you
+  // moved the map" — find the nearest and its watch go on: second review)
+  // Re-centred instead (the middle you looked at the middle of what you see)
+  // when held still would be wrong (third review, 2026-11-22): a search
+  // looking — its sums take where it looks from as drawn in the middle of
+  // what's shown, ~200 px off held still; or the place in the middle
+  // would end up under the sheet (with the notch on its side the sheet is
+  // wider than half the screen — you, after "center on me", hidden)
+  const shownMid = (cur.left + box.clientWidth - cur.right) / 2;
+  const hidden = rtl ? shownMid > box.clientWidth - w - SIDE_CLEAR : shownMid < w + SIDE_CLEAR;
+  // (…and closing what opening re-centred re-centres it back: a real iPhone
+  // sideways reports its insets on BOTH sides, the sheet always wider than
+  // half the screen — opening re-centred, closing held still, and each open
+  // and close walked the view ~190 px. Both ways keep the map's middle:
+  // back exactly where it was — fifth review, 2026-11-22)
+  // (kept while it stays open — a new width, the notch moving — so the
+  // close still goes back. A turn's re-centring isn't one to undo: the
+  // picture after a turn is new, closing then holds it still)
+  const back = !on && sideSheetRecentred;
+  sideSheetRecentred = on && (sideSheetRecentred || (!turned && (nearLooking || hidden)));
+  if (sideSheetRecentred || back || turned || nearLooking) return void map.jumpTo({ padding: pad }, { sideSheet: true });
+  const middle = map.unproject([(pad.left + box.clientWidth - pad.right) / 2, box.clientHeight / 2]);
+  map.jumpTo({ center: middle, padding: pad }, { sideSheet: true });
+}
+let sideSheetRecentred = false; // the sheet's last padding re-centred the map (closing: back the same way)
+let sideSheetBox = null; // the map's box at the last look: a new size is a turn
+const SIDE_CLEAR = 24; // px: the middle this close to the sheet counts as under it
+let sideSheetWaiting = false; // padded once the map's move ends
+// the top bar's height, for the sheet's top (styles.css --topbar-h): it
+// grows with the notch's inset and a longer title. Its BORDER box — the
+// inset is its padding (the content box stays the same: never fired)
+new ResizeObserver(() => {
+  document.documentElement.style.setProperty("--topbar-h", `${topbarHeight()}px`);
+  updateSideSheet();
+}).observe(document.querySelector(".topbar"), { box: "border-box" });
+// opened, closed, lifted onto the keyboard (its class), turned or resized;
+// or the sheet itself a new size with no resize at all — the notch moving
+// sides (a phone turned the other way round): its inset is the sheet's
+// (review, 2026-11-22). Its BORDER box: the inset is padding — its content
+// box stays the same size, and a plain observer never fired
+new MutationObserver(updateSideSheet).observe($("chat"), { attributes: true, attributeFilter: ["class"] });
+new ResizeObserver(updateSideSheet).observe($("chat"), { box: "border-box" });
+// (…and the notch on the FAR side: #safe-probe's own observer, initMap —
+// third review, 2026-11-22)
+sideSheetQuery.addEventListener("change", updateSideSheet);
+window.addEventListener("resize", updateSideSheet);
+
 if (window.visualViewport) {
   window.visualViewport.addEventListener("resize", fitChatToKeyboard);
   window.visualViewport.addEventListener("scroll", fitChatToKeyboard);
@@ -5568,7 +5783,9 @@ $("btn-decline").addEventListener("click", () => {
   if (!peer) return;
   peer.pending = false;
   if (!DEMO) {
-    userChannel.push("decline_request", { rider_id: peer.id });
+    // the request it saw (none known: whichever of theirs stands)
+    const req = peer.pendingReq;
+    userChannel.push("decline_request", typeof req === "number" ? { rider_id: peer.id, req } : { rider_id: peer.id });
   }
   transientBanner(t("Request declined"));
   if (DEMO) scheduleIncomingRequest();
@@ -5856,9 +6073,15 @@ let nearLooking = false; // looking (stepping out, waiting for answers) — what
 let nearOutward = false; // …and the search under way only steps OUT from where the map was (a look-again)
 let nobodyNear = false; // looked: nobody — the banner says so
 
+// (cx/cy: where the map's middle is drawn — beside the chat's side sheet
+// when the map is padded for it, updateSideSheet: the search's sums put
+// you, and so everyone, ~200 px off — review, 2026-11-22)
 function mapSize() {
   const c = map.getContainer();
-  return { w: c.clientWidth, h: c.clientHeight };
+  const w = c.clientWidth;
+  const h = c.clientHeight;
+  const p = map.getPadding();
+  return { w, h, cx: p.left + (w - p.left - p.right) / 2, cy: p.top + (h - p.top - p.bottom) / 2 };
 }
 
 // the markers the map has DRAWN now, of the kind you're looking for (only
@@ -6067,7 +6290,7 @@ function findNearest(at, { outFrom = null } = {}) {
   // the map's real view can be a pixel wider than the whole-pixel size —
   // at the first and the widest step it must still show people one by
   // one, never tip over into counts)
-  const ladder = { viewport: HoodViewport, h3, center: at, size: { w: size.w + 2 * NEAR_EDGE_PX, h: size.h + 2 * NEAR_EDGE_PX }, rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS };
+  const ladder = { viewport: HoodViewport, h3, center: at, size: { w: size.w + 2 * NEAR_EDGE_PX, h: size.h + 2 * NEAR_EDGE_PX, cx: size.cx + NEAR_EDGE_PX, cy: size.cy + NEAR_EDGE_PX }, rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS };
   // the usual view — or, on a screen so big it shows counts there (a
   // 2560×1440 monitor), the first zoom closer in that shows people one by one
   const startZoom = HoodNearby.markerStartZoom({ ...ladder, maxZoom: INTENT_ZOOM });

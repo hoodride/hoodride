@@ -943,7 +943,8 @@ defmodule HoodrideWeb.AuthController do
 
   defp pending_request_state(pending, people) do
     for r <- pending, rd = people[r.rider_id], rd != nil do
-      %{rider: person(rd), ts: Hoodride.Requests.wall_ts(r.ts), spot: r.spot}
+      # req: which request — a Decline names it (Requests.decline/3)
+      %{rider: person(rd), ts: Hoodride.Requests.wall_ts(r.ts), req: r.ts, spot: r.spot}
     end
   end
 

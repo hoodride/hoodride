@@ -1078,3 +1078,28 @@ test("randomized: the whole search — never zooms in, always ends, stops at the
     assert.ok(tally.real >= 40, at);
   }
 });
+
+// (review, 2026-11-22) sideways with the chat a side sheet, the map is
+// padded: `center` is drawn at the middle of what's beside the sheet, not
+// the screen's — the search predicted every car ~200 px off (found off
+// screen; or a car in view taken for one under the sheet)
+test("a padded map: positions from where the middle is DRAWN (size.cx/cy); the screen still the whole box", () => {
+  const SIDE = { w: 844, h: 390 };
+  const padded = { ...SIDE, cx: 400 + (844 - 400) / 2, cy: 195 };
+  const me = NYC;
+  const east = { lat: NYC.lat, lng: NYC.lng + 0.01 };
+  const plain = N.screenPoint(me, east, 14, SIDE);
+  const pad = N.screenPoint(me, east, 14, padded);
+  assert.equal(Math.round(pad.x - plain.x), Math.round(padded.cx - SIDE.w / 2));
+  assert.equal(Math.round(pad.y), Math.round(plain.y));
+  // you: at the padded middle
+  assert.deepEqual(N.screenPoint(me, me, 14, padded), { x: padded.cx, y: padded.cy });
+  // what the screen shows: the whole box — centred on `me` drawn at cx, so
+  // more to the east than to the west; as wide in all as unpadded
+  const r = N.screenAt(me, 14, SIDE);
+  const rp = N.screenAt(me, 14, padded);
+  assert.ok(Math.abs(rp.e - rp.w - (r.e - r.w)) < 1e-9, "as wide");
+  assert.ok(me.lng - rp.w > rp.e - me.lng, "more of it west of you (the sheet's side)");
+  // and unpadded (no cx/cy): exactly as before
+  assert.deepEqual(N.screenPoint(me, east, 14, { ...SIDE, cx: SIDE.w / 2, cy: SIDE.h / 2 }), plain);
+});

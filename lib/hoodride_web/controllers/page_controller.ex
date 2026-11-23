@@ -307,8 +307,14 @@ defmodule HoodrideWeb.PageController do
     |> Lang.vary()
     |> Lang.renew()
     |> put_resp_content_type("text/html")
-    |> send_resp(404, "notfound.html" |> static() |> StaticVersions.stamp() |> in_language(lang))
+    |> send_resp(404, in_language(not_found_page(), lang))
   end
+
+  # prepared at start-up in prod (prepare/1): no budget guards this page —
+  # any address that doesn't exist reaches it, as fast as anyone sends them
+  # — so no disk read or stamping per request (bug list, 2026-11-22)
+  defp not_found_page,
+    do: prepared(:notfound) || StaticVersions.stamp(static("notfound.html"))
 
   defp page, do: prepared(:index) || stamp_page(static("index.html"))
 
@@ -406,7 +412,7 @@ defmodule HoodrideWeb.PageController do
 
   @doc """
   PROD (`config :hoodride, :prepare_pages_at_boot`, called from Application):
-  stamp the page and sw.js ONCE, at start-up, and keep them — the running
+  stamp the page, sw.js and the not-found page ONCE, at start-up, and keep them — the running
   server then serves exactly the version it started with, even if files on
   disk change under it (a deploy copying files before the restart would
   otherwise send NEW code under the OLD build tag). Dev doesn't: there,
@@ -417,6 +423,7 @@ defmodule HoodrideWeb.PageController do
     StaticVersions.prepare()
     :persistent_term.put({__MODULE__, :index}, stamp_page(read.("index.html")))
     :persistent_term.put({__MODULE__, :sw}, stamp_worker(read.("sw.js")))
+    :persistent_term.put({__MODULE__, :notfound}, StaticVersions.stamp(read.("notfound.html")))
     :ok
   end
 
@@ -425,6 +432,7 @@ defmodule HoodrideWeb.PageController do
     StaticVersions.forget()
     :persistent_term.erase({__MODULE__, :index})
     :persistent_term.erase({__MODULE__, :sw})
+    :persistent_term.erase({__MODULE__, :notfound})
     :ok
   end
 

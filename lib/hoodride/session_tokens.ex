@@ -135,10 +135,15 @@ defmodule Hoodride.SessionTokens do
   Any sign-in of `user_id` left? A sign-out or a deletion removes every one
   (revoke_all, forget) before it looks for a ride (A1: a ride's start asks
   this of its rider — Requests.accept). Not in memory: read first; the
-  database unable to answer: false (no ride starts on a guess).
+  database unable to answer: false (no ride starts on a guess). Only a
+  VALID one counts: an expired one the Sweeper hasn't cleared yet is no
+  sign-in (bug list; 2026-11-22).
   """
   def any?(user_id) do
-    case read_loaded(user_id, fn -> mine(user_id) != [] end) do
+    now = now()
+    any = fn -> Enum.any?(mine(user_id), fn {_, ins, auth} -> valid?(ins, auth, now) end) end
+
+    case read_loaded(user_id, any) do
       {:ok, any} -> any
       :unavailable -> false
     end

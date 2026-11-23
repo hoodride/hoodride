@@ -41,8 +41,11 @@ defmodule Hoodride.Avatars do
   @doc "Google: the `picture` link from sign-in, at #{@size} px (the documented `=s128-c`), else as given."
   def from_google(url, current) do
     if allowed?(url, @google_hosts) do
-      with :error <- fetch(sized(url), @google_hosts),
-           :error <- fetch(url, @google_hosts) do
+      # one allowance for both tries (each its own: twice as long)
+      by = deadline()
+
+      with :error <- fetch(sized(url), @google_hosts, by),
+           :error <- fetch(url, @google_hosts, by) do
         current
       else
         {:ok, bytes, ext} -> store(bytes, ext, current)
@@ -59,13 +62,15 @@ defmodule Hoodride.Avatars do
   """
   def from_facebook(token, current, graph_url) do
     opts = [params: [redirect: 0, width: @size, height: @size], auth: {:bearer, token}]
+    # one allowance for both steps — where the photo is, then the photo
+    by = deadline()
 
-    case Req.get(graph_url, opts ++ base_opts()) do
-      {:ok, %{status: 200, body: %{"data" => %{"is_silhouette" => true}}}} ->
+    case within(by, fn -> Req.get(graph_url, opts ++ base_opts()) end) do
+      {:ok, {:ok, %{status: 200, body: %{"data" => %{"is_silhouette" => true}}}}} ->
         nil
 
-      {:ok, %{status: 200, body: %{"data" => %{"url" => url}}}} ->
-        case fetch(url, @facebook_hosts) do
+      {:ok, {:ok, %{status: 200, body: %{"data" => %{"url" => url}}}}} ->
+        case fetch(url, @facebook_hosts, by) do
           {:ok, bytes, ext} -> store(bytes, ext, current)
           :error -> current
         end
@@ -134,15 +139,73 @@ defmodule Hoodride.Avatars do
       Application.get_env(:hoodride, :avatar_req, [])
   end
 
-  defp fetch(url, hosts) do
+  defp deadline, do: System.monotonic_time(:millisecond) + @timeout_ms
+
+  defp fetch(url, hosts, by) do
     with true <- allowed?(url, hosts),
-         {:ok, %{status: 200, body: body}} when is_binary(body) and byte_size(body) <= @max_bytes <-
-           Req.get(url, [decode_body: false] ++ base_opts()),
+         {:ok, body} <- download(url, by),
          ext when is_binary(ext) <- kind(body) do
       {:ok, body, ext}
     else
       _ -> :error
     end
+  end
+
+  # The photo, whole, or :error (bug list, 2026-11-13; 2026-11-22):
+  # - ALL of it by `by` (@timeout_ms from the start, for every try and
+  #   step): `receive_timeout` is per read, so a trickle kept a sign-in
+  #   waiting as long as it kept sending;
+  # - read as it comes, stopped once past @max_bytes — never held whole
+  #   first (a size it announces past that: not read at all);
+  # - never zipped (`compressed: false`, Req 0.7's default, said here so it
+  #   stays: a small zipped answer can unpack to gigabytes).
+  defp download(url, by) do
+    opts = [decode_body: false, compressed: false, into: &under_cap/2] ++ base_opts()
+
+    case within(by, fn -> Req.get(url, opts) end) do
+      {:ok, {:ok, %{status: 200, body: body} = resp}} when is_binary(body) ->
+        if Req.Response.get_private(resp, :too_big) == true, do: :error, else: {:ok, body}
+
+      _ ->
+        :error
+    end
+  end
+
+  # `fun` in its own process, killed at the deadline `by`: `{:ok, result}`,
+  # or :error (out of time, or it crashed — never the caller's crash)
+  defp within(by, fun) do
+    task =
+      Task.async(fn ->
+        try do
+          {:ok, fun.()}
+        catch
+          _, _ -> :error
+        end
+      end)
+
+    left = max(by - System.monotonic_time(:millisecond), 0)
+
+    case Task.yield(task, left) || Task.shutdown(task, :brutal_kill) do
+      {:ok, result} -> result
+      _ -> :error
+    end
+  end
+
+  defp under_cap({:data, data}, {req, resp}) do
+    announced =
+      case Req.Response.get_header(resp, "content-length") do
+        [n | _] -> String.to_integer(n)
+        [] -> 0
+      end
+
+    body = resp.body <> data
+
+    if announced > @max_bytes or byte_size(body) > @max_bytes,
+      do: {:halt, {req, Req.Response.put_private(%{resp | body: ""}, :too_big, true)}},
+      else: {:cont, {req, %{resp | body: body}}}
+  rescue
+    # a content-length that isn't a number: refused
+    ArgumentError -> {:halt, {req, Req.Response.put_private(%{resp | body: ""}, :too_big, true)}}
   end
 
   # https, and a host that IS one of theirs (the dot: "x.googleusercontent.com",

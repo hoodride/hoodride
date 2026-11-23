@@ -99,11 +99,33 @@ defmodule HoodrideWeb.BuildTest do
     end
 
     # stands in for the files on disk, so the real ones are never touched
-    defp files(page, sw) do
+    defp files(page, sw, notfound \\ "<html lang=\"en\"><body>NF</body></html>") do
       fn
         "index.html" -> page
         "sw.js" -> sw
+        "notfound.html" -> notfound
       end
+    end
+
+    # the 404 page too (bug list, 2026-11-13; 2026-11-22): it had no budget
+    # and was read from disk and stamped on EVERY request — any address
+    # that doesn't exist, as fast as anyone could send them
+    test "the not-found page comes from the prepared copy, in the asker's language", %{conn: conn} do
+      HoodrideWeb.PageController.prepare(
+        files(
+          "<html></html>",
+          ~s(const CACHE = "x";),
+          ~s(<html lang="en"><body>PREPARED-404</body></html>)
+        )
+      )
+
+      nf = get(conn, "/no-such-page")
+      assert nf.status == 404
+      assert nf.resp_body =~ "PREPARED-404"
+
+      es = build_conn() |> put_req_header("accept-language", "es") |> get("/no-such-page")
+      assert es.resp_body =~ ~s(<html lang="es">)
+      assert es.resp_body =~ "PREPARED-404"
     end
 
     test "once prepared, the page and sw.js come from the prepared copy, not the disk", %{

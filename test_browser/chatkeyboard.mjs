@@ -66,6 +66,112 @@ await journey("chatkeyboard: typing with the keyboard up, the chat keeps its siz
   const up = await rect(rita);
   check(up.kb && up.h === before.h && up.bottom === H - KB, "the same height, its bottom on the keyboard", { before, up });
   check(up.msgs === before.msgs, "the messages keep their room — not squished", { before, up });
+  // (owner's iPhone, 2026-11-22: white in the bottom corners with the
+  // keyboard up) on the keyboard as on the screen's bottom: rounded on top
+  // only — rounded below, the map showed through beside the keyboard
+  const corners = await rita.eval(`(() => { const s = getComputedStyle(document.getElementById("chat")); return { tl: s.borderTopLeftRadius, tr: s.borderTopRightRadius, bl: s.borderBottomLeftRadius, br: s.borderBottomRightRadius }; })()`);
+  check(corners.bl === "0px" && corners.br === "0px" && corners.tl !== "0px" && corners.tr !== "0px", "square bottom corners on the keyboard, rounded top ones", corners);
+
+  // (owner, 2026-11-22: "in depth google into this") the iOS 26 keyboard is
+  // see-through with rounded corners, and shows the page under it — the
+  // light map lit its corners white (Apple forums 801060; 1ar.io Safari 26).
+  // As native sheets do (wolt_modal_sheet #395): the chat's own color
+  // carried down behind the keyboard, exactly to the page's bottom
+  step("behind the keyboard: the chat's own color, down to the page's bottom — never the map, never a longer page");
+  const backing = (p) =>
+    p.eval(`(() => { const c = document.getElementById("chat"); const s = getComputedStyle(c, "::after"); return { content: s.content, h: Math.round(parseFloat(s.height) || 0), top: Math.round(parseFloat(s.top)), bg: s.backgroundColor, card: getComputedStyle(c).backgroundColor, pageH: document.documentElement.scrollHeight }; })()`);
+  const under = await backing(rita);
+  check(under.content !== "none" && under.h === KB && under.top === up.h && under.bg === under.card, "the chat's color, the keyboard's whole height, right under the chat", under);
+  check(under.pageH <= H, "the page no longer than the screen (nothing new to scroll)", under);
+  // (review, 2026-11-22) Safari scrolls the page to the text box — and its
+  // window.scrollY is the VISIBLE area's top (WebKit 170981; Chrome's is the
+  // page's): read in, the color hung past the page's bottom, the page grew
+  // with every drag. Safari's numbers: scrollY = the visible area's top
+  const safariScrolled = async (p, top) => {
+    // (the window's own scrollY: kept once, put back as it was)
+    await p.eval(`(window.__scrollYDesc = window.__scrollYDesc || Object.getOwnPropertyDescriptor(window, "scrollY"), Object.defineProperty(window, "scrollY", { value: ${top}, configurable: true }), true)`);
+    await keyboard(p, H - KB, top);
+    const b = await backing(p);
+    const r = await rect(p);
+    await p.eval(`(Object.defineProperty(window, "scrollY", window.__scrollYDesc), true)`);
+    // (second review, 2026-11-22) the chat's own place read scrollY too: it
+    // sat `top` px above the keyboard, the map between — on the keyboard
+    // (the visible area's bottom), the color from there to the page's bottom
+    return { ...b, chatBottom: r.bottom, colorBottom: r.bottom + b.h };
+  };
+  const scrolledAll = await safariScrolled(rita, KB);
+  check(scrolledAll.h === 0 && scrolledAll.pageH <= H, "Safari scrolled the text box up to the keyboard: nothing past the page's bottom", scrolledAll);
+  check(scrolledAll.chatBottom === H, "…the chat on the keyboard", scrolledAll);
+  const scrolledSome = await safariScrolled(rita, 120);
+  check(scrolledSome.h === KB - 120 && scrolledSome.pageH <= H, "Safari scrolled 120 px: the color down to the page's bottom, no further", scrolledSome);
+  check(scrolledSome.chatBottom === 120 + H - KB && scrolledSome.colorBottom === H, "…the chat on the keyboard, the color from it to the page's bottom", scrolledSome);
+
+  // (third review, 2026-11-22) Safari scrolling the PAGE itself (100 px) and
+  // the visible area 20 px more inside it: the chat on the keyboard, the
+  // color down to the map's bottom — the map 30 px longer than the page's
+  // measured height (iOS 26: 100dvh a few px over the layout viewport,
+  // Apple forums 803987): no strip of map left under the keyboard
+  step("Safari scrolls the page itself, the map a little longer than the page: the chat on the keyboard, the color to the map's bottom");
+  // (fifth review, 2026-11-22) where Safari measures on-screen places from
+  // is reported both ways: the page's top (WebKit 170981, 257375) and the
+  // visible area's top (shyden #934, a real iPhone). Both played here —
+  // `visualRects`: every on-screen place given from the visible area — and
+  // the result read in the page's own places (offsetTop), which neither
+  // touches
+  const layoutScroll = (visualRects) =>
+    rita.eval(`(() => {
+      const map = document.getElementById("screen-map");
+      const c = document.getElementById("chat");
+      window.__scrollYDesc = window.__scrollYDesc || Object.getOwnPropertyDescriptor(window, "scrollY");
+      const rects = Element.prototype.getBoundingClientRect;
+      // (everything put back even if a line here throws)
+      try {
+        document.documentElement.style.minHeight = "${H + 200}px";
+        map.style.height = "${H + 30.6}px";
+        window.scrollTo(0, 100);
+        // (the page's real scroll, read before scrollY is faked)
+        const realScroll = Math.round(document.scrollingElement.scrollTop);
+        Object.defineProperty(window, "scrollY", { value: 120, configurable: true });
+        if (${visualRects}) Element.prototype.getBoundingClientRect = function () { const r = rects.call(this); return new DOMRect(r.x, r.y - 20, r.width, r.height); };
+        const fake = Object.assign(new EventTarget(), { width: ${W}, height: ${H - KB}, offsetTop: 20, offsetLeft: 0, pageTop: 120, pageLeft: 0, scale: 1 });
+        Object.defineProperty(window, "visualViewport", { value: fake, configurable: true });
+        fitChatToKeyboard();
+        const h = parseFloat(getComputedStyle(c, "::after").height) || 0;
+        // (in the page: the chat's bottom, its color's, the map's)
+        // (exact, not rounded: a fraction of a pixel past the map's bottom
+        // is a page to scroll — sixth review, 2026-11-22)
+        const chatBottom = parseFloat(c.style.top) + parseFloat(c.style.height);
+        return { realScroll, chatBottom: Math.round(chatBottom), colorBottom: chatBottom + h, colorH: h, mapBottom: map.offsetTop + rects.call(map).height };
+      } finally {
+        Element.prototype.getBoundingClientRect = rects;
+        Object.defineProperty(window, "scrollY", window.__scrollYDesc);
+        map.style.height = "";
+        window.scrollTo(0, 0);
+        document.documentElement.style.minHeight = "";
+      }
+    })()`);
+  for (const [visualRects, how] of [[false, "places measured from the page's top"], [true, "places measured from the visible area's top"]]) {
+    const s = await layoutScroll(visualRects);
+    check(s.realScroll === 100, `(${how}: the page itself really scrolled 100 px)`, s);
+    check(s.chatBottom === 120 + H - KB, `${how}: the chat on the keyboard (the visible area's bottom, in the page)`, s);
+    check(Math.abs(s.mapBottom - (H + 30.6)) < 0.01 && s.colorBottom <= s.mapBottom && s.colorBottom > s.mapBottom - 1 && Number.isInteger(s.colorH), `${how}: the color whole pixels, down to the map's bottom — never past it`, s);
+  }
+  await keyboard(rita, H - KB);
+
+  // (WebKit 217754, open since 2020: Safari keeps the home bar's inset with
+  // the keyboard up — an empty strip between the text box and the keyboard)
+  step("an iPhone with a home bar (34 px): on the keyboard no empty strip under the text box; at rest it clears the home bar");
+  await rita.safeArea({ bottom: 34 });
+  await rita.eval(`new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(() => ok(true))))`);
+  const pad = () => rita.eval(`getComputedStyle(document.querySelector("#chat .chat-form")).paddingBottom`);
+  const typingPad = await pad();
+  check(typingPad === "10px", "on the keyboard: its own 10 px only", typingPad);
+  await real(rita);
+  const restPad = await pad();
+  const rest = await backing(rita);
+  check(restPad === "44px", "at rest: clear of the home bar", restPad);
+  check(rest.content === "none", "at rest: nothing under the chat", rest);
+  await rita.safeArea({ bottom: 0 });
 
   step("an iPhone that says window.innerHeight is the visible area too: the same — the keyboard still seen");
   await keyboard(rita, H - KB, 0, H - KB);
@@ -109,7 +215,9 @@ await journey("chatkeyboard: typing with the keyboard up, the chat keeps its siz
   await rita.eval(`new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(() => ok(true))))`);
   await rita.eval(`(fitChatToKeyboard(), true)`);
   const turned = await rect(rita);
-  check(turned.kb && turned.bottom === W - 170 && Math.abs(turned.h - Math.round(before.h * W / H)) <= 2, "turned sideways: lifted, the sideways size", { before, turned });
+  // (sideways the chat is a side sheet — chatsideways — taller than what the
+  // keyboard leaves: on it, as much as fits, 8 px under the top)
+  check(turned.kb && turned.bottom === W - 170 && turned.top === 8 && turned.h === W - 170 - 8, "turned sideways: lifted, as much as fits (a side sheet there)", { before, turned });
   await facing(rita, "portrait-primary");
   await rita.phone(W, H - KB);
   await rita.eval(`new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(() => ok(true))))`);

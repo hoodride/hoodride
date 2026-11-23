@@ -9,9 +9,10 @@ defmodule Mix.Tasks.Hoodride.Secrets do
   check. A value that only LOOKS like a secret is listed in the repo's
   `.gitleaks.toml`, matched by its file and line, with why it's harmless.
 
-  Without gitleaks installed it says so and skips: anyone can still build
-  Hood Ride; installing it (`winget install Gitleaks.Gitleaks`,
-  `brew install gitleaks`) turns the check on.
+  Without gitleaks installed the check fails (2026-11-22: a skip that
+  passed left the only secret scan quietly off). Install it
+  (`winget install Gitleaks.Gitleaks`, `brew install gitleaks`), or skip
+  it on purpose with `HOODRIDE_SKIP_SECRETS=1`.
   """
   use Mix.Task
 
@@ -19,10 +20,8 @@ defmodule Mix.Tasks.Hoodride.Secrets do
   def run(_args) do
     case executable() do
       nil ->
-        Mix.shell().info("""
-        gitleaks: not installed — secret scan SKIPPED.
-          Install it to turn the check on: https://github.com/gitleaks/gitleaks\
-        """)
+        {:skip, note} = missing(System.get_env("HOODRIDE_SKIP_SECRETS"))
+        Mix.shell().info(note)
 
       exe ->
         root = repo_root()
@@ -41,6 +40,29 @@ defmodule Mix.Tasks.Hoodride.Secrets do
             """)
         end
     end
+  end
+
+  @doc """
+  No gitleaks: the check FAILS — it's the only secret scan (no CI), and a
+  skip that still passed left it quietly off (bug list, 2026-11-13).
+  Skipped only when asked by name, `HOODRIDE_SKIP_SECRETS=1`: then
+  `{:skip, note}`.
+  """
+  def missing("1") do
+    {:skip,
+     """
+     gitleaks: not installed — secret scan SKIPPED (HOODRIDE_SKIP_SECRETS=1).
+       Install it to turn the check on: https://github.com/gitleaks/gitleaks\
+     """}
+  end
+
+  def missing(_) do
+    Mix.raise("""
+    gitleaks isn't installed, so the secret scan can't run.
+      Install it: https://github.com/gitleaks/gitleaks
+      (winget install Gitleaks.Gitleaks / brew install gitleaks)
+      Or skip it on purpose: HOODRIDE_SKIP_SECRETS=1 mix precommit\
+    """)
   end
 
   @doc "gitleaks on PATH, or where winget puts it on Windows (a shell opened before installing doesn't see it)."

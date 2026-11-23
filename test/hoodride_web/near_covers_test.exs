@@ -473,7 +473,7 @@ defmodule HoodrideWeb.NearCoversTest do
     assert f =~ "const all = HoodNearby.zoomSteps(startZoom, widestZoom, NEAR_STEP);"
 
     assert f =~
-             "const ladder = { viewport: HoodViewport, h3, center: at, size: { w: size.w + 2 * NEAR_EDGE_PX, h: size.h + 2 * NEAR_EDGE_PX }, rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS };"
+             "const ladder = { viewport: HoodViewport, h3, center: at, size: { w: size.w + 2 * NEAR_EDGE_PX, h: size.h + 2 * NEAR_EDGE_PX, cx: size.cx + NEAR_EDGE_PX, cy: size.cy + NEAR_EDGE_PX }, rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS };"
   end
 
   # (a look-again — not a tap — never closer in than the map is: owner,
@@ -699,7 +699,7 @@ defmodule HoodrideWeb.NearCoversTest do
     lines_in_order(
       body("findNearest"),
       [
-        "const ladder = { viewport: HoodViewport, h3, center: at, size: { w: size.w + 2 * NEAR_EDGE_PX, h: size.h + 2 * NEAR_EDGE_PX }, rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS };",
+        "const ladder = { viewport: HoodViewport, h3, center: at, size: { w: size.w + 2 * NEAR_EDGE_PX, h: size.h + 2 * NEAR_EDGE_PX, cx: size.cx + NEAR_EDGE_PX, cy: size.cy + NEAR_EDGE_PX }, rungs: [H3_RES, ...AGG_RESES], budget: MAX_WATCHED_CELLS };",
         "if (anyone(steps[i])) {",
         "if (!DEMO && worldSync.wantedAggSize() > 0 && worldSync.wantedGeoSize() === 0) {",
         "if (i === steps.length - 1) {"
@@ -894,7 +894,12 @@ defmodule HoodrideWeb.NearCoversTest do
   end
 
   test "a move of yours ends the search and its watch, and the back-off starts afresh" do
-    lines_in_order(body("initMap"), ["if (!e.nearSearch) movedByHand();"], "initMap")
+    lines_in_order(
+      body("initMap"),
+      ["if (!e.nearSearch && !e.sideSheet) movedByHand();"],
+      "initMap"
+    )
+
     lines_in_order(body("movedByHand"), ["researches = 0;", "stopFindNearest();"], "movedByHand")
   end
 
@@ -1004,8 +1009,10 @@ defmodule HoodrideWeb.NearCoversTest do
     assert body("setBanner") =~
              ~s[requestAnimationFrame(() => {\n            if (bannerShowing !== showing) return;\n            fitBanner(b, text);\n            bannerFitted(b, text);]
 
-    # the resize one: inside two frames, once per burst
-    r = Regex.run(~r/window\.addEventListener\("resize", \(\) => \{.*?\n\}\);/s, src) |> hd()
+    # the resize one (refitBanner: a window resize, or the chat docking as a
+    # side sheet): inside two frames, once per burst
+    assert src =~ ~s[window.addEventListener("resize", refitBanner);]
+    r = Regex.run(~r/^function refitBanner\(\) \{.*?\n\}$/ms, src) |> hd()
 
     assert r =~
              ~s[b.style.width = "";\n  if (bannerRefit) return;\n  bannerRefit = true;\n  requestAnimationFrame(() =>\n    requestAnimationFrame(() => {\n      bannerRefit = false;\n      if (b.style.textWrap === "wrap") return;\n      fitBanner(b, b.dataset.text);\n      bannerFitted(b);]
@@ -1031,7 +1038,7 @@ defmodule HoodrideWeb.NearCoversTest do
     assert b =~ ~s[b.classList.add("hidden");\n    bannerFitted(b);]
     assert b =~ ~s[b.style.width = "";\n      bannerFitted(b);]
 
-    r = Regex.run(~r/window\.addEventListener\("resize", \(\) => \{.*?\n\}\);/s, @app) |> hd()
+    r = Regex.run(~r/^function refitBanner\(\) \{.*?\n\}$/ms, @app) |> hd()
     assert r =~ ~s[holdBanner(b);\n  b.classList.add("fitting");\n  b.style.width = "";]
 
     # not drawn — still laid out: measured, and counted as a cover

@@ -224,8 +224,9 @@ defmodule HoodrideWeb.LogoutAcceptRaceTest do
       [_, back] =
         String.split(accept, ":ets.insert_new(@requests, {rider_id, driver_id, ts})", parts: 2)
 
+      # (or the driver gone off the map meanwhile — sixth review, 2026-11-22)
       assert back =~
-               "unless look.() do\n                  case take_if_ours(rider_id, driver_id) do"
+               "unless look.() and Hoodride.Geo.driver_on_map?(driver_id) do\n                  case take_if_ours(rider_id, driver_id) do"
 
       assert back =~ "decline_consumed(rider_id, driver_id)"
     end

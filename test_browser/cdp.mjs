@@ -591,13 +591,22 @@ function page(cdp, sessionId, name, browserContextId) {
     async release(x, y) {
       await send("Input.dispatchMouseEvent", { type: "mouseReleased", x, y, button: "left", buttons: 0, clickCount: 1 });
     },
-    async drag(x1, y1, x2, y2) {
-      await send("Input.dispatchMouseEvent", { type: "mousePressed", x: x1, y: y1, button: "left", buttons: 1, clickCount: 1 });
+    // (`modifiers`: keys held down — 8 Shift, as CDP numbers them;
+    // `beforeRelease`: something done with the button still down, e.g. a key)
+    async drag(x1, y1, x2, y2, modifiers = 0, { beforeRelease } = {}) {
+      await send("Input.dispatchMouseEvent", { type: "mousePressed", x: x1, y: y1, button: "left", buttons: 1, clickCount: 1, modifiers });
       for (let i = 1; i <= 8; i++) {
         const x = x1 + ((x2 - x1) * i) / 8, y = y1 + ((y2 - y1) * i) / 8;
-        await send("Input.dispatchMouseEvent", { type: "mouseMoved", x, y, button: "left", buttons: 1 });
+        await send("Input.dispatchMouseEvent", { type: "mouseMoved", x, y, button: "left", buttons: 1, modifiers });
       }
-      await send("Input.dispatchMouseEvent", { type: "mouseReleased", x: x2, y: y2, button: "left", buttons: 0, clickCount: 1 });
+      if (beforeRelease) await beforeRelease();
+      await send("Input.dispatchMouseEvent", { type: "mouseReleased", x: x2, y: y2, button: "left", buttons: 0, clickCount: 1, modifiers });
+    },
+    // a key pressed and let go (real input), e.g. "Escape". (The defaults
+    // suit Escape and Enter only: a letter needs its code — "KeyA" — and
+    // keyCode passed)
+    async key(key, code = key, keyCode = { Escape: 27, Enter: 13 }[key] || 0) {
+      for (const type of ["keyDown", "keyUp"]) await send("Input.dispatchKeyEvent", { type, key, code, windowsVirtualKeyCode: keyCode });
     },
     // the cookies the browser itself keeps for this page (its own store:
     // name, value, expires in seconds since 1970, session, secure…)

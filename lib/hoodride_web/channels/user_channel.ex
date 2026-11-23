@@ -352,6 +352,14 @@ defmodule HoodrideWeb.UserChannel do
     end
   end
 
+  # `req`: the stamp of the request the driver saw — a newer one from the
+  # same rider is left alone (Requests.decline/3; bug list, 2026-11-22)
+  defp event("decline_request", %{"rider_id" => rider_id, "req" => req}, socket)
+       when is_integer(rider_id) and is_integer(req) do
+    Hoodride.Requests.decline(socket.assigns.user_id, rider_id, req)
+    {:reply, :ok, socket}
+  end
+
   defp event("decline_request", %{"rider_id" => rider_id}, socket)
        when is_integer(rider_id) do
     Hoodride.Requests.decline(socket.assigns.user_id, rider_id)

@@ -56,8 +56,10 @@ defmodule HoodrideWeb.IntentZoomTest do
   end
 
   test "any move but its own ends it" do
-    # (a move of yours: movedByHand — the search ends, near_covers_test.exs)
-    assert body("initMap") =~ "if (!e.nearSearch) movedByHand();"
+    # (a move of yours: movedByHand — the search ends, near_covers_test.exs;
+    # never the side sheet's own padding, which leaves the picture where it
+    # is: updateSideSheet)
+    assert body("initMap") =~ "if (!e.nearSearch && !e.sideSheet) movedByHand();"
 
     assert body("findNearest") =~
              "map.easeTo({ center: [at.lng, at.lat], zoom, duration: NEAR_STEP_MS }, { nearSearch: seq })"

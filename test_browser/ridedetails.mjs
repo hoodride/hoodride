@@ -38,7 +38,13 @@ await journey("ride details: decline, too late, Navigate, the pin, I'm here", as
   step("Rita asks Dan; Dan declines: Rita is told, no longer waiting");
   await request(rita, danId);
   await openRequest(dan, ritaId);
+  // the Decline names the request Dan saw (its stamp from the server), so
+  // a late one never ends a newer request (Requests.decline/3, 2026-11-22)
+  await dan.eval(`(() => { const p = userChannel.push.bind(userChannel); userChannel.push = (ev, payload, ...a) => { if (ev === "decline_request") window.__decline = payload; return p(ev, payload, ...a); }; return true; })()`);
+  const seenReq = await dan.eval(`realPeersById.get(${ritaId}).pendingReq`);
+  check(typeof seenReq === "number", "Dan's app knows which request it shows");
   await dan.click("btn-decline");
+  check(await dan.eval(`window.__decline && window.__decline.req === ${seenReq} && window.__decline.rider_id === ${ritaId}`), "the Decline names that request");
   await bannerIs(dan, "Request declined");
   await bannerIs(rita, "Driver can't take this one — try another");
   check(await rita.eval(`!state.ride`), "Rita no longer waiting");

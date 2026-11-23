@@ -42,8 +42,9 @@ About 10 minutes. No server or Google account needed.
 
 **Before sending changes:** `mix precommit` runs every check: the tests, the
 security scan (Sobelow), the JavaScript tests (needs
-[Node.js](https://nodejs.org) 20+), and a scan for secrets if
-[gitleaks](https://github.com/gitleaks/gitleaks) is installed.
+[Node.js](https://nodejs.org) 20+), and a scan for secrets (needs
+[gitleaks](https://github.com/gitleaks/gitleaks); without it the check
+fails, unless you skip it on purpose with `HOODRIDE_SKIP_SECRETS=1`).
 
 ## Run your own
 

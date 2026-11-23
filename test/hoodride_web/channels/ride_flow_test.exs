@@ -354,4 +354,33 @@ defmodule HoodrideWeb.RideFlowTest do
     ref = push(rchan, "request_ride", %{"to" => driver.id})
     assert_reply ref, :ok
   end
+
+  # (bug list, 2026-11-22) the driver's Decline names the request it saw:
+  # an older one's leaves the standing request alone
+  test "a Decline names its request: an older one's leaves the newer standing",
+       %{rider: rider, driver: driver} do
+    rsock = connect_as(rider)
+    dsock = connect_as(driver)
+    {:ok, _, rchan} = subscribe_and_join(rsock, "user:#{rider.id}", %{})
+    {:ok, _, dchan} = subscribe_and_join(dsock, "user:#{driver.id}", %{})
+
+    push(dchan, "driver_update", %{"spot" => @car_spot, "lat" => 1.0, "lng" => 2.0})
+    ref = push(dchan, "cancel_request", %{})
+    assert_reply ref, :ok
+    watch(rsock, @cell)
+    ref = push(rchan, "request_ride", %{"to" => driver.id})
+    assert_reply ref, :ok
+    assert_push "request", %{req: req}
+    assert is_integer(req)
+
+    ref = push(dchan, "decline_request", %{"rider_id" => rider.id, "req" => req - 7})
+    assert_reply ref, :ok
+    refute_push "request_declined", %{}, 50
+    assert %{ts: ^req} = Hoodride.Requests.open_request_of(rider.id)
+
+    ref = push(dchan, "decline_request", %{"rider_id" => rider.id, "req" => req})
+    assert_reply ref, :ok
+    assert_push "request_declined", %{}
+    assert Hoodride.Requests.open_request_of(rider.id) == nil
+  end
 end

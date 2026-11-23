@@ -10,6 +10,21 @@ defmodule Hoodride.Blocks do
   the one who blocked unblocks, or either account is deleted (the
   database's cascade). Only who and when.
 
+  NEXT, NOT BUILT (owner, 2026-11-22): the table to WITHOUT ROWID, with
+  (blocker_id, blocked_id) as its primary key instead of the unused `id` —
+  one copy of each pair, not two (table + unique index). SQLite's own
+  advice (sqlite.org/withoutrowid.html): it suits a two-column key with
+  small rows, it isn't a default — measure, and keep it where it helps.
+  Measured on a scratch copy, 1,000,000 fake blocks: 76.6 → 51.5 bytes a
+  block (−33%); "did A block B?" and adding a block the same; the
+  Blocked list and "who blocked me" ~2x faster. Nothing here uses the row
+  number (every read, insert and delete goes by the two ids), and no
+  autoincrement or update hook needs it. SQLite can't switch a table in
+  place: a NEW migration copies the rows into the new table and rebuilds
+  the `blocked_id` index — cheap while the table is young. Built with the
+  memory packing, with a test that every block and the newest-first order
+  come through the copy.
+
   MEMORY HOLDS THE BLOCKS OF PEOPLE IN USE — "cache-aside": a person's rows
   (theirs and the ones naming them) are read from the database the first
   time they're needed and dropped once they're GONE by the app's own

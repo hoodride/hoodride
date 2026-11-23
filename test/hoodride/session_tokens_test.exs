@@ -164,6 +164,27 @@ defmodule Hoodride.SessionTokensTest do
     assert SessionTokens.any?(other.id)
   end
 
+  # (bug list, 2026-11-13; 2026-11-22) an expired sign-in the Sweeper
+  # hasn't cleared yet counted as "signed in": a driver's Accept could
+  # start a ride with a rider whose every sign-in had run out
+  test "any?: an expired sign-in isn't one — not past 30 days, nor a year from the real sign-in" do
+    u = user("st-any-expired")
+    {:ok, raw} = SessionTokens.create(u.id)
+    age(raw, 31 * @day)
+    refute SessionTokens.any?(u.id)
+
+    v = user("st-any-year")
+    {:ok, raw} = SessionTokens.create(v.id)
+    age(raw, @day, 366 * @day)
+    refute SessionTokens.any?(v.id)
+
+    # still in its time: yes
+    w = user("st-any-fresh")
+    {:ok, raw} = SessionTokens.create(w.id)
+    age(raw, 29 * @day, 364 * @day)
+    assert SessionTokens.any?(w.id)
+  end
+
   test "a sign-out can't slip in between a replacement's two steps" do
     u = user("st-race")
     {:ok, old} = SessionTokens.create(u.id)

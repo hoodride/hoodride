@@ -31,13 +31,23 @@
   }
 
   // what a screen of `size` {w, h} CSS px shows, centred on `center` {lat,
-  // lng} at `zoom` — as map.getBounds() reads it
+  // lng} at `zoom` — as map.getBounds() reads it. `size.cx/cy`: where the
+  // centre is DRAWN, when that's not the screen's middle — the map padded
+  // for the chat's side sheet puts it in the middle of what's beside it
+  // (review, 2026-11-22); the screen is still the whole box
   function screenAt(center, zoom, size) {
     const world = TILE * 2 ** zoom;
-    const cy = mercY(center.lat);
-    const hw = size.w / 2 / world;
-    const hh = size.h / 2 / world;
-    return { n: latOf(cy - hh), s: latOf(cy + hh), e: center.lng + hw * 360, w: center.lng - hw * 360 };
+    const y = mercY(center.lat);
+    const { x: cx, y: cy } = drawnMiddle(size);
+    return {
+      n: latOf(y - cy / world),
+      s: latOf(y + (size.h - cy) / world),
+      e: center.lng + ((size.w - cx) / world) * 360,
+      w: center.lng - (cx / world) * 360,
+    };
+  }
+  function drawnMiddle(size) {
+    return { x: size.cx ?? size.w / 2, y: size.cy ?? size.h / 2 };
   }
 
   // the people one by one: the first rung of the map's ladder
@@ -90,13 +100,15 @@
   // Where `pos` lands on a screen of `size` CSS px centred on `me` at `zoom`
   // (px from the screen's top-left) — as the map draws it: flat, north up
   // (the map never turns or tilts). Across the 180° line the map draws the
-  // nearer copy of the world: the shorter way round.
+  // nearer copy of the world: the shorter way round. `me` drawn where the
+  // middle is (size.cx/cy — screenAt)
   function screenPoint(me, pos, zoom, size) {
     const scale = TILE * 2 ** zoom;
     const dLng = ((((pos.lng - me.lng + 180) % 360) + 360) % 360) - 180;
+    const mid = drawnMiddle(size);
     return {
-      x: size.w / 2 + (dLng / 360) * scale,
-      y: size.h / 2 + (mercY(pos.lat) - mercY(me.lat)) * scale,
+      x: mid.x + (dLng / 360) * scale,
+      y: mid.y + (mercY(pos.lat) - mercY(me.lat)) * scale,
     };
   }
 
