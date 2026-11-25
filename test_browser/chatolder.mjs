@@ -62,8 +62,8 @@ await journey("chatolder: chats older than the pages loaded — opened early, a 
   const { p: ray, id: rayId } = await crowded(browser, "BT-OlRay", 65);
   const held = await ray.holdResponses("*/api/chats?before=*");
   await scrollList(ray);
-  for (let i = 0; i < 100 && held.count() === 0; i++) await new Promise((r) => setTimeout(r, 50));
-  check(held.count() === 1, "page 2's answer held", held.count());
+  await held.arrived();
+  check(held.count() === 1, "page 2's answer held", { held: held.count(), trace: held.trace() });
   const beforeRay = await total(ray);
   // BT-C1: the crowd's oldest — past page 2
   await server(`crowd_says 1 ${rayId} one more thing`);
@@ -80,8 +80,8 @@ await journey("chatolder: chats older than the pages loaded — opened early, a 
   const { p: sid } = await crowded(browser, "BT-OlSid", 35);
   const sidHeld = await sid.holdResponses("*/api/chats?before=*");
   await scrollList(sid);
-  for (let i = 0; i < 100 && sidHeld.count() === 0; i++) await new Promise((r) => setTimeout(r, 50));
-  check(sidHeld.count() === 1, "page 2's answer held", sidHeld.count());
+  await sidHeld.arrived();
+  check(sidHeld.count() === 1, "page 2's answer held", { held: sidHeld.count(), trace: sidHeld.trace() });
   await sid.eval(`softReload(), true`);
   await sid.waitFor(`hydrated && !reloading && chats.size === 30`, "reloaded: the first page again");
   await sidHeld.release();

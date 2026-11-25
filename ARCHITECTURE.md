@@ -1800,6 +1800,42 @@ principle is budget-driven selection, which we already own:
   it rebuilds from truth and heals any missed shift within 60s (verified by test:
   corrupt the counter, sweep, healed). Browser-verified live both directions.
 - ETS (not process state) because many channel processes read counts concurrently on join.
+- **One sender per hex: `Hoodride.AggAnnouncer` (2026-11-23).** The writers
+  run in parallel (one per core, by user id), so two can change one hex's
+  count at the same moment. The count never goes wrong (atomic
+  `update_counter`), but when each writer also READ the count and SENT it,
+  two sends could cross: one read 17, another changed it to 16 and sent
+  "16", the first one's "17" arrived last — watchers left on a stale count
+  until the hex next changed. A re-read after sending (`reconfirm_agg`, 3
+  tries, 2026-11-10) narrowed it; under a rush its tries ran out and a stale
+  number still landed last (AggregatesTest's stress test failed 1 run in ~3
+  on a many-core PC; never live — the 1-core server has one writer). Now a
+  writer only changes the count and leaves the hex's announcer a note
+  (`settle_and_broadcast`: a cast, "this hex, these sides moved"); the
+  announcer reads the count WHEN it handles the note and sends the named
+  sides (`announce_now`; no row = 0). An emptied hex's row is still deleted
+  by the writer as it changes it (atomic compare-and-delete of exactly
+  0/0) — left to the announcer, a `{hex, 0, 0}` row lingered while its note
+  waited (InvariantFuzzTest), and rows vanished under the recount. One sender per
+  hex — Erlang delivers one process's messages to another in the order
+  sent — and the last note arrives after the last change, so the last
+  count heard is the truth; no retries, no bound, no memory. Only the
+  named sides are sent (the privacy law: never a side because the other
+  moved). Partitioned like the writers, by HEX (`PartitionSupervisor`,
+  one per scheduler). The recount's corrections go through the same
+  notes. A note handled takes the notes already waiting WITH it (at most
+  1,000), merged per hex — the sides any named — so a rush in one hex is
+  one read and one count per side, the true one (30 cars at once were 30
+  identical counts); other hexes in the batch get their own. Tests: the
+  stress tests (45 repeats clean, where it failed ~1 run in 3 before;
+  spreading one hex's notes over several announcers brings the failure
+  back), a pin that notes queued while the announcer is busy are read
+  when handled (merged: one count, the true one), a merge test (30 cars
+  at once: one count, 30; another hex in the same queue its own), an
+  emptied hex's row gone before its announcer runs, and the two privacy
+  tests (per car change pair: 1, 0 or 0, 0 — or one merged 0; never a
+  third, never ending on 1).
+  `Geo.flush_announcements/0` waits for every note sent so far (tests).
 
 ## Capacity (measured 2026-10-26)
 
@@ -3262,6 +3298,30 @@ here say the rest.
   smaller screen still inside the old padded area keeps it (the
   margin's rule). Journey `turnhexes` (a car in a hex seen only
   sideways reaches the rider once she turns).
+- **Settings sideways scrolls as one** (2026-11-23, owner's iPhone: the
+  Your car / Navigation app / Language list squeezed into ~50 px of its
+  own scroll between the top and the bottom, which never shrank). As a
+  navigation drawer and iOS Settings do, the whole drawer scrolls
+  (`.drawer` overflow-y auto, overflow-x hidden, overscroll-behavior
+  contain); the list has no scroll of its own (`flex: 1 0 auto`: it grows
+  to keep the sign-out part at the bottom upright, never shrinks below its
+  rows). Its top and bottom room (16 px + the notch) are spacers
+  (`::before`, `::after`), not padding: Safari 26.4 and later 26.x (iOS
+  and macOS) leaves a scrolling flex column's padding out of its scroll
+  (WebKit 316902; fixed in WebKit's code, 315813@main, not yet in every
+  Safari), the last line — Terms · Privacy · Delete account — out of
+  reach; spacers every engine counts. The journey (Chrome, which hasn't
+  the bug) guards that the whole bottom room is a spacer, there at the end
+  of the scroll. The ✕ is sticky at `top: calc(12px + notch)`, where it
+  also sits at rest (its −4 px top margin pulls it 4 px up into the
+  spacer), its room given back by negative margins
+  (−4 above, −24 below = its 28 px border box), a round of the drawer's
+  color behind it (rows scroll under it). `.card-close`'s later `top: 8px` used to win over the old rule and
+  put it in an iPhone's status bar. Opening it, and the delete confirm,
+  start at the top (`scrollTop = 0`; the confirm focuses Cancel with
+  `preventScroll`, so the question shows first). Right to left, its
+  padding leaves the notch's room on its own side, the right. Journey
+  `drawerscroll` (each check failed first or was proven by a break).
 - **Banner tap:** "💬 {name}: {text}" opens that chat when tapped while
   it shows (`bannerPeer`, `.banner.tappable`); nothing if the chat's gone
   meanwhile; no other banner is tappable. Journey `bannertap`.

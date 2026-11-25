@@ -5,12 +5,14 @@
 // then GPS starts as when a browser has no check at all
 // (test_js/locator.test.mjs: the rule itself).
 import { journey, step, check } from "./cdp.mjs";
-import { goOnline } from "./app.mjs";
+import { goOnline, onMapOnServer } from "./app.mjs";
 
 await journey("permhang: a permission check that never answers — a resumed shift still starts GPS", async (browser) => {
   step("Dan (driver) goes online");
   const dan = await browser.person("BT-Dan");
   await goOnline(dan);
+  // (the server has his car before he reloads: else no shift to resume)
+  await onMapOnServer(dan);
 
   step("his browser's permission check stops answering; he reloads: his shift resumes WITH GPS");
   await dan.onEveryPage(`(() => {

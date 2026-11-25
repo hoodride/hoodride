@@ -30,7 +30,16 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     # number may be one an old run's leftovers already have, 2026-11-22)
     File.rm_rf!(dir)
     File.mkdir_p!(dir)
-    on_exit(fn -> File.rm_rf!(dir) end)
+    sweep_old_builds(dir)
+    # (waited for 20 s at most: under full CPU, one delete waited over 60 s
+    # — on Windows Defender's scan, most likely — and the timeout failed a
+    # run whose every journey had passed, 2026-11-24; what's left is swept
+    # by a later run, above)
+    on_exit(fn ->
+      task = Task.async(fn -> File.rm_rf(dir) end)
+      Task.yield(task, 20_000) || Task.shutdown(task, :brutal_kill)
+    end)
+
     # (and our CSS too — the whole deploy build, Minify.build/4)
     0 = Mix.Tasks.Hoodride.Minify.build("priv/static", dir)
     %{minified: dir}
@@ -135,6 +144,23 @@ defmodule HoodrideWeb.BrowserJourneysTest do
       end
 
     if what, do: Agent.update(log, &[" #{at} ms: #{what} (took #{ms} ms)" | &1])
+  end
+
+  # earlier runs' builds left behind (stopped part-way, or their cleanup not
+  # done when the VM ended) — only ones untouched for 2 hours: never a run
+  # still going. Best effort: one that won't go is tried again next time.
+  defp sweep_old_builds(mine) do
+    cutoff = System.os_time(:second) - 2 * 3600
+    # (forward slashes: a wildcard reads Windows' "\" as an escape — the
+    # temp folder's own path matched nothing, 2026-11-24)
+    slashes = &String.replace(&1, "\\", "/")
+
+    for old <- Path.wildcard(slashes.(Path.join(System.tmp_dir!(), "hoodride_journeys_min_*"))),
+        old != slashes.(mine),
+        match?({:ok, %{mtime: t}} when t < cutoff, File.stat(old, time: :posix)),
+        do: File.rm_rf(old)
+
+    :ok
   end
 
   defp elem_or({result, _}), do: inspect(result)

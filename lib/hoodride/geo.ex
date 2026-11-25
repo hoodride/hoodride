@@ -921,74 +921,60 @@ defmodule Hoodride.Geo do
   # Publishes ONLY the sides that changed, each to its own audience. Sending
   # the other side too — even an unchanged number — would tell riders WHEN
   # hands come and go (and drivers when cars do): a timing leak.
-  # (public only for its tests: two shards' interleavings are set up directly)
+  #
+  # The writers run in parallel (one per core): two can change one hex at
+  # the same moment, and when each read and sent the count itself, their
+  # sends could cross — a stale number landing last (a re-read after
+  # sending, 3 tries, ran out under a rush: AggregatesTest, 2026-11-23).
+  # So a writer only leaves a NOTE for the hex's one announcer
+  # (Hoodride.AggAnnouncer), which reads the count when it handles it: one
+  # sender per hex, its messages in order, its last read after the last
+  # change.
+  # (public: the writers' and the recount's call, and its tests)
   @doc false
   def settle_and_broadcast(_cell, []), do: :ok
 
   def settle_and_broadcast(cell, sides) do
-    # atomic compare-and-delete: only an exactly-zero row dies, so another
-    # shard's concurrent increment on the same hex can never be lost
-    sent =
-      if :ets.select_delete(@agg, [{{cell, 0, 0}, [], [true]}]) == 1 do
-        broadcast_agg(cell, sides, 0, 0)
-        {0, 0}
-      else
-        case :ets.lookup(@agg, cell) do
-          [{_, d, h}] ->
-            broadcast_agg(cell, sides, d, h)
-            {d, h}
+    # an emptied hex's row goes HERE, as it changes — atomic compare-and-
+    # delete: only an exactly-zero row dies, so another writer's concurrent
+    # increment can never be lost. (Left to the announcer, a {hex, 0, 0}
+    # row lingered while its note waited: InvariantFuzzTest, 2026-11-23;
+    # and the recount, the writers paused, saw rows vanish under it)
+    :ets.select_delete(@agg, [{{cell, 0, 0}, [], [true]}])
 
-          # gone: another shard took it to 0/0 and deleted it — its own
-          # side it announced; OURS moved too, so ours is said (0), or its
-          # watchers keep the old count until the hex next changes
-          [] ->
-            broadcast_agg(cell, sides, 0, 0)
-            {0, 0}
-        end
-      end
-
-    reconfirm_agg(cell, sides, sent, 3)
+    GenServer.cast(
+      {:via, PartitionSupervisor, {Hoodride.AggAnnouncers, cell}},
+      {:announce, cell, Enum.uniq(sides)}
+    )
   end
 
-  # Another shard counting the same hex sends the number IT read — and two
-  # senders' messages land in either order: its older number could arrive
-  # after ours and leave watchers on it until the hex next changed. So the
-  # count is read again AFTER sending: moved meanwhile, it's sent again. The
-  # last number any watcher gets was then read after the last change
-  # (bounded: a hex that keeps changing has its own next send coming).
-  # (`read` is the count's reader — the table; a test passes one whose
-  # count never settles, to pin the bound)
+  # Runs ONLY in the hex's announcer: the count as it is NOW, the named
+  # sides sent (no row: an emptied hex — 0). (public for the announcer)
   @doc false
-  def reconfirm_agg(cell, sides, sent, tries, read \\ &read_agg/1)
-
-  def reconfirm_agg(_cell, _sides, _sent, 0, _read), do: :ok
-
-  def reconfirm_agg(cell, sides, sent, tries, read) do
-    now = read.(cell)
-
-    # per SIDE: a side is sent again only if ITS count moved — never
-    # because the other side did (a repeat of the car count would tell
-    # riders a hand went up or down there: the privacy law)
-    moved = Enum.filter(Enum.uniq(sides), &(side_count(now, &1) != side_count(sent, &1)))
-
-    if moved == [] do
-      :ok
-    else
-      {d, h} = now
-      broadcast_agg(cell, moved, d, h)
-      reconfirm_agg(cell, sides, now, tries - 1, read)
-    end
-  end
-
-  defp read_agg(cell) do
+  def announce_now(cell, sides) do
     case :ets.lookup(@agg, cell) do
-      [{_, d, h}] -> {d, h}
-      [] -> {0, 0}
+      [{_, d, h}] -> broadcast_agg(cell, sides, d, h)
+      [] -> broadcast_agg(cell, sides, 0, 0)
     end
+
+    :ok
   end
 
-  defp side_count({d, _h}, :drivers), do: d
-  defp side_count({_d, h}, :hands), do: h
+  @doc """
+  Every count note left so far has been sent (tests: the announcers are
+  separate processes). A writer's note is queued before it answers its
+  caller, so a call to each announcer made after that comes after it — on
+  one node, where a local send is in the mailbox when it returns; Erlang
+  itself only promises order between ONE sender and one receiver (the
+  writer's note and this call have two).
+  """
+  def flush_announcements do
+    for {_, pid, _, _} <- PartitionSupervisor.which_children(Hoodride.AggAnnouncers),
+        is_pid(pid),
+        do: GenServer.call(pid, :flush)
+
+    :ok
+  end
 
   defp cell_deltas(nil, _cells, _sign), do: %{}
 

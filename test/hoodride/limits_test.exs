@@ -27,6 +27,8 @@ defmodule Hoodride.LimitsTest do
     "close_wait_ms" =>
       "deleting an account waits this long for its connections to close, then stops them",
     "ewma_keep" => "the recount's learned batch size (a moving average)",
+    "batch" =>
+      "hex-count notes an announcer takes together in one pass, merged per hex (Hoodride.AggAnnouncer)",
     "ns_per_ms" => "a unit",
     "accept_wait_ms" =>
       "a rider's Cancel waits this long for an Accept already at work to finish (Hoodride.Requests)",

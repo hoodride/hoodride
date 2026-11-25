@@ -912,8 +912,15 @@ function showDeleteConfirm() {
   // every time empty and locked: never left half-typed from last time
   $("delete-typed").value = "";
   $("delete-yes").disabled = true;
-  $("settings-sheet").classList.add("confirming");
-  $("delete-cancel").focus(); // the safe choice has focus
+  const sheet = $("settings-sheet");
+  sheet.classList.add("confirming");
+  // the question and its warning first: at the top — sideways the drawer
+  // scrolls, you'd come from "Delete account" at its bottom, and focusing
+  // Cancel (the last thing) scrolled the question off the top (review,
+  // 2026-11-23). Cancel still has focus — the safe choice — without
+  // scrolling to it
+  sheet.scrollTop = 0;
+  $("delete-cancel").focus({ preventScroll: true });
 }
 
 function hideDeleteConfirm() {
@@ -1029,6 +1036,9 @@ function openSettings() {
   renderSettings();
   const drawer = $("settings-sheet");
   drawer.inert = false;
+  // (at its top: it scrolls as one when it doesn't fit — sideways — and
+  // kept where you'd left it; opened again halfway down: review, 2026-11-23)
+  drawer.scrollTop = 0;
   drawer.classList.add("open");
   $("settings-backdrop").classList.add("open");
   $("btn-account").setAttribute("aria-expanded", "true");

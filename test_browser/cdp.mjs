@@ -466,12 +466,51 @@ function page(cdp, sessionId, name, browserContextId) {
       const paused = [];
       await send("Network.enable");
       await send("Fetch.enable", { patterns: [].concat(urlPatterns).map((urlPattern) => ({ urlPattern, requestStage: "Response" })) });
+      // what the browser's own network saw of matching requests — sent,
+      // answered, finished — beside what was held: a hold that "got 0"
+      // tells whether the app never asked, the answer never came, or it
+      // came and wasn't held (2026-11-23: two such failures, causes unknown)
+      const globs = [].concat(urlPatterns).map((g) => new RegExp("^" + g.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*").replace(/\?/g, ".?") + "$"));
+      // (Chrome's own matching above: `*` any run, `?` ZERO or one
+      // character — base::MatchPattern — over the whole URL)
+      const seen = new Map();
+      const t0 = Date.now();
       cdp.on((msg) => {
-        if (done || msg.sessionId !== sessionId || msg.method !== "Fetch.requestPaused") return;
-        paused.push({ id: msg.params.requestId, url: msg.params.request.url });
+        if (done || msg.sessionId !== sessionId) return;
+        if (msg.method === "Fetch.requestPaused") {
+          paused.push({ id: msg.params.requestId, url: msg.params.request.url });
+          // (by Chrome's own id for it — the same as its Network events';
+          // by URL only as a fallback: a retry of the same URL marked the
+          // first, failed try as the one held — review, 2026-11-23)
+          const s = seen.get(msg.params.networkId) || [...seen.values()].find((r) => r.url === msg.params.request.url && !r.held);
+          if (s) s.held = Date.now() - t0;
+          return;
+        }
+        const id = msg.params && msg.params.requestId;
+        if (msg.method === "Network.requestWillBeSent" && globs.some((g) => g.test(msg.params.request.url)))
+          seen.set(id, { url: msg.params.request.url, sent: Date.now() - t0, from: msg.params.initiator && msg.params.initiator.type });
+        else if (msg.method === "Network.responseReceived" && seen.has(id))
+          Object.assign(seen.get(id), { status: msg.params.response.status, answered: Date.now() - t0, fromWorker: !!msg.params.response.fromServiceWorker });
+        else if (msg.method === "Network.loadingFinished" && seen.has(id)) seen.get(id).finished = Date.now() - t0;
+        else if (msg.method === "Network.loadingFailed" && seen.has(id)) seen.get(id).failed = msg.params.errorText;
       });
       return {
         count: (part = "") => paused.filter((r) => r.url.includes(part)).length,
+        // (ms since the hold began: sent, answered, held, finished, failed)
+        trace: () => [...seen.values()],
+        // until `n` answers are held (or `ms` pass) → how many are. A
+        // request is held when its ANSWER comes: the test server's one
+        // database connection can keep it waiting its turn ~10 s or more
+        // (DBConnection aims at queue_target, 5 s, and doubles it once its
+        // queue stays slow for a whole queue_interval, 10 s) — a 5 s wait
+        // failed once in a batch (chatreload, 2026-11-23: the app had asked
+        // at once; with the database held busy 6 s on purpose, the server
+        // answered in 6 s and the old wait missed it)
+        async arrived(n = 1, ms = 20000) {
+          const until = Date.now() + ms;
+          while (paused.length < n && Date.now() < until) await new Promise((r) => setTimeout(r, 50));
+          return paused.length;
+        },
         async release(part) {
           const go = part === undefined ? paused.splice(0) : paused.filter((r) => r.url.includes(part));
           for (const r of go) {

@@ -85,6 +85,13 @@ defmodule Hoodride.Application do
       # itself (a slow database froze it: Hoodride.RideBusyTest)
       {Task.Supervisor, name: Hoodride.Rides.Lookups},
       {DynamicSupervisor, strategy: :one_for_one, name: Hoodride.Rides.Supervisor},
+      # the hex counts' one sender per hex (before the writers, who leave it
+      # their notes: Hoodride.AggAnnouncer; the same restart allowance)
+      {PartitionSupervisor,
+       child_spec: Hoodride.AggAnnouncer,
+       name: Hoodride.AggAnnouncers,
+       max_restarts: 50,
+       max_seconds: 5},
       # one supervisor for ALL the map writers: its restart allowance is
       # theirs together — the default 3 in 5 s let a few writer crashes in
       # a row give up and soon restart the whole app (supervision review,

@@ -344,22 +344,74 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   flex-direction: column;
   background: var(--card);
   box-shadow: 4px 0 20px rgba(0,0,0,0.5);
-  padding: calc(16px + env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));
+  /* its sides only: the top and bottom room are spacers (::before,
+     ::after) — Safari 26.4 and later 26.x (iOS and macOS) leaves a scrolling
+     flex column's padding out of its scroll (WebKit 316902, fixed in
+     WebKit's code, 315813@main, not yet in every Safari): the drawer's
+     last 16 px, Terms · Privacy · Delete account, out of reach sideways.
+     Spacers are counted by every engine — harmless once that fix is
+     everywhere (review, 2026-11-23) */
+  padding: 0 12px 0 calc(12px + env(safe-area-inset-left));
   transform: translateX(-105%);
   visibility: hidden;
+  /* the whole drawer scrolls as one when it doesn't fit — a phone sideways
+     (owner's iPhone, 2026-11-23: the list squeezed into ~50 px of its own
+     scroll between the top and the bottom, which never shrank) — as a
+     navigation drawer and iOS Settings do; its scroll stays its own */
+  overflow-y: auto;
+  /* (never sideways: a wide row someday mustn't make it scroll that way) */
+  overflow-x: hidden;
+  overscroll-behavior: contain;
   /* hidden only AFTER sliding out; visible AT ONCE when opening — focus can't
      land in a still-hidden drawer (an animated visibility starts hidden) */
   transition: transform 0.2s ease, visibility 0s linear 0.2s;
 }
 /* right to left: it slides in from the right (its shadow on the left) */
-[dir="rtl"] .drawer { transform: translateX(105%); box-shadow: -4px 0 20px rgba(0,0,0,0.5); }
+[dir="rtl"] .drawer {
+  transform: translateX(105%);
+  box-shadow: -4px 0 20px rgba(0,0,0,0.5);
+  /* …the notch's room on ITS side, the right: on the left it sat mid-screen
+     and the text ran under a notch on the right, sideways (review,
+     2026-11-23) */
+  padding: 0 calc(12px + env(safe-area-inset-right)) 0 12px;
+}
+.drawer::before { content: ""; flex: none; height: calc(16px + env(safe-area-inset-top)); }
+.drawer::after { content: ""; flex: none; height: calc(16px + env(safe-area-inset-bottom)); }
 .drawer.open { transform: none; visibility: visible; transition: transform 0.2s ease, visibility 0s; }
 /* reduce motion: no slide, no fade — opening too (the open state's own
    rule above is more specific than .drawer: named here as well) */
 @media (prefers-reduced-motion: reduce) {
   .drawer, .drawer-backdrop, .drawer.open, .drawer-backdrop.open { transition: none; }
 }
-.drawer-close { top: calc(12px + env(safe-area-inset-top)); inset-inline-end: 12px; font-size: 18px; }
+/* ✕: stays at the top while the drawer scrolls (sticky, in the flow but
+   taking no room: its height given back below it). 12 px under the top
+   and the notch — .card-close's own top (8 px, a later rule) used to win
+   over this and put it in an iPhone's status bar */
+.drawer .drawer-close {
+  position: sticky;
+  /* (12 px plus the notch from the drawer's top — no top padding to count
+     from: its room is a spacer. At rest it sits there too — its −4 px top
+     margin (below) pulls it 4 px up into the spacer — so it never jumps;
+     the side, from its place in the row, not .card-close's inset) */
+  top: calc(12px + env(safe-area-inset-top));
+  inset-inline-end: auto;
+  align-self: flex-end;
+  flex: none;
+  z-index: 1;
+  height: 28px;
+  line-height: 20px;
+  /* (its room given back: −4 above, −24 below = its 28 px border box —
+     .card-close's 4 px padding is inside it: box-sizing; −28 pulled the
+     whole drawer up 4 px — review, 2026-11-23) */
+  margin: -4px -2px -24px 0;
+  margin-inline: 0 -2px;
+  font-size: 18px;
+  /* (scrolled under it, the rows' text: a round of the drawer's own color
+     behind it, so it reads clean) */
+  min-width: 28px;
+  border-radius: 50%;
+  background: var(--card);
+}
 .drawer-me { display: flex; align-items: center; gap: 12px; padding: 8px 0 16px; padding-inline: 4px 36px; min-width: 0; border-bottom: 1px solid #333; }
 .drawer-me strong { font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #settings-name:focus { outline: none; }
@@ -380,7 +432,9 @@ html.on-map, html.on-map body { touch-action: pan-x pan-y; }
   color: var(--accent); font-weight: 600; text-decoration: none;
 }
 .drawer-box .settings-refresh-note { font-size: 13px; margin: 0; }
-.drawer-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; padding-top: 8px; }
+/* (no scroll of its own — the drawer scrolls: it grows to push the sign-out
+   part to the bottom when there's room, never shrinks below its rows) */
+.drawer-list { flex: 1 0 auto; display: flex; flex-direction: column; padding-top: 8px; }
 .drawer-bottom { border-top: 1px solid #333; padding-top: 8px; }
 .drawer-row {
   width: 100%;

@@ -634,7 +634,10 @@ defmodule HoodrideWeb.WorldChannel do
   #   - only the newest message per car / hand / count survives (a car that
   #     moved twice, or moved and left, sends only its latest); different
   #     ones keep their order. One car's messages all come from its one map
-  #     writer, so they arrive here in the order they happened.
+  #     writer, so they arrive here in the order they happened; a hex's
+  #     counts all come from its one announcer (Hoodride.AggAnnouncer), so
+  #     its newest is the true one — a car and its hex's count can land a
+  #     moment apart, each settling right.
   #   - its OWN timer, started by the first held message — never a shared
   #     clock, which would make every channel send at the same instant
   #   - before any reply or "role", everything held goes out (flush/1)

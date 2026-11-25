@@ -49,8 +49,8 @@ await journey("chatreload: a reload's 'ended' keeps the list, never takes a mess
   await openChatWith(dot, boId);
   const held = await dot.holdResponses("*/api/state*");
   await dot.eval(`softReload(), true`);
-  for (let i = 0; i < 100 && held.count() === 0; i++) await new Promise((r) => setTimeout(r, 50));
-  check(held.count() === 1, "the reload's answer held (made before the message)", held.count());
+  await held.arrived();
+  check(held.count() === 1, "the reload's answer held (made before the message)", { held: held.count(), trace: held.trace() });
   await typeText(dot, "hi Bo");
   await send(dot);
   await dot.waitFor(`chats.get(state.chatPeer).msgs.some((m) => m.text === "hi Bo" && m.id != null)`, "sent: the server has it");
@@ -154,9 +154,18 @@ await journey("chatreload: a reload's 'ended' keeps the list, never takes a mess
   const restBefore = await hal.eval(`[...unreadRest.keys()]`);
   const cursorBefore = await hal.eval(`chatsMore`);
   const page2 = await hal.holdResponses("*/api/chats?before=*");
+  // (every page-2 ask the app makes, as it makes it — the browser's own
+  // timing list only has a request once it's done)
+  await hal.eval(`(() => { window.__asks = []; const f = window.fetch; window.__fetch = f; window.fetch = (u, o) => { if (String(u).includes("/api/chats?before=")) window.__asks.push(Math.round(performance.now())); return f(u, o); }; return true; })()`);
+  const askedAt = await hal.eval(`Math.round(performance.now())`);
   await hal.eval(`loadOlderChats(), true`);
-  for (let i = 0; i < 100 && page2.count() === 0; i++) await new Promise((r) => setTimeout(r, 50));
-  check(page2.count() === 1, "page 2 (with BT-C1) held", page2.count());
+  // (up to 20 s — held when its answer comes: arrived(), cdp.mjs)
+  await page2.arrived();
+  // (not held: why — asked, or not; a load already under way; the page
+  // the app was on — 2026-11-23, once in a batch of journeys)
+  const why = page2.count() === 1 ? null : await hal.eval(`({ askedAt: ${askedAt}, asks: window.__asks, more: chatsMore, olderLoading, olderFailed, reloading, hydrated, chats: chats.size, done: performance.getEntriesByType("resource").filter((e) => e.name.includes("/api/chats?before=")).map((e) => ({ at: Math.round(e.startTime), took: Math.round(e.duration) })) })`);
+  await hal.eval(`(window.fetch = window.__fetch, true)`);
+  check(page2.count() === 1, "page 2 (with BT-C1) held", { held: page2.count(), why, trace: page2.trace() });
   await dropAndWait(hal);
   await server(`crowd_close 1 ${halId}`);
   await restoreAndWait(hal);

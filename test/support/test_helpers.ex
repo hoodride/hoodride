@@ -151,6 +151,11 @@ defmodule Hoodride.TestHelpers do
   def save_env(keys), do: for(k <- keys, do: {k, Application.fetch_env(:hoodride, k)})
 
   def scrub_live_state do
+    # the hex counts' notes a previous test left still waiting in an
+    # announcer: sent now, before the tables are emptied — not as a stray
+    # extra count in this test (Hoodride.AggAnnouncer, 2026-11-23)
+    Hoodride.Geo.flush_announcements()
+
     # kill ride processes leaked by a previous test (their timers and
     # registry entries would otherwise bleed into this one)
     for {_, pid, _, _} <- DynamicSupervisor.which_children(Hoodride.Rides.Supervisor) do

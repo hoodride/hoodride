@@ -8,7 +8,7 @@
 // Here the reload's answer is made slow (the question reaches the server at
 // once), and the tap lands while it's on its way.
 import { journey, step, check, server as onServer } from "./cdp.mjs";
-import { bannerLike, goOnline, sees, openChatWith, typeText, send } from "./app.mjs";
+import { bannerLike, goOnline, onMapOnServer, sees, openChatWith, typeText, send } from "./app.mjs";
 
 // a reload as a rejoin starts one, its answer 1.5 s on the way; `act` while
 // it's loading; then wait until it's applied
@@ -81,16 +81,6 @@ async function reloadWhileDriving(p, event, channel) {
 }
 
 const server = (p) => p.eval(`window.fetch("/api/state").then(r => r.json()).then(s => ({ hand: !!s.hand, onMap: !!s.on_map }))`);
-// "online" on her screen is sent the same instant; the server files it a
-// moment later (it first checks her car is on file — step 5). A request
-// before that finds no car: wait until the server has it
-async function onMapOnServer(p) {
-  for (let i = 0; i < 50; i++) {
-    if ((await server(p)).onMap) return;
-    await new Promise((r) => setTimeout(r, 100));
-  }
-  check(false, `${p.name}'s car on the map (server)`);
-}
 
 await journey("tapreload: what you do while the app reloads stays done", async (browser) => {
   step("Sam (rider) taps ✋ while a reload is loading: up on his screen AND on the server");

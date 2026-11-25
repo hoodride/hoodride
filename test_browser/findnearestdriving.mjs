@@ -141,13 +141,28 @@ await journey("findnearestdriving: a driver driving off (found, or nobody), and 
     window.__slow = [];
     const push = worldChannel.push.bind(worldChannel);
     window.__push0 = push;
-    worldChannel.push = (ev, ...rest) => { const r = push(ev, ...rest); if (ev === "sync") r.receive("error", (e) => window.__slow.push(e && e.reason)); return r; };
+    // (armed: the allowance spent just BEFORE the search's first sync, on the
+    // same connection, so the server reads them in that order — spent
+    // earlier, it refilled one a second, and on a busy PC the search's first
+    // sync came over a second later and went through: precommit, 2026-11-24)
+    window.__spend = false;
+    worldChannel.push = (ev, ...rest) => {
+      if (ev === "sync" && window.__spend) {
+        window.__spend = false;
+        const ids = Array.from({ length: 20 }, (_, i) => 900000 + i);
+        for (let k = 0; k < 3; k++) push("reveal", { ids });
+      }
+      const r = push(ev, ...rest);
+      if (ev === "sync") r.receive("error", (e) => window.__slow.push(e && e.reason));
+      return r;
+    };
     return true;
   })()`);
   await dora.eval(`(map.jumpTo({ center: [state.me.lng + 0.02, state.me.lat], zoom: 14 }), true)`);
   await dora.waitFor(`!map.isMoving() && worldSync.settled()`, "moved off, answered", 15000);
-  // (the allowance spent: names asked for, as a group's list does)
-  await dora.eval(`(() => { const ids = Array.from({ length: 20 }, (_, i) => 900000 + i); for (let k = 0; k < 2; k++) worldChannel.push("reveal", { ids }); return true; })()`);
+  // (the allowance spent — names asked for, as a group's list does — as
+  // the search sends its first sync: armed above)
+  await dora.eval(`(window.__spend = true, true)`);
   const seqSlow = await dora.eval(`(__trace.length = 0, nearSeq)`);
   await tapLocate(dora);
   await dora.waitFor(`nearSeq > ${seqSlow} && !nearLooking && !map.isMoving()`, "the search answered in the end", 30000);

@@ -29,6 +29,18 @@ export const noPulse = (p, id) =>
   p.eval(`document.getElementById(${q(id)}).getAnimations({ subtree: true }).every((x) => x.animationName !== "seeking")`);
 export const fill = (p, id) => p.eval(`getComputedStyle(document.getElementById(${q(id)})).backgroundColor`);
 
+// "online" on the screen is instant; the server puts the car on the map a
+// moment later, with the phone's first position. A reload before that finds
+// no car on the server and resumes no shift (permhang failed so in a busy
+// precommit, 2026-11-24; tapreload knew it): wait until the server has it
+export async function onMapOnServer(p) {
+  for (let i = 0; i < 50; i++) {
+    if (await p.eval(`window.fetch("/api/state").then((r) => r.json()).then((s) => !!s.on_map)`)) return;
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  check(false, `${p.name}'s car on the map (server)`);
+}
+
 // a driver with a car, online (the browser's location is the home block)
 export async function goOnline(p, car = { color: "Blue", make: "Toyota", model: "Prius" }) {
   const saved = await p.eval(

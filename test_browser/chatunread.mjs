@@ -117,8 +117,8 @@ await journey("chatunread: a chat ended while not loaded — its unread leaves t
   await tom.click("btn-chat");
   await tom.waitFor(`document.querySelectorAll("#chat-messages .chat-item").length >= 30`, "the list drawn");
   await tom.eval(`(() => { const b = document.getElementById("chat-messages"); b.scrollTop = b.scrollHeight; return true; })()`);
-  for (let i = 0; i < 100 && held.count() === 0; i++) await new Promise((r) => setTimeout(r, 50));
-  check(held.count() === 1, "the page's answer held", held.count());
+  await held.arrived();
+  check(held.count() === 1, "the page's answer held", { held: held.count(), trace: held.trace() });
   const beforeHeld = await total(tom);
   await server(`close_chat ${left[0]} ${tomId}`);
   await heardClosed(tom, left[0], "ended while the page was on its way");
@@ -169,8 +169,8 @@ await journey("chatunread: a chat ended while not loaded — its unread leaves t
   await uma.click("btn-chat");
   await uma.waitFor(`document.querySelectorAll("#chat-messages .chat-item").length >= 30`, "the list drawn");
   await uma.eval(`(() => { const b = document.getElementById("chat-messages"); b.scrollTop = b.scrollHeight; return true; })()`);
-  for (let i = 0; i < 100 && umaHeld.count() === 0; i++) await new Promise((r) => setTimeout(r, 50));
-  check(umaHeld.count() === 1, "page 2's answer held", umaHeld.count());
+  await umaHeld.arrived();
+  check(umaHeld.count() === 1, "page 2's answer held", { held: umaHeld.count(), trace: umaHeld.trace() });
   const beforeUma = await total(uma);
   // BT-C1: the crowd's oldest — past page 2
   await server(`crowd_close 1 ${umaId}`);

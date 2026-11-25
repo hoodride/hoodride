@@ -184,6 +184,14 @@ defmodule Hoodride.TestClient do
   stay in the mailbox.
   """
   def frames(%__MODULE__{} = client, topic \\ "world") do
+    # the hex counts come from their announcers (Hoodride.AggAnnouncer), not
+    # the writer the test called: every note sent first — each announcer's
+    # message is in the channel's mailbox before it answers, so ahead of
+    # the barrier below: on one node, where a local send is in the mailbox
+    # when it returns (two senders: no language guarantee — the old
+    # barrier leaned on the same). 2026-11-23: without it, under load a
+    # count landed after the barrier and was missed
+    Hoodride.Geo.flush_announcements()
     # an event nothing handles: refused (never a crash), but answered in order
     _ = request(client, topic, "__barrier__", %{})
     collect(client.name, topic, [])

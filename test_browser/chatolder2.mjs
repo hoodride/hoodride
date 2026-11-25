@@ -84,8 +84,8 @@ await journey("chatolder2: a page-2 chat opened early counted once; a reload nev
   const abeHeld = await abe.holdResponses("*/api/state*");
   await abe.eval(`(window.__banners = [], new MutationObserver(() => window.__banners.push(document.getElementById("banner").textContent)).observe(document.getElementById("banner"), { childList: true, characterData: true, subtree: true }), true)`);
   await abe.eval(`softReload(), true`);
-  for (let i = 0; i < 100 && abeHeld.count() === 0; i++) await new Promise((r) => setTimeout(r, 50));
-  check(abeHeld.count() === 1, "the reconnect's answer held", abeHeld.count());
+  await abeHeld.arrived();
+  check(abeHeld.count() === 1, "the reconnect's answer held", { held: abeHeld.count(), trace: abeHeld.trace() });
   await abe.eval(`openChat(realPeersById.get(${a})), true`);
   await abeHeld.release();
   await abe.waitFor(`hydrated && !reloading`, "reloaded", 15000);
