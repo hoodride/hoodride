@@ -216,13 +216,16 @@ defmodule HoodrideWeb.ChatRebuildTest do
     test "erased on sign-out, account deletion, and a signed-out start" do
       [logout] = Regex.run(~r/\$\("btn-logout"\)\.addEventListener\("click".*?\n\}\);\n/s, @app)
       assert logout =~ "HoodReadStore.forget(storageOrNull(), state.realUser.id);"
+      # (and the ride requests seen as a driver: who asked, when — 2026-11-25)
+      assert logout =~ "forgetSeenReqs(storageOrNull(), state.realUser.id);"
 
       # deleting the account: the same clean-up
       assert @app =~
-               "HoodViewStore.forget(storageOrNull(), state.realUser.id);\n    HoodReadStore.forget(storageOrNull(), state.realUser.id);\n    loc.stop();"
+               "HoodViewStore.forget(storageOrNull(), state.realUser.id);\n    HoodReadStore.forget(storageOrNull(), state.realUser.id);\n    forgetSeenReqs(storageOrNull(), state.realUser.id);\n    loc.stop();"
 
       [out] = Regex.run(~r/onSignedOut: async \(\) => \{.*?\n  \},/s, @app)
       assert out =~ "HoodReadStore.forgetAll(storageOrNull());"
+      assert out =~ "forgetSeenReqs(storageOrNull());"
     end
   end
 end

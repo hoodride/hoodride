@@ -337,9 +337,12 @@ defmodule HoodrideWeb.UserChannel do
       {:error, :accepting} ->
         {:reply, {:error, %{reason: "accepted"}}, socket}
 
+      # (nothing there: "ok", saying nothing was done — a decline or an
+      # expiry took it first; the app says "Request cancelled" only for a
+      # real cancel: review round 20, 2026-11-26)
       {:error, :none} ->
         if is_nil(Hoodride.Rides.ride_id_of_user(uid)),
-          do: {:reply, :ok, socket},
+          do: {:reply, {:ok, %{done: false}}, socket},
           else: {:reply, {:error, %{reason: "accepted"}}, socket}
     end
   end
@@ -356,7 +359,7 @@ defmodule HoodrideWeb.UserChannel do
   # same rider is left alone (Requests.decline/3; bug list, 2026-11-22)
   defp event("decline_request", %{"rider_id" => rider_id, "req" => req}, socket)
        when is_integer(rider_id) and is_integer(req) do
-    Hoodride.Requests.decline(socket.assigns.user_id, rider_id, req)
+    Hoodride.Requests.decline(socket.assigns.user_id, rider_id, Hoodride.Requests.ts_of(req))
     {:reply, :ok, socket}
   end
 
@@ -472,12 +475,23 @@ defmodule HoodrideWeb.UserChannel do
               still_signed_in(socket)
             )
 
-            {:noreply, assign(socket, :has_car, true)}
+            # ("ok": placed — the app tries again on no answer, so a silence
+            # here made every update time out and go twice: final review,
+            # 2026-11-26. Not placed — signed out or a ride started in the
+            # moment: no answer, as before — never "ok" for a car not there)
+            socket = assign(socket, :has_car, true)
+
+            if Geo.driver_on_map?(me), do: {:reply, :ok, socket}, else: {:noreply, socket}
 
           false ->
             {:reply, {:error, %{reason: "no_car"}}, socket}
 
           {:error, :unavailable} ->
+            # (said in the log: a car not placed — the app tries again when
+            # told; the rare missed car in a precommit, 2026-11-26)
+            require Logger
+            Logger.warning("driver_update: car check busy — not placed, the app retries")
+
             {:reply, {:error, %{reason: "busy", retry_ms: Hoodride.Accounts.retry_spread_ms()}},
              socket}
         end

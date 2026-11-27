@@ -2148,7 +2148,37 @@ clocks can be off); both disappear with their conversation or request (and
 the repair passes sweep strays). The app (priv/static/distance.js,
 HoodDistance) measures to the best position it may have: the ride
 partner's exact one → the block they show on your map → the block they
-last shared, with its age ("0.6 mi away · 20 min ago") → nothing. The
+last shared, with its age ("0.6 mi away · 20 min ago") → nothing. A car
+that LEAVES your map (offline, out of view, hidden by your request or
+ride) keeps its last block and the moment it left, in this app only
+(`noteCarsGone`, 2026-11-24 — the rider's chat went blank): measured like
+a shared block, with its age; of the two snapshots the newer wins. Cars
+only (public anyway); a ✋ isn't kept. No expiry — the age says it;
+gone with the peer, with a reload (the map's memory), and with a ride
+with them (they've driven since) — a ride seen live, or, after the phone
+was away, the request it knew of found gone at the reload (a missed ride,
+or just a decline or an expiry: the server keeps no ride history to tell
+them apart — owner, 2026-11-25 — so a blank distance, which his car on
+the map fills in again; an ask whose answer never came counts as known).
+Stamped when the car is removed, not at
+the next redraw (no screen frames in a background tab), at its latest
+block (a car in a cell the view left but the server still sends reads
+live till that cell goes). Ages on the wall clock (`Date.now()`: the
+page's steady clock stops while the phone sleeps, w3c/hr-time#115), for
+shared blocks too. "Last seen" means when this phone last KNEW, not
+when it found out (every socket message, Phoenix's heartbeat answers
+every 30 s, says it was live; 45 s of silence is a gap). Two gaps: the
+SAME connection silent — a frozen tab (iOS holds its messages, hands
+them over on waking): the burst right after is old news, dated to the
+silence's start; the connection LOST: the new one's news is fresh, only
+what the reconnect's snapshots find missing is dated to the loss (a
+connection that died silently — no close, replaced at Phoenix's
+heartbeat timeout, its late close never reaching socket.onClose — is
+noted lost by the world channel's error: laststall). Cars
+hidden meanwhile (a mode switch) take the same date. Once cleared for a
+ride or a vanished request, no older block is taken
+again (a late snapshot dropping their stale entry). (2026-11-24/25
+reviews.) The
 privacy policy says so ("who sees what"). The chat box note "📍 Drivers you
 message see roughly where you are (about a block)" is OFF since 2026-10-29
 (owner) — commented out in index.html and app.js, to bring back. Why blocks: a
@@ -3116,6 +3146,37 @@ here say the rest.
   (StaticPathsTest — `turnstile.js` was missing, caught by its journey).
 
 ### Blocks (2026-11-15)
+- **A Block or Unblock whose answer is lost** (a push timeout): the sheet
+  says "Checking…" and the server is ASKED over the web, not the line that
+  lost the answer (`GET /api/blocks?peer=<id>` → `{blocking}`; now, 5 s,
+  20 s and 60 s later — a slow save may still land): blocked → done (what
+  a block ends ended here too: a pending request, the chat); not →
+  "Couldn't block — try again"; no answer → "Couldn't confirm — check
+  Blocked people". A failure leaves nothing "being blocked". The sheet for
+  that same person and action closes, even one reopened meanwhile; the
+  newest wish wins (an older action's late check decides nothing). The
+  server answers a no-op as ever, before the day's allowance (a block
+  already there "ok", an unblock already done "none"). Never "Couldn't
+  block" for one that went through (owner, 2026-11-25). A resend over the
+  socket was built first and removed (owner, 2026-11-26): its states kept
+  breaking (reviews, rounds 5–12).
+- **What a reload says of what's gone: facts, never reasons** (owner,
+  2026-11-26). A request or ride the phone knew of, gone from the
+  snapshot: "Your ride request ended — ask again if you still need a ride",
+  "Your ride ended" (`HoodRehydrate.lostBanner`; the ride channel's own
+  "gone" too). Never "lost" or "ended unexpectedly": a snapshot can't tell a
+  restart from a decline, her own cancel or block, or a ride — every rule
+  that tried to (muting it for her own block or cancel; marks, a resend of
+  her cancel) had a rare hole, and the reviews found one each round
+  (rounds 4–20). Deleted. Only what the server SAID is said with a
+  reason: "Blocked.", "Driver can't take this one", "Request cancelled" —
+  once per cancel wish (`cancelIntent`), on the cancel's ok (not one
+  answered "nothing was there": `{done: false}`) or `cancel_done` (her
+  Cancel, answered "accepted", carried out when the Accept failed). A
+  reload never says "Request cancelled". Journeys `blockextra`,
+  `blockretry`, `blockretry2`, `blockslow`, `blocksettle`, `blocklost`,
+  `lostanswers`, `cancelaccepted`, `cancelride`, `cancelguess`,
+  `cancelreload`; CancelAcceptRaceTest.
 - **What a block does, either way:** off each other's maps (cars and ✋,
   live and in snapshots; area counts stay whole — a number names nobody),
   no messages or ride requests (the ordinary "unavailable",

@@ -97,8 +97,10 @@
     const draft = (chat.draft || "").trim();
     if (draft) return { draft: true, text: draft };
     const last = chat.msgs[chat.msgs.length - 1];
-    if (last) return { draft: false, text: last.text };
     const s = chat.summary && chat.summary.last;
+    // (a note put back by a reload, older than the summary's last message —
+    // `behind`: that message is the newer one; restoreRequestNote)
+    if (last && !(last.behind && s)) return { draft: false, text: last.text };
     return { draft: false, text: s ? s.preview : "" };
   }
 

@@ -67,6 +67,8 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     on_exit(fn -> turnstile_off() end)
     # (and the account deletion's test pause, after server("delete_slow …"))
     on_exit(fn -> Application.delete_env(:hoodride, :account_deletion_hook) end)
+    # (and a block's save pause, after server("block_slow …"))
+    on_exit(fn -> Application.delete_env(:hoodride, :blocks_hook) end)
 
     # the server's side of a failure: every socket connect and channel join,
     # when and how long it took (a join stuck "joining" under load, 2026-11-02).
@@ -332,6 +334,36 @@ defmodule HoodrideWeb.BrowserJourneysTest do
   # the next account deletion's database step takes 2.5 s (a busy
   # database): the deleting phone's own connection is closed first, and it
   # notices before the answer comes. "fail": the erase then refused too
+  # every block's save waits `ms` first (a database stuck on a lock): the
+  # app's push times out, its retry queues behind it in the channel
+  # (cross-feature review round 10, 2026-11-25). "off": no pause
+  defp server("block_slow " <> args) do
+    case String.trim(args) do
+      "off" ->
+        Application.delete_env(:hoodride, :blocks_hook)
+
+      ms ->
+        ms = String.to_integer(ms)
+
+        Application.put_env(:hoodride, :blocks_hook, fn
+          :inserting -> Process.sleep(ms)
+          _ -> :ok
+        end)
+    end
+
+    "ok"
+  end
+
+  # where the server has this driver on the map: their cell, or "none" —
+  # for sees()'s diagnostics (the rare missed car: the server's side or the
+  # app's? 2026-11-26)
+  defp server("driver_cell " <> id) do
+    case Hoodride.Geo.driver_cell(String.to_integer(String.trim(id))) do
+      nil -> "none"
+      cell -> cell
+    end
+  end
+
   defp server("delete_slow " <> args) do
     # "fail" | "ok" [, the pause in ms — 2,500 unless given]
     [how | rest] = String.split(args)
@@ -498,6 +530,21 @@ defmodule HoodrideWeb.BrowserJourneysTest do
     [a, b, secs] = args |> String.split() |> Enum.map(&String.to_integer/1)
     key = Hoodride.Chat.pair_key(a, b)
     true = :ets.update_element(:chat_conversations, key, {2, System.system_time(:second) - secs})
+    "ok"
+  end
+
+  # the messages between two people so far, timed `secs` later — a time
+  # that can't place a request's note among them (only its message id can:
+  # test_browser/requesttop.mjs)
+  defp server("msgs_later " <> args) do
+    [a, b, secs] = args |> String.split() |> Enum.map(&String.to_integer/1)
+    key = Hoodride.Chat.pair_key(a, b)
+
+    for {^key, id, from, text, ts} = row <- :ets.lookup(:chat_messages, key) do
+      :ets.delete_object(:chat_messages, row)
+      :ets.insert(:chat_messages, {key, id, from, text, ts + secs})
+    end
+
     "ok"
   end
 

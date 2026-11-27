@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Cancel·la la sol·licitud"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Cancel·la la sol·licitud a {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Primer cancel·la la teva sol·licitud de viatge"
 
@@ -169,6 +173,10 @@ msgstr "Xats"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Revisa: {fields} (fins a {max} lletres cadascun)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "S'està comprovant…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Tria…"
@@ -205,14 +213,6 @@ msgstr "S'ha restablert la connexió. Toca CONNECTA'T per tornar a conduir"
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "S'ha restablert la connexió. Torna a tocar ✋ si encara necessites un viatge"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "S'ha restablert la connexió. El teu viatge ha acabat de manera inesperada; torna a organitzar-lo"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "S'ha restablert la connexió. S'ha perdut la teva sol·licitud de viatge; torna a demanar-lo"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Continua amb Facebook"
@@ -244,6 +244,10 @@ msgstr "No s'ha pogut bloquejar. Torna-ho a provar"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "No s'ha pogut comprovar el teu navegador. Permet challenges.cloudflare.com o prova un altre navegador"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "No s'ha pogut confirmar. Consulta Persones bloquejades"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "groc"
 msgid "You already have an open request"
 msgstr "Ja tens una sol·licitud oberta"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Ja has demanat un viatge a {name}"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Podràs actualitzar-ho després del viatge"
@@ -904,6 +912,14 @@ msgstr "El teu cotxe"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "El teu nom i la teva foto provenen de {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "El teu trajecte ha acabat"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "La teva sol·licitud de trajecte ha acabat. Torna-ho a demanar si encara el necessites"
 
 #: priv/static/app.js
 msgid "Your rider"

@@ -5,7 +5,7 @@ defmodule Hoodride.BlockEffects do
   already refused:
 
     1. a request between them, either way: withdrawn (the driver told it
-       was cancelled) or declined (the rider told it was declined) — as any
+       was cancelled, the rider's app quietly) or declined (the rider told it was declined) — as any
        other; nobody is told it's a block;
     2. a ride together: ended (the other told "ended", as any ending). A
        ride STARTING in that same moment isn't missed: its own last look,
@@ -20,9 +20,12 @@ defmodule Hoodride.BlockEffects do
   def apply(a, b) do
     for {rider, driver} <- [{a, b}, {b, a}] do
       case Requests.open_request_of(rider) do
-        %{driver_id: ^driver} ->
-          # the one who blocked asked: withdrawn; the other asked: declined
-          if rider == a, do: Requests.cancel(rider), else: Requests.decline(driver, rider)
+        %{driver_id: ^driver, ts: ts} ->
+          # the one who blocked asked: withdrawn — THIS request (its stamp),
+          # never a newer one to someone else; the other asked: declined
+          if rider == a,
+            do: withdrawn(rider, driver, ts),
+            else: Requests.decline(driver, rider)
 
         _ ->
           :ok
@@ -43,6 +46,18 @@ defmodule Hoodride.BlockEffects do
         do: send(pid, {:blocked, other})
 
     :ok
+  end
+
+  # the rider's own request, withdrawn by their block: the driver's told
+  # (request_cancelled, as any cancel) — and the rider's app too, quietly:
+  # it kept "Waiting for the driver…" (every other chat greyed: "You
+  # already requested a ride from" them) when the block's answer came too
+  # late, or a reload caught the request before the block took it (review,
+  # 2026-11-24). Their own app drops it on the block's answer as well.
+  defp withdrawn(rider, driver, ts) do
+    with :ok <- Requests.withdraw(rider, driver, ts) do
+      HoodrideWeb.Endpoint.broadcast("user:#{rider}", "request_withdrawn", %{driver_id: driver})
+    end
   end
 
   @doc """

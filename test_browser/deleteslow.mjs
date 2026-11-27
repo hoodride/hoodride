@@ -86,9 +86,11 @@ await journey("deleteslow: a slow deletion's answer is the app's to show", async
   const annId = await ann.id();
   await server("delete_slow ok");
   await ann.eval(`HoodModeStore.save(window.localStorage, state.realUser.id, "driver"), true`);
+  await ann.eval(`(markReqSeen(900000001, 1234), true)`);
   check((await ann.eval(`window.localStorage.getItem("hoodride_mode_${annId}")`)) !== null, "a remembered mode");
   await openDelete(ann);
   await ann.click("delete-yes");
   await ann.waitFor(`typeof state !== "undefined" && !state.realUser && !document.getElementById("auth-buttons").classList.contains("hidden")`, "signed out, the sign-in screen", 20000);
   check((await ann.eval(`window.localStorage.getItem("hoodride_mode_${annId}")`)) === null, "the remembered mode gone from this phone");
+  check((await ann.eval(`Object.keys(localStorage).filter((k) => /seenreq/i.test(k)).length`)) === 0, "the seen requests gone from this phone", await ann.eval(`Object.keys(localStorage).filter((k) => /seenreq/i.test(k))`));
 });

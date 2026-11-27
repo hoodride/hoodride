@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Ghairi ombi"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Ghairi ombi kwa {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Ghairi kwanza ombi lako la usafiri"
 
@@ -169,6 +173,10 @@ msgstr "Mazungumzo"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Angalia {fields} (herufi zisizozidi {max} kila moja)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Inakagua…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Chagua…"
@@ -205,14 +213,6 @@ msgstr "Muunganisho umewekwa upya — gusa ANZA KAZI ili uendeshe tena"
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Muunganisho umewekwa upya — gusa ✋ tena kama bado unahitaji usafiri"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Muunganisho umewekwa upya — safari yako imeisha ghafla, tafadhali ipange upya"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Muunganisho umewekwa upya — ombi lako la usafiri limepotea, tafadhali omba tena"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Endelea na Facebook"
@@ -244,6 +244,10 @@ msgstr "Imeshindwa kuzuia — jaribu tena"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Imeshindwa kukagua kivinjari chako — ruhusu challenges.cloudflare.com, au jaribu kivinjari kingine"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Imeshindwa kuthibitisha — angalia Watu uliowazuia"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "ya njano"
 msgid "You already have an open request"
 msgstr "Tayari una ombi lililo wazi"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Tayari umeomba safari kwa {name}"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Unaweza kusasisha baada ya safari yako"
@@ -904,6 +912,14 @@ msgstr "Gari lako"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Jina na picha yako vinatoka {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Safari yako imeisha"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Ombi lako la safari limeisha — omba tena kama bado unahitaji safari"
 
 #: priv/static/app.js
 msgid "Your rider"

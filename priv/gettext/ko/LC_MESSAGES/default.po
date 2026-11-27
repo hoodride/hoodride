@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "요청 취소"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "{name} 님에게 보낸 요청 취소"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "먼저 탑승 요청을 취소하세요"
 
@@ -169,6 +173,10 @@ msgstr "채팅"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "{fields} 항목을 확인하세요(각각 최대 {max}자)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "확인 중…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "선택…"
@@ -205,14 +213,6 @@ msgstr "연결이 재설정됐어요. 다시 운전하려면 온라인 전환을
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "연결이 재설정됐어요. 아직 차가 필요하면 ✋를 다시 탭하세요"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "연결이 재설정됐어요. 운행이 예기치 않게 종료됐으니 다시 설정해 주세요"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "연결이 재설정됐어요. 탑승 요청이 사라졌으니 다시 요청해 주세요"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Facebook으로 계속하기"
@@ -244,6 +244,10 @@ msgstr "차단하지 못했어요. 다시 시도해 주세요"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "브라우저를 확인하지 못했어요. challenges.cloudflare.com을 허용하거나 다른 브라우저를 사용해 주세요"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "확인하지 못했어요. 차단한 사람에서 확인하세요"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "노란색"
 msgid "You already have an open request"
 msgstr "이미 진행 중인 요청이 있어요"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "이미 {name} 님에게 승차를 요청했어요"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "운행이 끝난 후 새로고침할 수 있어요"
@@ -904,6 +912,14 @@ msgstr "내 차량"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "이름과 사진은 {provider}에서 가져와요"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "탑승이 끝났어요"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "탑승 요청이 끝났어요. 아직 필요하면 다시 요청하세요"
 
 #: priv/static/app.js
 msgid "Your rider"

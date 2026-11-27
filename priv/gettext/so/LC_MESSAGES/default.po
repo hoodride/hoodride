@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Jooji codsiga"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Jooji codsiga aad u dirtay {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Marka hore jooji codsiga safarka"
 
@@ -169,6 +173,10 @@ msgstr "Sheekeysiyo"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Hubi: {fields} (ugu badnaan {max} xaraf midkiiba)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Waa la hubinayaa…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Dooro…"
@@ -205,14 +213,6 @@ msgstr "Xiriirka dib ayaa loo bilaabay — taabo KHADKA GAL si aad mar kale u wa
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Xiriirka dib ayaa loo bilaabay — mar kale taabo ✋ haddii aad weli safar u baahan tahay"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Xiriirka dib ayaa loo bilaabay — safarkaagu si lama filaan ah ayuu u dhammaaday, fadlan dib u diyaari"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Xiriirka dib ayaa loo bilaabay — codsigaaga safarka wuu lumay, fadlan mar kale codso"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Ku sii wad Facebook"
@@ -244,6 +244,10 @@ msgstr "Lama xannibi karin — isku day mar kale"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Browser-kaaga lama hubin karin — u oggolow challenges.cloudflare.com, ama isku day browser kale"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Lama xaqiijin karin — eeg Dadka la xannibay"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "huruud ah"
 msgid "You already have an open request"
 msgstr "Waxaad horey u haysataa codsi furan"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Waxaad horey uga codsatay {name} safar"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Waad cusboonaysiin kartaa safarkaaga kadib"
@@ -904,6 +912,14 @@ msgstr "Baabuurkaaga"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Magacaaga iyo sawirkaaga waxay ka yimaadaan {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Safarkaagu wuu dhammaaday"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Codsigaaga safarku wuu dhammaaday — mar kale codso haddii aad weli u baahan tahay safar"
 
 #: priv/static/app.js
 msgid "Your rider"

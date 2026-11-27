@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Prekliči prošnjo"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Prekliči prošnjo: {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Najprej prekliči svojo prošnjo za prevoz"
 
@@ -169,6 +173,10 @@ msgstr "Klepeti"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Preveri: {fields} (največ {max} črk za vsako)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Preverjanje…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Izberi …"
@@ -205,14 +213,6 @@ msgstr "Povezava je bila prekinjena – tapni POVEŽI SE in spet vozi"
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Povezava je bila prekinjena – če še potrebuješ prevoz, znova tapni ✋"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Povezava je bila prekinjena – vožnja se je nepričakovano končala, dogovorita se znova"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Povezava je bila prekinjena – tvoja prošnja za prevoz se je izgubila, prosi znova"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Nadaljuj s Facebookom"
@@ -244,6 +244,10 @@ msgstr "Blokiranje ni uspelo – poskusi znova"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Tvojega brskalnika ni bilo mogoče preveriti – dovoli challenges.cloudflare.com ali poskusi drug brskalnik"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Ni bilo mogoče potrditi. Preveri Blokirane osebe"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "rumeni"
 msgid "You already have an open request"
 msgstr "Odprto prošnjo že imaš"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Odprto prošnjo za vožnjo že imaš: {name}"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Osvežiš lahko po vožnji"
@@ -904,6 +912,14 @@ msgstr "Tvoj avto"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Ime in fotografija sta iz računa {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Tvoja vožnja se je končala"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Tvoja prošnja za vožnjo se je končala. Prosi znova, če vožnjo še potrebuješ"
 
 #: priv/static/app.js
 msgid "Your rider"

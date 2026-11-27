@@ -924,6 +924,27 @@ html.chat-side .bottom-controls {
 .chat-actions { flex: 1 1 auto; display: flex; gap: 10px; }
 .chat-actions > .btn { flex: 1 1 auto; }
 .chat-actions:not(:has(> .btn:not(.hidden))) { display: none; }
+/* "You already requested a ride from {name}" (another driver's chat):
+   greyed, but READABLE — the half-faded disabled look would make a sentence
+   hard to read (muted on the field grey ≈ 5:1). A sentence, not a label: it
+   wraps, centered; a long name breaks rather than overflowing. Nothing's
+   loading: no wait cursor. (break-word first: Safari before 15.4 drops
+   `anywhere` — caniuse — and still breaks a too-long name there, once
+   the line is full; `anywhere` also lets the button shrink below it:
+   review, 2026-11-24) */
+.btn.btn-why:disabled {
+  opacity: 1; cursor: default;
+  background: #2c2c2e; color: var(--muted); border: 1px solid #3a3a3c;
+  font-weight: 500; text-align: center;
+  overflow-wrap: break-word; overflow-wrap: anywhere;
+}
+/* "Cancel request to {name}", centered under it: the row wraps for it
+   (beside the name or under it, the two stay one column) */
+.chat-actions.why { flex-wrap: wrap; row-gap: 6px; }
+.chat-actions > .chat-cancel-other {
+  flex: 1 0 100%; align-self: auto; text-align: center;
+  overflow-wrap: break-word; overflow-wrap: anywhere;
+}
 .chat-title > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #chat-name { font-weight: 700; font-size: 16px; }
 .chat-dist { font-size: 12px; opacity: 0.7; }

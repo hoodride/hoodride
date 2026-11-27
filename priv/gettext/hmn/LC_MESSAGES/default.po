@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Tso tseg kev thov"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Tso tseg kev thov rau {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Tso tseg koj kev thov caij tsheb ua ntej"
 
@@ -169,6 +173,10 @@ msgstr "Kev sib tham"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Kuaj {fields} (txhua yam tsis pub tshaj {max} tus ntawv)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Tab tom kuaj…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Xaiv…"
@@ -205,14 +213,6 @@ msgstr "Kev txuas rov pib dua — nias MUS ONLINE txhawm rau tsav dua"
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Kev txuas rov pib dua — nias ✋ dua yog koj tseem xav caij tsheb"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Kev txuas rov pib dua — koj kev caij tsheb xaus tsis tau xav txog, thov teeb tsa dua"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Kev txuas rov pib dua — koj kev thov caij tsheb ploj lawm, thov rov thov dua"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Siv Facebook mus ntxiv"
@@ -244,6 +244,10 @@ msgstr "Thaiv tsis tau — sim dua"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Kuaj tsis tau koj lub browser — tso cai rau challenges.cloudflare.com, lossis sim lwm lub browser"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Lees tsis tau — saib Cov neeg raug thaiv"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "daj"
 msgid "You already have an open request"
 msgstr "Koj twb muaj ib qho kev thov lawm"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Koj twb thov {name} caij tsheb lawm"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Koj hloov kho tau tom qab koj caij tsheb tas"
@@ -904,6 +912,14 @@ msgstr "Koj lub tsheb"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Koj lub npe thiab duab los ntawm {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Koj txoj kev caij tsheb tas lawm"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Koj daim ntawv thov caij tsheb tas lawm — thov dua yog tias koj tseem xav tau ib lub tsheb"
 
 #: priv/static/app.js
 msgid "Your rider"

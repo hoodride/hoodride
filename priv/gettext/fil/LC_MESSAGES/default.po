@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Kanselahin ang request"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Kanselahin ang request kay {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Kanselahin muna ang request mo ng sakay"
 
@@ -169,6 +173,10 @@ msgstr "Mga Chat"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Tingnan ang {fields} (hanggang {max} titik bawat isa)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Sinusuri…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Pumili…"
@@ -205,14 +213,6 @@ msgstr "Na-reset ang koneksyon — i-tap ang MAG-ONLINE para magmaneho ulit"
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Na-reset ang koneksyon — i-tap ulit ang ✋ kung kailangan mo pa ng sakay"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Na-reset ang koneksyon — biglang natapos ang sakay mo, pakiayos ulit"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Na-reset ang koneksyon — nawala ang request mo ng sakay, pakihingi ulit"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Magpatuloy gamit ang Facebook"
@@ -244,6 +244,10 @@ msgstr "Hindi ma-block — subukan ulit"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Hindi masuri ang browser mo — payagan ang challenges.cloudflare.com, o sumubok ng ibang browser"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Hindi makumpirma — tingnan ang Mga naka-block"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "dilaw"
 msgid "You already have an open request"
 msgstr "May bukas ka nang request"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Humiling ka na ng sakay kay {name}"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Puwede kang mag-refresh pagkatapos ng sakay mo"
@@ -904,6 +912,14 @@ msgstr "Ang kotse mo"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Galing sa {provider} ang pangalan at larawan mo"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Natapos na ang biyahe mo"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Natapos na ang hiling mong sakay — humiling ulit kung kailangan mo pa ng sakay"
 
 #: priv/static/app.js
 msgid "Your rider"

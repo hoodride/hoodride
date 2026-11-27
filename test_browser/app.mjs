@@ -1,6 +1,6 @@
 // Hood Ride steps for the browser journeys: what a person does, done the way
 // the app does it (a marker tap = openMarkerCard, then the real buttons).
-import { check } from "./cdp.mjs";
+import { check, serverAsk } from "./cdp.mjs";
 
 const q = JSON.stringify;
 
@@ -61,8 +61,36 @@ export async function goOnline(p, car = { color: "Blue", make: "Toyota", model: 
 // it's in a pile on screen). Not just known: the app keeps people's data
 // for cells it no longer draws (2026-11-10) — "has their data" ≠ "sees".
 export const DRAWN = (id) => `[...pileMarkers.values()].some((pm) => pm.ids.includes(${id}))`;
+// (a rare miss, four times — BT-Dora/Ray's ✋ in a precommit, BT-SeenRosa/Dirk's
+// car in a batch, 2026-11-25; BT-AskRosa/Dirk, BT-LostLia/Dov the same day,
+// single runs, their "had:" lines not kept — 6 reruns clean. FOUND
+// 2026-11-26 (a precommit's lastseen: server cell "none"): the driver's
+// first update after going online refused "busy" (the car check's
+// database read), the answer ignored, the next one at the heartbeat
+// (16–24 s) — retried now (journey onlinebusy). If it fails, it says what
+// the app had — known? which cell, wanted? visible to this role? drawn? —
+// to root-cause it then)
 export async function sees(p, id, what = "on the map") {
-  await p.waitFor(`realPeersById.has(${id}) && realEntries.has(${id}) && ${DRAWN(id)}`, `${p.name} sees #${id} ${what}`, 15000);
+  try {
+    await p.waitFor(`realPeersById.has(${id}) && realEntries.has(${id}) && ${DRAWN(id)}`, `${p.name} sees #${id} ${what}`, 15000);
+  } catch (e) {
+    const had = await p
+      .eval(`(() => {
+        const e = realEntries.get(${id});
+        return {
+          known: realPeersById.has(${id}), entry: e ? { type: e.type, cell: e.cell, spot: e.spot } : null,
+          wanted: e ? worldSync.wantedGeoHas(e.cell) : null, visible: e ? browseVisible(e.type) : null,
+          mode: state.mode, ride: !!state.ride, piles: pileMarkers.size, entries: realEntries.size,
+          renderPending: renderMarkersSoon.pending(), settled: worldSync.settled(), hidden: document.hidden,
+        };
+      })()`)
+      .catch((x) => "the page couldn't be read: " + x.message);
+    // (the server's side: where it has them — a car never filed, or filed
+    // in a cell this map doesn't watch? 2026-11-26)
+    const cell = await serverAsk(`driver_cell ${id}`).catch((x) => "couldn't ask: " + x.message);
+    const watched = await p.eval(`worldSync.wantedGeoHas(${JSON.stringify(String(cell))})`).catch(() => null);
+    throw new Error(`${e.message} — had: ${JSON.stringify(had)} — server: ${JSON.stringify({ cell, watched })} — page errors: ${JSON.stringify(p.errors.slice(0, 3))}`);
+  }
 }
 // the app has their data (drawn or not): for checks that need only that
 export async function knows(p, id, what = "known") {

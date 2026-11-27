@@ -36,7 +36,8 @@ defmodule Hoodride.H3Test do
 
   test "the app sends only its block: no areas of its own to believe (app.js)" do
     js = File.read!("priv/static/app.js")
-    assert js =~ ~s|userChannel.push("driver_update", { spot });|
+    # (its answer handled now — "busy", lost: sent again; onlinebusy)
+    assert js =~ ~s|.push("driver_update", { spot })|
     assert js =~ ~s|userChannel.push("hand_up", { spot });|
     refute js =~ "parents"
   end

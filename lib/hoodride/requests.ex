@@ -38,6 +38,14 @@ defmodule Hoodride.Requests do
   # served ONLY while that same request (rider, driver, ts) is open, so every
   # way a request ends hides it at once; the repair pass removes the row.
   @spots :request_spots
+  # where each request sits among the pair's messages: the newest message id
+  # when it was made (Chat.newest_id) — {{rider_id, driver_id, ts}, after_id},
+  # keyed by the request itself (a rider's second, refused create never
+  # touches the open one's), written BEFORE the request is saved (a state
+  # read between the save and the announce read "no message before it":
+  # the note above them all — review, 2026-11-24); served only while that
+  # same request is open, as the block above
+  @after_ids :request_after
 
   def init_tables do
     Hoodride.ETS.new(@requests, [:named_table, :public, :set])
@@ -45,7 +53,18 @@ defmodule Hoodride.Requests do
     Hoodride.ETS.new(@cancel_wanted, [:named_table, :public, :bag])
     Hoodride.ETS.new(@by_driver, [:named_table, :public, :ordered_set])
     Hoodride.ETS.new(@spots, [:named_table, :public, :set])
+    Hoodride.ETS.new(@after_ids, [:named_table, :public, :set])
+    init_req_offset()
     :ok
+  end
+
+  @doc false
+  # the request stamp's offset (req_of/1), fixed ONCE at boot, before any
+  # request: computed at first use, two first requests a moment apart could
+  # disagree by a second (the two clocks tick at different moments) — a
+  # Decline then named a request that never existed (review, 2026-11-25)
+  def init_req_offset do
+    :persistent_term.put({__MODULE__, :req_offset}, System.system_time(:second) - steady_s())
   end
 
   # a request left the main table for good — drop its own index row
@@ -73,11 +92,21 @@ defmodule Hoodride.Requests do
     # (tests: a pause after create/4's checks, before the save)
     hook(:saving)
 
+    # its place among their messages, before it exists (above). The FIRST
+    # writer of a key wins (insert_new): a twin create — another tab, the
+    # same second — never overwrites the place the winner announced, and a
+    # refused create never deletes one: a place is only ever served while a
+    # request with its exact key is open, and the repair pass takes strays
+    # after a minute (reviews, 2026-11-24/25)
+    place = {rider.id, driver_id, now}
+    :ets.insert_new(@after_ids, {place, Hoodride.Chat.newest_id(rider.id, driver_id)})
+    # (tests: a pause between the place's write and the save)
+    hook(:placed)
     # index first: the request is findable the instant it exists
     :ets.insert(@by_driver, {{driver_id, rider.id}, now})
 
     cond do
-      not :ets.insert_new(@requests, {rider.id, driver_id, now}) ->
+      not :ets.insert_new(@requests, place) ->
         lost_create(rider, driver_id, now)
 
       # FIRST: the two are already in a STARTED ride
@@ -120,6 +149,13 @@ defmodule Hoodride.Requests do
       # the same look, the driver's side (second review, 2026-11-22)
       in_started_ride?(driver_id) ->
         withdraw(rider.id, driver_id, now, :driver_busy)
+
+      # a block between them saved since the channel's check — the block's
+      # own look (BlockEffects) may have come before this save and found
+      # nothing: withdrawn, never shown — whichever is second sees the
+      # other (review, 2026-11-24). Refused as any unreachable person is
+      Hoodride.Blocks.blocked?(driver_id, rider.id) ->
+        withdraw(rider.id, driver_id, now, :unavailable)
 
       true ->
         hook(:saved)
@@ -200,11 +236,15 @@ defmodule Hoodride.Requests do
       do:
         :ets.insert(@spots, {rider.id, driver_id, now, spot, System.monotonic_time(:millisecond)})
 
+    after_id = after_of(rider.id, driver_id, now)
+
     HoodrideWeb.Endpoint.broadcast("user:#{driver_id}", "request", %{
       from: %{id: rider.id, name: rider.name, photo: rider.photo},
       spot: spot,
       # which request this is: a Decline names it (decline/3)
-      req: now
+      req: req_of(now),
+      # where it sits among their messages (the driver's note after it)
+      after_id: after_id
     })
 
     # ended between the save's checks and the line above (a sign-out's
@@ -353,6 +393,16 @@ defmodule Hoodride.Requests do
 
   @doc "The rider's request withdrawn now (the driver told): `:ok` or `{:error, :none}`."
   def cancel(rider_id), do: take_to_cancel(rider_id) |> cancelled(rider_id)
+
+  @doc """
+  THIS request withdrawn — the rider's to `driver_id`, made at `ts` (as
+  `open_request_of/1` saw it) — never another one made since: `:ok` or
+  `{:error, :none}`. For a block (Hoodride.BlockEffects): `cancel/1` would
+  take whatever the rider has by then, a newer request to another driver
+  too (review, 2026-11-24).
+  """
+  def withdraw(rider_id, driver_id, ts),
+    do: cancel_exact(rider_id, driver_id, ts) || {:error, :none}
 
   defp take_to_cancel(rider_id) do
     case :ets.take(@requests, rider_id) do
@@ -578,8 +628,14 @@ defmodule Hoodride.Requests do
                 hook(:done_working)
 
                 # (taken in one step: it, or the Cancel's drop — never both)
-                if :ets.select_delete(@cancel_wanted, [{{rider_id, work}, [], [true]}]) == 1,
-                  do: cancel_exact(rider_id, driver_id, ts)
+                # (…and the RIDER told: her Cancel was answered "accepted" —
+                # done after all, her app says so; it couldn't know — round 18)
+                if :ets.select_delete(@cancel_wanted, [{{rider_id, work}, [], [true]}]) == 1 and
+                     cancel_exact(rider_id, driver_id, ts),
+                   do:
+                     HoodrideWeb.Endpoint.broadcast("user:#{rider_id}", "cancel_done", %{
+                       driver_id: driver_id
+                     })
 
                 # …and: either of them signed out meanwhile (their
                 # sign-out may have looked for a request before this — A1)?
@@ -674,7 +730,20 @@ defmodule Hoodride.Requests do
   def pending_for_driver(driver_id) do
     for {{^driver_id, rider_id}, _} <- :ets.match_object(@by_driver, {{driver_id, :_}, :_}),
         [{^rider_id, ^driver_id, ts}] <- [:ets.lookup(@requests, rider_id)] do
-      %{rider_id: rider_id, ts: ts, spot: spot_of(rider_id, driver_id, ts)}
+      %{
+        rider_id: rider_id,
+        ts: ts,
+        spot: spot_of(rider_id, driver_id, ts),
+        after_id: after_of(rider_id, driver_id, ts)
+      }
+    end
+  end
+
+  # the newest message id between them when THIS request was made — or nil
+  defp after_of(rider_id, driver_id, ts) do
+    case :ets.lookup(@after_ids, {rider_id, driver_id, ts}) do
+      [{_, after_id}] -> after_id
+      _ -> nil
     end
   end
 
@@ -745,6 +814,18 @@ defmodule Hoodride.Requests do
         do: :ets.delete_object(@spots, row)
     end)
 
+    # …and its place among the messages
+    # (one young enough that its request may still stand is left: a create
+    # still saving — written just BEFORE its request — or an Accept that took
+    # the request out and will put it back; requests never outlive `ttl`:
+    # reviews, 2026-11-24/25)
+    recent = steady_s() - ttl
+
+    each_match(@after_ids, [{:"$1", [], [:"$1"]}], fn {{rider_id, driver_id, ts}, _} = row ->
+      unless ts > recent or match?([{_, ^driver_id, ^ts}], :ets.lookup(@requests, rider_id)),
+        do: :ets.delete_object(@after_ids, row)
+    end)
+
     :ok
   end
 
@@ -791,4 +872,18 @@ defmodule Hoodride.Requests do
   anything sent out (/api/state). Its age is exact even across a jump.
   """
   def wall_ts(ts), do: System.system_time(:second) - (steady_s() - ts)
+
+  @doc """
+  A request's stamp as the apps see it (`req`: a Decline names it, the
+  driver's app keys "seen" and "withdrawn" by it) — and back. The steady
+  clock starts at the SAME value every boot, so its seconds alone came back
+  after a restart: a driver's app that kept "withdrawn: X" ignored a new
+  request X (review, 2026-11-25). Shifted by the wall clock at boot — fixed
+  for the boot (a clock jump moves nothing; set by init_tables/0), new at
+  the next.
+  """
+  def req_of(ts), do: ts + req_offset()
+  def ts_of(req), do: req - req_offset()
+
+  defp req_offset, do: :persistent_term.get({__MODULE__, :req_offset})
 end

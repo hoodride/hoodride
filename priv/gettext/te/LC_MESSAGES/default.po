@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "రిక్వెస్ట్‌ను రద్దు చేయండి"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "{name} గారికి పంపిన రిక్వెస్ట్‌ను రద్దు చేయండి"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "ముందుగా మీ రైడ్ రిక్వెస్ట్‌ను రద్దు చేయండి"
 
@@ -169,6 +173,10 @@ msgstr "చాట్‌లు"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "వీటిని చెక్ చేయండి: {fields} (ఒక్కొక్కటి గరిష్ఠంగా {max} అక్షరాలు)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "తనిఖీ చేస్తోంది…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "ఎంచుకోండి…"
@@ -205,14 +213,6 @@ msgstr "కనెక్షన్ రీసెట్ అయింది. మళ�
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "కనెక్షన్ రీసెట్ అయింది. మీకు ఇంకా రైడ్ కావాలంటే ✋ను మళ్లీ ట్యాప్ చేయండి"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "కనెక్షన్ రీసెట్ అయింది. మీ రైడ్ అనుకోకుండా ముగిసింది, దయచేసి దాన్ని మళ్లీ సెటప్ చేయండి"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "కనెక్షన్ రీసెట్ అయింది. మీ రైడ్ రిక్వెస్ట్ పోయింది, దయచేసి మళ్లీ రిక్వెస్ట్ చేయండి"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Facebookతో కొనసాగించండి"
@@ -244,6 +244,10 @@ msgstr "బ్లాక్ చేయడం సాధ్యపడలేదు. �
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "మీ బ్రౌజర్‌ను తనిఖీ చేయడం సాధ్యపడలేదు. challenges.cloudflare.com‌ను అనుమతించండి, లేదా వేరే బ్రౌజర్ ట్రై చేయండి"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "నిర్ధారించలేకపోయాం — బ్లాక్ చేసిన వ్యక్తులను చూడండి"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "పసుపు రంగు"
 msgid "You already have an open request"
 msgstr "మీకు ఇప్పటికే ఒక ఓపెన్ రిక్వెస్ట్ ఉంది"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "మీరు ఇప్పటికే {name} గారిని రైడ్ కోసం రిక్వెస్ట్ చేశారు"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "మీ రైడ్ తర్వాత మీరు రిఫ్రెష్ చేయవచ్చు"
@@ -904,6 +912,14 @@ msgstr "మీ కారు"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "మీ పేరు, ఫోటో {provider} నుండి వస్తాయి"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "మీ రైడ్ ముగిసింది"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "మీ రైడ్ అభ్యర్థన ముగిసింది — ఇంకా రైడ్ కావాలంటే మళ్లీ అడగండి"
 
 #: priv/static/app.js
 msgid "Your rider"

@@ -119,6 +119,10 @@ msgid "Cancel request"
 msgstr ""
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr ""
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr ""
 
@@ -166,6 +170,10 @@ msgstr ""
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr ""
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr ""
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr ""
@@ -202,14 +210,6 @@ msgstr ""
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr ""
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr ""
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr ""
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr ""
@@ -240,6 +240,10 @@ msgstr ""
 
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
+msgstr ""
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
 msgstr ""
 
 #: priv/static/app.js
@@ -842,6 +846,10 @@ msgstr ""
 msgid "You already have an open request"
 msgstr ""
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr ""
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr ""
@@ -900,6 +908,14 @@ msgstr ""
 
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
+msgstr ""
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr ""
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
 msgstr ""
 
 #: priv/static/app.js

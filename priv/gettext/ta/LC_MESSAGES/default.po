@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "கோரிக்கையை ரத்துசெய்"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "{name} அவர்களுக்கான கோரிக்கையை ரத்துசெய்"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "முதலில் உங்கள் பயணக் கோரிக்கையை ரத்துசெய்யவும்"
 
@@ -169,6 +173,10 @@ msgstr "அரட்டைகள்"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "இவற்றைச் சரிபார்க்கவும்: {fields} (ஒவ்வொன்றும் அதிகபட்சம் {max} எழுத்துகள்)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "சரிபார்க்கப்படுகிறது…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "தேர்வுசெய்யவும்…"
@@ -205,14 +213,6 @@ msgstr "இணைப்பு மீட்டமைக்கப்பட்ட�
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "இணைப்பு மீட்டமைக்கப்பட்டது. இன்னும் பயணம் தேவையெனில் ✋ ஐ மீண்டும் தட்டவும்"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "இணைப்பு மீட்டமைக்கப்பட்டது. உங்கள் பயணம் எதிர்பாராமல் முடிந்தது, மீண்டும் அமைக்கவும்"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "இணைப்பு மீட்டமைக்கப்பட்டது. உங்கள் பயணக் கோரிக்கை தொலைந்தது, மீண்டும் கோரவும்"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Facebook மூலம் தொடர்க"
@@ -244,6 +244,10 @@ msgstr "தடுக்க முடியவில்லை. மீண்டு
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "உங்கள் உலாவியைச் சரிபார்க்க முடியவில்லை. challenges.cloudflare.com-ஐ அனுமதிக்கவும் அல்லது வேறு உலாவியை முயலவும்"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "உறுதிப்படுத்த முடியவில்லை — தடுத்த நபர்களைப் பாருங்கள்"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "மஞ்சள் நிற"
 msgid "You already have an open request"
 msgstr "உங்களிடம் ஏற்கெனவே ஒரு கோரிக்கை நிலுவையில் உள்ளது"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "நீங்கள் ஏற்கெனவே {name} அவர்களிடம் பயணம் கோரியுள்ளீர்கள்"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "பயணம் முடிந்ததும் புதுப்பிக்கலாம்"
@@ -904,6 +912,14 @@ msgstr "உங்கள் கார்"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "உங்கள் பெயரும் படமும் {provider} இலிருந்து வருகின்றன"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "உங்கள் பயணம் முடிந்தது"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "உங்கள் பயணக் கோரிக்கை முடிந்தது — இன்னும் பயணம் தேவையெனில் மீண்டும் கேளுங்கள்"
 
 #: priv/static/app.js
 msgid "Your rider"

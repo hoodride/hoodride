@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Hủy yêu cầu"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Hủy yêu cầu gửi {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Hãy hủy yêu cầu chuyến đi trước"
 
@@ -169,6 +173,10 @@ msgstr "Cuộc trò chuyện"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Hãy kiểm tra {fields} (mỗi mục tối đa {max} ký tự)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Đang kiểm tra…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Chọn…"
@@ -205,14 +213,6 @@ msgstr "Kết nối đã được đặt lại — nhấn BẬT NHẬN CHUYẾN 
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Kết nối đã được đặt lại — nhấn ✋ lần nữa nếu bạn vẫn cần đi xe"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Kết nối đã được đặt lại — chuyến đi của bạn đã kết thúc ngoài ý muốn, hãy thiết lập lại"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Kết nối đã được đặt lại — yêu cầu chuyến đi của bạn đã bị mất, hãy yêu cầu lại"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Tiếp tục với Facebook"
@@ -244,6 +244,10 @@ msgstr "Không thể chặn — hãy thử lại"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Không kiểm tra được trình duyệt của bạn — hãy cho phép challenges.cloudflare.com, hoặc thử trình duyệt khác"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Không xác nhận được — hãy xem Người đã chặn"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "vàng"
 msgid "You already have an open request"
 msgstr "Bạn đã có một yêu cầu đang mở"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Bạn đã gửi yêu cầu chuyến đi cho {name} rồi"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Bạn có thể làm mới sau chuyến đi"
@@ -904,6 +912,14 @@ msgstr "Xe của bạn"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Tên và ảnh của bạn được lấy từ {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Chuyến đi của bạn đã kết thúc"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Yêu cầu chuyến đi của bạn đã kết thúc — hãy yêu cầu lại nếu vẫn cần"
 
 #: priv/static/app.js
 msgid "Your rider"

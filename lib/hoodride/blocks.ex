@@ -213,10 +213,23 @@ defmodule Hoodride.Blocks do
   :self | :none | :full | :rate_limited | :failed}` — nothing changed.
   """
   def block(me, other) when is_integer(me) and is_integer(other) do
-    cond do
-      me == other -> {:error, :self}
-      not exists?(other) -> {:error, :none}
-      true -> with_allowance(me, fn -> do_block(me, other) end)
+    # (the first looks read the database too: one that can't is "failed",
+    # never a crash taking the channel down — round 9)
+    readable(fn ->
+      cond do
+        me == other -> {:error, :self}
+        not exists?(other) -> {:error, :none}
+        # already blocked: "ok" as ever, the day's allowance not asked — the
+        # app's retry of a block whose answer was lost asks exactly this, and
+        # at the limit it heard "too many today" (cross-feature review round
+        # 8, 2026-11-25). (Raced: do_block looks again, under the lock)
+        row?(me, other) -> :ok
+        true -> :go
+      end
+    end)
+    |> case do
+      :go -> with_allowance(me, fn -> do_block(me, other) end)
+      answer -> answer
     end
   end
 
@@ -271,10 +284,32 @@ defmodule Hoodride.Blocks do
   `me` too, that block stays.
   """
   def unblock(me, other) when is_integer(me) and is_integer(other) do
-    if me == other, do: {:error, :self}, else: with_allowance(me, fn -> do_unblock(me, other) end)
+    readable(fn ->
+      cond do
+        me == other -> {:error, :self}
+        # not blocked: "none" as ever, the allowance not asked (as block/2)
+        not row?(me, other) -> {:error, :none}
+        true -> :go
+      end
+    end)
+    |> case do
+      :go -> with_allowance(me, fn -> do_unblock(me, other) end)
+      answer -> answer
+    end
   end
 
   def unblock(_me, _other), do: {:error, :none}
+
+  @doc "Does `me` block `other`? `{:ok, bool}`, or `{:error, :failed}` (the database) — read from the database, as block/2's first look."
+  def blocking(me, other) when is_integer(me) and is_integer(other),
+    do: readable(fn -> {:ok, row?(me, other)} end)
+
+  # a look at the database that can't be made: "failed" (as with_allowance's)
+  defp readable(fun) do
+    fun.()
+  rescue
+    e -> if Repo.down?(e), do: {:error, :failed}, else: reraise(e, __STACKTRACE__)
+  end
 
   defp do_unblock(me, other) do
     locked([me, other], fn ->

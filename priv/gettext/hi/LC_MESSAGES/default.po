@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "अनुरोध रद्द करें"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "{name} से अनुरोध रद्द करें"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "पहले अपना राइड अनुरोध रद्द करें"
 
@@ -169,6 +173,10 @@ msgstr "चैट"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "{fields} जांचें (हर एक में ज़्यादा से ज़्यादा {max} अक्षर)।"
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "जाँच हो रही है…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "चुनें…"
@@ -205,14 +213,6 @@ msgstr "कनेक्शन रीसेट हो गया — फिर स
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "कनेक्शन रीसेट हो गया — अगर अब भी राइड चाहिए, तो ✋ पर फिर से टैप करें"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "कनेक्शन रीसेट हो गया — आपकी राइड अचानक खत्म हो गई, कृपया इसे फिर से सेट करें"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "कनेक्शन रीसेट हो गया — आपका राइड अनुरोध खो गया, कृपया फिर से अनुरोध करें"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Facebook के साथ जारी रखें"
@@ -244,6 +244,10 @@ msgstr "ब्लॉक नहीं हो सका — फिर से क�
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "आपके ब्राउज़र की जाँच नहीं हो सकी — challenges.cloudflare.com को अनुमति दें, या कोई दूसरा ब्राउज़र आज़माएँ"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "पुष्टि नहीं हो सकी — ब्लॉक किए गए लोग देखें"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "पीली"
 msgid "You already have an open request"
 msgstr "आपका एक अनुरोध पहले से खुला है"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "आप पहले ही {name} से राइड का अनुरोध कर चुके हैं"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "आप अपनी राइड के बाद रीफ़्रेश कर सकते हैं"
@@ -904,6 +912,14 @@ msgstr "आपकी कार"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "आपका नाम और फ़ोटो {provider} से आते हैं"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "आपकी राइड खत्म हो गई"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "आपकी राइड का अनुरोध खत्म हो गया — अभी भी राइड चाहिए तो फिर से माँगें"
 
 #: priv/static/app.js
 msgid "Your rider"

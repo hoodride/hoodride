@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Zrušit žádost"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Zrušit žádost: {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Nejdřív zruš svou žádost o odvoz"
 
@@ -169,6 +173,10 @@ msgstr "Chaty"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Zkontroluj: {fields} (u každého max. {max} písmen)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Ověřuje se…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Vyber…"
@@ -205,14 +213,6 @@ msgstr "Spojení se přerušilo – klepni na PŘEJÍT ONLINE a jezdi dál"
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Spojení se přerušilo – pokud pořád potřebuješ odvoz, klepni znovu na ✋"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Spojení se přerušilo – jízda nečekaně skončila, domluvte ji prosím znovu"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Spojení se přerušilo – tvoje žádost o odvoz se ztratila, požádej prosím znovu"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Pokračovat přes Facebook"
@@ -244,6 +244,10 @@ msgstr "Zablokování se nezdařilo – zkus to znovu"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Tvůj prohlížeč se nepodařilo ověřit – povol challenges.cloudflare.com, nebo zkus jiný prohlížeč"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Nepodařilo se ověřit. Podívej se do Blokovaných lidí"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "žlutý"
 msgid "You already have an open request"
 msgstr "Už máš otevřenou žádost"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Už máš otevřenou žádost o jízdu: {name}"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Aktualizovat můžeš po jízdě"
@@ -904,6 +912,14 @@ msgstr "Tvoje auto"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Tvoje jméno a fotka jsou z účtu {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Tvoje jízda skončila"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Tvoje žádost o jízdu skončila. Pokud jízdu pořád potřebuješ, požádej znovu"
 
 #: priv/static/app.js
 msgid "Your rider"

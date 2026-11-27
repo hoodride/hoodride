@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Annulla richiesta"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Annulla richiesta a {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Prima annulla la tua richiesta di passaggio"
 
@@ -169,6 +173,10 @@ msgstr "Chat"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Controlla: {fields} (massimo {max} lettere ciascuno)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Verifica in corso…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Scegli…"
@@ -205,14 +213,6 @@ msgstr "Connessione reimpostata. Tocca VAI ONLINE per tornare a guidare"
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Connessione reimpostata. Tocca di nuovo ✋ se ti serve ancora un passaggio"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Connessione reimpostata. Il tuo passaggio è terminato inaspettatamente; organizzalo di nuovo"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Connessione reimpostata. La tua richiesta di passaggio è andata persa; richiedilo di nuovo"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Continua con Facebook"
@@ -244,6 +244,10 @@ msgstr "Impossibile bloccare. Riprova"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Impossibile verificare il tuo browser. Consenti challenges.cloudflare.com o prova un altro browser"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Impossibile confermare. Controlla Persone bloccate"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "gialla"
 msgid "You already have an open request"
 msgstr "Hai già una richiesta aperta"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Hai già chiesto un passaggio a {name}"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Potrai aggiornare dopo il passaggio"
@@ -904,6 +912,14 @@ msgstr "La tua auto"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Il tuo nome e la tua foto provengono da {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "La tua corsa è terminata"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "La tua richiesta di corsa è terminata. Richiedila di nuovo se ti serve ancora"
 
 #: priv/static/app.js
 msgid "Your rider"

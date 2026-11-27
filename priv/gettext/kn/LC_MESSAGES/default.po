@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "ವಿನಂತಿ ರದ್ದುಮಾಡಿ"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "{name} ಅವರಿಗೆ ಕಳುಹಿಸಿದ ವಿನಂತಿ ರದ್ದುಮಾಡಿ"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "ಮೊದಲು ನಿಮ್ಮ ರೈಡ್ ವಿನಂತಿಯನ್ನು ರದ್ದುಮಾಡಿ"
 
@@ -169,6 +173,10 @@ msgstr "ಚಾಟ್‌ಗಳು"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "ಪರಿಶೀಲಿಸಿ: {fields} (ಪ್ರತಿಯೊಂದೂ ಗರಿಷ್ಠ {max} ಅಕ್ಷರಗಳು)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "ಆಯ್ಕೆಮಾಡಿ…"
@@ -205,14 +213,6 @@ msgstr "ಸಂಪರ್ಕ ಮರುಹೊಂದಿಸಲಾಗಿದೆ — ಮ
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "ಸಂಪರ್ಕ ಮರುಹೊಂದಿಸಲಾಗಿದೆ — ನಿಮಗೆ ಇನ್ನೂ ರೈಡ್ ಬೇಕಿದ್ದರೆ ✋ ಅನ್ನು ಮತ್ತೆ ಟ್ಯಾಪ್ ಮಾಡಿ"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "ಸಂಪರ್ಕ ಮರುಹೊಂದಿಸಲಾಗಿದೆ — ನಿಮ್ಮ ರೈಡ್ ಅನಿರೀಕ್ಷಿತವಾಗಿ ಕೊನೆಗೊಂಡಿದೆ, ದಯವಿಟ್ಟು ಮತ್ತೆ ಹೊಂದಿಸಿ"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "ಸಂಪರ್ಕ ಮರುಹೊಂದಿಸಲಾಗಿದೆ — ನಿಮ್ಮ ರೈಡ್ ವಿನಂತಿ ಕಳೆದುಹೋಗಿದೆ, ದಯವಿಟ್ಟು ಮತ್ತೆ ಕೇಳಿ"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Facebook ಮೂಲಕ ಮುಂದುವರಿಯಿರಿ"
@@ -244,6 +244,10 @@ msgstr "ನಿರ್ಬಂಧಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್�
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "ನಿಮ್ಮ ಬ್ರೌಸರ್ ಅನ್ನು ಪರಿಶೀಲಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ — challenges.cloudflare.com ಅನ್ನು ಅನುಮತಿಸಿ, ಅಥವಾ ಬೇರೆ ಬ್ರೌಸರ್ ಪ್ರಯತ್ನಿಸಿ"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "ಖಚಿತಪಡಿಸಲು ಆಗಲಿಲ್ಲ — ನಿರ್ಬಂಧಿಸಿದ ಜನರನ್ನು ಪರಿಶೀಲಿಸಿ"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "ಹಳದಿ"
 msgid "You already have an open request"
 msgstr "ನಿಮ್ಮದೊಂದು ವಿನಂತಿ ಈಗಾಗಲೇ ತೆರೆದಿದೆ"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "ನೀವು ಈಗಾಗಲೇ {name} ಅವರಿಂದ ರೈಡ್ ವಿನಂತಿಸಿದ್ದೀರಿ"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "ರೈಡ್ ಮುಗಿದ ನಂತರ ನೀವು ರಿಫ್ರೆಶ್ ಮಾಡಬಹುದು"
@@ -904,6 +912,14 @@ msgstr "ನಿಮ್ಮ ಕಾರು"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "ನಿಮ್ಮ ಹೆಸರು ಮತ್ತು ಫೋಟೋ {provider} ನಿಂದ ಬರುತ್ತವೆ"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "ನಿಮ್ಮ ಸವಾರಿ ಮುಗಿದಿದೆ"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "ನಿಮ್ಮ ಸವಾರಿ ವಿನಂತಿ ಮುಗಿದಿದೆ — ಇನ್ನೂ ಸವಾರಿ ಬೇಕಿದ್ದರೆ ಮತ್ತೆ ಕೇಳಿ"
 
 #: priv/static/app.js
 msgid "Your rider"

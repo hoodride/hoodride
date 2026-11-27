@@ -42,6 +42,34 @@ defmodule HoodrideWeb.BlocksApiTest do
     refute Map.has_key?(state(ann), "blocked"), "not with every app open"
   end
 
+  # (cross-feature review round 11, 2026-11-25) one person: do I block them?
+  # — the app settles a Block whose answers were lost. Only your own blocks
+  test "?peer=<id>: do I block them — mine only, either way" do
+    [ann, bob, cat] = [user("bp-ann"), user("bp-bob"), user("bp-cat")]
+    :ok = Blocks.block(ann.id, bob.id)
+
+    assert json_response(get(signed_in(ann), "/api/blocks?peer=#{bob.id}"), 200) == %{
+             "blocking" => true
+           }
+
+    assert json_response(get(signed_in(ann), "/api/blocks?peer=#{cat.id}"), 200) == %{
+             "blocking" => false
+           }
+
+    # (Bob is blocked BY Ann: he doesn't block her)
+    assert json_response(get(signed_in(bob), "/api/blocks?peer=#{ann.id}"), 200) == %{
+             "blocking" => false
+           }
+
+    assert json_response(get(signed_in(ann), "/api/blocks?peer=x"), 400)["error"] == "bad_peer"
+    # (not a plain id — a map, a list, past 64 bits: refused, never a crash
+    # or a list joined into another id — round 12)
+    for q <- ["peer[a]=1", "peer[]=1&peer[]=2", "peer=99999999999999999999999", "peer=-1"] do
+      assert json_response(get(signed_in(ann), "/api/blocks?" <> q), 400)["error"] == "bad_peer",
+             q
+    end
+  end
+
   test "the list: who you blocked, newest first, name and photo only" do
     [ann, bob, cat] = [user("ba3-ann"), user("ba3-bob"), user("ba3-cat")]
     :ok = Blocks.block(ann.id, bob.id)

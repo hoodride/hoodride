@@ -981,6 +981,7 @@ async function deleteAccount() {
     HoodModeStore.forget(storageOrNull(), state.realUser.id);
     HoodViewStore.forget(storageOrNull(), state.realUser.id);
     HoodReadStore.forget(storageOrNull(), state.realUser.id);
+    forgetSeenReqs(storageOrNull(), state.realUser.id);
     loc.stop();
     auth.signOut();
     location.reload();
@@ -1314,6 +1315,7 @@ $("btn-logout").addEventListener("click", async () => {
   HoodGoogleRefresh.forget(storageOrNull());
   HoodViewStore.forget(storageOrNull(), state.realUser.id); // privacy page: signing out removes it
   HoodReadStore.forget(storageOrNull(), state.realUser.id); // and which messages you've read
+  forgetSeenReqs(storageOrNull(), state.realUser.id); // and the ride requests you'd seen
   loc.stop();
   auth.signOut();
   location.reload();
@@ -1590,11 +1592,28 @@ async function connectSocket() {
     failsSinceOpen = 0;
     restartNotice = null;
     connWatch.up();
+    // (a NEW connection: its news is fresh, never a frozen page's held burst
+    // — the gap across the loss is lostFrom's: review, 2026-11-25)
+    socketLiveAt = Date.now();
+    heldUntil = 0;
   });
-  socket.onClose(() => connWatch.down());
+  socket.onClose(() => {
+    connWatch.down();
+    connectionLost();
+  });
   // live news a state snapshot could be overtaken by (softReload)
   socket.onMessage((m) => {
     if (HoodRehydrate.countsAsLive(m)) liveNews++;
+    // (silence past the heartbeat: the page was frozen — iOS suspends a
+    // background tab — or the connection stalled: we knew nothing since)
+    const now = Date.now();
+    if (now - socketLiveAt > SOCKET_SILENT_MS) heldBurst(provenLive(), now);
+    socketLiveAt = now;
+    // (a held burst's messages say nothing of now: only one after it does)
+    if (now >= heldUntil) provenLiveAt = now;
+    // (the catch-up after a loss: done once the map's settled — looked at
+    // after each message, the sync's own answers included)
+    if (lostFrom != null) queueMicrotask(caughtUp);
   });
   // a refused or dropped connect: the token may have expired or been revoked.
   // The FIRST failure after being connected asks at once (signed out on
@@ -1603,6 +1622,7 @@ async function connectSocket() {
   // while isn't asked by every phone every few seconds)
   socket.onError(() => {
     connWatch.down();
+    connectionLost();
     const since = performance.now() - socketTokenAt;
     if ((failsSinceOpen++ === 0 && since > 5_000) || since > 60_000) refreshSocketToken();
   });
@@ -1652,14 +1672,37 @@ async function connectSocket() {
     refreshChatDistance();
   });
 
-  userChannel.on("request", ({ from, spot, req }) => {
+  userChannel.on("request", ({ from, spot, req, after_id }) => {
     const peer = ensurePeer(from);
+    // (a request already withdrawn, heard late: a cancel between its save
+    // and its announce goes out first — Requests.announce says it again
+    // after. Not shown again: review, 2026-11-25)
+    if (typeof req === "number" && peer.withdrawnReq === req) return;
     if (spot) rememberShared(peer, { spot, age_ms: 0 });
+    // the same request a reload already brought (saved, then announced: a
+    // state read between the two lists it — its note is back already;
+    // review, 2026-11-24)
+    const known = peer.pending === true && typeof req === "number" && peer.pendingReq === req;
     peer.pending = true;
     // which request: a Decline names it, so a late one never ends a newer
     // request from the same rider (Requests.decline/3; 2026-11-22)
     peer.pendingReq = typeof req === "number" ? req : null;
-    receiveMsg(peer, t("📩 requested a ride"));
+    if (!known) {
+      receiveMsg(peer, t("📩 requested a ride"));
+      // (which request the note is: "seen" is about it — readSeen)
+      const c = chats.get(peer);
+      const note = c && c.msgs[c.msgs.length - 1];
+      if (note && note.id == null && !note.mine) {
+        note.req = peer.pendingReq;
+        // (its place: right after that message — a chat not loaded yet
+        // merges it there, and its messages that came since go below it:
+        // review, 2026-11-24)
+        if (after_id !== undefined) {
+          note.afterId = after_id;
+          if (c.loaded === false) note.after = after_id;
+        }
+      }
+    }
     refreshControls();
   });
 
@@ -1670,6 +1713,11 @@ async function connectSocket() {
     const peer = realPeersById.get(from_id);
     if (peer && peer.pending) {
       peer.pending = false;
+      peer.withdrawnReq = peer.pendingReq;
+      // (at the bottom, as it happens — like any new message, the chat to
+      // the top of the list: the same whether the chat was open or merged
+      // later. Owner, 2026-11-25: it went under its note when merged, above
+      // messages she wrote before cancelling)
       receiveMsg(peer, t("(request withdrawn)"));
       refreshControls();
     }
@@ -1682,6 +1730,34 @@ async function connectSocket() {
     if (by_id != null && state.ride.peer.id !== by_id) return;
     state.ride = null;
     transientBanner(t("Driver can't take this one — try another"));
+    refreshControls();
+  });
+
+  // your request withdrawn by your own block of that driver (BlockEffects):
+  // quietly — "Blocked." says it — and only that driver's (review,
+  // 2026-11-24: a late block answer left it "Waiting for the driver…")
+  userChannel.on("request_withdrawn", ({ driver_id } = {}) => {
+    if (!state.ride || state.ride.status !== "requested" || state.ride.peer.id !== driver_id) return;
+    state.ride = null;
+    setBanner(contextBanner());
+    refreshControls();
+  });
+
+  // her Cancel, answered "accepted" (an Accept at work), done after all —
+  // that Accept failed (Requests: the Cancel's mark): the request gone, said
+  // once (round 18)
+  userChannel.on("cancel_done", ({ driver_id } = {}) => {
+    // (only while her cancel of that driver is on: a new request since —
+    // its tap clears the wish — isn't what was cancelled: round 20)
+    if (!cancelIntent || cancelIntent.peer.id !== driver_id) return;
+    if (state.ride && state.ride.status === "requested" && state.ride.peer.id === driver_id) {
+      state.ride = null;
+      setBanner(contextBanner());
+    }
+    if (!cancelIntent.said) {
+      cancelIntent.said = true;
+      transientBanner(t("Request cancelled"));
+    }
     refreshControls();
   });
 
@@ -1875,7 +1951,9 @@ function fromServer(m) {
 function settleLast(c) {
   const last = c.msgs[c.msgs.length - 1];
   const s = c.summary && c.summary.last;
-  if (last) {
+  // (a request's note put back by a reload, older than the summary's last
+  // message: that message is the chat's last — restoreRequestNote)
+  if (last && !(last.behind && s)) {
     c.lastAt = last.at;
     c.lastId = last.id ?? null;
   } else if (s) {
@@ -1992,6 +2070,11 @@ async function loadOlderChats() {
               here.restUnread = 0;
             }
             if (typeof c.last_activity === "number") here.emptyAt = HoodChatList.localAt(c.last_activity, chatSkew);
+            // a request's note put back before this page came: behind the
+            // page's newer last message, if it is (as restoreRequestNote —
+            // the note took the chat's time and line: review, 2026-11-24)
+            const sl = here.summary && here.summary.last;
+            if (sl) here.msgs.forEach((m) => (m.restored || (m.id == null && m.afterId !== undefined)) && (m.behind = isBehind(m, sl)));
             settleLast(here);
           }
         } else applyConversation(c);
@@ -2048,7 +2131,9 @@ function hydrate(st) {
     peer.pendingReq = typeof r.req === "number" ? r.req : null;
     // a pending request implies a driver context
     state.mode = "driver";
+    restoreRequestNote(peer, typeof r.ts === "number" ? HoodChatList.localAt(r.ts, chatSkew) : Date.now(), peer.pendingReq, "after_id" in r ? r.after_id : undefined, r.answered === true);
   });
+  pruneSeenReqs((st.pending_requests || []).map((r) => ({ id: r.rider.id, req: r.req })));
 
   if (st.open_request) {
     const peer = ensurePeer(st.open_request.driver);
@@ -2059,6 +2144,7 @@ function hydrate(st) {
 
   if (st.ride) {
     const peer = ensurePeer(st.ride.peer);
+    rideTakesTheMap(peer, st.ride.role);
     state.mode = st.ride.role === "driver" ? "driver" : "rider";
     state.ride = {
       peer,
@@ -2072,7 +2158,10 @@ function hydrate(st) {
 
   // a reload RESUMES live map presence instead of orphaning it:
   // your ✋ stays yours, your shift stays on duty
-  if (st.hand && !state.ride) {
+  // (…a ✋ through a request too, as live: the server keeps it — forgotten,
+  // a decline after left "✋ Need a ride" on her button while every driver
+  // still saw her ✋: final review, 2026-11-26, handrequest)
+  if (st.hand && (!state.ride || state.ride.status === "requested")) {
     state.handRaised = true;
     state.mode = "rider"; // a ✋ is a rider's (it may be from another device)
     setBanner(contextBanner());
@@ -2210,7 +2299,9 @@ const worldSync = HoodSync.createWorldSync({
   onSnapshot: ({ geo, agg }) => {
     // a snapshot is the whole truth for its cell: drop what it doesn't list
     // (the ghost fix — see browse.js), then add or refresh what it does
-    HoodBrowse.staleInSnapshot(realEntries, geo).forEach(dropEntry);
+    HoodBrowse.staleInSnapshot(realEntries, geo).forEach((id) => dropEntry(id));
+    // (after this snapshot's own drops — dated to the loss — and its cars)
+    queueMicrotask(caughtUp);
     geo.forEach((s) => {
       (s.drivers || []).forEach((d) => upsertBrowseEntry(d, "driver"));
       (s.hands || []).forEach((h) => upsertBrowseEntry(h, "hand"));
@@ -2240,6 +2331,16 @@ function dropEntry(id) {
   if (!e) return;
   if (e.marker) e.marker.remove();
   realEntries.delete(id);
+  // a car shown till now: gone NOW — not at the next redraw, which waits for
+  // a screen frame (none in a background tab: the age counted from when you
+  // came back — review, 2026-11-24) — and at its block NOW (it may have
+  // moved since its last draw, unseen: review). Shown, or showable and not
+  // drawn: a car that moved cells in a background tab came back in its new
+  // cell, never drawn; a car in a cell the view left but the server still
+  // sends — its distance read live meanwhile, and now goes on from its
+  // latest block, not jump back to where it left the view (review)
+  if (e.type === "driver" && (drawnCars.has(id) || carsKnown()))
+    carGone(id, e.peer.pos, e.peer, lastKnownAt());
 }
 
 function joinWorldChannel() {
@@ -2274,7 +2375,16 @@ function joinWorldChannel() {
   // the server's role for us changed (it already dropped the old layer)
   worldChannel.on("role", ({ role }) => onServerRole(role));
   worldChannel.onClose(() => worldSync.onLeft());
-  worldChannel.onError(() => worldSync.onLeft());
+  // (a connection that died silently — no close, a heartbeat timeout
+  // replacing it — never reaches socket.onClose: Phoenix drops a late close
+  // event. Its channels are always errored, so the loss is noted here too,
+  // or a car found gone at the reconnect reads "just left" — review,
+  // 2026-11-25, laststall. A channel crash on a live connection only dates
+  // drops to the last message until the catch-up: harmless)
+  worldChannel.onError(() => {
+    connectionLost();
+    worldSync.onLeft();
+  });
   // runs on the first join AND every automatic rejoin; the reply says
   // which role the server holds us in
   worldChannel.join().receive("ok", (reply) => {
@@ -2346,6 +2456,12 @@ let reloadRetry = null;
 // stay as they are (the world channel resyncs itself). A short wifi blip
 // loses nothing, and messages sent meanwhile now appear; after a restart
 // the user is told what was lost (HoodRehydrate).
+// her cancel wish (endRide): said "Request cancelled" yet? Only on the
+// server's word — the cancel's ok, or "cancel_done"
+let cancelIntent = null;
+// the driver a Request ride went to whose answer never came (its push
+// timed out): the next reload counts him as asked (softReload)
+let askingPeer = null;
 async function softReload() {
   if (DEMO || !hydrated) return;
   clearTimeout(reloadRetry);
@@ -2394,6 +2510,9 @@ async function softReload() {
   if (!st.user) return; // logged out meanwhile: the socket's refusal handles it
 
   const before = HoodRehydrate.summarize(state);
+  // the driver this phone had asked (or was asking: its answer may be lost)
+  const asked = (state.ride && state.ride.status === "requested" && state.ride.peer) || askingPeer;
+  askingPeer = null;
   const openChatPeerId = !$("chat").classList.contains("hidden") && state.chatPeer ? state.chatPeer.id : null;
   // a chat on screen: where you were reading it — drawing it again sent you
   // to the newest, the "New messages" line and ↓ gone (owner, 2026-11-08)
@@ -2426,6 +2545,13 @@ async function softReload() {
   const armedRide = state.pinArmed && state.ride ? state.ride.id : null;
   resetMirror();
   hydrate(st);
+  // The request this phone knew of is gone: answered while it was away — a
+  // whole ride (request → ride → end, none of it seen), or a decline or an
+  // expiry. The server keeps no ride history to tell them apart (owner,
+  // 2026-11-25), so his car's block from when she asked is dropped either
+  // way: a blank distance, not where he was before a ride. His car on the
+  // map fills it in again. (A ride under way now: hydrate's rideTakesTheMap)
+  if (asked && !(state.ride && state.ride.peer && state.ride.peer.id === asked.id)) forgetLastSeen(asked);
   // (a chat not among the first page's: its place waits for it — applied
   // when it's opened; review, 2026-11-20)
   places.forEach(({ id, place }) => {
@@ -2446,12 +2572,20 @@ async function softReload() {
   // ride's rider has Meet here, and a ride that ends is gone)
   if (armedRide && state.ride && state.ride.id === armedRide) state.pinArmed = true;
 
+  // what's gone since, said as a fact — "your ride request ended", "your
+  // ride ended": never WHY (a decline, her own cancel or block, a ride, a
+  // restart — a snapshot can't tell, and the guesses kept being wrong:
+  // owner, 2026-11-26)
   const msg = HoodRehydrate.lostBanner(HoodRehydrate.lost(before, HoodRehydrate.summarize(state)));
   // a message on screen keeps it (it restores the banner itself when it
   // ends): this runs right after start-up connects, and wiped e.g. the
   // "Couldn't refresh automatically" note (Chrome check, 2026-10-29)
   if (!bannerTimer) setBanner(contextBanner());
   if (msg) transientBanner(msg);
+  // (never "Request cancelled" from here: the request gone from a snapshot
+  // doesn't say how — a decline, an Accept at work holding it, a ride; it
+  // said so falsely twice — rounds 18–19, cancelguess. Only the server's
+  // word says it: the cancel's ok, or "cancel_done")
 
   // the chat that was open comes back — one the server has, or a new one
   // nothing was sent in yet (the server decides at Send whether they can
@@ -2774,6 +2908,7 @@ function renderRealMarkers() {
   // while the server holds it, not their markers — never markers under
   // the count hexes of a view zoomed out meanwhile)
   const shown = new Map([...realEntries].filter(([, e]) => e.type !== "ridepeer" && browseVisible(e.type) && worldSync.wantedGeoHas(e.cell)));
+  noteCarsGone(shown);
   const live = new Set();
   HoodBrowse.groupMarkers(shown).forEach((g) => {
     live.add(g.key);
@@ -2793,6 +2928,144 @@ function renderRealMarkers() {
   });
   if (state.pileKey) renderPileSheet();
   nearbyArrived();
+  // the open chat's distance follows the map at once (a car gone or back —
+  // not at the 30 s timer: review, 2026-11-24)
+  refreshChatDistance();
+}
+
+// A car leaving the map — the driver gone offline, out of view, or hidden
+// by your request or ride — keeps its last block and the moment it left:
+// the chat with them still says "0.5 mi away · 3 min ago" (owner,
+// 2026-11-22: it went blank). Cars only: they're public on the map; a
+// rider's ✋ isn't kept (what a rider shares is the block sent with each
+// message). No expiry — the age says it; forgotten with the peer.
+// (`drawnCars`: the cars the last draw showed, with their blocks)
+let drawnCars = new Map();
+// what browseVisible last read (refreshControls redraws when it changes)
+let lastSeenKey = "";
+// When this phone last KNEW the map (review, 2026-11-24). Every socket
+// message — Phoenix's heartbeat answers too, every 30 s — says the
+// connection was live then (socketLiveAt). Two kinds of gap:
+// - the SAME connection silent past the heartbeat (a frozen page: iOS
+//   holds a background tab's messages and hands them over when it wakes):
+//   what comes in the burst right after is old news — dated to the
+//   silence's start (heldFrom, till heldUntil). Phoenix runs a channel's
+//   handlers before the socket's onMessage, so the burst's FIRST message
+//   sees socketLiveAt still old: lastKnownAt checks that too.
+// - the connection LOST (onClose/onError): a new one brings fresh news;
+//   only what the reconnect's snapshots find missing left in the gap —
+//   dated to its start (lostFrom, for the catch-up's half minute).
+// "Last seen" is when we last knew a car was there — not when we found out
+// it wasn't (an age read "0 min ago" for a driver gone 25).
+const SOCKET_SILENT_MS = 45_000;
+const HELD_BURST_MS = 2_000;
+let socketLiveAt = Date.now();
+// the last moment we KNOW we were live: as socketLiveAt, but never moved by
+// a held burst — a frozen page whose connection then dropped took the
+// wake-up as its loss (review, 2026-11-25)
+let provenLiveAt = socketLiveAt;
+// …and once a wake's burst is over with the connection still up, its last
+// message too: the page caught up then, even if nothing came after it
+// before the next freeze (a glance between two short freezes: the second
+// was dated to the FIRST one's start — review, 2026-11-25). Not for a
+// close (connectionLost: strict)
+function provenLive() {
+  return Date.now() >= heldUntil ? Math.max(provenLiveAt, socketLiveAt) : provenLiveAt;
+}
+let heldFrom = null;
+let heldUntil = 0;
+let lostFrom = null;
+function heldBurst(from, now) {
+  heldFrom = from;
+  heldUntil = now + HELD_BURST_MS;
+}
+// (a loss before the last one's catch-up finished: still known only till
+// the first — kept)
+function connectionLost() {
+  // (strict: a wake's burst then a close — the connection was dead all
+  // along, the burst only its backlog: dated to before the freeze)
+  if (lostFrom == null) lostFrom = provenLiveAt;
+}
+// the catch-up done — connected, the map's snapshots in (worldSync
+// settled): what's missing was dropped, dated to the loss; from here news
+// is news. Not a timer: a slow catch-up dated its drops "now", a flapping
+// connection kept the first loss's time for good (review, 2026-11-25)
+function caughtUp() {
+  if (lostFrom != null && socket && socket.isConnected() && worldSync.settled()) lostFrom = null;
+}
+// when news handled now was true: now, or — handled in a held burst — the
+// silence's start
+function lastKnownAt() {
+  // (not caughtUp() here: a snapshot is handled with the map already
+  // settled — its own drops would be dated "now". It runs AFTER them, and
+  // after each message: below and in onMessage)
+  const now = Date.now();
+  let at = now;
+  if (now - socketLiveAt > SOCKET_SILENT_MS) at = provenLive();
+  else if (heldFrom != null && now < heldUntil) at = heldFrom;
+  // (the connection down, or back but its catch-up not done: nothing known
+  // since the loss — whatever drops a car then, a snapshot, a cell the
+  // rejoin let go, the map torn down for a ride that started meanwhile:
+  // reviews, 2026-11-25. It caps the silence's and the burst's answers too:
+  // a wake's backlog then a dead connection isn't "live" — lastfrozen)
+  if (lostFrom != null) at = Math.min(at, lostFrom);
+  return at;
+}
+
+function noteCarsGone(shown) {
+  const now = new Map();
+  shown.forEach((e, id) => {
+    if (e.type === "driver" && e.peer.pos) now.set(id, { peer: e.peer, lat: e.peer.pos.lat, lng: e.peer.pos.lng });
+  });
+  drawnCars.forEach((c, id) => {
+    if (now.has(id)) return;
+    const e = realEntries.get(id);
+    carGone(id, e && e.type === "driver" ? e.peer.pos : null);
+  });
+  drawnCars = now;
+}
+
+// A ride starting takes the map (the browse layer torn down): the other
+// cars you knew, kept at their LATEST block, now (else a car that moved
+// while you waited kept its block from when you asked — review,
+// 2026-11-25); your driver's block from before the ride, gone — he's on
+// his way, his ride position is what counts (it read "1.2 mi away · 8 min
+// ago" till then; a reload already cleared it)
+function rideTakesTheMap(partner, role) {
+  if (DEMO) return;
+  if (carsKnown())
+    realEntries.forEach((e, id) => {
+      if (e.type === "driver" && e.peer !== partner) carGone(id, e.peer.pos, e.peer, lastKnownAt());
+    });
+  if (role === "rider") forgetLastSeen(partner);
+}
+
+// their car's last block from before a ride with them: gone — and none
+// older than now taken again (a snapshot dropping their stale entry later)
+function forgetLastSeen(peer) {
+  peer.lastSeen = null;
+  peer.lastSeenFloor = Date.now();
+  drawnCars.delete(peer.id);
+}
+
+// a rider's app still gets the cars: browsing, or waiting on a request
+// (hidden then, still sent — the map stays subscribed till a ride starts)
+function carsKnown() {
+  return state.mode === "rider" && (!state.ride || state.ride.status === "requested");
+}
+// (at: by default when this phone last knew the map — cars hidden while
+// the connection's down are as old as that, not "now": review)
+function carGone(id, pos, peerGiven = null, at = lastKnownAt()) {
+  const c = drawnCars.get(id);
+  const peer = c ? c.peer : peerGiven;
+  const where = pos || c;
+  drawnCars.delete(id);
+  if (!peer || !where) return;
+  // (never a block from before a ride with them that we know of — a late
+  // snapshot dropping their old hidden entry after the reload cleared it:
+  // review, 2026-11-24)
+  if (peer.lastSeenFloor != null && at < peer.lastSeenFloor) return;
+  peer.lastSeen = { lat: where.lat, lng: where.lng, at };
 }
 
 function makePileMarker(g) {
@@ -3083,8 +3356,25 @@ function pushDriverUpdate() {
   const now = Date.now();
   if (!HoodSendFilter.shouldSend(lastGeoSent, now, state.me, spot, HoodSendFilter.BROWSE_MIN_METERS))
     return;
-  lastGeoSent = HoodSendFilter.stamp(state.me, spot, now, Math.random);
-  userChannel.push("driver_update", { spot });
+  const sent = (lastGeoSent = HoodSendFilter.stamp(state.me, spot, now, Math.random));
+  // not placed (the server busy, the answer lost): sent again soon — the
+  // next one waited for the heartbeat (16–24 s), the car hidden that long
+  // while the app said online (precommit, 2026-11-26: the rare "rider never
+  // sees the car" — the server had none; journey onlinebusy). "busy": when
+  // the server says; anything else but "no car" (asked for at the tap): the
+  // next tick
+  const again = () => {
+    if (lastGeoSent === sent) lastGeoSent = null;
+  };
+  userChannel
+    .push("driver_update", { spot })
+    .receive("error", (e) => {
+      const reason = e && e.reason;
+      if (reason === "no_car") return;
+      if (reason === "busy") return void setTimeout(again, Math.max(500, Number(e.retry_ms) || 1000));
+      again();
+    })
+    .receive("timeout", again);
 }
 
 function pushDriverOffline() {
@@ -3241,6 +3531,7 @@ function startRealRide(r) {
   // (owner, 2026-11-10: tapping it said "Too late — the request was withdrawn")
   if (r.role === "driver") realPeersById.forEach((p) => p !== peer && p.pending && (p.pending = false));
   closeMapOverlays();
+  rideTakesTheMap(peer, r.role);
   state.ride = { peer, status: "connected", id: r.ride_id, role: r.role };
   state.handRaised = false;
   syncGeoSubscriptions(); // tears down the browse layer for the ride
@@ -3354,6 +3645,7 @@ function joinRideChannel() {
       // the ride is gone (a server restart, or it ended while we couldn't
       // hear "ended"). This runs before the reconnect's soft reload, which
       // would then see no ride to report — so say it here.
+      // ("your ride ended": a fact, never why — owner, 2026-11-26)
       if (state.ride) transientBanner(HoodRehydrate.lostBanner(["ride"]));
       realRideCleanup();
     });
@@ -3434,6 +3726,9 @@ function realRideCleanup() {
     peer.pos = null;
     peer.posExact = false;
     peer.posRx = null;
+    // …nor the block their car was on when you asked: they've driven since
+    // ("0.4 mi away · 25 min ago" next to you — review, 2026-11-24)
+    peer.lastSeen = null;
   }
   // a finished ride leaves the driver OFFLINE — back on the map only via an
   // explicit GO ONLINE tap, once the actual trip is really over
@@ -3898,11 +4193,13 @@ function sharedSpot() {
 }
 
 // a block someone shared with us: its centre, and its age (the server's age
-// when it arrived, counted on from there on this device's steady clock)
+// when it arrived, counted on from there on the wall clock — it runs on
+// while the phone sleeps)
 function rememberShared(peer, { spot, age_ms }) {
   try {
     const [lat, lng] = h3.cellToLatLng(spot);
-    peer.shared = { lat, lng, ageAtRx: age_ms || 0, rxAt: performance.now() };
+    // (the wall clock: it runs on while the phone sleeps)
+    peer.shared = { lat, lng, ageAtRx: age_ms || 0, rxAt: Date.now() };
   } catch (_) {} // not a block: ignore it
 }
 
@@ -3914,12 +4211,19 @@ function distanceTo(peer) {
   // demo people aren't real map entries: their position IS what the demo
   // map shows (as the profile card uses it)
   const entry = realEntries.get(peer.id);
-  const onMap = DEMO ? !partner && !!peer.pos : !partner && entry && entry.type !== "ridepeer" && browseVisible(entry.type);
+  // (a car in a cell the view left but the server still sends counts: its
+  // block is live; once the cell goes, dropEntry keeps its latest block.
+  // While you wait on a request the cars are hidden but still sent — the
+  // driver you asked included: his live block, not the one from when you
+  // asked, nor blank after a reload — review, 2026-11-24)
+  const live = entry && entry.type !== "ridepeer" && (entry.type === "driver" ? carsKnown() : browseVisible(entry.type));
+  const onMap = DEMO ? !partner && !!peer.pos : live && (!partner || state.ride.status === "requested");
   const target = HoodDistance.target({
     ridePos: partner && (DEMO || peer.posExact) ? peer.pos : null,
     mapPos: onMap ? peer.pos : null,
     shared: peer.shared,
-    now: performance.now(),
+    lastSeen: peer.lastSeen,
+    now: Date.now(),
   });
   return HoodDistance.label(here, target, metersBetween, UNIT);
 }
@@ -5038,6 +5342,9 @@ function readSeen() {
     return;
   }
   c.unread -= n;
+  // (their request's note seen — itself, on screen: a reload doesn't count
+  // it unread again; another message read above it isn't it — review)
+  if (peer.pending === true && peer.pendingReq != null && unread.slice(0, n).some((m) => m.req === peer.pendingReq)) markReqSeen(peer.id, peer.pendingReq);
   // the server's mark: the last SEEN of theirs it knows (an id)
   const known = unread.slice(0, n).filter((m) => m.id != null && m.ts != null);
   const last = known[known.length - 1];
@@ -5129,7 +5436,9 @@ async function loadChat(peer, c) {
     if (chatOnScreen(peer)) renderChat();
     return;
   }
-  c.msgs = HoodChatMerge.keep(HoodChatMerge.merge(body.messages.map(fromServer), c.msgs), CHAT_KEEP);
+  // (restored notes placed BEFORE trimming: one that's the oldest goes, not
+  // a message — review, 2026-11-24)
+  c.msgs = HoodChatMerge.keep(placeRestored(HoodChatMerge.merge(body.messages.map(fromServer), c.msgs)), CHAT_KEEP);
   // (the server's "read up to" with them: the later of the two)
   if (Array.isArray(body.read)) c.serverRead = laterMark(c.serverRead, body.read);
   c.loaded = true;
@@ -5424,7 +5733,10 @@ function unreadNotes(c, mark) {
     const m = c.msgs[i];
     if (m.mine) continue;
     seen++;
-    if (m.id == null) notes++;
+    // (a note put back by a reload: unread by noteUnread's rule)
+    if (m.id == null) {
+      if (!m.restored || noteUnread(c, m, mark)) notes++;
+    }
     else if (mark && m.ts != null && !HoodReadStore.newer(m, mark)) break;
   }
   return notes;
@@ -5440,6 +5752,210 @@ function theirsKept(c) {
   // one more came to 1: review, 2026-11-20)
   if (c.loaded === false) return CHAT_KEEP;
   return c.msgs.filter((m) => !m.mine).length;
+}
+
+// A waiting request's note, back after a reload (owner, 2026-11-22). The
+// note "📩 requested a ride" is this phone's own — the server keeps no
+// message for it — so a reload (resetMirror: the chats rebuilt from the
+// server) lost it: a request with no message left NO chat at all, one with
+// messages sank below newer chats. Now each request still open
+// (/api/state's pending_requests, with its time) puts it back AT THAT TIME:
+// among the messages by time (a chat not loaded yet — a summary: held, and
+// put in its place once its messages come, placeRestored), and the chat's
+// place in the list the later of its last message and the request. Quiet:
+// no banner. Unread again — a request waiting for an answer — unless this
+// phone saw it already (peer.seenReq: the peers outlive a soft reload) or
+// a message of theirs came after it (unread is "their newest N").
+function restoreRequestNote(peer, at, req, afterId, answered = false) {
+  const fresh = !chats.has(peer);
+  const c = olderChat(peer, false);
+  // (a chat made just now for it — loaded or not: its time is the
+  // request's, not now; review, 2026-11-24)
+  if (fresh) c.lastAt = c.emptyAt = at;
+  // req: which request — what "seen" is about (readSeen). afterId: the
+  // newest message between them when it was made (the server's, exact —
+  // undefined from an older server: placed by time)
+  // (answered: the server says you've written to them since — from any
+  // phone; a summary shows only the chat's last message)
+  const msg = { text: t("📩 requested a ride"), mine: false, at, ts: null, id: null, restored: true, req, afterId, peerId: peer.id, answered };
+  if (c.loaded === false) {
+    msg.after = afterId !== undefined ? afterId : newestKnownId(c);
+    // (a newer message in the summary: the list's preview and the chat's
+    // place stay that one — HoodChatList.preview, settleLast — till opened)
+    const s = c.summary && c.summary.last;
+    if (s && isBehind(msg, s)) msg.behind = true;
+    c.msgs.push(msg);
+  } else c.msgs.splice(noteIndex(c.msgs, msg), 0, msg);
+  // (the chat's time: the note's only if it IS the newest — placed by id
+  // before a message whose time is earlier, the second's rounding, it
+  // isn't: review, 2026-11-25)
+  if (at > c.lastAt && !msg.behind && c.msgs[c.msgs.length - 1] === msg) {
+    c.lastAt = at;
+    c.lastId = null;
+  }
+  keepChat(c);
+  // (counted once the chat's trimmed: a note the oldest of a full chat is
+  // gone already — its +1 left the "New messages" line one too high)
+  if (c.msgs.includes(msg) && noteUnread(c, msg, readMarkOf(peer, c))) c.unread = Math.min(c.unread + 1, theirsKept(c));
+}
+
+// A restored note is unread unless this phone saw it (seenReqOf: kept on
+// the phone, a full reload too) or a message of theirs AFTER it is read —
+// reading goes top down, so that one read means the note was passed
+// (review, 2026-11-24: a fixed verdict went wrong once an older page came
+// or the marks moved). Their messages after it: the chat's own, or — not
+// loaded yet — the summary's (after the request's message id).
+function noteUnread(c, n, mark) {
+  if (n.req != null && seenReqOf(n.peerId) === n.req) return false;
+  if (n.answered) return false;
+  const i = c.msgs.indexOf(n);
+  // (a reply of yours after it — sent from any phone of yours — passed it)
+  if (c.msgs.slice(i + 1).some((m) => m.mine && m.id != null)) return false;
+  const sl = c.loaded === false && c.summary && c.summary.last;
+  if (sl && sl.mine && isBehind(n, sl)) return false;
+  if (!mark) return true;
+  const later = c.msgs.slice(i + 1).filter((m) => !m.mine && m.id != null && m.ts != null);
+  if (c.loaded === false && c.summary)
+    later.push(...(c.summary.theirs || []).filter((m) => (n.afterId !== undefined ? n.afterId == null || m.id > n.afterId : notBefore(HoodChatList.localAt(m.ts, chatSkew), n.at))));
+  return !later.some((m) => !HoodReadStore.newer(m, mark));
+}
+
+// the "read up to" mark with them: this phone's or the server's, the later
+function readMarkOf(peer, c) {
+  return laterMark((HoodReadStore.read(storageOrNull(), state.realUser.id) || {})[peer.id] || null, c.serverRead || null);
+}
+
+// a summary's last message newer than a restored note: by the request's
+// message id when known, else by time
+function isBehind(n, last) {
+  if (n.afterId !== undefined) return n.afterId == null || last.id > n.afterId;
+  return HoodChatList.localAt(last.ts, chatSkew) >= n.at;
+}
+
+// where a restored note goes among loaded messages: right after the
+// request's message (afterId: null — before them all), else by time (an
+// older server, or that message trimmed away)
+function noteIndex(msgs, n) {
+  if (n.afterId === null) return 0;
+  if (n.afterId !== undefined) {
+    const i = msgs.findIndex((m) => m.id === n.afterId);
+    if (i >= 0) return i + 1;
+    return beforeNewer(msgs, n.afterId);
+  }
+  return placeAt(msgs, n.at);
+}
+
+// its message gone (trimmed — the oldest go first): ids only grow, so it
+// goes before the first message newer than that one — exact, where the
+// request's whole-second time could be a message off (review, 2026-11-25)
+function beforeNewer(msgs, afterId) {
+  const i = msgs.findIndex((m) => m.id != null && m.id > afterId);
+  return i >= 0 ? i : msgs.length;
+}
+
+// Requests this phone has SEEN (their note on screen), by rider — kept in
+// storage, so a full reload (the peers made anew) doesn't count a seen
+// request unread again (review, 2026-11-24). Pruned at each state load to
+// the requests still open. No storage: this page's memory only.
+let seenReqMem = {};
+// (the last write to storage failed — full, or blocked: this tab's memory
+// holds marks storage doesn't — review, 2026-11-25)
+let seenReqWriteFailed = false;
+const SEEN_REQ_PREFIX = "hoodride_seenreq_";
+const seenReqKey = () => SEEN_REQ_PREFIX + state.realUser.id;
+// who asked you for a ride, and when: gone with the sign-out, as the rest
+// (privacy page: "Signing out removes them") — one account's (id), or every
+// account's (no id: signed out elsewhere, the page doesn't know whose).
+// Cross-feature review, 2026-11-25
+function forgetSeenReqs(storage, id) {
+  seenReqMem = {};
+  if (!storage) return;
+  try {
+    const keys = [];
+    for (let i = 0; i < storage.length; i++) {
+      const k = storage.key(i);
+      if (k && (id != null ? k === SEEN_REQ_PREFIX + id : k.startsWith(SEEN_REQ_PREFIX))) keys.push(k);
+    }
+    keys.forEach((k) => storage.removeItem(k));
+  } catch (_) {}
+}
+// (storage is the truth when it can be read — shared by this account's
+// tabs: another tab's newer mark wins over this one's memory, which only
+// stands in when storage can't be used: review, 2026-11-25)
+function seenReqAll() {
+  try {
+    const st = storageOrNull();
+    if (st) {
+      const v = JSON.parse(st.getItem(seenReqKey()) || "{}");
+      const stored = v && typeof v === "object" ? v : {};
+      return seenReqWriteFailed ? Object.assign({}, stored, seenReqMem) : stored;
+    }
+  } catch (_) {} // unreadable: memory only
+  return Object.assign({}, seenReqMem);
+}
+function seenReqSave(all) {
+  seenReqMem = all;
+  try {
+    const st = storageOrNull();
+    // (nothing to keep: no key left behind)
+    if (st) Object.keys(all).length ? st.setItem(seenReqKey(), JSON.stringify(all)) : st.removeItem(seenReqKey());
+    seenReqWriteFailed = false;
+  } catch (_) {
+    seenReqWriteFailed = true; // full or blocked: memory too
+  }
+}
+function seenReqOf(peerId) {
+  return seenReqAll()[peerId] ?? null;
+}
+function markReqSeen(peerId, req) {
+  const all = seenReqAll();
+  all[peerId] = req;
+  seenReqSave(all);
+}
+// (only the requests still open: what was seen of the rest no longer matters)
+function pruneSeenReqs(open) {
+  const all = seenReqAll();
+  const kept = {};
+  for (const r of open) if (all[r.id] === r.req) kept[r.id] = r.req;
+  seenReqSave(kept);
+}
+
+// where a note of time `at` goes among messages by time. Request times
+// are whole seconds, off by up to one (Requests.wall_ts: two clocks): a
+// message in the same second goes AFTER the note — asked, then written,
+// the usual order (review, 2026-11-24)
+const notBefore = (mAt, at) => mAt >= at;
+function placeAt(msgs, at) {
+  let i = msgs.length;
+  while (i > 0 && notBefore(msgs[i - 1].at, at)) i--;
+  return i;
+}
+
+// restored notes (restoreRequestNote) in their place by time, once a
+// chat's messages come — merged at the end (HoodChatMerge), a message sent
+// after the request was above them, and the chat's time went back to the
+// request's (review, 2026-11-24)
+function placeRestored(msgs) {
+  // (restored ones, and live ones that know their request's message)
+  const move = (m) => m.restored || (m.id == null && m.afterId !== undefined);
+  const was = new Map(msgs.map((m, i) => [m, i]));
+  const notes = msgs.filter(move);
+  const rest = msgs.filter((m) => !move(m));
+  for (const n of notes) {
+    let i;
+    if (n.afterId !== undefined) {
+      const at = n.afterId === null ? -1 : rest.findIndex((m) => m.id === n.afterId);
+      i = n.afterId === null ? 0 : at >= 0 ? at + 1 : beforeNewer(rest, n.afterId);
+      // (after the notes and lines already there that came BEFORE it — a
+      // request, its "(request withdrawn)", the next request: in that
+      // order, never the newest first: review, 2026-11-25)
+      while (i < rest.length && rest[i].id == null && was.get(rest[i]) < was.get(n)) i++;
+    } else i = placeAt(rest, n.at);
+    rest.splice(i, 0, n);
+    delete n.behind;
+  }
+  msgs.splice(0, msgs.length, ...rest);
+  return msgs;
 }
 
 // the newest message id this chat knows: its last with one, else (not
@@ -5682,20 +6198,29 @@ $("btn-ride-action").addEventListener("click", () => {
     if (state.mode === "rider") {
       startRideAction(t("Requesting…"), t("Requesting your ride…"));
       loc.requestCheck();
+      // (a new request: no earlier cancel wish covers it — round 16)
+      cancelIntent = null;
       userChannel
         .push("request_ride", { to: peer.id, spot: sharedSpot() })
         .receive("ok", () => {
+          if (askingPeer === peer) askingPeer = null;
           state.ride = { peer, status: "requested" };
           setBanner(contextBanner());
           endRideAction();
         })
         .receive("timeout", () => {
-          // slow, not necessarily failed: the server may have it — ask it
+          // slow, not necessarily failed: the server may have it — ask it.
+          // (its answer lost: the reload counts him as asked — only now, a
+          // push still on its way isn't a request gone: a rejoin's reload
+          // read before the server saved it wiped his last-known block —
+          // cross-feature review, 2026-11-25, lastasking)
+          askingPeer = peer;
           endRideAction();
           softReload();
         })
         .receive("error", (e) => {
           endRideAction();
+          if (askingPeer === peer) askingPeer = null;
           // a repeat (e.g. after a timeout that DID go through): the server
           // knows best — re-sync rather than a puzzling message
           if (e.reason === "already_requested") return softReload();
@@ -5803,6 +6328,12 @@ $("btn-decline").addEventListener("click", () => {
 });
 
 $("btn-endride").addEventListener("click", endRide);
+// (another driver's chat: "Cancel request to {name}" — shown only while
+// that request is open: refreshControls. A tap already on its way as the
+// ride starts never ends the ride: review, 2026-11-24)
+$("chat-cancel-other").addEventListener("click", () => {
+  if (state.ride && state.ride.status === "requested") endRide();
+});
 
 // a Cancel answered "accepted": how long the ride's news gets before the
 // app asks the server (endRide)
@@ -5819,11 +6350,26 @@ function endRide() {
       // (ride_started), never a "Request cancelled" before it
       // (test_browser/cancelrace.mjs)
       const asked = state.ride;
+      // (still that request: by the person — a reload in between makes the
+      // ride anew, and the object compared left a cancelled request on
+      // screen — round 13, cancelreload)
+      const stillAsked = () => !!state.ride && state.ride.status === "requested" && state.ride.peer === asked.peer;
+      // (one cancel wish — the tap, and a reload's resends of it: said once,
+      // by whichever ok comes first — even after a reload already cleared
+      // the request here: round 16)
+      if (!cancelIntent || cancelIntent.peer !== asked.peer) cancelIntent = { peer: asked.peer, said: false };
+      const intent = cancelIntent;
       userChannel
         .push("cancel_request", {})
-        .receive("ok", () => {
-          if (state.ride === asked) state.ride = null;
-          transientBanner(t("Request cancelled"));
+        .receive("ok", (resp) => {
+          if (stillAsked()) state.ride = null;
+          // (the server's "nothing was there" — a decline or an expiry took
+          // it first: not "Request cancelled" over "Driver can't take this
+          // one" — review round 20)
+          if (!(resp && resp.done === false) && !intent.said) {
+            intent.said = true;
+            transientBanner(t("Request cancelled"));
+          }
           refreshControls();
         })
         .receive("error", (e) => {
@@ -5831,9 +6377,13 @@ function endRide() {
           // seconds — its start failed after all, or the news was lost —
           // the server says what's true (crash review 2026-11-14: the
           // Cancel otherwise did nothing; test_browser/cancelrace.mjs)
+          // ("accepted": not done — not yet, maybe never: a ride may start.
+          // Only the server's "cancel_done" says it was done after all, the
+          // Accept having failed: round 18; the next Request tap ends the
+          // wish)
           if (e && e.reason === "accepted") {
             setTimeout(() => {
-              if (state.ride === asked) softReload();
+              if (stillAsked()) softReload();
             }, ACCEPTED_WAIT_MS);
             return;
           }
@@ -6878,6 +7428,17 @@ $("btn-mode").addEventListener("click", () => {
 function refreshControls() {
   // GPS runs exactly while something needs it (HoodSendFilter.gpsNeeded)
   if (!DEMO) loc.reconcile();
+  // what the map shows follows the ride and mode (browseVisible): a request
+  // hides the cars — redrawn now, not at the next map message (minutes in a
+  // quiet area: the requested driver's distance blank meanwhile — review,
+  // 2026-11-24). Only when what it reads changed: this runs at every GPS
+  // reading, and a redraw rebuilds an open pile list — a tap on a row lost
+  // as it's rebuilt under the finger (review, 2026-11-24)
+  const seenKey = `${state.mode}|${!!state.ride}|${state.online}`;
+  if (!DEMO && seenKey !== lastSeenKey) {
+    lastSeenKey = seenKey;
+    renderMarkersSoon();
+  }
   // an open Settings sheet follows the ride (its sign-out row blocks in one)
   if (settingsOpen()) renderSettings();
   // End chat follows too: a message delivered (the chat now on the server),
@@ -6944,6 +7505,13 @@ function refreshControls() {
     action.classList.remove("hidden");
     action.textContent = t("Requested…");
     action.disabled = true;
+  } else if (requested) {
+    // a request open to someone else — one at a time (the server's
+    // already_requested): say why, greyed, instead of no button at all
+    // (owner, 2026-11-22: a rider in another driver's chat saw nothing)
+    action.classList.remove("hidden");
+    action.textContent = t("You already requested a ride from {name}", { name: state.ride.peer.name });
+    action.disabled = true;
   } else if (!state.ride && (rider || (state.chatPeer.pending && state.online))) {
     action.classList.remove("hidden");
     action.textContent = rider ? t("Request ride") : t("Accept ride");
@@ -6951,6 +7519,14 @@ function refreshControls() {
   } else {
     action.classList.add("hidden");
   }
+  const why = !!requested && state.ride.peer !== state.chatPeer;
+  action.classList.toggle("btn-why", why);
+  // (the row wraps for the link under it: a class, not :has() — older
+  // browsers without it squeezed the sentence to a column: review)
+  action.parentElement.classList.toggle("why", why);
+  // …and under it, that request cancelled from here (endRide's own Cancel)
+  toggle("chat-cancel-other", why && !!msgView);
+  if (why) $("chat-cancel-other").textContent = t("Cancel request to {name}", { name: state.ride.peer.name });
   // a request/accept on its way: say so, unavailable but still focusable
   if (rideActionInFlight) {
     action.textContent = rideActionInFlight;
@@ -7035,6 +7611,7 @@ const booting = HoodBoot.create({
     // signed out (here or from another device): no remembered map area left
     HoodViewStore.forgetAll(storageOrNull());
     HoodReadStore.forgetAll(storageOrNull());
+    forgetSeenReqs(storageOrNull());
     // …and the rest the Sign out button clears: the block, a refresh due
     forgetAllSpots(storageOrNull());
     HoodGoogleRefresh.forget(storageOrNull());
@@ -7108,6 +7685,8 @@ function peerInUse(p) {
     bannerPeer === p ||
     (!!blockAsk && blockAsk.peer === p) ||
     endArmed === p ||
+    askingPeer === p ||
+    (!!cancelIntent && cancelIntent.peer === p) ||
     !!p.pending ||
     !!p.blocking
   );
@@ -7166,31 +7745,104 @@ $("block-yes").addEventListener("click", () => {
   if (DEMO) return demoBlockAnswer(ask);
   if (!liveNow()) return blockError(CANT_REACH());
   $("block-yes").disabled = true;
+  sendBlockAction(ask);
+});
+// a Block / Unblock. Its answer lost (a timeout): "Checking…", and the
+// server is ASKED over the web — not the line that lost the answer — now,
+// 5 s and 20 s later (a slow save may still land): what it says is what's
+// shown. It said "Couldn't block — try again" for a block that went through
+// (owner, 2026-11-25). Simpler than resending it (owner, 2026-11-26: the
+// resend's states kept breaking — reviews, rounds 5–12)
+function sendBlockAction(ask) {
   const { peer, mode } = ask;
+  // the newest wish wins: an older action's answer, checked late, decides
+  // nothing once a newer one for this person has gone (round 6)
+  const seq = ++blockSeq;
+  blockLatest.set(peer.id, seq);
+  const superseded = () => blockLatest.get(peer.id) !== seq;
+  // (an Unblock: they're not being blocked now — the list's row is its own
+  // object: the person's record by id — nor is a lost block's mark theirs,
+  // or a later real loss with them is muted: round 11)
+  if (mode === "unblock") {
+    const rp = realPeersById.get(peer.id);
+    if (rp) rp.blocking = false;
+  }
   // (the server closes your chat before it answers: that close is yours)
   if (mode === "block") peer.blocking = true;
+  // the sheet open for this same action — this one, or one reopened since
+  // (its answer closes that too — round 5)
+  const sheetFor = () => !!blockAsk && blockAsk.peer.id === peer.id && blockAsk.mode === mode;
+  // not done: nothing left "being blocked" (a later chat ending with them
+  // said, a later loss not muted — rounds 11–12)
+  const unmark = () => {
+    peer.blocking = false;
+  };
+  // (the sheet closed meanwhile: a failure said as a banner instead)
+  const refused = (reason) => {
+    unmark();
+    if (sheetFor()) blockRefusal(reason, mode);
+    else transientBanner(mode === "block" ? t("Couldn't block — try again") : t("Couldn't unblock — try again"));
+  };
+  const done = () => {
+    if (mode === "block") {
+      afterBlocked(peer);
+      if (sheetFor()) closeBlockSheet();
+      transientBanner(t("Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."));
+    } else {
+      if (ask.row) ask.row.remove();
+      // (…and the row a reopened sheet came from: the list may be drawn anew)
+      if (sheetFor() && blockAsk.row) blockAsk.row.remove();
+      if (sheetFor()) closeBlockSheet();
+      if (!$("blocked-list").querySelector(".blocked-row") && !blockedMore) showBlockedEmpty();
+    }
+  };
+  // (a slow save — a database stuck on a lock — lands within a minute or so)
+  const SETTLE_AT = [0, 5_000, 20_000, 60_000];
+  const settle = async (i) => {
+    if (superseded()) return;
+    let blocking = null;
+    try {
+      const res = await apiFetch(`/api/blocks?peer=${encodeURIComponent(peer.id)}`);
+      if (res.ok) blocking = (await res.json()).blocking;
+    } catch (_) {} // unreachable: asked again
+    if (superseded()) return;
+    if (blocking === (mode === "block")) return done();
+    if (i + 1 < SETTLE_AT.length) return void setTimeout(() => settle(i + 1), SETTLE_AT[i + 1] - SETTLE_AT[i]);
+    if (blocking != null) return refused(null);
+    // (never an answer: not known — said so, the list a tap away; not
+    // "being blocked" now)
+    peer.blocking = false;
+    const text = t("Couldn't confirm — check Blocked people");
+    if (sheetFor()) return blockError(text, true);
+    transientBanner(text);
+  };
   userChannel
     .push(mode, { peer: peer.id })
-    .receive("ok", () => {
-      if (mode === "block") {
-        afterBlocked(peer);
-        closeBlockSheet();
-        transientBanner(t("Blocked. To undo it, tap your profile picture at the top left, then Blocked people at the bottom."));
-      } else {
-        if (ask.row) ask.row.remove();
-        closeBlockSheet();
-        if (!$("blocked-list").querySelector(".blocked-row") && !blockedMore) showBlockedEmpty();
-      }
-    })
+    .receive("ok", () => !superseded() && done())
     .receive("error", (e) => {
-      peer.blocking = false;
-      blockRefusal(e && e.reason, mode);
+      if (superseded()) return;
+      const reason = e && e.reason;
+      // ("none": not blocked — an earlier unblock went through: done)
+      if (mode === "unblock" && reason === "none") return done();
+      refused(reason);
     })
     .receive("timeout", () => {
-      peer.blocking = false;
-      blockRefusal(null, mode);
+      if (superseded()) return;
+      // slow, not necessarily failed: the server may have done it — a
+      // request it withdrew stayed here ("Waiting for the driver…", every
+      // other chat greyed) until a reload; ask it (review, 2026-11-24)
+      softReload();
+      if (sheetFor()) {
+        $("block-error").textContent = t("Checking…");
+        $("block-error").classList.remove("hidden");
+        $("block-list-open").classList.add("hidden");
+      }
+      settle(0);
     });
-});
+}
+// each person's newest Block/Unblock (its number: sendBlockAction)
+const blockLatest = new Map();
+let blockSeq = 0;
 $("block-cancel").addEventListener("click", closeBlockSheet);
 $("block-backdrop").addEventListener("click", closeBlockSheet);
 $("block-list-open").addEventListener("click", () => {
@@ -7229,7 +7881,22 @@ function demoBlockAnswer({ peer, mode, row }) {
 function afterBlocked(peer) {
   if (state.cardPeer === peer) closePeerCard();
   if (chats.has(peer)) closeChatWith(peer, "me");
+  // your request to them: withdrawn by the server (BlockEffects), which
+  // tells only the driver — it stayed here: "Waiting for the driver…", and
+  // another driver's chat said "You already requested a ride from" the
+  // one you'd just blocked (review, 2026-11-24)
+  if (state.ride && state.ride.status === "requested" && state.ride.peer === peer) {
+    state.ride = null;
+    setBanner(contextBanner());
+  }
+  // (a driver blocking a rider who'd asked: the server declined it and
+  // told only the rider — a pending mark left would keep them in memory)
+  // (…and that request, announced late — its announce raced the block —
+  // makes no new chat with them: round 4)
+  if (peer.pending && peer.pendingReq != null) peer.withdrawnReq = peer.pendingReq;
+  peer.pending = false;
   peer.blocking = false;
+  refreshControls();
 }
 
 // ----- the list, in pages (GET /api/blocks) -----

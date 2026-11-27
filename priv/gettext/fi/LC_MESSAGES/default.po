@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Peru pyyntö"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Peru pyyntö kuljettajalle {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Peru ensin kyytipyyntösi"
 
@@ -169,6 +173,10 @@ msgstr "Chatit"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Tarkista: {fields} (enintään {max} kirjainta kussakin)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Tarkistetaan…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Valitse…"
@@ -205,14 +213,6 @@ msgstr "Yhteys katkesi. Napauta LINJOILLE, niin voit ajaa taas"
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Yhteys katkesi. Napauta ✋ uudelleen, jos tarvitset yhä kyydin"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Yhteys katkesi. Kyytisi päättyi odottamatta, joten sovi se uudelleen"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Yhteys katkesi. Kyytipyyntösi katosi, joten pyydä uudelleen"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Jatka Facebookilla"
@@ -244,6 +244,10 @@ msgstr "Estäminen ei onnistunut. Yritä uudelleen"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Selaintasi ei voitu tarkistaa. Salli challenges.cloudflare.com tai kokeile toista selainta"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Ei voitu vahvistaa. Katso Estetyt henkilöt"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "keltainen"
 msgid "You already have an open request"
 msgstr "Sinulla on jo avoin pyyntö"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Olet jo pyytänyt kyytiä kuljettajalta {name}"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Voit päivittää kyydin jälkeen"
@@ -904,6 +912,14 @@ msgstr "Autosi"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Nimesi ja kuvasi tulevat palvelusta {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Kyytisi päättyi"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Kyytipyyntösi päättyi. Pyydä uudelleen, jos tarvitset vielä kyydin"
 
 #: priv/static/app.js
 msgid "Your rider"

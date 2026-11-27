@@ -101,6 +101,41 @@ defmodule Hoodride.Chat do
 
   def pair_key(a, b), do: {min(a, b), max(a, b)}
 
+  @doc """
+  The newest message id between `a` and `b` now, or nil — where a ride
+  request sits among their messages (Hoodride.Requests: the driver's app
+  puts its note right after it; ids only grow, so this is exact where the
+  request's whole-second time isn't — review, 2026-11-24).
+  """
+  def newest_id(a, b) do
+    # (under the pair's lock: a message whose id is taken but not stored yet
+    # — mid-write — is waited for, never missed: placed before it, a reload
+    # put the note above his message and counted it answered — review,
+    # 2026-11-25)
+    pair_locked(pair_key(a, b), fn -> newest_id_of(a, b) end)
+  end
+
+  @doc """
+  Has `from` written to `to` after message `after_id` (nil: at all)? — a
+  driver's reply after a ride request means he saw it, even from another
+  phone: a reload's summary shows only the chat's last message (review,
+  2026-11-25).
+  """
+  def sent_after?(from, to, after_id) do
+    floor = after_id || -1
+
+    Enum.any?(:ets.lookup(@messages, pair_key(from, to)), fn {_, id, sender, _, _} ->
+      sender == from and id > floor
+    end)
+  end
+
+  defp newest_id_of(a, b) do
+    case :ets.lookup(@messages, pair_key(a, b)) do
+      [] -> nil
+      rows -> rows |> Enum.map(&elem(&1, 1)) |> Enum.max()
+    end
+  end
+
   def exists?(a, b), do: :ets.member(@conversations, pair_key(a, b))
 
   @doc """

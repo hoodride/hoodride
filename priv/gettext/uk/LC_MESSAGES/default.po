@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Скасувати запит"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Скасувати запит водієві {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Спершу скасуйте запит на поїздку"
 
@@ -169,6 +173,10 @@ msgstr "Чати"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Перевірте поля: {fields} (не більше {max} літер у кожному)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Перевірка…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Виберіть…"
@@ -205,14 +213,6 @@ msgstr "З’єднання скинуто. Торкніться «ВИЙТИ Н
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "З’єднання скинуто. Торкніться ✋ ще раз, якщо поїздка досі потрібна"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "З’єднання скинуто. Поїздка несподівано завершилася, домовтеся про неї знову"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "З’єднання скинуто. Запит на поїздку втрачено, надішліть його ще раз"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Продовжити з Facebook"
@@ -244,6 +244,10 @@ msgstr "Не вдалося заблокувати. Спробуйте ще ра
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Не вдалося перевірити ваш браузер. Дозвольте challenges.cloudflare.com або спробуйте інший браузер"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Не вдалося підтвердити. Перевір «Заблоковані»"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "жовтий"
 msgid "You already have an open request"
 msgstr "У вас уже є активний запит"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Ви вже запросили поїздку у водія {name}"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Оновити можна після поїздки"
@@ -904,6 +912,14 @@ msgstr "Ваша машина"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Ім’я та фото взято з {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Поїздку завершено"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Запит на поїздку завершено. Попроси ще раз, якщо поїздка ще потрібна"
 
 #: priv/static/app.js
 msgid "Your rider"

@@ -314,6 +314,11 @@
         <div class="chat-actions">
           <button id="btn-decline" class="btn btn-danger btn-compact hidden" data-t>Decline</button>
           <button id="btn-ride-action" class="btn btn-primary btn-compact hidden" data-t>Request ride</button>
+          <!-- under "You already requested a ride from {name}" (another
+               driver's chat): that request cancelled from here — Cancel
+               request in the bottom buttons sits behind an upright chat
+               (owner, 2026-11-24). Its words: refreshControls -->
+          <button id="chat-cancel-other" type="button" class="chat-end chat-cancel-other hidden"></button>
         </div>
         <!-- "Requesting your ride…" for screen readers while it's on its way -->
         <p id="ride-action-status" class="sr-only" role="status"></p>

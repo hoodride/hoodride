@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "لغو درخواست"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "لغو درخواست به {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "اول درخواست سفرتان را لغو کنید"
 
@@ -169,6 +173,10 @@ msgstr "گفتگوها"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "{fields} را بررسی کنید (هر کدام حداکثر {max} حرف)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "در حال بررسی…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "انتخاب کنید…"
@@ -205,14 +213,6 @@ msgstr "اتصال قطع شد — برای رانندگی دوباره، «آن
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "اتصال قطع شد — اگر هنوز سفر می‌خواهید، دوباره ✋ را بزنید"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "اتصال قطع شد — سفرتان ناگهان تمام شد، لطفاً دوباره تنظیمش کنید"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "اتصال قطع شد — درخواست سفرتان از بین رفت، لطفاً دوباره درخواست دهید"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "ادامه با Facebook"
@@ -244,6 +244,10 @@ msgstr "مسدود کردن ممکن نشد — دوباره امتحان کنی
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "بررسی مرورگر شما ممکن نشد — به challenges.cloudflare.com اجازه دهید، یا مرورگر دیگری را امتحان کنید"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "تأیید نشد — فهرست افراد مسدودشده را ببینید"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "زرد"
 msgid "You already have an open request"
 msgstr "شما یک درخواست باز دارید"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "شما قبلاً از {name} درخواست سفر کرده‌اید"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "بعد از سفر می‌توانید به‌روزرسانی کنید"
@@ -904,6 +912,14 @@ msgstr "ماشین شما"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "نام و عکس شما از {provider} می‌آید"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "سفر شما تمام شد"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "درخواست سفر شما تمام شد — اگر هنوز سفر لازم دارید، دوباره درخواست دهید"
 
 #: priv/static/app.js
 msgid "Your rider"

@@ -157,8 +157,24 @@ defmodule Hoodride.BlocksTest do
 
       assert {:error, :rate_limited} = Blocks.block(ann.id, user("day-over").id)
 
-      assert {:error, :rate_limited} =
-               Blocks.unblock(ann.id, List.last(Enum.take(others, n - half)).id)
+      # (one still blocked — from another day: a REAL unblock, refused)
+      kept = user("day-kept")
+
+      Repo.query!("INSERT INTO blocks (blocker_id, blocked_id, inserted_at) VALUES (?, ?, ?)", [
+        ann.id,
+        kept.id,
+        System.system_time(:second) - 86_400
+      ])
+
+      assert {:error, :rate_limited} = Blocks.unblock(ann.id, kept.id)
+
+      # …but a no-op answers as ever, at the limit too: a Block of someone
+      # already blocked "ok", an Unblock of someone not blocked "none" — the
+      # app's retry of an action whose answer was lost asks exactly that
+      # (cross-feature review round 8, 2026-11-25: "too many today" for a
+      # block that went through)
+      assert :ok = Blocks.block(ann.id, kept.id)
+      assert {:error, :none} = Blocks.unblock(ann.id, user("day-never").id)
 
       # a refusal after the allowance is taken gives it back: unblocking
       # someone not blocked, more times than the day allows
@@ -503,6 +519,22 @@ defmodule Hoodride.BlocksTest do
       allow("INSERT")
       assert :ok = Blocks.block(ann.id, bob.id), "the failures cost nothing"
       assert Blocks.blocked?(bob.id, ann.id)
+    end
+
+    # its first look (already blocked? not blocked? — before the allowance)
+    # can't READ the table either: "failed" as ever, never a crash taking the
+    # user's channel down (cross-feature review round 9, 2026-11-25)
+    test "the database can't be read at the first look: 'failed', not a crash" do
+      [ann, bob, carl] = [user("wr-ann"), user("wr-bob"), user("wr-carl")]
+      :ok = Blocks.block(ann.id, bob.id)
+      Repo.query!("ALTER TABLE blocks RENAME TO blocks_away")
+
+      try do
+        assert Blocks.unblock(ann.id, bob.id) == {:error, :failed}
+        assert Blocks.block(ann.id, carl.id) == {:error, :failed}
+      after
+        Repo.query!("ALTER TABLE blocks_away RENAME TO blocks")
+      end
     end
 
     test "the database refuses an unblock: 'failed', still blocked everywhere, the allowance given back" do

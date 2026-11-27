@@ -345,6 +345,26 @@ defmodule HoodrideWeb.BlocksEnforcedTest do
       block!(ann, bob)
       assert_receive {:bob, "request_cancelled", %{from_id: from}}, 1_000
       assert from == ann.user.id
+      # …and Ann's own app told, quietly (not a "decline"): it dropped the
+      # request only on the block's answer — a late answer left it showing
+      assert_receive {:ann, "request_withdrawn", %{driver_id: driver}}, 1_000
+      assert driver == bob.user.id
+      refute_received {:ann, "request_declined", _}
+    end
+
+    # the block's own look (BlockEffects) can come before a request's save:
+    # the save's looks see the block — withdrawn, never left standing
+    # (review, 2026-11-24)
+    test "a request saved after the block looked: withdrawn at once ('unavailable')" do
+      bob = person(:bob, driver!("bx9-bob"))
+      online(bob)
+      ann = person(:ann, user!("bx9-ann"))
+      # (the block saved, its effects not yet run — as in that moment)
+      :ok = Blocks.block(bob.user.id, ann.user.id)
+      assert {:error, :unavailable} = Requests.create(ann.user, bob.user.id)
+      assert Requests.open_request_of(ann.user.id) == nil
+      # (never shown to the driver either)
+      refute_received {:bob, "request", _}
     end
 
     test "a ride together: ended" do
@@ -385,5 +405,31 @@ defmodule HoodrideWeb.BlocksEnforcedTest do
              act(ann, :user, "block", %{"peer" => user!("br-over").id})
 
     assert {:error, %{reason: "bad_request"}} = act(ann, :user, "block", %{"peer" => "x"})
+  end
+
+  # (not blocks — these use this file's people and channels)
+  describe "a request's place (review, 2026-11-24)" do
+    test "a request names the newest message between them when made: the driver's note goes right after it" do
+      bob = person(:bob, driver!("rq-bob"))
+      online(bob)
+      ann = person(:ann, user!("rq-ann"))
+      watch(ann)
+      {:ok, %{id: first}} = Chat.send_message(ann.user, bob.user.id, "hi")
+      assert {:ok, _} = act(ann, :user, "request_ride", %{"to" => bob.user.id})
+      assert_receive {:bob, "request", %{after_id: ^first}}, 1_000
+      # a message after it doesn't move it
+      {:ok, _} = Chat.send_message(ann.user, bob.user.id, "by the benches")
+      assert [%{after_id: ^first}] = Requests.pending_for_driver(bob.user.id)
+    end
+
+    test "no message before it: nil" do
+      bob = person(:bob, driver!("rq2-bob"))
+      online(bob)
+      ann = person(:ann, user!("rq2-ann"))
+      watch(ann)
+      assert {:ok, _} = act(ann, :user, "request_ride", %{"to" => bob.user.id})
+      assert_receive {:bob, "request", %{after_id: nil}}, 1_000
+      assert [%{after_id: nil}] = Requests.pending_for_driver(bob.user.id)
+    end
   end
 end

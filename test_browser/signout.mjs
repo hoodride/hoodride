@@ -20,9 +20,14 @@ await journey("signout: off the map at once; refused in a ride or a waiting requ
   // (drawn just after Dan's app has her: wait for it)
   await dan.waitFor(`[...pileMarkers.values()].some((pm) => pm.el.querySelector('img[src^="hand.svg"]') && !pm.el.textContent.includes("✋"))`, "Dan's map: the hand picture");
 
-  step("Rita signs out: her ✋ leaves Dan's map at once");
+  step("Rita signs out: her ✋ leaves Dan's map at once — and the requests she'd seen (as a driver) leave this phone");
+  // (who asked her for a ride, and when: privacy page, "Signing out removes
+  // them" — cross-feature review, 2026-11-25)
+  await rita.eval(`(markReqSeen(900000001, 1234), true)`);
+  check((await rita.eval(`Object.keys(localStorage).filter((k) => /seenreq/i.test(k)).length`)) > 0, "a seen request kept on this phone", await rita.eval(`Object.keys(localStorage).filter((k) => /seenreq/i.test(k))`));
   await signOut(rita);
   await dan.waitFor(`!realEntries.has(${ritaId})`, "Rita's ✋ gone from Dan's map", 5000);
+  check((await rita.eval(`Object.keys(localStorage).filter((k) => /seenreq/i.test(k)).length`)) === 0, "the seen requests gone from this phone", await rita.eval(`Object.keys(localStorage).filter((k) => /seenreq/i.test(k))`));
   await rita.close(); // done: fewer pages open for the rest
 
   step("Ria (rider) asks Dan for a ride: waiting");

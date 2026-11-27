@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Anile demann lan"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Anile demann lan bay {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Anile demann woulib ou a anvan"
 
@@ -169,6 +173,10 @@ msgstr "Chat yo"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Verifye {fields} (pa plis pase {max} lèt chak)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "N ap verifye…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Chwazi…"
@@ -205,14 +213,6 @@ msgstr "Koneksyon an rekòmanse — peze ANTRE AN LIY pou kondui ankò"
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Koneksyon an rekòmanse — peze ✋ ankò si ou toujou bezwen woulib"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Koneksyon an rekòmanse — woulib ou a fini sanzatann, tanpri fè l ankò"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Koneksyon an rekòmanse — demann woulib ou a pèdi, tanpri mande ankò"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Kontinye ak Facebook"
@@ -244,6 +244,10 @@ msgstr "Pa t ka bloke — eseye ankò"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Nou pa t ka verifye navigatè w la — otorize challenges.cloudflare.com, oswa eseye yon lòt navigatè"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Nou pa t ka konfime — gade Moun ou bloke yo"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "jòn"
 msgid "You already have an open request"
 msgstr "Ou gen yon demann ki louvri deja"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Ou deja mande {name} yon woulib"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Ou ka mete ajou apre woulib ou a"
@@ -904,6 +912,14 @@ msgstr "Machin ou"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Non ak foto ou soti nan {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Woulib ou fini"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Demann woulib ou fini — mande ankò si ou toujou bezwen yon woulib"
 
 #: priv/static/app.js
 msgid "Your rider"

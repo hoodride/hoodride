@@ -98,7 +98,7 @@ defmodule HoodrideWeb.LightReloadSourceTest do
     l = body("loadChat")
     # (then kept to the newest CHAT_KEEP, as everywhere — 2026-11-19)
     assert l =~
-             "c.msgs = HoodChatMerge.keep(HoodChatMerge.merge(body.messages.map(fromServer), c.msgs), CHAT_KEEP);"
+             "c.msgs = HoodChatMerge.keep(placeRestored(HoodChatMerge.merge(body.messages.map(fromServer), c.msgs)), CHAT_KEEP);"
 
     assert l =~ "c.loaded = true;"
     assert l =~ "c.summary = null;"
@@ -185,7 +185,9 @@ defmodule HoodrideWeb.LightReloadSourceTest do
 
   test "a chat's place in the list: its last message, else its summary's, else when it began" do
     s = body("settleLast")
-    assert s =~ "if (last) {"
+    # (a reload's request note older than the summary's last: that one —
+    # restoreRequestNote, 2026-11-24)
+    assert s =~ "if (last && !(last.behind && s)) {"
     assert s =~ "} else if (s) {"
     assert s =~ "c.lastAt = c.emptyAt;"
     # a refused message's chat goes back by the same rule

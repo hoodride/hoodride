@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Annuller anmodning"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Annuller anmodningen til {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Annuller først din anmodning om et lift"
 
@@ -169,6 +173,10 @@ msgstr "Chats"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Tjek: {fields} (højst {max} bogstaver i hvert felt)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Tjekker…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Vælg…"
@@ -205,14 +213,6 @@ msgstr "Forbindelsen blev nulstillet. Tryk på GÅ ONLINE for at køre igen"
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Forbindelsen blev nulstillet. Tryk på ✋ igen, hvis du stadig har brug for et lift"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Forbindelsen blev nulstillet. Din tur sluttede uventet, så aftal den igen"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Forbindelsen blev nulstillet. Din anmodning om et lift gik tabt, så spørg igen"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Fortsæt med Facebook"
@@ -244,6 +244,10 @@ msgstr "Kunne ikke blokere. Prøv igen"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Din browser kunne ikke tjekkes. Tillad challenges.cloudflare.com, eller prøv en anden browser"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Kunne ikke bekræftes. Tjek Blokerede personer"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "gul"
 msgid "You already have an open request"
 msgstr "Du har allerede en åben anmodning"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Du har allerede bedt {name} om en tur"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Du kan opdatere efter din tur"
@@ -904,6 +912,14 @@ msgstr "Din bil"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Dit navn og billede kommer fra {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Din tur er slut"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Din turanmodning er slut. Spørg igen, hvis du stadig har brug for en tur"
 
 #: priv/static/app.js
 msgid "Your rider"

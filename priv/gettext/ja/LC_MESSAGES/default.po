@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "リクエストをキャンセル"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "{name}さんへのリクエストをキャンセル"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "先に乗車リクエストをキャンセルしてください"
 
@@ -169,6 +173,10 @@ msgstr "チャット"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "{fields}を確認してください（それぞれ{max}文字以内）。"
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "確認中…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "選択…"
@@ -205,14 +213,6 @@ msgstr "接続がリセットされました。もう一度運転するには「
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "接続がリセットされました。まだ乗車が必要な場合は、もう一度 ✋ をタップしてください"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "接続がリセットされました。乗車が予期せず終了しました。もう一度設定してください"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "接続がリセットされました。乗車リクエストが失われました。もう一度リクエストしてください"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Facebook で続行"
@@ -244,6 +244,10 @@ msgstr "ブロックできませんでした。もう一度お試しください
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "ブラウザを確認できませんでした。challenges.cloudflare.com を許可するか、別のブラウザをお試しください"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "確認できませんでした。ブロックした人を確認してください"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "黄色"
 msgid "You already have an open request"
 msgstr "すでに未完了のリクエストがあります"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "すでに{name}さんに乗車をリクエストしています"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "乗車後に更新できます"
@@ -904,6 +912,14 @@ msgstr "あなたの車"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "名前と写真は {provider} から取得しています"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "乗車が終了しました"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "乗車リクエストは終了しました。まだ必要なら、もう一度リクエストしてください"
 
 #: priv/static/app.js
 msgid "Your rider"

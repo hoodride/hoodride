@@ -376,7 +376,8 @@ defmodule HoodrideWeb.RideFlowTest do
     ref = push(dchan, "decline_request", %{"rider_id" => rider.id, "req" => req - 7})
     assert_reply ref, :ok
     refute_push "request_declined", %{}, 50
-    assert %{ts: ^req} = Hoodride.Requests.open_request_of(rider.id)
+    ts = Hoodride.Requests.ts_of(req)
+    assert %{ts: ^ts} = Hoodride.Requests.open_request_of(rider.id)
 
     ref = push(dchan, "decline_request", %{"rider_id" => rider.id, "req" => req})
     assert_reply ref, :ok

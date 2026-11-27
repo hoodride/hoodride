@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Verzoek annuleren"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Verzoek aan {name} annuleren"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Annuleer eerst je ritverzoek"
 
@@ -169,6 +173,10 @@ msgstr "Chats"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Controleer: {fields} (max. {max} letters per veld)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Controleren…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Kies…"
@@ -205,14 +213,6 @@ msgstr "Verbinding verbroken. Tik op ONLINE GAAN om weer te rijden"
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Verbinding verbroken. Tik opnieuw op ✋ als je nog een rit nodig hebt"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Verbinding verbroken. Je rit is onverwacht beëindigd. Regel hem opnieuw"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Verbinding verbroken. Je ritverzoek is verloren gegaan. Vraag het opnieuw"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Doorgaan met Facebook"
@@ -244,6 +244,10 @@ msgstr "Blokkeren lukt niet. Probeer het opnieuw"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Je browser kon niet worden gecontroleerd. Sta challenges.cloudflare.com toe of probeer een andere browser"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Kon niet worden bevestigd. Kijk bij Geblokkeerde personen"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "gele"
 msgid "You already have an open request"
 msgstr "Je hebt al een open verzoek"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Je hebt {name} al om een rit gevraagd"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Je kunt vernieuwen na je rit"
@@ -904,6 +912,14 @@ msgstr "Je auto"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Je naam en foto komen van {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Je rit is afgelopen"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Je ritaanvraag is afgelopen. Vraag opnieuw als je nog een rit nodig hebt"
 
 #: priv/static/app.js
 msgid "Your rider"

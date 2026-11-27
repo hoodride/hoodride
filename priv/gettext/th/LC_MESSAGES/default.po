@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "ยกเลิกคำขอ"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "ยกเลิกคำขอถึง {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "ยกเลิกคำขอเรียกรถก่อน"
 
@@ -169,6 +173,10 @@ msgstr "แชท"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "ตรวจสอบ{fields} (ไม่เกิน {max} ตัวอักษรต่อช่อง)"
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "กำลังตรวจสอบ…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "เลือก…"
@@ -205,14 +213,6 @@ msgstr "การเชื่อมต่อถูกรีเซ็ต แต�
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "การเชื่อมต่อถูกรีเซ็ต แตะ ✋ อีกครั้งหากยังต้องการรถ"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "การเชื่อมต่อถูกรีเซ็ต การเดินทางของคุณสิ้นสุดลงโดยไม่คาดคิด โปรดนัดหมายใหม่อีกครั้ง"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "การเชื่อมต่อถูกรีเซ็ต คำขอเรียกรถของคุณหายไป โปรดขออีกครั้ง"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "ดำเนินการต่อด้วย Facebook"
@@ -244,6 +244,10 @@ msgstr "บล็อกไม่ได้ โปรดลองอีกคร�
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "ตรวจสอบเบราว์เซอร์ของคุณไม่ได้ โปรดอนุญาต challenges.cloudflare.com หรือลองใช้เบราว์เซอร์อื่น"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "ยืนยันไม่ได้ — ดูที่คนที่บล็อกไว้"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "เหลือง"
 msgid "You already have an open request"
 msgstr "คุณมีคำขอที่ยังเปิดอยู่แล้ว"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "คุณขอติดรถ {name} ไปแล้ว"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "คุณรีเฟรชได้หลังจบการเดินทาง"
@@ -904,6 +912,14 @@ msgstr "รถของคุณ"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "ชื่อและรูปภาพของคุณมาจาก {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "การเดินทางของคุณสิ้นสุดแล้ว"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "คำขอเดินทางของคุณสิ้นสุดแล้ว — ถ้ายังต้องการ ขอใหม่ได้เลย"
 
 #: priv/static/app.js
 msgid "Your rider"

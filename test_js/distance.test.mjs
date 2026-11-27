@@ -84,6 +84,21 @@ test("a shared block ages from when it was sent (the server's age) plus the time
   assert.equal(D.target({ shared, now: 1000 + 15 * 60_000 }).ageMs, 20 * 60_000);
 });
 
+// a car that left your map: its last block, aged from when it left (owner,
+// 2026-11-22: the rider's chat went blank when the driver went offline)
+test("a car gone from the map: its last block, aged from when it left — below the map, beside a shared block (the newer wins)", () => {
+  const map = { lat: 2, lng: 0 };
+  const lastSeen = { lat: 4, lng: 0, at: 1000 };
+  assert.deepEqual(D.target({ lastSeen, now: 1000 + 3 * 60_000 }), { lat: 4, lng: 0, ageMs: 3 * 60_000 });
+  assert.deepEqual(D.target({ mapPos: map, lastSeen, now: 5000 }), { lat: 2, lng: 0, ageMs: null }, "back on the map: the map's");
+  assert.deepEqual(D.target({ ridePos: { lat: 1, lng: 0 }, lastSeen, now: 5000 }), { lat: 1, lng: 0, ageMs: null });
+  // shared 10 min ago vs left 3 min ago → last seen; and the other way
+  const shared = { lat: 3, lng: 0, ageAtRx: 10 * 60_000, rxAt: 1000 };
+  assert.equal(D.target({ shared, lastSeen, now: 1000 + 3 * 60_000 }).lat, 4);
+  const oldSeen = { lat: 4, lng: 0, at: -20 * 60_000 };
+  assert.equal(D.target({ shared, lastSeen: oldSeen, now: 1000 }).lat, 3);
+});
+
 test("the label: distance, and the age only for a shared block", () => {
   const here = { lat: 0, lng: 0 };
   assert.equal(D.label(here, { lat: 0.5, lng: 0, ageMs: null }, flat, "mi"), "0.4 mi away");

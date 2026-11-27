@@ -82,3 +82,11 @@ test("the same message objects come back (a bubble can be found by its message)"
   const r = M.merge([msg(1), msg(2)], [live, n]);
   assert.ok(r.includes(live) && r.includes(n));
 });
+
+// (review, 2026-11-25) a chat on a later page (no message id known): a
+// request, withdrawn, then she writes — the line goes before what came
+// after it, not below it
+test("a note with nothing known before it goes before a message that came AFTER it", () => {
+  const r = M.merge([msg(5), msg(9, "sorry")], [note("📩", 5), note("withdrawn", null), msg(9, "sorry")]);
+  assert.deepEqual(texts(r), ["m5", "📩", "withdrawn", "sorry"]);
+});

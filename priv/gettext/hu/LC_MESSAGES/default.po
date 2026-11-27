@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Kérés visszavonása"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Kérés visszavonása: {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Előbb vond vissza a fuvarkérésedet"
 
@@ -169,6 +173,10 @@ msgstr "Csevegések"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Ellenőrizd: {fields} (mezőnként legfeljebb {max} betű)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Ellenőrzés…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Válassz…"
@@ -205,14 +213,6 @@ msgstr "A kapcsolat újraindult – koppints az ONLINE LESZEK gombra, hogy újra
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "A kapcsolat újraindult – koppints újra a ✋ jelre, ha még kell fuvar"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "A kapcsolat újraindult – a fuvarod váratlanul véget ért, kérlek, szervezd meg újra"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "A kapcsolat újraindult – a fuvarkérésed elveszett, kérlek, kérj újra"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Folytatás a Facebookkal"
@@ -244,6 +244,10 @@ msgstr "Nem sikerült letiltani – próbáld újra"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Nem sikerült ellenőrizni a böngésződet – engedélyezd a challenges.cloudflare.com oldalt, vagy próbálj ki egy másik böngészőt"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Nem sikerült megerősíteni. Nézd meg a Letiltott személyeket"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "sárga"
 msgid "You already have an open request"
 msgstr "Már van nyitott kérésed"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Már kértél fuvart tőle: {name}"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "A fuvar után frissíthetsz"
@@ -904,6 +912,14 @@ msgstr "Az autód"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "A neved és a fotód innen származik: {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Az utad véget ért"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Az utazási kérésed véget ért. Kérj újra, ha még szükséged van fuvarra"
 
 #: priv/static/app.js
 msgid "Your rider"

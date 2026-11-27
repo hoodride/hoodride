@@ -19,6 +19,33 @@ defmodule Hoodride.RequestsEdgeTest do
   defp on_map(id),
     do: Hoodride.Geo.driver_update(%{id: id, name: "D#{id}", photo: nil}, "cell8", nil)
 
+  # the request stamp's offset: fixed at boot, never computed at first use —
+  # two first uses a moment apart disagreed by a second (a probe saw both
+  # values within 1.2 s), and a Decline named a request that never existed
+  # (review, 2026-11-25)
+  test "the request stamp's offset is set at boot and only ever read" do
+    key = {Requests, :req_offset}
+    boot = :persistent_term.get(key)
+    assert is_integer(boot)
+
+    seen =
+      for _ <- 1..60, into: MapSet.new() do
+        v = Requests.req_of(0)
+        Process.sleep(20)
+        v
+      end
+
+    assert MapSet.to_list(seen) == [boot]
+    # (a use never writes it)
+    :persistent_term.erase(key)
+
+    try do
+      assert_raise ArgumentError, fn -> Requests.req_of(0) end
+    after
+      :persistent_term.put(key, boot)
+    end
+  end
+
   test "fresh requests are not expired" do
     on_map(22)
     :ok = Requests.create(rider(11), 22)
@@ -42,6 +69,27 @@ defmodule Hoodride.RequestsEdgeTest do
 
   test "cancel of nothing is a no-op error" do
     assert {:error, :none} = Requests.cancel(11)
+  end
+
+  # a block withdraws the request it SAW (BlockEffects): a newer one, to
+  # another driver, made in between, stays (review, 2026-11-24)
+  test "withdraw takes only that request — never a newer one to another driver" do
+    on_map(22)
+    on_map(33)
+    :ok = Requests.create(rider(11), 22)
+    %{ts: old} = Requests.open_request_of(11)
+    :ok = Requests.cancel(11)
+    Phoenix.PubSub.subscribe(Hoodride.PubSub, "user:33")
+    :ok = Requests.create(rider(11), 33)
+
+    assert {:error, :none} = Requests.withdraw(11, 22, old)
+    assert %{driver_id: 33} = Requests.open_request_of(11)
+    refute_received %Phoenix.Socket.Broadcast{event: "request_cancelled"}
+
+    %{ts: now} = Requests.open_request_of(11)
+    assert :ok = Requests.withdraw(11, 33, now)
+    assert Requests.open_request_of(11) == nil
+    assert_received %Phoenix.Socket.Broadcast{event: "request_cancelled", payload: %{from_id: 11}}
   end
 
   test "open_between? sees both directions" do
@@ -187,6 +235,128 @@ defmodule Hoodride.RequestsEdgeTest do
       :ok
     end
 
+    # a state read between the request's save and its announce: its place
+    # among their messages already known — not nil, "before them all"
+    # (review, 2026-11-24)
+    test "a request read before it's announced already knows its place among their messages" do
+      on_map(22)
+      key = Hoodride.Chat.pair_key(11, 22)
+      :ets.insert(:chat_messages, {key, 4242, 11, "hi", System.system_time(:second)})
+      me = self()
+
+      Application.put_env(:hoodride, :requests_hook, fn
+        :saved -> send(me, {:seen, Requests.pending_for_driver(22)})
+        _ -> nil
+      end)
+
+      :ok = Requests.create(rider(11), 22)
+      assert_received {:seen, [%{after_id: 4242}]}
+    end
+
+    # a second tap, refused: the open request's place kept (a stray row of
+    # the refused one, another second, goes with the repair pass)
+    test "a refused second request never overwrites the open one's place" do
+      on_map(22)
+      :ok = Requests.create(rider(11), 22)
+      assert [%{after_id: nil}] = Requests.pending_for_driver(22)
+
+      :ets.insert(
+        :chat_messages,
+        {Hoodride.Chat.pair_key(11, 22), 777, 11, "hi", System.system_time(:second)}
+      )
+
+      assert {:error, :already_requested} = Requests.create(rider(11), 22)
+      assert [%{after_id: nil}] = Requests.pending_for_driver(22)
+    end
+
+    # two creates with the same key: the FIRST place written wins — a
+    # message landing between the two writes never moves the one the
+    # twin wrote (and may have announced) first
+    test "a twin create never overwrites the place written first" do
+      on_map(22)
+      key = Hoodride.Chat.pair_key(11, 22)
+      :ets.insert(:chat_messages, {key, 100, 11, "first", System.system_time(:second)})
+
+      Application.put_env(:hoodride, :requests_hook, fn
+        # the twin, first: its place written (after "first"), then a message
+        :saving ->
+          :ets.insert_new(:request_after, {{11, 22, System.monotonic_time(:second)}, 100})
+          :ets.insert(:chat_messages, {key, 200, 11, "second", System.system_time(:second)})
+
+        _ ->
+          nil
+      end)
+
+      :ok = Requests.create(rider(11), 22)
+      assert [%{after_id: 100}] = Requests.pending_for_driver(22)
+    end
+
+    # two creates with the same key at once (two connections of one
+    # account): the winner's place is the same row — the refused one never
+    # deletes it (review, 2026-11-25)
+    test "a twin create refused never deletes the winner's place" do
+      on_map(22)
+
+      :ets.insert(
+        :chat_messages,
+        {Hoodride.Chat.pair_key(11, 22), 4242, 11, "hi", System.system_time(:second)}
+      )
+
+      Application.put_env(:hoodride, :requests_hook, fn
+        # the twin wins the save meanwhile, under this same key
+        :placed ->
+          [{{11, 22, ts}, _}] = :ets.lookup(:request_after, :ets.first(:request_after))
+          :ets.insert(:ride_requests, {11, 22, ts})
+
+        _ ->
+          nil
+      end)
+
+      assert {:error, :already_requested} = Requests.create(rider(11), 22)
+      assert [%{after_id: 4242}] = Requests.pending_for_driver(22)
+    end
+
+    # the repair pass during a failed Accept (the request taken out, put
+    # back): its place survives — an open request's place is never swept
+    # while the request can still be standing (review, 2026-11-25)
+    test "a repair pass while a failed Accept puts the request back keeps its place" do
+      on_map(22)
+
+      :ets.insert(
+        :chat_messages,
+        {Hoodride.Chat.pair_key(11, 22), 4242, 11, "hi", System.system_time(:second)}
+      )
+
+      old = System.monotonic_time(:second) - 120
+      :ets.insert(:ride_requests, {11, 22, old})
+      :ets.insert(:requests_by_driver, {{22, 11}, old})
+      :ets.insert(:request_after, {{11, 22, old}, 4242})
+
+      Application.put_env(:hoodride, :requests_hook, fn
+        :start ->
+          :ok = Requests.heal_index(300)
+          {:error, :boom}
+
+        _ ->
+          nil
+      end)
+
+      assert {:error, :boom} = Requests.accept(%{id: 22, name: "D22", photo: nil}, 11)
+      assert [%{after_id: 4242}] = Requests.pending_for_driver(22)
+    end
+
+    # the repair pass: a place young enough that its request may still
+    # stand (a create still saving, an Accept putting it back) — left; a
+    # stray older than any request can be goes
+    test "the repair pass leaves a place its request may still need, removes an old stray" do
+      now = System.monotonic_time(:second)
+      :ets.insert(:request_after, {{11, 22, now}, 5})
+      :ets.insert(:request_after, {{12, 22, now - 400}, 6})
+      :ok = Requests.heal_index(300)
+      assert :ets.lookup(:request_after, {11, 22, now}) != []
+      assert :ets.lookup(:request_after, {12, 22, now - 400}) == []
+    end
+
     # a Decline is for the request the driver SAW: one sent while a newer
     # request replaced it (the first expired, the rider asked again — the
     # Decline was on its way, or queued on a bad connection) never wipes
@@ -213,8 +383,14 @@ defmodule Hoodride.RequestsEdgeTest do
       on_map(22)
       :ok = Requests.create(rider(11), 22)
       %{ts: ts} = Requests.open_request_of(11)
-      assert_receive %Phoenix.Socket.Broadcast{event: "request", payload: %{req: ^ts}}
+      assert_receive %Phoenix.Socket.Broadcast{event: "request", payload: %{req: req}}
       assert [%{rider_id: 11, ts: ^ts}] = Requests.pending_for_driver(22)
+      # the stamp the apps see never repeats across server boots: the
+      # steady clock starts at the SAME value every boot (-576460752 s), so
+      # its seconds alone came back after a restart — a driver's app that
+      # kept "withdrawn: X" ignored a new request X (review, 2026-11-25).
+      # Anchored to the wall clock at boot instead, the same within a boot
+      assert abs(req - System.system_time(:second)) <= 5
     end
 
     # the rider's own ride started (another driver's Accept) between the
@@ -609,6 +785,46 @@ defmodule Hoodride.RequestsEdgeTest do
       }
 
       refute_receive %Phoenix.Socket.Broadcast{event: "request"}, 50
+    end
+
+    # the driver's message mid-write (its id taken, not stored yet) as the
+    # request reads its place: the place waits for it — read under the
+    # pair's lock (review, 2026-11-25: placed before it, the reload put the
+    # note above his message and counted it answered)
+    test "a request's place never misses a message being written" do
+      on_map(22)
+      me = self()
+      on_exit(fn -> Application.delete_env(:hoodride, :chat_hook) end)
+
+      Application.put_env(:hoodride, :chat_hook, fn
+        :indexed ->
+          send(me, {:writing, self()})
+
+          receive do
+            :go -> :ok
+          after
+            5_000 -> :ok
+          end
+
+        _ ->
+          :ok
+      end)
+
+      sender =
+        Task.async(fn ->
+          Hoodride.Chat.send_message(%{id: 22, name: "D22", photo: nil}, 11, "on my way")
+        end)
+
+      assert_receive {:writing, writer}, 2_000
+      Application.delete_env(:hoodride, :chat_hook)
+      creator = Task.async(fn -> Requests.create(rider(11), 22) end)
+      # (the request given its chance to read the place mid-write: done
+      # already, or waiting on the pair's lock)
+      early = Task.yield(creator, 200)
+      send(writer, :go)
+      {:ok, %{id: id}} = Task.await(sender)
+      assert {:ok, :ok} = early || Task.yield(creator, 5_000)
+      assert [%{after_id: ^id}] = Requests.pending_for_driver(22)
     end
   end
 end

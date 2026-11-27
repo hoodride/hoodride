@@ -113,6 +113,18 @@ test("the list line: what you typed and didn't send (a draft) over the last mess
   assert.deepEqual(L.preview({ msgs: [], draft: "hey" }), { draft: true, text: "hey" });
 });
 
+// a request's note put back by a reload, older than the chat's last
+// message (still a summary): the line is that newer message (2026-11-24)
+test("the list line: a note put back behind a newer message shows the message, not the note", () => {
+  const summary = { last: { preview: "I'm by the benches" } };
+  const note = { text: "📩 requested a ride", behind: true };
+  assert.deepEqual(L.preview({ msgs: [note], summary }), { draft: false, text: "I'm by the benches" });
+  // (the note newer — not behind — it's the line, as any held message)
+  assert.deepEqual(L.preview({ msgs: [{ text: "📩 requested a ride" }], summary }), { draft: false, text: "📩 requested a ride" });
+  // (behind, but no summary to show instead: the note)
+  assert.deepEqual(L.preview({ msgs: [note] }), { draft: false, text: "📩 requested a ride" });
+});
+
 test("a rebuild (reconnect, reopen) keeps every draft, and — while the chat window is open — the empty chats too", () => {
   const held = [
     { id: 1, server: true, msgs: [{ text: "hi" }], draft: "half typed" },

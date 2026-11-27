@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Batalkan permintaan"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Batalkan permintaan kepada {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Batalkan permintaan tumpangan Anda dulu"
 
@@ -169,6 +173,10 @@ msgstr "Chat"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Periksa {fields} (maksimal {max} huruf per kolom)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Memeriksa…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Pilih…"
@@ -205,14 +213,6 @@ msgstr "Koneksi direset — ketuk AKTIFKAN untuk mengemudi lagi"
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Koneksi direset — ketuk ✋ lagi jika Anda masih butuh tumpangan"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Koneksi direset — perjalanan Anda berakhir secara tiba-tiba, silakan atur ulang"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Koneksi direset — permintaan tumpangan Anda hilang, silakan minta lagi"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Lanjutkan dengan Facebook"
@@ -244,6 +244,10 @@ msgstr "Tidak dapat memblokir — coba lagi"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Browser Anda tidak dapat diperiksa — izinkan challenges.cloudflare.com, atau coba browser lain"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Tidak bisa dipastikan — cek Orang yang diblokir"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "kuning"
 msgid "You already have an open request"
 msgstr "Anda sudah punya permintaan yang terbuka"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Anda sudah meminta tumpangan kepada {name}"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Anda bisa memperbarui setelah perjalanan"
@@ -904,6 +912,14 @@ msgstr "Mobil Anda"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Nama dan foto Anda berasal dari {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Perjalananmu sudah selesai"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Permintaan perjalananmu sudah berakhir — minta lagi kalau masih butuh tumpangan"
 
 #: priv/static/app.js
 msgid "Your rider"

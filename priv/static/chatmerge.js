@@ -19,7 +19,10 @@
   //    Send waits): either way, not added again.
   // 3. Then each note right after the message it came after — after any
   //    note already placed there, so they keep their order. One with
-  //    nothing before it, or after a message that's gone: at the end.
+  //    nothing before it, or after a message that's gone: before the
+  //    first held message that came AFTER it (a chat on a later page knows
+  //    no id: a withdrawn line went below what she wrote since — review,
+  //    2026-11-25), else at the end.
   //
   // The same objects come back (a bubble is found by its message); the two
   // lists given are left as they were.
@@ -29,10 +32,14 @@
     held.forEach((m) => {
       if (m.id != null && m.id > newest) result.push(m);
     });
-    held.forEach((n) => {
+    held.forEach((n, k) => {
       if (n.id != null) return;
       let i = n.after == null ? -1 : result.findIndex((m) => m.id === n.after);
-      if (i < 0) return result.push(n);
+      if (i < 0) {
+        const ids = new Set(held.slice(k + 1).filter((m) => m.id != null).map((m) => m.id));
+        const at = result.findIndex((m) => m.id != null && ids.has(m.id));
+        return at < 0 ? result.push(n) : result.splice(at, 0, n);
+      }
       while (i + 1 < result.length && result[i + 1].id == null && result[i + 1].after === n.after) i++;
       result.splice(i + 1, 0, n);
     });

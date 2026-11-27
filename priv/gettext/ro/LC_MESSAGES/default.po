@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Anulează cererea"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Anulează cererea către {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Mai întâi anulează-ți cererea de cursă"
 
@@ -169,6 +173,10 @@ msgstr "Chaturi"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Verifică: {fields} (maximum {max} litere fiecare)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Se verifică…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Alege…"
@@ -205,14 +213,6 @@ msgstr "Conexiunea s-a resetat – atinge INTRĂ ONLINE ca să conduci din nou"
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Conexiunea s-a resetat – atinge din nou ✋ dacă încă ai nevoie de o cursă"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Conexiunea s-a resetat – cursa s-a încheiat neașteptat, stabiliți-o din nou"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Conexiunea s-a resetat – cererea ta de cursă s-a pierdut, cere din nou"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Continuă cu Facebook"
@@ -244,6 +244,10 @@ msgstr "Nu s-a putut bloca – încearcă din nou"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Nu ți-am putut verifica browserul – permite challenges.cloudflare.com sau încearcă alt browser"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Nu s-a putut confirma. Verifică Persoane blocate"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "galben"
 msgid "You already have an open request"
 msgstr "Ai deja o cerere deschisă"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Ai cerut deja o cursă de la {name}"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Poți reîmprospăta după cursă"
@@ -904,6 +912,14 @@ msgstr "Mașina ta"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Numele și fotografia vin din contul {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Cursa ta s-a încheiat"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Cererea ta de cursă s-a încheiat. Cere din nou dacă mai ai nevoie de o cursă"
 
 #: priv/static/app.js
 msgid "Your rider"

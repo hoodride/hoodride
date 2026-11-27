@@ -33,14 +33,28 @@
   const ORDER = ["ride", "request", "hand", "shift"];
 
   function lost(before, after) {
-    return ORDER.filter((k) => before[k] && !after[k] && !(k === "request" && after.ride));
+    // (not lost: a request that became a ride; a driver's shift during a
+    // ride — off the map by design; a rider's ✋ while she has a request or
+    // a ride — kept on the server, only hidden here: final review,
+    // 2026-11-26 — "tap GO ONLINE" mid-ride, "tap ✋ again" while waiting)
+    return ORDER.filter(
+      (k) =>
+        before[k] &&
+        !after[k] &&
+        !(k === "request" && after.ride) &&
+        !(k === "shift" && after.ride) &&
+        !(k === "hand" && (after.ride || after.request))
+    );
   }
 
   // (each a function: translated when shown, in the language then)
   const MESSAGES = {
     // (not "message them": after a restart the chat is gone too)
-    ride: () => t("Connection reset — your ride ended unexpectedly, please set it up again"),
-    request: () => t("Connection reset — your ride request was lost, please ask again"),
+    // (what happened, never why: a snapshot can't tell a restart from a
+    // decline, her own cancel or block, or a ride — the guesses kept being
+    // wrong: owner, 2026-11-26)
+    ride: () => t("Your ride ended"),
+    request: () => t("Your ride request ended — ask again if you still need a ride"),
     hand: () => t("Connection reset — tap ✋ again if you still need a ride"),
     shift: () => t("Connection reset — tap GO ONLINE to drive again"),
   };

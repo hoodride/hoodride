@@ -60,14 +60,36 @@ test("only losses count — something NEW from the server is not a loss", () => 
   );
 });
 
+// (final review, 2026-11-26) nothing false about a ✋ or a shift: a driver
+// in a ride is off the map by design (his shift isn't lost — GO ONLINE is
+// hidden), and a rider with a request or a ride keeps her ✋ on the server
+// though the app hides it then (not "tap ✋ again")
+test("a driver in a ride hasn't lost his shift; a rider with a request or a ride hasn't lost her ✋", () => {
+  const inRide = { status: "connected" };
+  assert.deepEqual(R.lost(R.summarize(v({ mode: "driver", online: true, ride: inRide })), R.summarize(v({ mode: "driver", online: false, ride: inRide }))), []);
+  for (const after of [{ status: "requested" }, { status: "connected" }]) {
+    assert.deepEqual(R.lost(R.summarize(v({ handRaised: true, ride: { status: "requested" } })), R.summarize(v({ ride: after }))), []);
+  }
+  // (…while a real loss is still said: the shift with no ride, the ✋ alone)
+  assert.deepEqual(R.lost(R.summarize(v({ mode: "driver", online: true })), R.summarize(v({ mode: "driver" }))), ["shift"]);
+  assert.deepEqual(R.lost(R.summarize(v({ handRaised: true })), R.summarize(v({}))), ["hand"]);
+});
+
 test("several losses at once: the most important one is told (ride > request > hand > shift)", () => {
   assert.match(R.lostBanner(["hand", "ride"]), /ride ended/i);
   assert.match(R.lostBanner(["shift", "request"]), /request/i);
   assert.match(R.lostBanner(["shift", "hand"]), /✋/);
 });
 
-test("every banner says why: the connection was reset", () => {
-  for (const k of ["ride", "request", "hand", "shift"]) assert.match(R.lostBanner([k]), /connection/i);
+// (owner, 2026-11-26) a request or ride gone from a snapshot is said as what
+// happened — never why: a decline, her own cancel or block, a ride, a restart
+// all look the same, and the guesses kept being wrong
+test("a request or a ride gone: said as a fact ('ended'), never a reason", () => {
+  for (const k of ["ride", "request"]) {
+    assert.match(R.lostBanner([k]), /ended/i);
+    assert.doesNotMatch(R.lostBanner([k]), /lost|unexpectedly|connection/i);
+  }
+  for (const k of ["hand", "shift"]) assert.match(R.lostBanner([k]), /connection/i);
 });
 
 // A refused ride join used to end the ride locally whatever the reason. A

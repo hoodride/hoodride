@@ -37,7 +37,10 @@ defmodule HoodrideWeb.OfflineTest do
   test "the socket tells the watch when it opens, closes or fails" do
     [connect] = Regex.run(~r/async function connectSocket\(.*?\n}\n/s, @app)
     assert connect =~ "connWatch.up();"
-    assert connect =~ ~s[socket.onClose(() => connWatch.down());]
+    # (and the loss noted for "last seen" ages — lastKnownAt, 2026-11-25)
+    assert connect =~ "socket.onClose(() => {
+    connWatch.down();
+    connectionLost();"
     [on_error] = Regex.run(~r/socket\.onError\(\(\) => \{.*?\n  \}\);/s, connect)
     assert on_error =~ "connWatch.down();"
   end

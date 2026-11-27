@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "İsteği iptal et"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "İsteği iptal et: {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Önce yolculuk isteğini iptal et"
 
@@ -169,6 +173,10 @@ msgstr "Sohbetler"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Şu alanları kontrol et: {fields} (her biri en fazla {max} harf)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Kontrol ediliyor…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Seç…"
@@ -205,14 +213,6 @@ msgstr "Bağlantı sıfırlandı. Yeniden sürücü olmak için ÇEVRİMİÇİ O
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Bağlantı sıfırlandı. Hâlâ araç lazımsa ✋ simgesine tekrar dokun"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Bağlantı sıfırlandı. Yolculuğun beklenmedik şekilde sona erdi, lütfen yeniden ayarla"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Bağlantı sıfırlandı. Yolculuk isteğin kayboldu, lütfen tekrar iste"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Facebook ile devam et"
@@ -244,6 +244,10 @@ msgstr "Engellenemedi. Tekrar dene"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Tarayıcın kontrol edilemedi. challenges.cloudflare.com'a izin ver veya başka bir tarayıcı dene"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Doğrulanamadı. Engellenen kişilere bak"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "sarı"
 msgid "You already have an open request"
 msgstr "Zaten açık bir isteğin var"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Zaten bir sürücüden yolculuk istedin: {name}"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Yolculuğundan sonra yenileyebilirsin"
@@ -904,6 +912,14 @@ msgstr "Aracın"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Adın ve fotoğrafın {provider} hesabından geliyor"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Yolculuğun sona erdi"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Yolculuk isteğin sona erdi. Hâlâ yolculuğa ihtiyacın varsa tekrar iste"
 
 #: priv/static/app.js
 msgid "Your rider"

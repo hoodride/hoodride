@@ -77,7 +77,11 @@ defmodule HoodrideWeb.AreasFromSpotTest do
     end
 
     test "the app's new message — the block only — is enough", %{chan: chan, user: u} do
-      push(chan, "driver_update", %{"spot" => @spot})
+      ref = push(chan, "driver_update", %{"spot" => @spot})
+      # (placed: "ok" — the app retries an update that got no answer; with
+      # none ever sent for a placed car, every one timed out and was sent
+      # again: final review, 2026-11-26)
+      assert_reply ref, :ok
       settled(chan)
       assert Hoodride.Geo.driver_cell(u.id) == @cell
       assert counted_in(u.id) == [{u.id, :driver, @wider}]

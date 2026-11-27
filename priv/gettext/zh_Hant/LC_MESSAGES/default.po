@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "取消請求"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "取消向{name}發出的請求"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "請先取消你的搭車請求"
 
@@ -169,6 +173,10 @@ msgstr "聊天"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "請檢查{fields}（每項最多 {max} 個字）。"
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "正在檢查…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "請選擇…"
@@ -205,14 +213,6 @@ msgstr "連線已重設，輕觸「上線」即可繼續開車"
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "連線已重設，如果你仍需要搭車，請再輕觸一次 ✋"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "連線已重設，你的行程意外結束，請重新安排"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "連線已重設，你的搭車請求已遺失，請重新提出"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "使用 Facebook 繼續"
@@ -244,6 +244,10 @@ msgstr "無法封鎖，請再試一次"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "無法檢查你的瀏覽器，請允許 challenges.cloudflare.com，或改用其他瀏覽器"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "無法確認，請查看已封鎖的人"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "黃色"
 msgid "You already have an open request"
 msgstr "你已經有一個尚未完成的請求"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "你已經向{name}請求搭車了"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "行程結束後即可更新"
@@ -904,6 +912,14 @@ msgstr "你的車"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "你的名稱和大頭貼來自 {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "你的行程已結束"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "你的乘車請求已結束。如果還需要，請再次請求"
 
 #: priv/static/app.js
 msgid "Your rider"

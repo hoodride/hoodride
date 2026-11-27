@@ -81,6 +81,13 @@ function watchTheTest() {
   });
 }
 
+// …and one whose reply is an answer, not "ok" (diagnostics)
+export async function serverAsk(what) {
+  readStdin();
+  console.log(`@@server ${what}`);
+  return await stdinLines.next();
+}
+
 export async function server(what) {
   readStdin();
   console.log(`@@server ${what}`);

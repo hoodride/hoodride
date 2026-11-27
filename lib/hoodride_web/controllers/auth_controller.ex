@@ -677,7 +677,7 @@ defmodule HoodrideWeb.AuthController do
             unread_rest: page.unread_rest,
             read_known: page.read_known,
             open_request: open_request_state(open, people),
-            pending_requests: pending_request_state(pending, people),
+            pending_requests: pending_request_state(pending, people, u.id),
             # live map presence, so a reload RESUMES a raised hand or an
             # on-duty shift instead of orphaning the row as a ghost
             hand: Hoodride.Geo.hand_of(u.id),
@@ -901,6 +901,27 @@ defmodule HoodrideWeb.AuthController do
   # owner, 2026-11-15). Name and photo only. An account that's gone simply
   # isn't listed. `more`: where the next page starts, or nil. (No count:
   # the link is always there, owner 2026-11-18 — the list says "nobody".)
+  # GET /api/blocks?peer=<id> — do I block them? `{blocking: true|false}`:
+  # the app settles a Block/Unblock whose answers were lost (its sheet's
+  # "Checking…" — cross-feature review round 11, 2026-11-25). Only your
+  # own blocks, as the list.
+  def blocks(conn, %{"peer" => peer}) do
+    conn = put_resp_header(conn, "cache-control", "no-store")
+
+    # (a plain id only: not a map or a list joined into another id, never
+    # past 64 bits — round 12)
+    with {:user, %{} = user} <- {:user, conn.assigns.current_user},
+         {:peer, {id, ""}} when id > 0 and id < 9_223_372_036_854_775_807 <-
+           {:peer, if(is_binary(peer), do: Integer.parse(peer), else: :error)},
+         {:ok, blocking} <- Hoodride.Blocks.blocking(user.id, id) do
+      json(conn, %{blocking: blocking})
+    else
+      {:user, _} -> conn |> put_status(401) |> json(%{error: "unauthenticated"})
+      {:peer, _} -> conn |> put_status(400) |> json(%{error: "bad_peer"})
+      {:error, :failed} -> conn |> put_status(503) |> json(%{error: "busy"})
+    end
+  end
+
   def blocks(conn, params) do
     conn = put_resp_header(conn, "cache-control", "no-store")
 
@@ -941,10 +962,20 @@ defmodule HoodrideWeb.AuthController do
          do: %{driver: driver_person(d), ts: Hoodride.Requests.wall_ts(r.ts)}
   end
 
-  defp pending_request_state(pending, people) do
+  defp pending_request_state(pending, people, driver_id) do
     for r <- pending, rd = people[r.rider_id], rd != nil do
       # req: which request — a Decline names it (Requests.decline/3)
-      %{rider: person(rd), ts: Hoodride.Requests.wall_ts(r.ts), req: r.ts, spot: r.spot}
+      # after: the newest message id between them when it was made — the
+      # driver's note goes right after it (review, 2026-11-24)
+      # answered: the driver has written to them since (any phone of his)
+      %{
+        rider: person(rd),
+        ts: Hoodride.Requests.wall_ts(r.ts),
+        req: Hoodride.Requests.req_of(r.ts),
+        spot: r.spot,
+        after_id: r.after_id,
+        answered: Hoodride.Chat.sent_after?(driver_id, r.rider_id, r.after_id)
+      }
     end
   end
 

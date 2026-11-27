@@ -179,6 +179,10 @@ defmodule HoodrideWeb.CancelAcceptRaceTest do
       # (the driver told: it's off their list)
       assert_push "request_cancelled", %{from_id: from}
       assert from == rider.id
+      # (…and the RIDER told her cancel is done after all — told only
+      # "accepted" before, her app couldn't know: round 18)
+      driver_id = driver.id
+      assert_push "cancel_done", %{driver_id: ^driver_id}
       assert Hoodride.Rides.ride_id_of_user(rider.id) == nil
     end
 
@@ -368,9 +372,12 @@ defmodule HoodrideWeb.CancelAcceptRaceTest do
     end
   end
 
-  test "nothing to cancel and no ride: still 'ok'", %{rider: rider} do
+  # …but saying so: nothing was cancelled (a decline or an expiry took it
+  # first) — the app says "Request cancelled" only for a real one, never
+  # over "Driver can't take this one" (review round 20, 2026-11-26)
+  test "nothing to cancel and no ride: still 'ok', with nothing done", %{rider: rider} do
     {:ok, _, rchan} = subscribe_and_join(connect_as(rider), "user:#{rider.id}", %{})
     ref = push(rchan, "cancel_request", %{})
-    assert_reply ref, :ok
+    assert_reply ref, :ok, %{done: false}
   end
 end

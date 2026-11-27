@@ -18,7 +18,9 @@
 // ride partners share one); the block they show on your map (a car or a ✋
 // your role sees); the block they last SHARED by messaging or requesting a
 // ride (someone not driving shares a ~170 m block that way — with its age,
-// since it's a snapshot); else nothing. Never anyone's live position
+// since it's a snapshot) or the block a car was on when it LEFT your map
+// (offline, out of view: also a snapshot, with its age — the newer of the
+// two wins); else nothing. Never anyone's live position
 // outside a ride.
 //
 // MILES OR KM, automatically — the standard way: the user's locale looked
@@ -103,13 +105,17 @@
     return min < 60 ? t("{n} min ago", { n: min }) : t("{n} h ago", { n: Math.floor(min / 60) });
   }
 
-  // the position to measure to: {lat, lng, ageMs} (ageMs only for a shared
-  // block: the server's age when it arrived + the time since), or null
-  function target({ ridePos, mapPos, shared, now }) {
+  // the position to measure to: {lat, lng, ageMs} (ageMs for a snapshot: a
+  // shared block — the server's age when it arrived + the time since — or
+  // the block a car was last on your map, {lat, lng, at}: the time since it
+  // left), or null. Of two snapshots, the newer
+  function target({ ridePos, mapPos, shared, lastSeen, now }) {
     if (ridePos) return { lat: ridePos.lat, lng: ridePos.lng, ageMs: null };
     if (mapPos) return { lat: mapPos.lat, lng: mapPos.lng, ageMs: null };
-    if (shared) return { lat: shared.lat, lng: shared.lng, ageMs: shared.ageAtRx + (now - shared.rxAt) };
-    return null;
+    const s = shared ? { lat: shared.lat, lng: shared.lng, ageMs: shared.ageAtRx + (now - shared.rxAt) } : null;
+    const l = lastSeen ? { lat: lastSeen.lat, lng: lastSeen.lng, ageMs: now - lastSeen.at } : null;
+    if (s && l) return l.ageMs < s.ageMs ? l : s;
+    return s || l;
   }
 
   // "0.6 mi away · 20 min ago" — or "" (no position of mine, or theirs)

@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "Ακύρωση αιτήματος"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "Ακύρωση αιτήματος: {name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "Ακύρωσε πρώτα το αίτημα διαδρομής σου"
 
@@ -169,6 +173,10 @@ msgstr "Συνομιλίες"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "Έλεγξε: {fields} (έως {max} γράμματα το καθένα)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "Γίνεται έλεγχος…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "Επίλεξε…"
@@ -205,14 +213,6 @@ msgstr "Η σύνδεση διακόπηκε — πάτησε ΣΕ ΥΠΗΡΕΣ�
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "Η σύνδεση διακόπηκε — πάτησε ξανά ✋ αν χρειάζεσαι ακόμα διαδρομή"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "Η σύνδεση διακόπηκε — η διαδρομή σου τερματίστηκε απρόσμενα, κανόνισέ τη ξανά"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "Η σύνδεση διακόπηκε — το αίτημα διαδρομής σου χάθηκε, ζήτησέ το ξανά"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Συνέχεια με Facebook"
@@ -244,6 +244,10 @@ msgstr "Δεν ήταν δυνατός ο αποκλεισμός — δοκίμ�
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "Δεν ήταν δυνατός ο έλεγχος του προγράμματος περιήγησής σου — επίτρεψε το challenges.cloudflare.com ή δοκίμασε άλλο πρόγραμμα περιήγησης"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "Δεν ήταν δυνατή η επιβεβαίωση. Δες τα Αποκλεισμένα άτομα"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "κίτρινο"
 msgid "You already have an open request"
 msgstr "Έχεις ήδη ανοιχτό αίτημα"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "Έχεις ήδη ανοιχτό αίτημα διαδρομής: {name}"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "Μπορείς να κάνεις ανανέωση μετά τη διαδρομή σου"
@@ -904,6 +912,14 @@ msgstr "Το αυτοκίνητό σου"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "Το όνομα και η φωτογραφία σου προέρχονται από: {provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "Η διαδρομή σου τελείωσε"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "Το αίτημα διαδρομής σου έληξε. Ζήτα ξανά αν χρειάζεσαι ακόμα διαδρομή"
 
 #: priv/static/app.js
 msgid "Your rider"

@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "ביטול הבקשה"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "ביטול הבקשה ל־{name}"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "קודם צריך לבטל את בקשת הנסיעה"
 
@@ -169,6 +173,10 @@ msgstr "צ׳אטים"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "צריך לבדוק את השדות: {fields} (עד {max} תווים בכל אחד)."
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "בודק…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "בחירה…"
@@ -205,14 +213,6 @@ msgstr "החיבור אופס — מקישים על התחברות כדי לחז
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "החיבור אופס — אם עדיין צריך נסיעה, מקישים שוב על ✋"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "החיבור אופס — הנסיעה הסתיימה באופן לא צפוי, צריך לתאם אותה מחדש"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "החיבור אופס — בקשת הנסיעה אבדה, צריך לבקש שוב"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "המשך עם Facebook"
@@ -244,6 +244,10 @@ msgstr "החסימה נכשלה — כדאי לנסות שוב"
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "לא ניתן היה לבדוק את הדפדפן — כדאי לאפשר את challenges.cloudflare.com, או לנסות דפדפן אחר"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "לא ניתן לאשר — כדאי לבדוק באנשים חסומים"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "צהובה"
 msgid "You already have an open request"
 msgstr "כבר יש לך בקשה פתוחה"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "כבר ביקשת נסיעה מ־{name}"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "אפשר לרענן אחרי הנסיעה"
@@ -904,6 +912,14 @@ msgstr "הרכב שלך"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "השם והתמונה שלך מגיעים מ-{provider}"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "הנסיעה שלך הסתיימה"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "בקשת הנסיעה שלך הסתיימה — אפשר לבקש שוב אם עדיין צריך נסיעה"
 
 #: priv/static/app.js
 msgid "Your rider"

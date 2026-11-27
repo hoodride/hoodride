@@ -25,6 +25,8 @@ defmodule Hoodride.TestHelpers do
     :session_token_loaded,
     :chat_sent_ids,
     :request_spots,
+    # a request's place among the messages
+    :request_after,
     :geo_drivers,
     :geo_hands,
     :geo_presence,

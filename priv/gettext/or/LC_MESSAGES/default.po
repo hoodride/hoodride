@@ -122,6 +122,10 @@ msgid "Cancel request"
 msgstr "ଅନୁରୋଧ ବାତିଲ କରନ୍ତୁ"
 
 #: priv/static/app.js
+msgid "Cancel request to {name}"
+msgstr "{name}ଙ୍କୁ କରାଯାଇଥିବା ଅନୁରୋଧ ବାତିଲ କରନ୍ତୁ"
+
+#: priv/static/app.js
 msgid "Cancel your ride request first"
 msgstr "ପ୍ରଥମେ ଆପଣଙ୍କ ରାଇଡ ଅନୁରୋଧ ବାତିଲ କରନ୍ତୁ"
 
@@ -169,6 +173,10 @@ msgstr "ଚାଟଗୁଡ଼ିକ"
 msgid "Check the {fields} (up to {max} letters each)."
 msgstr "ଯାଞ୍ଚ କରନ୍ତୁ: {fields} (ପ୍ରତ୍ୟେକରେ ସର୍ବାଧିକ {max} ଅକ୍ଷର)।"
 
+#: priv/static/app.js
+msgid "Checking…"
+msgstr "ଯାଞ୍ଚ କରାଯାଉଛି…"
+
 #: priv/static/index.html
 msgid "Choose…"
 msgstr "ବାଛନ୍ତୁ…"
@@ -205,14 +213,6 @@ msgstr "ସଂଯୋଗ ରିସେଟ ହୋଇଛି — ପୁଣି ଡ୍�
 msgid "Connection reset — tap ✋ again if you still need a ride"
 msgstr "ସଂଯୋଗ ରିସେଟ ହୋଇଛି — ଯଦି ଆପଣଙ୍କୁ ଏବେ ବି ରାଇଡ ଦରକାର, ✋ ପୁଣି ଟାପ କରନ୍ତୁ"
 
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride ended unexpectedly, please set it up again"
-msgstr "ସଂଯୋଗ ରିସେଟ ହୋଇଛି — ଆପଣଙ୍କ ରାଇଡ ଅପ୍ରତ୍ୟାଶିତ ଭାବେ ଶେଷ ହୋଇଗଲା, ଦୟାକରି ପୁଣି ସେଟ କରନ୍ତୁ"
-
-#: priv/static/rehydrate.js
-msgid "Connection reset — your ride request was lost, please ask again"
-msgstr "ସଂଯୋଗ ରିସେଟ ହୋଇଛି — ଆପଣଙ୍କ ରାଇଡ ଅନୁରୋଧ ହଜିଗଲା, ଦୟାକରି ପୁଣି ମାଗନ୍ତୁ"
-
 #: priv/static/index.html
 msgid "Continue with Facebook"
 msgstr "Facebook ସହ ଜାରି ରଖନ୍ତୁ"
@@ -244,6 +244,10 @@ msgstr "ବ୍ଲକ କରିହେଲା ନାହିଁ — ପୁଣି ଚ�
 #: priv/static/app.js
 msgid "Couldn't check your browser — allow challenges.cloudflare.com, or try another browser"
 msgstr "ଆପଣଙ୍କ ବ୍ରାଉଜର ଯାଞ୍ଚ କରିହେଲା ନାହିଁ — challenges.cloudflare.com କୁ ଅନୁମତି ଦିଅନ୍ତୁ, କିମ୍ବା ଅନ୍ୟ ବ୍ରାଉଜର ଚେଷ୍ଟା କରନ୍ତୁ"
+
+#: priv/static/app.js
+msgid "Couldn't confirm — check Blocked people"
+msgstr "ନିଶ୍ଚିତ କରିହେଲା ନାହିଁ — ବ୍ଲକ୍ କରାଯାଇଥିବା ଲୋକଙ୍କୁ ଦେଖନ୍ତୁ"
 
 #: priv/static/app.js
 msgid "Couldn't copy"
@@ -845,6 +849,10 @@ msgstr "ହଳଦିଆ"
 msgid "You already have an open request"
 msgstr "ଆପଣଙ୍କର ପୂର୍ବରୁ ଏକ ଖୋଲା ଅନୁରୋଧ ଅଛି"
 
+#: priv/static/app.js
+msgid "You already requested a ride from {name}"
+msgstr "ଆପଣ ପୂର୍ବରୁ {name}ଙ୍କୁ ରାଇଡ ପାଇଁ ଅନୁରୋଧ କରିସାରିଛନ୍ତି"
+
 #: priv/static/index.html
 msgid "You can refresh after your ride"
 msgstr "ରାଇଡ ପରେ ଆପଣ ରିଫ୍ରେସ କରିପାରିବେ"
@@ -904,6 +912,14 @@ msgstr "ଆପଣଙ୍କ କାର"
 #: priv/static/app.js
 msgid "Your name and photo come from {provider}"
 msgstr "ଆପଣଙ୍କ ନାମ ଏବଂ ଫଟୋ {provider} ରୁ ଆସେ"
+
+#: priv/static/rehydrate.js
+msgid "Your ride ended"
+msgstr "ଆପଣଙ୍କ ଯାତ୍ରା ଶେଷ ହେଲା"
+
+#: priv/static/rehydrate.js
+msgid "Your ride request ended — ask again if you still need a ride"
+msgstr "ଆପଣଙ୍କ ଯାତ୍ରା ଅନୁରୋଧ ଶେଷ ହେଲା — ଏବେ ବି ଯାତ୍ରା ଦରକାର ହେଲେ ପୁଣି ମାଗନ୍ତୁ"
 
 #: priv/static/app.js
 msgid "Your rider"
